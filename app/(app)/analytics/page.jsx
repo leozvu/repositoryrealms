@@ -10,6 +10,7 @@ export default function AnalyticsPage() {
   const clients = useResource('clients');
   const leads = useResource('leads');
   const nps = useResource('nps');
+  const csat = useResource('csat');
   const [modal, setModal] = useState(null);
   const toast = useToast();
   if (invoices.forbidden && nps.forbidden) return <Forbidden />;
@@ -55,6 +56,33 @@ export default function AnalyticsPage() {
     newC.push(nw); retC.push(ret);
   }
 
+  /* ---------- v3.3: Cohort retention — nhóm khách theo tháng có hóa đơn đầu tiên ---------- */
+  const mAdd = (k, o) => { const d = new Date(+k.slice(0, 4), +k.slice(5, 7) - 1 + o, 1); return localISO(d).slice(0, 7); };
+  const firstInvOf = {};
+  invoices.rows.filter(v => v.status !== 'draft').forEach(v => {
+    const k = monthKey(v.date);
+    if (!firstInvOf[v.clientId] || k < firstInvOf[v.clientId]) firstInvOf[v.clientId] = k;
+  });
+  const nowK = mk(0);
+  const cohorts = [];
+  for (let i = -5; i <= 0; i++) {
+    const cm = mk(i);
+    const members = Object.keys(firstInvOf).filter(c => firstInvOf[c] === cm);
+    if (!members.length) continue;
+    const cells = [];
+    for (let o = 0; ; o++) {
+      const tm = mAdd(cm, o);
+      if (tm > nowK) break;
+      const active = members.filter(c => invoices.rows.some(v => v.clientId === c && v.status !== 'draft' && monthKey(v.date) === tm)).length;
+      cells.push(Math.round(active / members.length * 100));
+    }
+    cohorts.push({ month: cm, size: members.length, cells });
+  }
+  const maxOffsets = Math.max(0, ...cohorts.map(c => c.cells.length));
+
+  /* ---------- v3.3: CSAT ---------- */
+  const avgCsat = csat.rows.length ? (csat.rows.reduce((s, c) => s + c.score, 0) / csat.rows.length) : null;
+
   /* ---------- NPS ---------- */
   const promoters = nps.rows.filter(r => r.score >= 9).length;
   const detractors = nps.rows.filter(r => r.score <= 6).length;
@@ -81,7 +109,39 @@ export default function AnalyticsPage() {
         <div className="card kpi"><span className="kpi-label">NPS</span>
           <div className="kpi-value" style={{ color: npsScore === null ? 'inherit' : npsScore >= 50 ? 'var(--accent)' : npsScore >= 0 ? 'var(--warn)' : 'var(--danger)' }}>{npsScore === null ? '—' : npsScore}</div>
           <div className="kpi-sub">{nps.rows.length} phản hồi · {promoters} promoter / {detractors} detractor</div></div>
+        <div className="card kpi"><span className="kpi-label">CSAT (hài lòng hỗ trợ)</span>
+          <div className="kpi-value" style={{ color: avgCsat === null ? 'inherit' : avgCsat >= 4 ? 'var(--accent)' : avgCsat >= 3 ? 'var(--warn)' : 'var(--danger)' }}>{avgCsat !== null ? avgCsat.toFixed(1) + ' ★' : '—'}</div>
+          <div className="kpi-sub">{csat.rows.length} đánh giá từ ticket hỗ trợ</div></div>
       </div>
+
+      {/* v3.3: Cohort retention matrix */}
+      {cohorts.length > 0 && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <div className="card-head"><span className="card-title">Cohort retention — % khách còn phát sinh hóa đơn sau N tháng</span></div>
+          <div className="card-body" style={{ overflowX: 'auto' }}>
+            <table style={{ fontSize: '.8rem' }}>
+              <thead><tr>
+                <th>Cohort (tháng có HĐ đầu)</th><th>Số khách</th>
+                {Array.from({ length: maxOffsets }, (_, o) => <th key={o} style={{ textAlign: 'center' }}>+{o} th</th>)}
+              </tr></thead>
+              <tbody>
+                {cohorts.map(c => (
+                  <tr key={c.month}>
+                    <td><b>{+c.month.slice(5)}/{c.month.slice(0, 4)}</b></td>
+                    <td>{c.size}</td>
+                    {Array.from({ length: maxOffsets }, (_, o) => {
+                      const pct = c.cells[o];
+                      if (pct === undefined) return <td key={o}></td>;
+                      return <td key={o} style={{ textAlign: 'center', fontWeight: 700, borderRadius: 6, background: `rgba(37,99,235,${0.08 + pct / 100 * 0.72})`, color: pct > 55 ? '#fff' : 'inherit' }}>{pct}%</td>;
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p style={{ fontSize: '.74rem', color: 'var(--muted)', marginTop: 8 }}>Đọc theo hàng: 100 khách bắt đầu tháng đó, sau N tháng còn bao nhiêu % tiếp tục có hóa đơn. Ô càng đậm = giữ chân càng tốt.</p>
+          </div>
+        </div>
+      )}
 
       <div className="grid two-col" style={{ marginTop: 16 }}>
         <div className="card">

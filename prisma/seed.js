@@ -182,6 +182,13 @@ async function main() {
 
   await prisma.invoice.create({ data: { code: 'INV-2026-006', clientId: minhphat.id, projectId: p4.id, items: J([{ desc: 'Bộ nhận diện — đợt 1 (50%)', qty: 1, price: 22500000 }]), vat: 8, status: 'draft', date: D(-2), dueDate: D(+15), payments: '[]' } });
 
+  // Hóa đơn cũ — nuôi cohort matrix: Spa churn sau 2 tháng, Cà phê retain đều
+  const spaItems = [{ desc: 'Gói social + ads tháng', qty: 1, price: 12000000 }];
+  const spaGrand = grandOf(spaItems);
+  await prisma.invoice.create({ data: { code: 'INV-CU-001', clientId: spa.id, items: J(spaItems), vat: 8, status: 'paid', date: MD(-4, 5), dueDate: MD(-4, 15), paidDate: MD(-4, 12), payments: J([{ id: 'p1', amount: spaGrand, date: MD(-4, 12), note: 'CK' }]) } });
+  await prisma.invoice.create({ data: { code: 'INV-CU-002', clientId: spa.id, items: J(spaItems), vat: 8, status: 'paid', date: MD(-3, 5), dueDate: MD(-3, 15), paidDate: MD(-3, 14), payments: J([{ id: 'p1', amount: spaGrand, date: MD(-3, 14), note: 'CK' }]) } });
+  await prisma.invoice.create({ data: { code: 'INV-CU-003', clientId: cafe.id, items: J(retItems), vat: 8, status: 'paid', date: MD(-2, 1), dueDate: MD(-2, 10), paidDate: MD(-2, 9), payments: J([{ id: 'p1', amount: retGrand, date: MD(-2, 9), note: 'CK' }]), recurring: true, recGroup: 'RET-CAFE' } });
+
   /* ---------- Sổ quỹ: 4 tháng thu chi — dòng tiền dương, thu tháng này > cùng kỳ ---------- */
   const tx = [];
   const inc = (amount, date, desc, projectId) => tx.push({ type: 'income', category: 'Doanh thu dịch vụ', amount, date, desc, projectId: projectId || null });
@@ -363,6 +370,16 @@ async function main() {
     data: [
       { convId: grp.id, senderId: pm.id, content: 'Khách phản hồi key visual: đổi tone ấm hơn, Hà xem giúp nhé.', createdAt: DT(-20) },
       { convId: grp.id, senderId: nhanvien.id, content: 'Ok anh, em gửi bản chỉnh trước 5h chiều nay.', createdAt: DT(-19) },
+    ],
+  });
+
+  /* ---------- CSAT theo ticket đã xử lý (v3.3) ---------- */
+  const tkResolved = await prisma.ticket.findFirst({ where: { code: 'TK-2026-004' } });
+  const tkClosed = await prisma.ticket.findFirst({ where: { code: 'TK-2026-005' } });
+  await prisma.csatResponse.createMany({
+    data: [
+      { ticketId: tkResolved?.id, clientId: eva.id, score: 5, date: D(-1), comment: 'Xuất lại báo cáo nhanh, cảm ơn team!' },
+      { ticketId: tkClosed?.id, clientId: minhphat.id, score: 4, date: D(-7), comment: 'Hướng dẫn rõ ràng' },
     ],
   });
 

@@ -1,7 +1,27 @@
 'use client';
 import { useState } from 'react';
-import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
-import { initials } from '@/lib/format';
+import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Modal, useToast } from '@/components/ui';
+import { initials, todayISO } from '@/lib/format';
+
+/* v3.3: modal chấm CSAT 1-5 sao sau khi xử lý xong ticket */
+function CsatModal({ ticket, onSave, onClose }) {
+  const [score, setScore] = useState(5);
+  const [comment, setComment] = useState('');
+  return (
+    <Modal title={`Khách đánh giá — ${ticket.code}`} onClose={onClose}
+      footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
+        <button className="btn btn-primary" onClick={() => { onSave(score, comment); onClose(); }}>Lưu đánh giá</button></>}>
+      <p style={{ fontSize: '.85rem', marginBottom: 10 }}>Hỏi khách: "Anh/chị hài lòng thế nào với lần hỗ trợ này?" (1 = tệ, 5 = tuyệt vời)</p>
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 12 }}>
+        {[1, 2, 3, 4, 5].map(n => (
+          <button key={n} onClick={() => setScore(n)}
+            style={{ fontSize: '1.6rem', background: 'none', border: 'none', cursor: 'pointer', opacity: n <= score ? 1 : .25 }}>⭐</button>
+        ))}
+      </div>
+      <textarea placeholder="Góp ý của khách (tùy chọn)" value={comment} onChange={e => setComment(e.target.value)} style={{ width: '100%' }} />
+    </Modal>
+  );
+}
 
 const PRIORITY = { urgent: ['Khẩn cấp', 'b-red', 4], high: ['Cao', 'b-amber', 8], normal: ['Thường', 'b-blue', 24], low: ['Thấp', 'b-gray', 72] };
 const STATUS = { open: ['Mới', 'b-red'], in_progress: ['Đang xử lý', 'b-blue'], waiting: ['Chờ khách', 'b-amber'], resolved: ['Đã xử lý', 'b-green'], closed: ['Đóng', 'b-gray'] };
@@ -18,6 +38,10 @@ export default function TicketsPage() {
   const { rows, create, update, remove } = useResource('tickets');
   const clients = useResource('clients');
   const users = useResource('users');
+  const csat = useResource('csat');
+  const csatOf = tid => csat.rows.find(c => c.ticketId === tid);
+  const csatMonth = csat.rows.filter(c => c.date && c.date.slice(0, 7) === todayISO().slice(0, 7));
+  const avgCsat = csat.rows.length ? (csat.rows.reduce((s, c) => s + c.score, 0) / csat.rows.length).toFixed(1) : null;
   const [f, setF] = useState('openish');
   const [modal, setModal] = useState(null);
   const toast = useToast();
@@ -62,6 +86,9 @@ export default function TicketsPage() {
         <div className="card kpi"><span className="kpi-label">Vỡ SLA</span><div className="kpi-value" style={{ color: breach.length ? 'var(--danger)' : 'var(--accent)' }}>{breach.length}</div></div>
         <div className="card kpi"><span className="kpi-label">Thời gian xử lý TB (tháng)</span><div className="kpi-value">{avgHours !== null ? avgHours + 'h' : '—'}</div>
           <div className="kpi-sub">{resolvedThisMonth.length} ticket đã xử lý</div></div>
+        <div className="card kpi"><span className="kpi-label">CSAT (hài lòng hỗ trợ)</span>
+          <div className="kpi-value" style={{ color: avgCsat === null ? 'inherit' : avgCsat >= 4 ? 'var(--accent)' : avgCsat >= 3 ? 'var(--warn, #D97706)' : 'var(--danger)' }}>{avgCsat !== null ? avgCsat + ' ★' : '—'}</div>
+          <div className="kpi-sub">{csat.rows.length} đánh giá · {csatMonth.length} trong tháng</div></div>
       </div>
       <div className="toolbar">
         <select className="filter" value={f} onChange={e => setF(e.target.value)}>
@@ -94,6 +121,10 @@ export default function TicketsPage() {
                     {!['resolved', 'closed'].includes(t.status) &&
                       <button className="icon-btn" style={{ color: 'var(--accent)' }} title="Đánh dấu đã xử lý"
                         onClick={async () => { await update(t.id, { status: 'resolved', resolvedAt: new Date().toISOString() }); toast('Đã xử lý ' + t.code); }}><Icon name="check" size={16} /></button>}
+                    {['resolved', 'closed'].includes(t.status) && (csatOf(t.id)
+                      ? <span title={csatOf(t.id).comment || 'Đánh giá của khách'} style={{ fontSize: '.78rem', fontWeight: 700, color: 'var(--warn, #D97706)', alignSelf: 'center' }}>★{csatOf(t.id).score}</span>
+                      : <button className="icon-btn" title="Ghi đánh giá CSAT của khách" style={{ color: 'var(--warn, #D97706)' }}
+                          onClick={() => setModal({ mode: 'csat', row: t })}>⭐</button>)}
                     <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: t })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
                     <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: t })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
                   </div></td>
@@ -110,6 +141,11 @@ export default function TicketsPage() {
         onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, payload(d, false, modal.row)); toast('Đã cập nhật'); }} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa ticket ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
+      {modal?.mode === 'csat' && <CsatModal ticket={modal.row} onClose={() => setModal(null)}
+        onSave={async (score, comment) => {
+          await csat.create({ ticketId: modal.row.id, clientId: modal.row.clientId || null, score, date: todayISO(), comment: comment || null });
+          toast('Đã ghi đánh giá ★' + score);
+        }} />}
     </>
   );
 }
