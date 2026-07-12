@@ -1,11 +1,11 @@
 # Đối chiếu yêu cầu ERP đầy đủ ↔ hệ thống hiện tại
-> Cập nhật 12/07/2026 — sau v3.3. Ký hiệu: ✅ đã có · 🟡 có một phần · 🔨 nên xây tiếp · 🔌 nên tích hợp dịch vụ ngoài (không tự xây) · ⛔ không phù hợp agency 10–25 người
+> Cập nhật 12/07/2026 — sau v3.4. Ký hiệu: ✅ đã có · 🟡 có một phần · 🔨 nên xây tiếp · 🔌 nên tích hợp dịch vụ ngoài (không tự xây) · ⛔ không phù hợp agency 10–25 người
 
 | # | Nhóm yêu cầu | Trạng thái | Ghi chú |
 |---|---|---|---|
 | I | **CEO Dashboard + AI Summary** | ✅ | Doanh thu, lợi nhuận, AR/AP, pipeline + conversion, khách active, utilization, burn rate, project health, ticket/SLA, việc hôm nay + **AI Summary** (churn, quá hạn, deal ứ đọng, hợp đồng hết hạn…) lọc theo vai trò |
-| II | **CRM** (lead, contact, company, pipeline, activity) | ✅ | Pipeline kanban + **AI Lead Score**, khách hàng + nhật ký hoạt động, nguồn lead. 🔨 v tiếp: company nhiều contact, timeline gộp email/call |
-| III | **Sales** (quote→contract→invoice→recurring) | ✅ | Báo giá→hóa đơn→thu từng phần→retainer + hợp đồng + duyệt theo ngưỡng + **hoa hồng sales (v3.2)**. 🔨: forecast theo pipeline. 🔌 E-sign: DocuSign/SignNow |
+| II | **CRM** (lead, contact, company, pipeline, activity) | ✅ | Pipeline kanban + AI Lead Score + **hồ sơ khách 360° với nhiều contact + timeline gộp (v3.4)** + chăm lead tự động (cảnh báo 48h, tự chia AM) |
+| III | **Sales** (quote→contract→invoice→recurring) | ✅ | Báo giá→hóa đơn→thu từng phần→retainer + hợp đồng + duyệt theo ngưỡng + hoa hồng (v3.2) + **forecast theo pipeline weighted xác suất (v3.4)**. 🔌 E-sign: DocuSign/SignNow |
 | IV | **Marketing** (email, automation, ads, funnel) | 🔌 | Nên dùng Mailchimp/Brevo (email), còn **Facebook Ads + ClickUp đã kết nối trong Claude** — kéo được số liệu ads về báo cáo. 🔨 nhỏ: UTM/coupon tracking |
 | V | **Customer Success** (ticket, SLA, NPS, churn) | ✅ | Ticket + SLA tự tính + cảnh báo vỡ SLA (v2.4) · NPS (v2.5) · **CSAT 1-5★ theo ticket (v3.3)** · churn prediction trong AI Summary. 🔌 Live chat: Tawk.to (miễn phí) |
 | VI | **Project Management** | ✅ | Kanban, deadline, tiến độ, giờ công, lợi nhuận dự án + **Gantt milestone + phụ thuộc công việc, chặn hoàn thành sai thứ tự (v3.2)** |
@@ -30,5 +30,6 @@
 
 ## Đề xuất thứ tự tiếp theo
 1. **Deploy cloud** (Vercel + Supabase) — cần tạo tài khoản Supabase/Vercel; đưa team vào dùng thật để AI có dữ liệu thật
-2. **v3.4**: đồng bộ Google Calendar 2 chiều (OAuth — cần Google Cloud project) · forecast doanh thu theo pipeline · custom dashboard builder · company nhiều contact + timeline gộp
-3. **Tích hợp**: kéo số liệu Facebook Ads/ClickUp về báo cáo (đã có MCP trong Claude, hoặc n8n qua API mở v3.3) · e-sign · đối soát ngân hàng
+2. **v3.5 — ERP vận hành**: chuông thông báo gom một chỗ · resource planning (ma trận người × tuần, cảnh báo quá tải) · gắn link tài liệu vào dự án/khách/hợp đồng · in PDF hợp đồng + RFQ so giá NCC · HR onboarding checklist
+3. **Chờ tài khoản ngoài**: Google Calendar 2 chiều (Google Cloud OAuth) · gửi email báo giá/hóa đơn (SMTP/Resend) · đối soát ngân hàng · e-sign
+4. **Tích hợp**: kéo số liệu Facebook Ads/ClickUp về báo cáo (n8n qua API mở v3.3 hoặc MCP trong Claude) · custom dashboard builder

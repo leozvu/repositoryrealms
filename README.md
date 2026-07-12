@@ -1,4 +1,4 @@
-# Agency ERP v3.3 — Đa người dùng, phân quyền theo cấp bậc
+# Agency ERP v3.4 — Đa người dùng, phân quyền theo cấp bậc
 
 Next.js 14 + Prisma + NextAuth. Dev chạy SQLite ngay trên máy, deploy đổi sang Postgres.
 
@@ -71,6 +71,13 @@ npm run dev          # → http://localhost:3300
 - **Tự động hóa IF/THEN** (menu mới, Giám đốc): "KHI lead cập nhật VÀ stage = won THÌ nhắn Kênh chung + tạo việc cho AM" — điều kiện `= != > < contains changed`, hành động nhắn kênh chung / tạo việc / gọi webhook, template `{trường}` chèn dữ liệu
 - **Xuất lịch ICS**: nút "📅 Link ICS" trên trang Lịch — subscribe vào Google/Apple Calendar là việc, deadline, mốc, nghỉ phép, hạn thu tự đổ về (không cần OAuth)
 - **CSAT + cohort**: chấm 1-5★ sau mỗi ticket xử lý xong; Analytics thêm KPI CSAT + bảng cohort retention theo tháng
+
+**v3.4 — CRM Pro**:
+- **Hồ sơ khách 360°**: click tên khách → trang riêng với KPI (doanh thu lũy kế, công nợ, NPS/CSAT của khách), **danh bạ nhiều người liên hệ** (chức vụ, người chính) và **dòng thời gian gộp** mọi tương tác: hoạt động CRM, báo giá, hóa đơn, dự án, ticket, khảo sát
+- **Sales forecast**: lead có "ngày dự kiến chốt" + xác suất theo giai đoạn (chỉnh trong Cài đặt) → biểu đồ dự báo doanh thu 3 tháng so mục tiêu, insight trong AI Summary
+- **Chăm lead tự động**: cảnh báo đỏ lead mới quá 48h chưa liên hệ; tự chia lead chưa gán cho AM ít lead nhất (bật trong Cài đặt)
+- **Tìm kiếm toàn cục Ctrl+K**: khách, lead, dự án, việc, hóa đơn, ticket, NCC, hợp đồng, nhân sự — tôn trọng phân quyền
+- **Xuất CSV**: khách hàng, pipeline, hóa đơn, giờ công (BOM UTF-8, Excel đọc tiếng Việt chuẩn)
 
 ## Import dữ liệu từ bản offline v1
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**
