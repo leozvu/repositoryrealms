@@ -1,12 +1,77 @@
 'use client';
 // Khung ứng dụng v2.1: sidebar theo 7 vai trò + badge phê duyệt
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { SessionProvider, signOut } from 'next-auth/react';
 import { Icon, Modal, ToastProvider, useToast } from './ui';
 import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
+
+// v3.4: tìm kiếm toàn cục Ctrl+K — gom mọi resource user được đọc
+const SEARCH_GROUPS = [
+  { res: 'clients', label: 'Khách hàng', icon: 'clients', text: r => [r.name, r.contact, r.industry, r.phone], title: r => r.name, sub: r => r.industry || '', href: r => `/clients/${r.id}` },
+  { res: 'leads', label: 'Khách tiềm năng', icon: 'leads', text: r => [r.name, r.company, r.phone, r.email], title: r => r.company || r.name, sub: r => r.name, href: () => '/leads' },
+  { res: 'projects', label: 'Dự án', icon: 'projects', text: r => [r.name, r.service], title: r => r.name, sub: r => r.service || '', href: () => '/projects' },
+  { res: 'tasks', label: 'Công việc', icon: 'tasks', text: r => [r.title, r.note], title: r => r.title, sub: r => r.status, href: () => '/tasks' },
+  { res: 'invoices', label: 'Hóa đơn', icon: 'invoices', text: r => [r.code], title: r => r.code, sub: r => r.date, href: () => '/invoices' },
+  { res: 'tickets', label: 'Ticket', icon: 'check', text: r => [r.code, r.title], title: r => `${r.code}: ${r.title}`, sub: r => r.status, href: () => '/tickets' },
+  { res: 'vendors', label: 'Nhà cung cấp', icon: 'wallet', text: r => [r.name, r.type], title: r => r.name, sub: r => r.type || '', href: () => '/vendors' },
+  { res: 'contracts', label: 'Hợp đồng', icon: 'shield', text: r => [r.code, r.partner], title: r => `${r.code} — ${r.partner}`, sub: r => r.endDate || '', href: () => '/contracts' },
+  { res: 'users', label: 'Nhân sự', icon: 'staff', text: r => [r.name, r.email, r.title], title: r => r.name, sub: r => r.title || '', href: () => '/staff' },
+];
+
+function GlobalSearch({ onClose }) {
+  const [q, setQ] = useState('');
+  const [data, setData] = useState({});
+  const router = useRouter();
+  useEffect(() => {
+    let alive = true;
+    Promise.all(SEARCH_GROUPS.map(async g => {
+      const res = await fetch('/api/data/' + g.res).catch(() => null);
+      return [g.res, res?.ok ? await res.json() : []];
+    })).then(pairs => alive && setData(Object.fromEntries(pairs)));
+    return () => { alive = false; };
+  }, []);
+
+  const results = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (needle.length < 2) return [];
+    return SEARCH_GROUPS.map(g => ({
+      ...g,
+      items: (data[g.res] || []).filter(r => g.text(r).filter(Boolean).join(' ').toLowerCase().includes(needle)).slice(0, 5),
+    })).filter(g => g.items.length);
+  }, [q, data]);
+
+  const go = (g, r) => { onClose(); router.push(g.href(r)); };
+
+  return (
+    <Modal title="Tìm kiếm toàn hệ thống" onClose={onClose}>
+      <input autoFocus placeholder="Gõ tên khách, deal, dự án, việc, hóa đơn, ticket… (≥2 ký tự)" value={q}
+        onChange={e => setQ(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter' && results[0]?.items[0]) go(results[0], results[0].items[0]); }}
+        style={{ width: '100%', marginBottom: 10 }} />
+      <div style={{ maxHeight: 380, overflowY: 'auto' }}>
+        {results.map(g => (
+          <div key={g.res}>
+            <div className="nav-section" style={{ padding: '8px 0 2px' }}>{g.label}</div>
+            {g.items.map(r => (
+              <div key={r.id} className="act-item" style={{ cursor: 'pointer', alignItems: 'center' }} onClick={() => go(g, r)}>
+                <span style={{ color: 'var(--muted)', flex: 'none', display: 'flex' }}><Icon name={g.icon} size={15} /></span>
+                <div style={{ flex: 1 }}>
+                  <div className="act-title">{g.title(r)}</div>
+                  <div className="act-sub">{g.sub(r)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+        {q.trim().length >= 2 && !results.length && <p style={{ fontSize: '.83rem', color: 'var(--muted)' }}>Không tìm thấy "{q}".</p>}
+        {q.trim().length < 2 && <p style={{ fontSize: '.78rem', color: 'var(--muted)' }}>Mẹo: mở nhanh bằng <b>Ctrl+K</b> ở bất kỳ đâu. Kết quả tôn trọng phân quyền của bạn.</p>}
+      </div>
+    </Modal>
+  );
+}
 
 // v3.2: modal bật/tắt đăng nhập 2 lớp TOTP cho tài khoản của mình
 function TwoFAModal({ onClose }) {
@@ -105,6 +170,7 @@ export default function Shell({ user, company, children }) {
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadChat, setUnreadChat] = useState(0);
   const [show2fa, setShow2fa] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const pathname = usePathname();
   const current = NAV.find(n => n.key && pathname.startsWith('/' + n.key));
   const myRoles = rolesOf(user);
@@ -124,6 +190,12 @@ export default function Shell({ user, company, children }) {
 
   useEffect(() => { // PWA: đăng ký service worker
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }, []);
+
+  useEffect(() => { // v3.4: Ctrl+K mở tìm kiếm toàn cục
+    const h = e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setShowSearch(true); } };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
   }, []);
 
   return (
@@ -171,12 +243,16 @@ export default function Shell({ user, company, children }) {
           </div>
         </aside>
         {show2fa && <TwoFAModal onClose={() => setShow2fa(false)} />}
+        {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
         <div id="backdrop" className={open ? 'show' : ''} onClick={() => setOpen(false)}></div>
         <div id="main">
           <header id="topbar">
             <button id="menu-btn" onClick={() => setOpen(true)} aria-label="Mở menu"><Icon name="menu" /></button>
             <h1 id="page-title">{current?.label || 'Agency ERP'}</h1>
             <div className="topbar-right">
+              <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
+                <Icon name="search" size={14} /><span> Ctrl+K</span>
+              </button>
               <span id="today-label">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
               <span className={`role-chip role-${myRoles[0]}`}>{myRoles.map(r => ROLE_LABEL[r] || r).join(' · ')}</span>
             </div>
