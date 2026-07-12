@@ -24,6 +24,7 @@ model User {
   phone        String?
   salary       Int       @default(0) // chỉ DIRECTOR và chính chủ được xem
   status       String    @default("active") // active | inactive
+  totpSecret   String? // v3.2: 2FA TOTP — null = chưa bật
   createdAt    DateTime  @default(now())
   tasks        Task[]
   timeLogs     TimeLog[]

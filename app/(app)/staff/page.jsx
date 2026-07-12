@@ -8,7 +8,7 @@ import { ROLES, ROLE_LABEL, rolesOf, hasAny, isDirector } from '@/lib/perm';
 /* ---------- Modal tài khoản: đa vai trò (checkbox) + nhóm ---------- */
 function UserModal({ row, teams, canRoles, onSave, onClose }) {
   const [f, setF] = useState(() => row
-    ? { name: row.name, title: row.title || '', phone: row.phone || '', salary: row.salary || 0, teamId: row.teamId || '', status: row.status, roles: rolesOf(row), password: '' }
+    ? { name: row.name, title: row.title || '', phone: row.phone || '', salary: row.salary || 0, teamId: row.teamId || '', status: row.status, roles: rolesOf(row), password: '', reset2fa: false }
     : { name: '', email: '', password: '', title: '', phone: '', salary: 0, teamId: '', status: 'active', roles: ['STAFF'] });
   const toggleRole = r => setF(x => ({ ...x, roles: x.roles.includes(r) ? x.roles.filter(v => v !== r) : [...x.roles, r] }));
   const set = (k, v) => setF(x => ({ ...x, [k]: v }));
@@ -43,6 +43,14 @@ function UserModal({ row, teams, canRoles, onSave, onClose }) {
             <div className="hint">Giám đốc = toàn quyền · Trưởng nhóm cần được gán làm lead của một nhóm bên dưới</div>
           </div>
         )}
+        {row && canRoles && (
+          <div className="field full">
+            <label style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer' }}>
+              <input type="checkbox" style={{ width: 'auto' }} checked={!!f.reset2fa} onChange={e => set('reset2fa', e.target.checked)} />
+              Reset đăng nhập 2 lớp (2FA) — dùng khi nhân sự mất điện thoại
+            </label>
+          </div>
+        )}
       </div>
     </Modal>
   );
@@ -73,6 +81,7 @@ export default function StaffPage() {
   const saveUser = async f => {
     const body = { name: f.name, title: f.title, phone: f.phone, salary: +f.salary || 0, teamId: f.teamId || null, status: f.status, roles: f.roles };
     if (f.password) body.password = f.password;
+    if (f.reset2fa) body.reset2fa = true;
     let r;
     if (modal.row) r = await callUsers('PUT', { id: modal.row.id, ...body });
     else {

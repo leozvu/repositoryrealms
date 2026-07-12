@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const router = useRouter();
@@ -13,9 +14,9 @@ export default function LoginPage() {
   const submit = async e => {
     e.preventDefault();
     setBusy(true); setErr('');
-    const res = await signIn('credentials', { email, password, redirect: false });
+    const res = await signIn('credentials', { email, password, otp, redirect: false });
     setBusy(false);
-    if (res?.error) setErr('Email hoặc mật khẩu không đúng');
+    if (res?.error) setErr('Email, mật khẩu hoặc mã 2FA không đúng');
     else { router.push('/dashboard'); router.refresh(); }
   };
 
@@ -34,6 +35,10 @@ export default function LoginPage() {
           <div className="field">
             <label>Mật khẩu</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" />
+          </div>
+          <div className="field">
+            <label>Mã 2FA (bỏ trống nếu chưa bật)</label>
+            <input type="text" inputMode="numeric" maxLength={6} value={otp} onChange={e => setOtp(e.target.value)} placeholder="000000" autoComplete="one-time-code" />
           </div>
           <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px' }} disabled={busy}>
             {busy ? 'Đang đăng nhập…' : 'Đăng nhập'}

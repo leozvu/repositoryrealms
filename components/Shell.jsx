@@ -4,9 +4,59 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SessionProvider, signOut } from 'next-auth/react';
-import { Icon, ToastProvider } from './ui';
+import { Icon, Modal, ToastProvider, useToast } from './ui';
 import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
+
+// v3.2: modal bật/tắt đăng nhập 2 lớp TOTP cho tài khoản của mình
+function TwoFAModal({ onClose }) {
+  const [info, setInfo] = useState(null); // {enabled, secret, url}
+  const [code, setCode] = useState('');
+  const [err, setErr] = useState('');
+  const toast = useToast();
+  useEffect(() => { fetch('/api/users/2fa').then(r => r.json()).then(setInfo); }, []);
+
+  const call = async method => {
+    setErr('');
+    const res = await fetch('/api/users/2fa', {
+      method, headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(method === 'POST' ? { secret: info.secret, code } : { code }),
+    });
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok) { setErr(j.error || 'Có lỗi xảy ra'); return; }
+    toast(method === 'POST' ? 'Đã bật đăng nhập 2 lớp' : 'Đã tắt đăng nhập 2 lớp');
+    onClose();
+  };
+
+  return (
+    <Modal title="Bảo mật — đăng nhập 2 lớp (2FA)" onClose={onClose}
+      footer={<>
+        <button className="btn btn-outline" onClick={onClose}>Đóng</button>
+        {info && (info.enabled
+          ? <button className="btn btn-danger" onClick={() => call('DELETE')}>Tắt 2FA</button>
+          : <button className="btn btn-primary" onClick={() => call('POST')}>Bật 2FA</button>)}
+      </>}>
+      {!info ? <p style={{ fontSize: '.85rem' }}>Đang tải…</p> : info.enabled ? (
+        <div style={{ fontSize: '.85rem', display: 'grid', gap: 10 }}>
+          <p>2FA <b style={{ color: 'var(--accent, #059669)' }}>đang bật</b> cho tài khoản của bạn. Nhập mã hiện tại từ ứng dụng xác thực để tắt.</p>
+          <input value={code} onChange={e => setCode(e.target.value)} placeholder="Mã 6 số" inputMode="numeric" maxLength={6} />
+          {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
+        </div>
+      ) : (
+        <div style={{ fontSize: '.85rem', display: 'grid', gap: 10 }}>
+          <p>1. Mở <b>Google Authenticator</b> (hoặc Authy, 1Password…) → thêm tài khoản → <b>nhập khóa thủ công</b>:</p>
+          <code style={{ padding: '8px 10px', background: 'var(--bg, #f1f5f9)', borderRadius: 8, letterSpacing: 1, wordBreak: 'break-all', fontWeight: 700 }}>
+            {info.secret.match(/.{1,4}/g).join(' ')}
+          </code>
+          <p>2. Nhập mã 6 số ứng dụng hiển thị để xác nhận:</p>
+          <input value={code} onChange={e => setCode(e.target.value)} placeholder="Mã 6 số" inputMode="numeric" maxLength={6} autoFocus />
+          {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
+          <p style={{ color: 'var(--muted)' }}>Sau khi bật, mỗi lần đăng nhập cần thêm mã từ điện thoại. Giữ khóa cẩn thận — mất điện thoại thì nhờ Giám đốc reset trong Hồ sơ nhân sự.</p>
+        </div>
+      )}
+    </Modal>
+  );
+}
 
 // roles: các vai trò được thấy mục này (DIRECTOR luôn thấy tất cả)
 const ALL = ['PM', 'AM', 'ACCOUNTANT', 'HR', 'LEAD', 'STAFF'];
@@ -53,6 +103,7 @@ export default function Shell({ user, company, children }) {
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadChat, setUnreadChat] = useState(0);
+  const [show2fa, setShow2fa] = useState(false);
   const pathname = usePathname();
   const current = NAV.find(n => n.key && pathname.startsWith('/' + n.key));
   const myRoles = rolesOf(user);
@@ -110,11 +161,15 @@ export default function Shell({ user, company, children }) {
               <div className="uc-name">{user.name}</div>
               <div className="uc-role">{myRoles.map(r => ROLE_LABEL[r] || r).join(' · ')}</div>
             </div>
+            <button onClick={() => setShow2fa(true)} title="Bảo mật 2 lớp (2FA)" aria-label="Bảo mật 2 lớp">
+              <Icon name="shield" size={16} />
+            </button>
             <button onClick={() => signOut({ callbackUrl: '/login' })} title="Đăng xuất" aria-label="Đăng xuất">
               <Icon name="logout" size={16} />
             </button>
           </div>
         </aside>
+        {show2fa && <TwoFAModal onClose={() => setShow2fa(false)} />}
         <div id="backdrop" className={open ? 'show' : ''} onClick={() => setOpen(false)}></div>
         <div id="main">
           <header id="topbar">

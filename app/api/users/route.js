@@ -54,6 +54,8 @@ export async function PUT(req) {
     const r = cleanRoles(fields.roles);
     if (r) { data.roles = JSON.stringify(r); data.role = r[0]; }
   }
+  // v3.2: Giám đốc reset 2FA khi nhân sự mất điện thoại
+  if (isDirector(user) && fields.reset2fa) data.totpSecret = null;
   if (password) {
     if (!isDirector(user) && !isSelf) return NextResponse.json({ error: 'Chỉ Giám đốc hoặc chính chủ đổi được mật khẩu' }, { status: 403 });
     if (password.length < 6) return NextResponse.json({ error: 'Mật khẩu tối thiểu 6 ký tự' }, { status: 400 });
