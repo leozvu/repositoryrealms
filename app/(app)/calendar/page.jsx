@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useResource, Modal } from '@/components/ui';
+import { useResource, Modal, useToast } from '@/components/ui';
 import { money, todayISO, remainOf, localISO } from '@/lib/format';
 
 export default function CalendarPage() {
@@ -15,6 +15,16 @@ export default function CalendarPage() {
   const [y, setY] = useState(now.getFullYear());
   const [m, setM] = useState(now.getMonth());
   const [dayModal, setDayModal] = useState(null);
+  const toast = useToast();
+
+  // v3.3: link ICS cá nhân — subscribe vào Google/Apple Calendar
+  const copyIcs = async () => {
+    const r = await fetch('/api/ics');
+    const j = await r.json();
+    if (!r.ok) return toast('Không lấy được link', 'error');
+    try { await navigator.clipboard.writeText(j.url); } catch { prompt('Copy link ICS:', j.url); return; }
+    toast('Đã copy link ICS — vào Google Calendar → Thêm lịch khác → Từ URL rồi dán vào');
+  };
 
   const uName = id => users.rows.find(u => u.id === id)?.name || '—';
   const events = {};
@@ -52,6 +62,7 @@ export default function CalendarPage() {
         <span className="cal-title">Tháng {m + 1}/{y}</span>
         <button className="btn btn-outline btn-sm" onClick={() => go(1)}>→</button>
         <button className="btn btn-outline btn-sm" onClick={() => { setY(now.getFullYear()); setM(now.getMonth()); }}>Hôm nay</button>
+        <button className="btn btn-outline btn-sm" onClick={copyIcs} title="Subscribe lịch này trong Google/Apple Calendar">📅 Link ICS</button>
         <div className="spacer"></div>
         <span className="legend" style={{ margin: 0 }}>
           <span><i style={{ background: '#3B82F6' }}></i>Công việc</span>
