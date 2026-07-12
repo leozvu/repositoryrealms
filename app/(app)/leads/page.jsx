@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useResource, Icon, FormModal, ConfirmDialog, Forbidden, useToast } from '@/components/ui';
+import { useResource, Icon, FormModal, ConfirmDialog, Forbidden, ExportCsv, useToast } from '@/components/ui';
 import { ActivitiesModal } from '@/components/Activities';
 import { BarChart } from '@/components/charts';
 import { money, moneyShort, initials, todayISO, localISO, LEAD_STAGES, leadScore, scoreColor } from '@/lib/format';
@@ -67,6 +67,11 @@ export default function LeadsPage() {
           Pipeline mở: <b style={{ color: 'var(--fg)' }}>{money(open.reduce((s, l) => s + l.value, 0))}</b> · {open.length} cơ hội
         </span>
         <div className="spacer"></div>
+        <ExportCsv rows={rows} name="pipeline" cols={[
+          { label: 'Deal', value: l => l.company || l.name }, { key: 'name', label: 'Người liên hệ' },
+          { key: 'stage', label: 'Giai đoạn' }, { key: 'value', label: 'Giá trị' }, { key: 'source', label: 'Nguồn' },
+          { key: 'expectedClose', label: 'Dự kiến chốt' }, { label: 'Phụ trách', value: l => userName(l.ownerId) },
+        ]} />
         <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm khách tiềm năng</span></button>
       </div>
 

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
+import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, ExportCsv, useToast } from '@/components/ui';
 import { ActivitiesModal } from '@/components/Activities';
 import { initials } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
@@ -32,6 +32,10 @@ export default function ClientsPage() {
       <div className="toolbar">
         <div className="search-box"><Icon name="search" size={15} /><input placeholder="Tìm khách hàng…" value={q} onChange={e => setQ(e.target.value)} /></div>
         <div className="spacer"></div>
+        <ExportCsv rows={filtered} name="khach-hang" cols={[
+          { key: 'name', label: 'Khách hàng' }, { key: 'contact', label: 'Liên hệ' }, { key: 'phone', label: 'SĐT' },
+          { key: 'email', label: 'Email' }, { key: 'industry', label: 'Ngành' }, { key: 'address', label: 'Địa chỉ' },
+        ]} />
         {isMgmt && <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm khách hàng</span></button>}
       </div>
       <div className="table-wrap">

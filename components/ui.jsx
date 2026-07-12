@@ -198,6 +198,26 @@ export function useResource(name) {
   };
 }
 
+/* ---------- v3.4: Xuất CSV (BOM UTF-8 để Excel đọc tiếng Việt) ---------- */
+export function ExportCsv({ rows, name, cols }) {
+  const dl = () => {
+    const lines = [cols.map(c => c.label), ...rows.map(r => cols.map(c => {
+      const v = typeof c.value === 'function' ? c.value(r) : r[c.key];
+      return v == null ? '' : String(v);
+    }))];
+    const csv = '\ufeff' + lines.map(l => l.map(x => /[",;\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x).join(',')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = `${name}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click(); URL.revokeObjectURL(a.href);
+  };
+  return (
+    <button className="btn btn-outline btn-sm" onClick={dl} disabled={!rows.length} title="Tải bảng này về file CSV (mở bằng Excel)">
+      <Icon name="download" size={14} /><span> CSV</span>
+    </button>
+  );
+}
+
 /* ---------- Khối trang bị chặn quyền ---------- */
 export function Forbidden() {
   return (

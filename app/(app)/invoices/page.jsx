@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Badge, Forbidden, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Badge, Forbidden, ExportCsv, useToast } from '@/components/ui';
 import DocEditor, { printDoc } from '@/components/DocEditor';
 import { money, fmtDate, todayISO, docGrand, paidOf, remainOf } from '@/lib/format';
 
@@ -68,6 +68,12 @@ export default function InvoicesPage() {
           <option value="overdue">Quá hạn</option><option value="paid">Đã thu</option>
         </select>
         <div className="spacer"></div>
+        <ExportCsv rows={filtered} name="hoa-don" cols={[
+          { key: 'code', label: 'Mã' }, { label: 'Khách hàng', value: v => client(v.clientId)?.name || '' },
+          { key: 'date', label: 'Ngày lập' }, { key: 'dueDate', label: 'Hạn thu' },
+          { label: 'Tổng tiền', value: v => docGrand(v) }, { label: 'Đã thu', value: v => paidOf(v) },
+          { label: 'Còn lại', value: v => remainOf(v) }, { key: 'status', label: 'Trạng thái' },
+        ]} />
         <button className="btn btn-primary" onClick={() => {
           if (!clients.rows.length) return toast('Hãy thêm khách hàng trước', 'error');
           setModal({ mode: 'add' });

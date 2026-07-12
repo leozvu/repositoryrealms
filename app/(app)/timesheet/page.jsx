@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
+import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, ExportCsv, useToast } from '@/components/ui';
 import { money, fmtDate, todayISO, thisMonth, monthKey, hourRate, initials } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
@@ -51,6 +51,11 @@ export default function TimesheetPage() {
           <option value="all">Tất cả</option>
         </select>
         <div className="spacer"></div>
+        <ExportCsv rows={visible} name="gio-cong" cols={[
+          { key: 'date', label: 'Ngày' }, { label: 'Nhân sự', value: l => uName(l.userId) },
+          { label: 'Dự án', value: l => pName(l.projectId) }, { key: 'hours', label: 'Giờ' },
+          { label: 'Tính phí', value: l => l.billable ? 'Billable' : 'Nội bộ' }, { key: 'note', label: 'Ghi chú' },
+        ]} />
         <button className="btn btn-primary" onClick={() => {
           if (!projects.rows.length) return toast('Chưa có dự án nào', 'error');
           setModal({ mode: 'add' });
