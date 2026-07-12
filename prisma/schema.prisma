@@ -357,6 +357,20 @@ model Message {
   createdAt DateTime     @default(now())
 }
 
+// ===== v3.2: Hoa hồng sales =====
+model Commission {
+  id        String  @id @default(cuid())
+  userId    String // AM được hưởng hoa hồng
+  invoiceId String // hóa đơn nguồn gốc
+  clientId  String?
+  rate      Float   @default(0) // % hoa hồng (VD: 5.0)
+  amount    Int     @default(0) // VND = grand(invoice) × rate/100
+  month     String // YYYY-MM tháng tính hoa hồng
+  status    String  @default("pending") // pending | paid
+  note      String?
+  createdAt String?
+}
+
 model Setting {
   id   Int    @id @default(1)
   json String @default("{}")

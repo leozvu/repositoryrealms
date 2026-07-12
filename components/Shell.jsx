@@ -30,6 +30,7 @@ const NAV = [
   { key: 'gantt', label: 'Gantt tiến độ', icon: 'reports', roles: ALL },
   { section: 'Tài chính' },
   { key: 'invoices', label: 'Hóa đơn', icon: 'invoices', roles: ['ACCOUNTANT', 'AM'] },
+  { key: 'commissions', label: 'Hoa hồng Sales', icon: 'percent', roles: ['ACCOUNTANT', 'AM', 'PM'] },
   { key: 'finance', label: 'Thu / Chi', icon: 'finance', roles: ['ACCOUNTANT'] },
   { key: 'finplan', label: 'Công nợ & Dự báo', icon: 'trendUp', roles: ['ACCOUNTANT'] },
   { key: 'vendors', label: 'Mua hàng / NCC', icon: 'wallet', roles: ['ACCOUNTANT', 'PM'] },
