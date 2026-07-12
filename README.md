@@ -1,4 +1,4 @@
-# Agency ERP v3.2 — Đa người dùng, phân quyền theo cấp bậc
+# Agency ERP v3.3 — Đa người dùng, phân quyền theo cấp bậc
 
 Next.js 14 + Prisma + NextAuth. Dev chạy SQLite ngay trên máy, deploy đổi sang Postgres.
 
@@ -65,6 +65,13 @@ npm run dev          # → http://localhost:3300
 - **Đăng nhập 2 lớp (TOTP)**: tự bật bằng nút 🛡, tương thích Google Authenticator, không cần thư viện ngoài; Giám đốc reset được khi nhân sự mất điện thoại
 - **Seed demo hoàn chỉnh**: 10 tài khoản + ~250 bản ghi phủ 30 module, ngày tương đối nên AI Summary/aging/dự báo luôn sống động
 
+**v3.3 — Nền tảng tích hợp + tự động hóa**:
+- **API mở**: tạo API key trong Cài đặt (key mang vai trò như một người dùng, đi qua đúng RBAC + phê duyệt) → gọi `GET/POST/PUT/DELETE /api/v1/<resource>` với `Authorization: Bearer <key>` — nối n8n/Zapier/hệ thống khác
+- **Webhook**: bắn POST khi dữ liệu thay đổi (lọc sự kiện kiểu `leads.*`, `invoices.update`, `*`), ký HMAC-SHA256 header `X-Signature` khi đặt secret
+- **Tự động hóa IF/THEN** (menu mới, Giám đốc): "KHI lead cập nhật VÀ stage = won THÌ nhắn Kênh chung + tạo việc cho AM" — điều kiện `= != > < contains changed`, hành động nhắn kênh chung / tạo việc / gọi webhook, template `{trường}` chèn dữ liệu
+- **Xuất lịch ICS**: nút "📅 Link ICS" trên trang Lịch — subscribe vào Google/Apple Calendar là việc, deadline, mốc, nghỉ phép, hạn thu tự đổ về (không cần OAuth)
+- **CSAT + cohort**: chấm 1-5★ sau mỗi ticket xử lý xong; Analytics thêm KPI CSAT + bảng cohort retention theo tháng
+
 ## Import dữ liệu từ bản offline v1
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**
 2. Đăng nhập ERP bằng Giám đốc → **Cài đặt → Import từ bản offline** → chọn file
@@ -76,4 +83,4 @@ npm run dev          # → http://localhost:3300
 4. Khai báo biến môi trường trên Vercel: `DATABASE_URL`, `NEXTAUTH_SECRET` (chuỗi ngẫu nhiên dài), `NEXTAUTH_URL` (https://ten-mien.vercel.app)
 5. Chạy `npx prisma db push && npm run db:seed` với DATABASE_URL trỏ tới Postgres (⚠ seed sẽ tạo dữ liệu demo — bỏ qua bước seed nếu muốn bắt đầu sạch, tạo tài khoản Giám đốc bằng script riêng)
 
-**Kế tiếp**: Deploy Vercel + Supabase (cần tạo tài khoản) · v3.3 đề xuất: API key + webhook mở · đồng bộ Google Calendar · rule builder IF/THEN · CSAT — xem DOI-CHIEU-YEU-CAU.md
+**Kế tiếp**: Deploy Vercel + Supabase (cần tạo tài khoản) · v3.4 đề xuất: đồng bộ Google Calendar 2 chiều (OAuth — cần Google Cloud project) · forecast doanh thu theo pipeline · custom dashboard — xem DOI-CHIEU-YEU-CAU.md
