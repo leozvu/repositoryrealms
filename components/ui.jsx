@@ -123,6 +123,7 @@ export function FormModal({ title, fields, data = {}, onSave, onClose, large, ex
     fields.forEach(f => {
       let v = form.elements[f.key]?.value;
       if (f.type === 'number') v = +v || 0;
+      if (f.type === 'multiselect') v = [...(form.elements[f.key]?.selectedOptions || [])].map(o => o.value);
       out[f.key] = v;
     });
     onSave(out);
@@ -143,6 +144,11 @@ export function FormModal({ title, fields, data = {}, onSave, onClose, large, ex
               <label>{f.label}{f.required && <span className="req"> *</span>}</label>
               {f.type === 'select' ? (
                 <select name={f.key} defaultValue={v} required={f.required}>
+                  {f.options.map(o => <option key={String(o.value)} value={o.value}>{o.label}</option>)}
+                </select>
+              ) : f.type === 'multiselect' ? (
+                <select name={f.key} multiple size={Math.min(5, Math.max(3, f.options.length))}
+                  defaultValue={Array.isArray(v) ? v : []}>
                   {f.options.map(o => <option key={String(o.value)} value={o.value}>{o.label}</option>)}
                 </select>
               ) : f.type === 'textarea' ? (

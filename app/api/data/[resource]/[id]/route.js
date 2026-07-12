@@ -21,6 +21,10 @@ export async function PUT(req, { params }) {
   let data = await req.json();
   delete data.id;
   if (cfg.filterUpdate) data = cfg.filterUpdate(data, user);
+  if (cfg.validate) {
+    const err = await cfg.validate(row, data, prisma);
+    if (err) return NextResponse.json({ error: err }, { status: 400 });
+  }
   try {
     const icp = await interceptWrite(params.resource, row, data, user);
     if (icp?.block) return NextResponse.json({ _blocked: true, _notice: icp.block });

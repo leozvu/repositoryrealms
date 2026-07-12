@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, FormModal, ConfirmDialog, Badge, useToast } from '@/components/ui';
-import { fmtDate, todayISO, daysFromNow, initials, TASK_COLS, BADGE } from '@/lib/format';
+import { fmtDate, todayISO, daysFromNow, initials, parseItems, TASK_COLS, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
 export default function TasksPage() {
@@ -28,15 +28,24 @@ export default function TasksPage() {
     { key: 'priority', label: 'Ưu tiên', type: 'select', options: Object.entries(BADGE.priority).map(([v, [l]]) => ({ value: v, label: l })) },
     { key: 'status', label: 'Trạng thái', type: 'select', options: TASK_COLS.map(c => ({ value: c.key, label: c.label })) },
     { key: 'dueDate', label: 'Hạn hoàn thành', type: 'date' },
+    { key: 'dependsOn', label: 'Phụ thuộc vào (Ctrl+click chọn nhiều)', type: 'multiselect', full: true,
+      options: rows.filter(t => t.id !== modal?.row?.id).map(t => ({ value: t.id, label: `${t.title} · ${projName(t.projectId)}` })),
+      hint: 'Việc này chỉ hoàn thành được sau khi các việc đã chọn xong' },
     { key: 'note', label: 'Mô tả', type: 'textarea', full: true },
   ];
   const visible = rows.filter(t => (proj === 'all' || String(t.projectId || '') === proj) && (!mine || t.assigneeId === user?.id));
   const canDrag = t => isMgmt || t.assigneeId === user?.id;
+  // v3.2: việc bị chặn = còn việc phụ thuộc chưa xong
+  const blockers = t => parseItems(t.dependsOn).map(id => rows.find(r => r.id === id)).filter(d => d && d.status !== 'done');
 
   const drop = async status => {
     setOverCol(null);
     const t = rows.find(x => x.id === dragId);
     if (!t || t.status === status) return;
+    if (status === 'done') {
+      const bl = blockers(t);
+      if (bl.length) { toast(`Chưa thể hoàn thành — còn chờ: ${bl.map(b => b.title).join(', ')}`, 'error'); return; }
+    }
     await update(t.id, { status });
   };
 
@@ -69,7 +78,8 @@ export default function TasksPage() {
                     onDragStart={() => canDrag(t) && setDragId(t.id)}
                     onClick={() => setModal({ mode: 'edit', row: t })}
                     style={canDrag(t) ? {} : { opacity: .75, cursor: 'default' }}>
-                    <div className="kan-title">{t.title}</div>
+                    <div className="kan-title">{blockers(t).length > 0 && t.status !== 'done' &&
+                      <span title={`Chờ: ${blockers(t).map(b => b.title).join(', ')}`} style={{ marginRight: 4 }}>⛓</span>}{t.title}</div>
                     <div className="kan-sub">{projName(t.projectId)}</div>
                     <div className="kan-foot">
                       <Badge map="priority" k={t.priority} />
@@ -92,10 +102,11 @@ export default function TasksPage() {
       {modal?.mode === 'add' && <FormModal title="Thêm công việc" fields={FIELDS}
         data={{ status: 'todo', priority: 'medium', dueDate: daysFromNow(3), projectId: proj !== 'all' ? proj : '' }}
         onClose={() => setModal(null)}
-        onSave={async d => { await create({ ...d, projectId: d.projectId || null }); toast('Đã thêm công việc'); }} />}
-      {modal?.mode === 'edit' && <FormModal title="Chi tiết công việc" fields={FIELDS} data={{ ...modal.row, projectId: modal.row.projectId || '' }}
+        onSave={async d => { await create({ ...d, projectId: d.projectId || null, dependsOn: JSON.stringify(d.dependsOn || []) }); toast('Đã thêm công việc'); }} />}
+      {modal?.mode === 'edit' && <FormModal title="Chi tiết công việc" fields={FIELDS}
+        data={{ ...modal.row, projectId: modal.row.projectId || '', dependsOn: parseItems(modal.row.dependsOn) }}
         onClose={() => setModal(null)}
-        onSave={async d => { await update(modal.row.id, { ...d, projectId: d.projectId || null }); toast('Đã cập nhật'); }}
+        onSave={async d => { await update(modal.row.id, { ...d, projectId: d.projectId || null, dependsOn: JSON.stringify(d.dependsOn || []) }); toast('Đã cập nhật'); }}
         extraFooter={isMgmt && <button className="btn btn-ghost" style={{ marginRight: 'auto', color: 'var(--danger)' }}
           onClick={() => setModal({ mode: 'del', row: modal.row })}><Icon name="trash" size={16} /> Xóa</button>} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa công việc "${modal.row.title}"?`}

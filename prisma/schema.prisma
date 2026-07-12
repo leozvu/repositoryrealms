@@ -68,18 +68,19 @@ model Service {
 }
 
 model Project {
-  id        String    @id @default(cuid())
-  name      String
-  clientId  String?
-  client    Client?   @relation(fields: [clientId], references: [id])
-  service   String?
-  budget    Int       @default(0)
-  status    String    @default("planning")
-  startDate String?
-  deadline  String?
-  progress  Int       @default(0)
-  tasks     Task[]
-  timeLogs  TimeLog[]
+  id         String      @id @default(cuid())
+  name       String
+  clientId   String?
+  client     Client?     @relation(fields: [clientId], references: [id])
+  service    String?
+  budget     Int         @default(0)
+  status     String      @default("planning")
+  startDate  String?
+  deadline   String?
+  progress   Int         @default(0)
+  tasks      Task[]
+  timeLogs   TimeLog[]
+  milestones Milestone[]
 }
 
 model Task {
@@ -93,6 +94,18 @@ model Task {
   status     String   @default("todo")
   dueDate    String?
   note       String?
+  dependsOn  String   @default("[]") // v3.2: JSON [taskId] — việc phải xong trước mới được hoàn thành
+}
+
+// ===== v3.2: Mốc dự án hiển thị trên Gantt =====
+model Milestone {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  name      String
+  date      String // YYYY-MM-DD
+  done      Boolean @default(false)
+  note      String?
 }
 
 model TimeLog {
