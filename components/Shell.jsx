@@ -14,6 +14,7 @@ const NAV = [
   { section: 'Tổng quan' },
   { key: 'dashboard', label: 'Bảng điều khiển', icon: 'dashboard', roles: ALL },
   { key: 'calendar', label: 'Lịch làm việc', icon: 'calendar', roles: ALL },
+  { key: 'messages', label: 'Tin nhắn', icon: 'mail', roles: ALL, chatBadge: true },
   { key: 'approvals', label: 'Phê duyệt', icon: 'check', roles: ALL, badge: true },
   { key: 'copilot', label: 'AI Copilot', icon: 'search', roles: ALL },
   { section: 'CRM — Bán hàng' },
@@ -50,16 +51,21 @@ const NAV = [
 export default function Shell({ user, company, children }) {
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [unreadChat, setUnreadChat] = useState(0);
   const pathname = usePathname();
   const current = NAV.find(n => n.key && pathname.startsWith('/' + n.key));
   const myRoles = rolesOf(user);
   const visible = item => hasAny(user, item.roles);
 
   useEffect(() => {
-    const load = () => fetch('/api/approvals').then(r => r.ok ? r.json() : null)
-      .then(d => d && setPendingCount(d.pendingCount || 0)).catch(() => {});
+    const load = () => {
+      fetch('/api/approvals').then(r => r.ok ? r.json() : null)
+        .then(d => d && setPendingCount(d.pendingCount || 0)).catch(() => {});
+      fetch('/api/chat').then(r => r.ok ? r.json() : null)
+        .then(d => d && setUnreadChat(d.totalUnread || 0)).catch(() => {});
+    };
     load();
-    const t = setInterval(load, 30000);
+    const t = setInterval(load, 15000);
     return () => clearInterval(t);
   }, [pathname]);
 
@@ -92,6 +98,7 @@ export default function Shell({ user, company, children }) {
                 <Link key={item.key} href={'/' + item.key} className={`nav-item ${active ? 'active' : ''}`} onClick={() => setOpen(false)}>
                   <Icon name={item.icon} size={18} /><span>{item.label}</span>
                   {item.badge && pendingCount > 0 && <span className="count" style={{ background: 'var(--danger)', color: '#fff' }}>{pendingCount}</span>}
+                  {item.chatBadge && unreadChat > 0 && <span className="count" style={{ background: 'var(--danger)', color: '#fff' }}>{unreadChat}</span>}
                 </Link>
               );
             })}

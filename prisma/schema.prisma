@@ -328,6 +328,35 @@ model NpsResponse {
   comment  String?
 }
 
+// ===== v3.1: Nhắn tin nội bộ =====
+model Conversation {
+  id        String       @id @default(cuid())
+  type      String       @default("dm") // dm | group | general (kênh chung cả công ty)
+  name      String?
+  createdAt DateTime     @default(now())
+  members   ConvMember[]
+  messages  Message[]
+}
+
+model ConvMember {
+  id         String       @id @default(cuid())
+  convId     String
+  conv       Conversation @relation(fields: [convId], references: [id])
+  userId     String
+  lastReadAt DateTime     @default(now())
+
+  @@unique([convId, userId])
+}
+
+model Message {
+  id        String       @id @default(cuid())
+  convId    String
+  conv      Conversation @relation(fields: [convId], references: [id])
+  senderId  String
+  content   String
+  createdAt DateTime     @default(now())
+}
+
 model Setting {
   id   Int    @id @default(1)
   json String @default("{}")
