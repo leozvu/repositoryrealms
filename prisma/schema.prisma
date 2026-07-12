@@ -1,0 +1,345 @@
+// Agency ERP v2.0 — schema đơn tenant (1 công ty)
+// Dev: SQLite. Deploy: đổi provider = "postgresql" + DATABASE_URL của Supabase/Neon.
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// v2.1: 7 vai trò — DIRECTOR, PM, AM, ACCOUNTANT, HR, LEAD, STAFF.
+// Một người giữ được nhiều vai trò (roles = JSON array, cộng quyền).
+// Cột `role` cũ giữ lại để tương thích, không dùng nữa.
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         String    @default("STAFF")
+  roles        String    @default("[\"STAFF\"]")
+  teamId       String?
+  title        String? // chức danh: Designer, Account Manager…
+  phone        String?
+  salary       Int       @default(0) // chỉ DIRECTOR và chính chủ được xem
+  status       String    @default("active") // active | inactive
+  createdAt    DateTime  @default(now())
+  tasks        Task[]
+  timeLogs     TimeLog[]
+  leaves       Leave[]
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  name      String
+  contact   String?
+  email     String?
+  phone     String?
+  industry  String?
+  address   String?
+  note      String?
+  createdAt String? // ISO date
+  projects  Project[]
+  invoices  Invoice[]
+  quotes    Quote[]
+}
+
+model Lead {
+  id        String  @id @default(cuid())
+  name      String
+  company   String?
+  email     String?
+  phone     String?
+  source    String?
+  value     Int     @default(0)
+  stage     String  @default("new")
+  ownerId   String?
+  note      String?
+  createdAt String?
+}
+
+model Service {
+  id    String  @id @default(cuid())
+  name  String
+  unit  String?
+  price Int     @default(0)
+  desc  String?
+}
+
+model Project {
+  id        String    @id @default(cuid())
+  name      String
+  clientId  String?
+  client    Client?   @relation(fields: [clientId], references: [id])
+  service   String?
+  budget    Int       @default(0)
+  status    String    @default("planning")
+  startDate String?
+  deadline  String?
+  progress  Int       @default(0)
+  tasks     Task[]
+  timeLogs  TimeLog[]
+}
+
+model Task {
+  id         String   @id @default(cuid())
+  title      String
+  projectId  String?
+  project    Project? @relation(fields: [projectId], references: [id])
+  assigneeId String?
+  assignee   User?    @relation(fields: [assigneeId], references: [id])
+  priority   String   @default("medium")
+  status     String   @default("todo")
+  dueDate    String?
+  note       String?
+}
+
+model TimeLog {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  date      String
+  hours     Float   @default(0)
+  billable  Boolean @default(true)
+  note      String?
+}
+
+model Quote {
+  id       String  @id @default(cuid())
+  code     String  @unique
+  clientId String
+  client   Client  @relation(fields: [clientId], references: [id])
+  items    String  @default("[]") // JSON [{desc, qty, price}]
+  vat      Int     @default(8)
+  status   String  @default("draft")
+  date     String
+  note     String?
+}
+
+model Invoice {
+  id        String  @id @default(cuid())
+  code      String  @unique
+  clientId  String
+  client    Client  @relation(fields: [clientId], references: [id])
+  projectId String?
+  items     String  @default("[]")
+  vat       Int     @default(8)
+  status    String  @default("draft")
+  date      String
+  dueDate   String?
+  paidDate  String?
+  payments  String  @default("[]") // JSON [{id, amount, date, note}]
+  recurring Boolean @default(false)
+  recGroup  String?
+}
+
+model Transaction {
+  id          String  @id @default(cuid())
+  type        String // income | expense
+  category    String?
+  amount      Int     @default(0)
+  date        String
+  desc        String?
+  projectId   String?
+  createdById String?
+}
+
+model Leave {
+  id     String  @id @default(cuid())
+  userId String
+  user   User    @relation(fields: [userId], references: [id])
+  from   String
+  to     String
+  type   String  @default("annual")
+  status String  @default("pending")
+  note   String?
+}
+
+// ===== CRM: nhật ký hoạt động / lịch hẹn =====
+model Activity {
+  id      String  @id @default(cuid())
+  kind    String  @default("note") // call | meeting | email | note
+  refType String // client | lead
+  refId   String
+  title   String
+  date    String?
+  done    Boolean @default(false)
+  userId  String?
+  note    String?
+}
+
+// ===== Mua hàng: nhà cung cấp + hóa đơn đầu vào (AP) =====
+model Vendor {
+  id      String       @id @default(cuid())
+  name    String
+  type    String? // KOL, Freelancer, Nhà in, Studio, Media…
+  contact String?
+  phone   String?
+  email   String?
+  note    String?
+  rating  Int          @default(0) // 0-5
+  bills   VendorBill[]
+}
+
+model VendorBill {
+  id        String  @id @default(cuid())
+  code      String
+  vendorId  String
+  vendor    Vendor  @relation(fields: [vendorId], references: [id])
+  projectId String?
+  desc      String?
+  amount    Int     @default(0)
+  date      String
+  dueDate   String?
+  status    String  @default("pending") // pending | approved | paid
+  paidDate  String?
+}
+
+// ===== Hợp đồng =====
+model Contract {
+  id        String  @id @default(cuid())
+  code      String
+  type      String  @default("client") // client | vendor | labor
+  partner   String // tên đối tác (khách / NCC / nhân sự)
+  value     Int     @default(0)
+  signDate  String?
+  startDate String?
+  endDate   String?
+  status    String  @default("active") // active | expired | terminated
+  note      String?
+}
+
+// ===== Tài sản & công cụ =====
+model Asset {
+  id       String  @id @default(cuid())
+  name     String
+  category String? // Thiết bị quay, Laptop, License phần mềm…
+  serial   String?
+  holderId String? // ai đang giữ
+  price    Int     @default(0)
+  buyDate  String?
+  renewAt  String? // ngày gia hạn license (nếu có)
+  status   String  @default("in_use") // in_use | storage | broken | sold
+  note     String?
+}
+
+model Team {
+  id     String  @id @default(cuid())
+  name   String
+  leadId String? // Trưởng nhóm
+}
+
+// ===== Máy phê duyệt đa bước =====
+// steps: JSON [{role, userId?, userName?, status: pending|approved|rejected, at?, note?}]
+// payload: JSON dữ liệu chờ thực thi khi duyệt xong (VD: khoản chi chưa ghi sổ)
+model Approval {
+  id            String    @id @default(cuid())
+  type          String // quote | expense | leave | vendorbill
+  refId         String?
+  title         String
+  amount        Int       @default(0)
+  payload       String?
+  requesterId   String
+  requesterName String
+  steps         String    @default("[]")
+  status        String    @default("pending") // pending | approved | rejected
+  createdAt     DateTime  @default(now())
+  decidedAt     DateTime?
+}
+
+// ===== v2.2 HRM =====
+model Attendance {
+  id     String  @id @default(cuid())
+  userId String
+  date   String
+  status String  @default("present") // present | remote | off
+  note   String?
+
+  @@unique([userId, date])
+}
+
+model Candidate {
+  id        String  @id @default(cuid())
+  name      String
+  position  String
+  email     String?
+  phone     String?
+  source    String?
+  stage     String  @default("applied") // applied | interview1 | interview2 | offer | hired | rejected
+  note      String?
+  createdAt String?
+}
+
+// Bảng lương tháng: lines = JSON [{userId, name, base, allowance, bonus, insurance, tax, net, employerCost}]
+model Payroll {
+  id        String   @id @default(cuid())
+  month     String   @unique // YYYY-MM
+  status    String   @default("draft") // draft | final
+  lines     String   @default("[]")
+  createdAt DateTime @default(now())
+}
+
+// ===== v2.3 Tài chính nâng cao =====
+model Budget {
+  id       String @id @default(cuid())
+  month    String // YYYY-MM
+  category String
+  amount   Int    @default(0)
+
+  @@unique([month, category])
+}
+
+// ===== v2.4 Customer Success: ticket hỗ trợ + SLA =====
+model Ticket {
+  id         String    @id @default(cuid())
+  code       String
+  clientId   String?
+  title      String
+  desc       String?
+  priority   String    @default("normal") // urgent | high | normal | low
+  status     String    @default("open") // open | in_progress | waiting | resolved | closed
+  assigneeId String?
+  channel    String? // email | phone | zalo | messenger | meeting
+  createdAt  DateTime  @default(now())
+  dueAt      DateTime? // hạn SLA
+  resolvedAt DateTime?
+}
+
+// ===== v2.5: KPI/OKR theo quý + khảo sát NPS =====
+model Okr {
+  id      String  @id @default(cuid())
+  quarter String // VD: 2026-Q3
+  userId  String? // null = OKR công ty
+  title   String
+  target  Float   @default(100)
+  current Float   @default(0)
+  unit    String? // %, khách, triệu đ…
+  note    String?
+}
+
+model NpsResponse {
+  id       String  @id @default(cuid())
+  clientId String?
+  score    Int // 0-10
+  date     String
+  comment  String?
+}
+
+model Setting {
+  id   Int    @id @default(1)
+  json String @default("{}")
+}
+
+model AuditLog {
+  id       String   @id @default(cuid())
+  userId   String
+  userName String
+  action   String // create | update | delete | approve | login | import
+  entity   String
+  refId    String?
+  detail   String?
+  at       DateTime @default(now())
+}
