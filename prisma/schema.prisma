@@ -44,20 +44,35 @@ model Client {
   projects  Project[]
   invoices  Invoice[]
   quotes    Quote[]
+  contacts  Contact[]
+}
+
+// ===== v3.4: một khách nhiều người liên hệ =====
+model Contact {
+  id       String  @id @default(cuid())
+  clientId String
+  client   Client  @relation(fields: [clientId], references: [id])
+  name     String
+  role     String? // chức vụ: Marketing Manager, Kế toán…
+  email    String?
+  phone    String?
+  primary  Boolean @default(false) // người liên hệ chính
+  note     String?
 }
 
 model Lead {
-  id        String  @id @default(cuid())
-  name      String
-  company   String?
-  email     String?
-  phone     String?
-  source    String?
-  value     Int     @default(0)
-  stage     String  @default("new")
-  ownerId   String?
-  note      String?
-  createdAt String?
+  id            String  @id @default(cuid())
+  name          String
+  company       String?
+  email         String?
+  phone         String?
+  source        String?
+  value         Int     @default(0)
+  stage         String  @default("new")
+  ownerId       String?
+  note          String?
+  createdAt     String?
+  expectedClose String? // v3.4: tháng/ngày dự kiến chốt (YYYY-MM-DD) — cho forecast
 }
 
 model Service {

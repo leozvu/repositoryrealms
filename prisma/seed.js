@@ -26,7 +26,7 @@ async function main() {
   console.log('⚠ Seed v3.2 — xóa toàn bộ dữ liệu cũ và tạo lại bộ demo (chỉ dùng cho dev).');
 
   /* ---------- Xóa theo thứ tự con → cha ---------- */
-  for (const m of ['apiKey', 'webhook', 'rule', 'csatResponse',
+  for (const m of ['contact', 'apiKey', 'webhook', 'rule', 'csatResponse',
     'message', 'convMember', 'conversation', 'auditLog', 'approval', 'commission',
     'npsResponse', 'okr', 'ticket', 'budget', 'payroll', 'candidate', 'attendance', 'activity',
     'timeLog', 'task', 'milestone', 'invoice', 'quote', 'vendorBill', 'transaction', 'leave',
@@ -72,6 +72,19 @@ async function main() {
   const smile = await prisma.client.create({ data: { name: 'Nha khoa Smile Plus', contact: 'Bác sĩ Hùng', email: 'info@smileplus.vn', phone: '0987654321', industry: 'Y tế / Nha khoa', createdAt: D(-90) } });
   const minhphat = await prisma.client.create({ data: { name: 'BĐS Minh Phát', contact: 'Anh Phát', email: 'phat@minhphat.land', phone: '0933222111', industry: 'Bất động sản', createdAt: D(-25), note: 'Khách mới từ lead thắng' } });
   const spa = await prisma.client.create({ data: { name: 'Serenity Spa', contact: 'Chị Hằng', email: 'hang@serenityspa.vn', phone: '0977888999', industry: 'Làm đẹp', createdAt: D(-240), note: 'Ngừng hợp tác từ quý trước — cần tái kết nối' } });
+
+  /* ---------- Danh bạ nhiều người liên hệ (v3.4) ---------- */
+  await prisma.contact.createMany({
+    data: [
+      { clientId: eva.id, name: 'Nguyễn Thảo Vy', role: 'Brand Manager', email: 'vy@evafashion.vn', phone: '0912345678', primary: true },
+      { clientId: eva.id, name: 'Trần Đức Tùng', role: 'Kế toán trưởng', email: 'tung.tran@evafashion.vn', phone: '0912999888', note: 'Liên hệ về hóa đơn, công nợ' },
+      { clientId: eva.id, name: 'Lê Hải Yến', role: 'Trợ lý Marketing', email: 'yen.le@evafashion.vn' },
+      { clientId: cafe.id, name: 'Phạm Anh Tuấn', role: 'Chủ quán', email: 'tuan@nhaminh.cafe', phone: '0908111222', primary: true },
+      { clientId: smile.id, name: 'BS. Trần Mạnh Hùng', role: 'Giám đốc phòng khám', email: 'hung@smileplus.vn', phone: '0987654321', primary: true },
+      { clientId: minhphat.id, name: 'Đỗ Minh Phát', role: 'Tổng giám đốc', email: 'phat@minhphat.land', phone: '0933222111', primary: true },
+      { clientId: minhphat.id, name: 'Vũ Thu Hường', role: 'Thư ký TGĐ', phone: '0933222999', note: 'Đặt lịch họp qua chị Hường' },
+    ],
+  });
 
   /* ---------- Leads: đủ 6 giai đoạn, 1 deal ứ đọng >14 ngày, 2 thắng gần đây (CAC) ---------- */
   await prisma.lead.createMany({

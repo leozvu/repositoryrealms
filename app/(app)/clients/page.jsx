@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
 import { ActivitiesModal } from '@/components/Activities';
@@ -39,8 +40,9 @@ export default function ClientsPage() {
           <tbody>
             {filtered.map(c => (
               <tr key={c.id}>
-                <td><span className="cell-person"><span className="avatar">{initials(c.name)}</span>
-                  <span><span className="cell-main">{c.name}</span><span className="cell-sub">{c.address || ''}</span></span></span></td>
+                <td><Link href={`/clients/${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <span className="cell-person"><span className="avatar">{initials(c.name)}</span>
+                  <span><span className="cell-main" style={{ color: 'var(--primary)' }}>{c.name}</span><span className="cell-sub">{c.address || ''}</span></span></span></Link></td>
                 <td>{c.contact ? <><span className="cell-main" style={{ fontWeight: 500 }}>{c.contact}</span><span className="cell-sub">{[c.phone, c.email].filter(Boolean).join(' · ')}</span></> : '—'}</td>
                 <td>{c.industry ? <span className="badge b-blue">{c.industry}</span> : '—'}</td>
                 {isMgmt && (
