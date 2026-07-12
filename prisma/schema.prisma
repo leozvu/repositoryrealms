@@ -385,6 +385,53 @@ model Commission {
   createdAt String?
 }
 
+// ===== v3.3: API mở — key hoạt động như "user ảo" với vai trò riêng =====
+model ApiKey {
+  id        String    @id @default(cuid())
+  name      String
+  prefix    String // 10 ký tự đầu của key để nhận diện trong danh sách
+  keyHash   String    @unique // sha256(key) — key thô chỉ hiển thị 1 lần lúc tạo
+  roles     String    @default("[\"PM\"]") // quyền của key, dùng chung RBAC registry
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  lastUsed  DateTime?
+}
+
+// ===== v3.3: Webhook — bắn sự kiện ra ngoài (n8n/Zapier/hệ thống khác) =====
+model Webhook {
+  id         String   @id @default(cuid())
+  url        String
+  events     String   @default("[\"*\"]") // JSON ["leads.update","invoices.*","*"]
+  secret     String? // HMAC-SHA256 ký payload → header X-Signature
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  lastStatus String? // kết quả lần gọi gần nhất: "200" / "lỗi: …"
+}
+
+// ===== v3.3: Rule tự động IF/THEN =====
+// conditions: JSON [{field, op, value}] — AND với nhau; op: = != > < >= <= contains changed
+// actions: JSON [{type: 'chat'|'task'|'webhook', ...params}] — template {field} lấy từ bản ghi
+model Rule {
+  id         String   @id @default(cuid())
+  name       String
+  active     Boolean  @default(true)
+  resource   String // leads, invoices, tasks, tickets…
+  event      String   @default("update") // create | update | any
+  conditions String   @default("[]")
+  actions    String   @default("[]")
+  createdAt  DateTime @default(now())
+}
+
+// ===== v3.3: CSAT theo ticket (1-5 sao) =====
+model CsatResponse {
+  id       String  @id @default(cuid())
+  ticketId String?
+  clientId String?
+  score    Int // 1-5
+  date     String
+  comment  String?
+}
+
 model Setting {
   id   Int    @id @default(1)
   json String @default("{}")

@@ -26,7 +26,8 @@ async function main() {
   console.log('⚠ Seed v3.2 — xóa toàn bộ dữ liệu cũ và tạo lại bộ demo (chỉ dùng cho dev).');
 
   /* ---------- Xóa theo thứ tự con → cha ---------- */
-  for (const m of ['message', 'convMember', 'conversation', 'auditLog', 'approval', 'commission',
+  for (const m of ['apiKey', 'webhook', 'rule', 'csatResponse',
+    'message', 'convMember', 'conversation', 'auditLog', 'approval', 'commission',
     'npsResponse', 'okr', 'ticket', 'budget', 'payroll', 'candidate', 'attendance', 'activity',
     'timeLog', 'task', 'milestone', 'invoice', 'quote', 'vendorBill', 'transaction', 'leave',
     'project', 'lead', 'contract', 'asset', 'vendor', 'service', 'client', 'user', 'team', 'setting']) {
@@ -362,6 +363,25 @@ async function main() {
     data: [
       { convId: grp.id, senderId: pm.id, content: 'Khách phản hồi key visual: đổi tone ấm hơn, Hà xem giúp nhé.', createdAt: DT(-20) },
       { convId: grp.id, senderId: nhanvien.id, content: 'Ok anh, em gửi bản chỉnh trước 5h chiều nay.', createdAt: DT(-19) },
+    ],
+  });
+
+  /* ---------- Rule tự động mẫu (v3.3) ---------- */
+  await prisma.rule.createMany({
+    data: [
+      {
+        name: 'Báo tin khi thắng deal', resource: 'leads', event: 'update',
+        conditions: J([{ field: 'stage', op: '=', value: 'won' }]),
+        actions: J([
+          { type: 'chat', template: '🎉 Deal {name} ({value}đ) vừa THẮNG! Cả nhà chúc mừng AM nhé.' },
+          { type: 'task', title: 'Soạn hợp đồng cho {company}', assigneeId: am.id, dueDays: 3 },
+        ]),
+      },
+      {
+        name: 'Cảnh báo ticket khẩn', resource: 'tickets', event: 'create',
+        conditions: J([{ field: 'priority', op: '=', value: 'urgent' }]),
+        actions: J([{ type: 'chat', template: '🚨 Ticket KHẨN mới: {title} ({code}) — ưu tiên xử lý ngay!' }]),
+      },
     ],
   });
 

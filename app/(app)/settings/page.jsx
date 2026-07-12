@@ -1,7 +1,97 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { Icon, Forbidden, useToast } from '@/components/ui';
+import { Icon, Forbidden, useToast, useResource, Modal } from '@/components/ui';
+import { ROLES, ROLE_LABEL } from '@/lib/perm';
+
+/* ---------- v3.3: API key + Webhook (chỉ Giám đốc) ---------- */
+function ApiSection() {
+  const [keys, setKeys] = useState([]);
+  const [newKey, setNewKey] = useState(null); // {name, key} — hiện raw đúng 1 lần
+  const [kName, setKName] = useState('');
+  const [kRoles, setKRoles] = useState(['PM']);
+  const webhooks = useResource('webhooks');
+  const [wUrl, setWUrl] = useState('');
+  const [wEvents, setWEvents] = useState('*');
+  const [wSecret, setWSecret] = useState('');
+  const toast = useToast();
+
+  const loadKeys = () => fetch('/api/apikeys').then(r => r.ok ? r.json() : []).then(setKeys);
+  useEffect(() => { loadKeys(); }, []);
+
+  const createKey = async () => {
+    if (!kName.trim()) return toast('Cần tên key', 'error');
+    const r = await fetch('/api/apikeys', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: kName.trim(), roles: kRoles }) });
+    const j = await r.json();
+    if (!r.ok) return toast(j.error || 'Lỗi', 'error');
+    setNewKey({ name: kName.trim(), key: j.key }); setKName(''); loadKeys();
+  };
+  const toggleKey = async k => { await fetch('/api/apikeys', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id, active: !k.active }) }); loadKeys(); };
+  const delKey = async k => { if (!confirm(`Xóa key "${k.name}"? Ứng dụng đang dùng key này sẽ mất truy cập.`)) return; await fetch('/api/apikeys', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id }) }); loadKeys(); toast('Đã xóa key'); };
+
+  const addWebhook = async () => {
+    if (!wUrl.trim().startsWith('http')) return toast('URL webhook không hợp lệ', 'error');
+    const events = wEvents.split(',').map(x => x.trim()).filter(Boolean);
+    await webhooks.create({ url: wUrl.trim(), events: JSON.stringify(events.length ? events : ['*']), secret: wSecret.trim() || null });
+    setWUrl(''); setWEvents('*'); setWSecret(''); toast('Đã thêm webhook');
+  };
+
+  return (
+    <div className="card">
+      <div className="card-head"><span className="card-title">API mở & Webhook</span></div>
+      <div className="card-body" style={{ display: 'grid', gap: 14, fontSize: '.83rem' }}>
+        <div>
+          <b>API key</b> — gọi <code>/api/v1/&lt;resource&gt;</code> với header <code>Authorization: Bearer &lt;key&gt;</code>. Key mang vai trò như một người dùng (đi qua đúng phân quyền + phê duyệt). Lưu ý: phạm vi dữ liệu cũng áp dụng — VD key vai trò AM chỉ thấy lead chưa gán; cần đọc toàn bộ thì cấp vai trò Giám đốc (cân nhắc rủi ro).
+          {keys.map(k => (
+            <div key={k.id} className="act-item" style={{ alignItems: 'center' }}>
+              <div style={{ flex: 1 }}>
+                <div className="act-title">{k.name} <code style={{ fontSize: '.72rem' }}>{k.prefix}…</code>{!k.active && <span className="badge b-gray" style={{ marginLeft: 6 }}><span className="dot"></span>Đã khóa</span>}</div>
+                <div className="act-sub">{JSON.parse(k.roles || '[]').map(r => ROLE_LABEL[r] || r).join(', ')} · dùng lần cuối: {k.lastUsed ? new Date(k.lastUsed).toLocaleString('vi-VN') : 'chưa'}</div>
+              </div>
+              <button className="btn btn-outline btn-sm" onClick={() => toggleKey(k)}>{k.active ? 'Khóa' : 'Mở'}</button>
+              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={() => delKey(k)}><Icon name="trash" size={14} /></button>
+            </div>
+          ))}
+          <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+            <input style={{ flex: 1, minWidth: 140 }} placeholder="Tên key (VD: n8n, Zapier…)" value={kName} onChange={e => setKName(e.target.value)} />
+            <select multiple size={3} value={kRoles} onChange={e => setKRoles([...e.target.selectedOptions].map(o => o.value))} title="Ctrl+click chọn nhiều vai trò">
+              {ROLES.map(r => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
+            </select>
+            <button className="btn btn-primary btn-sm" onClick={createKey}><Icon name="plus" size={14} /> Tạo key</button>
+          </div>
+        </div>
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+          <b>Webhook</b> — bắn POST khi dữ liệu thay đổi (n8n/Zapier/hệ thống khác). Sự kiện: <code>*</code>, <code>leads.*</code>, <code>invoices.update</code>… Có secret thì payload được ký HMAC-SHA256 ở header <code>X-Signature</code>.
+          {webhooks.rows.map(h => (
+            <div key={h.id} className="act-item" style={{ alignItems: 'center' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="act-title" style={{ wordBreak: 'break-all' }}>{h.url}{!h.active && <span className="badge b-gray" style={{ marginLeft: 6 }}><span className="dot"></span>Tắt</span>}</div>
+                <div className="act-sub">{JSON.parse(h.events || '[]').join(', ')} · lần gọi cuối: {h.lastStatus || 'chưa'}</div>
+              </div>
+              <button className="btn btn-outline btn-sm" onClick={() => webhooks.update(h.id, { active: !h.active })}>{h.active ? 'Tắt' : 'Bật'}</button>
+              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={async () => { await webhooks.remove(h.id); toast('Đã xóa webhook'); }}><Icon name="trash" size={14} /></button>
+            </div>
+          ))}
+          <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
+            <input placeholder="https://… (URL nhận webhook)" value={wUrl} onChange={e => setWUrl(e.target.value)} />
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <input style={{ flex: 1, minWidth: 120 }} placeholder="Sự kiện (mặc định *)" value={wEvents} onChange={e => setWEvents(e.target.value)} />
+              <input style={{ flex: 1, minWidth: 120 }} placeholder="Secret (tùy chọn)" value={wSecret} onChange={e => setWSecret(e.target.value)} />
+              <button className="btn btn-primary btn-sm" onClick={addWebhook}><Icon name="plus" size={14} /> Thêm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {newKey && (
+        <Modal title={`API key "${newKey.name}" đã tạo`} onClose={() => setNewKey(null)}
+          footer={<button className="btn btn-primary" onClick={() => { navigator.clipboard?.writeText(newKey.key); toast('Đã copy key'); setNewKey(null); }}>Copy & đóng</button>}>
+          <p style={{ fontSize: '.85rem', marginBottom: 10 }}>Lưu key này ngay — <b>chỉ hiển thị một lần duy nhất</b>:</p>
+          <code style={{ display: 'block', padding: '10px 12px', background: 'var(--bg, #f1f5f9)', borderRadius: 8, wordBreak: 'break-all', fontWeight: 700 }}>{newKey.key}</code>
+        </Modal>
+      )}
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -81,9 +171,10 @@ export default function SettingsPage() {
               onChange={e => e.target.files[0] && importV1(e.target.files[0])} />
           </div>
         </div>
+        <ApiSection />
         <div className="card">
           <div className="card-body" style={{ fontSize: '.8rem', color: 'var(--muted)' }}>
-            <b style={{ color: 'var(--fg)' }}>Agency ERP v2.0</b> — đa người dùng, phân quyền 3 cấp.<br />
+            <b style={{ color: 'var(--fg)' }}>Agency ERP v3.3</b> — đa người dùng, 7 vai trò cộng quyền.<br />
             Dev: SQLite trên máy này. Khi deploy lên Vercel + Supabase: đổi <code>provider</code> trong
             <code> prisma/schema.prisma</code> thành <code>postgresql</code> và cập nhật <code>DATABASE_URL</code>.
           </div>

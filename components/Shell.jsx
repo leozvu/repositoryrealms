@@ -95,6 +95,7 @@ const NAV = [
   { key: 'reports', label: 'Báo cáo', icon: 'reports', roles: ['ACCOUNTANT', 'PM'] },
   { key: 'analytics', label: 'Analytics (MRR/LTV)', icon: 'trendUp', roles: ['ACCOUNTANT', 'AM', 'PM'] },
   { key: 'okr', label: 'KPI / OKR', icon: 'tasks', roles: ALL },
+  { key: 'automation', label: 'Tự động hóa', icon: 'repeat', roles: [] }, // chỉ DIRECTOR
   { key: 'audit', label: 'Nhật ký hệ thống', icon: 'search', roles: [] }, // chỉ DIRECTOR
   { key: 'settings', label: 'Cài đặt', icon: 'settings', roles: [] },
 ];
