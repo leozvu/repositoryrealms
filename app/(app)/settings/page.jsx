@@ -152,6 +152,13 @@ export default function SettingsPage() {
             <F k="probProposal" label="Xác suất: Gửi đề xuất (%)" type="number" />
             <F k="probNegotiation" label="Xác suất: Thương lượng (%)" type="number" />
             <div className="field full">
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <input type="checkbox" style={{ width: 'auto' }} checked={!!s.autoAssignLeads}
+                  onChange={e => setS({ ...s, autoAssignLeads: e.target.checked })} />
+                Tự chia lead chưa gán cho AM đang giữ ít lead mở nhất
+              </label>
+            </div>
+            <div className="field full">
               <label>Claude API key (bật AI Copilot)</label>
               <input type="password" value={s.anthropicKey ?? ''} onChange={e => setS({ ...s, anthropicKey: e.target.value })} placeholder="sk-ant-…  (tạo tại console.anthropic.com)" />
               <div className="hint">Dùng cho menu AI Copilot — chat với dữ liệu công ty, viết email/proposal. Không có key thì các tính năng AI rule-based (AI Summary, Lead Score) vẫn chạy bình thường.</div>

@@ -28,7 +28,7 @@ export async function POST(req, { params }) {
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   let data = await req.json();
-  if (cfg.beforeCreate) data = cfg.beforeCreate(data, user);
+  if (cfg.beforeCreate) data = await cfg.beforeCreate(data, user, prisma);
   try {
     const icp = await interceptWrite(params.resource, null, data, user);
     if (icp?.block) return NextResponse.json({ _blocked: true, _notice: icp.block });

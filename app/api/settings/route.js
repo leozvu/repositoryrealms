@@ -9,6 +9,7 @@ const DEFAULTS = {
   approveQuoteOver: 50000000, approveExpenseOver: 10000000, approveExpenseDirectorOver: 50000000,
   // v3.4: xác suất chốt theo giai đoạn pipeline (%) — cho forecast doanh thu
   probNew: 10, probContacted: 20, probProposal: 40, probNegotiation: 60,
+  autoAssignLeads: false, // v3.4: tự chia lead chưa gán cho AM ít lead mở nhất
 };
 
 export async function GET() {
