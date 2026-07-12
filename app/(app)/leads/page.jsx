@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useResource, Icon, FormModal, ConfirmDialog, Forbidden, useToast } from '@/components/ui';
 import { ActivitiesModal } from '@/components/Activities';
-import { money, initials, todayISO, LEAD_STAGES, leadScore, scoreColor } from '@/lib/format';
+import { BarChart } from '@/components/charts';
+import { money, moneyShort, initials, todayISO, localISO, LEAD_STAGES, leadScore, scoreColor } from '@/lib/format';
 
 export default function LeadsPage() {
   const { rows, forbidden, create, update, remove } = useResource('leads');
@@ -11,8 +12,21 @@ export default function LeadsPage() {
   const [modal, setModal] = useState(null);
   const [dragId, setDragId] = useState(null);
   const [overCol, setOverCol] = useState(null);
+  const [settings, setSettings] = useState(null);
   const toast = useToast();
+  useEffect(() => { fetch('/api/settings').then(r => r.ok ? r.json() : null).then(setSettings).catch(() => {}); }, []);
   if (forbidden) return <Forbidden />;
+
+  /* ---------- v3.4: forecast doanh thu weighted theo xác suất giai đoạn ---------- */
+  const PROB = { new: settings?.probNew ?? 10, contacted: settings?.probContacted ?? 20, proposal: settings?.probProposal ?? 40, negotiation: settings?.probNegotiation ?? 60 };
+  const mk = off => { const d = new Date(); d.setMonth(d.getMonth() + off); return localISO(d).slice(0, 7); };
+  const fcMonths = [mk(0), mk(1), mk(2)];
+  const openAll = rows.filter(l => !['won', 'lost'].includes(l.stage));
+  const noDate = openAll.filter(l => !l.expectedClose);
+  const fcValues = fcMonths.map(k => Math.round(openAll
+    .filter(l => l.expectedClose && l.expectedClose.slice(0, 7) === k)
+    .reduce((s, l) => s + (l.value || 0) * (PROB[l.stage] || 0) / 100, 0)));
+  const target = settings?.monthlyTarget || 0;
 
   const FIELDS = [
     { key: 'name', label: 'Người liên hệ', required: true },
@@ -22,6 +36,7 @@ export default function LeadsPage() {
     { key: 'source', label: 'Nguồn', type: 'select', options: ['Facebook', 'Instagram', 'TikTok', 'Website', 'Giới thiệu', 'Khác'].map(s => ({ value: s, label: s })) },
     { key: 'value', label: 'Giá trị dự kiến (đ)', type: 'number' },
     { key: 'stage', label: 'Giai đoạn', type: 'select', options: LEAD_STAGES.map(s => ({ value: s.key, label: s.label })) },
+    { key: 'expectedClose', label: 'Ngày dự kiến chốt (cho dự báo)', type: 'date' },
     { key: 'ownerId', label: 'Người phụ trách', type: 'select', options: users.rows.filter(u => u.status === 'active').map(u => ({ value: u.id, label: u.name })) },
     { key: 'note', label: 'Ghi chú', type: 'textarea', full: true },
   ];
@@ -54,6 +69,25 @@ export default function LeadsPage() {
         <div className="spacer"></div>
         <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm khách tiềm năng</span></button>
       </div>
+
+      {/* v3.4: dự báo doanh thu chốt 3 tháng (weighted theo xác suất giai đoạn) */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div className="card-head"><span className="card-title">Dự báo doanh thu chốt (giá trị × xác suất giai đoạn)</span>
+          <span style={{ fontSize: '.75rem', color: 'var(--muted)' }}>
+            Xác suất: mới {PROB.new}% · liên hệ {PROB.contacted}% · đề xuất {PROB.proposal}% · thương lượng {PROB.negotiation}% — chỉnh trong Cài đặt
+          </span>
+        </div>
+        <div className="card-body" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'center' }}>
+          <BarChart labels={fcMonths.map(k => 'T' + +k.slice(5))} series={[{ name: 'Dự báo chốt', color: '#7C3AED', values: fcValues }]} height={170} />
+          <div style={{ fontSize: '.83rem', display: 'grid', gap: 8 }}>
+            <div><b style={{ fontSize: '1.25rem', color: 'var(--primary)' }}>{moneyShort(fcValues[0])}</b> dự báo tháng này
+              {target > 0 && <span style={{ color: fcValues[0] >= target ? 'var(--accent)' : 'var(--muted)' }}> · {Math.round(fcValues[0] / target * 100)}% mục tiêu {moneyShort(target)}</span>}</div>
+            {noDate.length > 0 && <div style={{ color: 'var(--warn, #D97706)' }}>⚠ {noDate.length} deal chưa đặt ngày dự kiến chốt — chưa tính vào dự báo</div>}
+            <div style={{ color: 'var(--muted)' }}>Deal thắng thực tế sẽ thay dự báo bằng doanh thu thật.</div>
+          </div>
+        </div>
+      </div>
+
       <div className="kanban">
         {LEAD_STAGES.map(st => {
           const items = rows.filter(l => l.stage === st.key);

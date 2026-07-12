@@ -7,6 +7,8 @@ const DEFAULTS = {
   company: 'Agency của bạn', address: '', taxCode: '', email: '', phone: '', bank: '',
   invoicePrefix: 'INV', quotePrefix: 'BG', vat: 8, monthlyTarget: 300000000,
   approveQuoteOver: 50000000, approveExpenseOver: 10000000, approveExpenseDirectorOver: 50000000,
+  // v3.4: xác suất chốt theo giai đoạn pipeline (%) — cho forecast doanh thu
+  probNew: 10, probContacted: 20, probProposal: 40, probNegotiation: 60,
 };
 
 export async function GET() {
