@@ -1,4 +1,4 @@
-# Agency ERP v3.5 — Đa người dùng, phân quyền theo cấp bậc
+# Agency ERP v3.7 — Đa người dùng, phân quyền theo cấp bậc
 
 Next.js 14 + Prisma + NextAuth + **Supabase Postgres**.
 
@@ -102,6 +102,15 @@ npm run dev          # → http://localhost:3300
 - **Gắn tài liệu 📎**: dán link Drive/Notion/Figma vào dự án, khách hàng, hợp đồng
 - **In phiếu hợp đồng** (lưu PDF qua hộp thoại in) + **RFQ so giá NCC**: một hạng mục nhiều báo giá, tick chọn NCC thắng kèm lý do
 - **Onboarding nhân sự**: ứng viên "Nhận việc" → checklist 6 bước tự tạo + báo HR
+
+**v3.6 — Đa doanh nghiệp**: 3 instance (AIm/Egoric/Vnecom) + Master Dashboard, `/api/v1/summary`, bootstrap công ty mới, tên chức danh theo công ty (roleLabels)
+
+**v3.7 — Nhân sự & Quản lý công việc chuyên sâu**:
+- **Việc của tôi**: trang cá nhân — việc quá hạn/hôm nay/tuần này với nút ✔ tại chỗ, chờ tôi duyệt, lịch hẹn, giờ log tuần
+- **Task nâng cao**: checklist bước con (☑ n/m trên thẻ), bình luận trao đổi (chuông cho người phụ trách), ghi giờ công ⏱ ngay trong việc
+- **Việc định kỳ 🔁**: lặp tuần/tháng — hoàn thành tự tạo kỳ sau, checklist reset
+- **Hồ sơ nhân sự 360°**: click tên nhân sự → việc mở, giờ công, phép còn lại, chấm công, tài sản đang giữ, OKR cá nhân
+- **Quota nghỉ phép**: n ngày phép năm (Cài đặt), hiện "còn n/12", cảnh báo khi xin vượt
 
 ## Import dữ liệu từ bản offline v1
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**
