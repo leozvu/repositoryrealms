@@ -1,0 +1,100 @@
+'use client';
+// v3.5: Resource planning — ma trận giờ công người × tuần + tải việc hiện tại.
+// PM/HR/GĐ nhìn 1 màn hình biết ai quá tải, ai đang trống để phân việc.
+import { useSession } from 'next-auth/react';
+import { useResource, EmptyState, Forbidden } from '@/components/ui';
+import { localISO, todayISO, initials } from '@/lib/format';
+import { hasAny, rolesOf } from '@/lib/perm';
+
+const CAP = 40; // giờ/tuần chuẩn
+const cellColor = h => h > CAP ? 'var(--danger)' : h >= 30 ? '#059669' : h >= 15 ? '#D97706' : 'var(--muted)';
+const cellBg = h => h > CAP ? 'rgba(220,38,38,.14)' : h >= 30 ? 'rgba(5,150,105,.12)' : h >= 15 ? 'rgba(217,119,6,.10)' : 'transparent';
+
+export default function ResourcesPage() {
+  const { data: session } = useSession();
+  const canSee = hasAny(session?.user, ['PM', 'HR', 'LEAD']);
+  const users = useResource('users');
+  const timelogs = useResource('timelogs');
+  const tasks = useResource('tasks');
+  if (session && !canSee) return <Forbidden />;
+
+  // Mọi nhân sự active trừ Giám đốc (GĐ không log giờ, hiện "trống" sẽ gây nhiễu)
+  const staff = users.rows.filter(u => u.status === 'active' && !rolesOf(u).includes('DIRECTOR'));
+  if (!staff.length) return <EmptyState title="Chưa có nhân sự" />;
+
+  // 4 tuần gần nhất, mốc thứ Hai
+  const monday = d => { const x = new Date(d + 'T00:00:00'); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return localISO(x); };
+  const weeks = [-3, -2, -1, 0].map(o => { const d = new Date(); d.setDate(d.getDate() + o * 7); return monday(localISO(d)); });
+  const wkLabel = wk => { const d = new Date(wk + 'T00:00:00'); return `${d.getDate()}/${d.getMonth() + 1}`; };
+
+  const hoursOf = (uid, wk) => timelogs.rows
+    .filter(l => l.userId === uid && monday(l.date) === wk)
+    .reduce((s, l) => s + l.hours, 0);
+
+  const today = todayISO();
+  const in7 = (() => { const d = new Date(); d.setDate(d.getDate() + 7); return localISO(d); })();
+  const loadOf = uid => {
+    const mine = tasks.rows.filter(t => t.assigneeId === uid && t.status !== 'done');
+    return {
+      open: mine.length,
+      late: mine.filter(t => t.dueDate && t.dueDate < today).length,
+      week: mine.filter(t => t.dueDate && t.dueDate >= today && t.dueDate <= in7).length,
+    };
+  };
+
+  const thisWeekTotal = staff.map(u => hoursOf(u.id, weeks[3]));
+  const overloaded = staff.filter((u, i) => thisWeekTotal[i] > CAP);
+  const idle = staff.filter((u, i) => thisWeekTotal[i] < 15);
+
+  return (
+    <>
+      <div className="grid kpi-grid" style={{ marginBottom: 16 }}>
+        <div className="card kpi"><span className="kpi-label">Nhân sự tính tải</span><div className="kpi-value">{staff.length}</div></div>
+        <div className="card kpi"><span className="kpi-label">Quá tải tuần này (&gt;{CAP}h)</span>
+          <div className="kpi-value" style={{ color: overloaded.length ? 'var(--danger)' : 'var(--accent)' }}>{overloaded.length}</div>
+          <div className="kpi-sub">{overloaded.map(u => u.name).join(', ') || 'Không ai'}</div></div>
+        <div className="card kpi"><span className="kpi-label">Đang trống (&lt;15h log)</span>
+          <div className="kpi-value">{idle.length}</div>
+          <div className="kpi-sub">{idle.slice(0, 3).map(u => u.name).join(', ') || '—'}</div></div>
+      </div>
+
+      <div className="card">
+        <div className="card-head"><span className="card-title">Giờ công theo tuần (mốc thứ Hai) — chuẩn {CAP}h/tuần</span>
+          <span className="legend" style={{ margin: 0 }}>
+            <span><i style={{ background: 'rgba(220,38,38,.7)' }}></i>Quá tải</span>
+            <span><i style={{ background: 'rgba(5,150,105,.7)' }}></i>Tốt (30–40h)</span>
+            <span><i style={{ background: 'rgba(217,119,6,.7)' }}></i>Vừa (15–30h)</span>
+            <span><i style={{ background: 'var(--border)' }}></i>Trống (&lt;15h)</span>
+          </span>
+        </div>
+        <div className="card-body" style={{ overflowX: 'auto' }}>
+          <table style={{ fontSize: '.82rem' }}>
+            <thead><tr><th>Nhân sự</th>{weeks.map((wk, i) => <th key={wk} style={{ textAlign: 'center' }}>Tuần {wkLabel(wk)}{i === 3 ? ' (này)' : ''}</th>)}<th style={{ textAlign: 'center' }}>Việc mở</th><th style={{ textAlign: 'center' }}>Trễ hạn</th><th style={{ textAlign: 'center' }}>Hạn 7 ngày</th></tr></thead>
+            <tbody>
+              {staff.map(u => {
+                const load = loadOf(u.id);
+                return (
+                  <tr key={u.id}>
+                    <td><span className="cell-person"><span className="avatar">{initials(u.name)}</span>
+                      <span><span className="cell-main">{u.name}</span><span className="cell-sub">{u.title || ''}</span></span></span></td>
+                    {weeks.map(wk => {
+                      const h = Math.round(hoursOf(u.id, wk) * 10) / 10;
+                      return <td key={wk} style={{ textAlign: 'center', fontWeight: 700, color: cellColor(h), background: cellBg(h), borderRadius: 6 }}>
+                        {h}h{h > CAP && ' ⚠'}</td>;
+                    })}
+                    <td style={{ textAlign: 'center', fontWeight: 700 }}>{load.open}</td>
+                    <td style={{ textAlign: 'center', fontWeight: 700, color: load.late ? 'var(--danger)' : 'var(--muted)' }}>{load.late || '—'}</td>
+                    <td style={{ textAlign: 'center', fontWeight: 700 }}>{load.week || '—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p style={{ fontSize: '.74rem', color: 'var(--muted)', marginTop: 10 }}>
+            Giờ = tổng giờ công đã log trong tuần · Việc mở = task chưa hoàn thành được gán · Muốn phân việc mới, ưu tiên người ô tuần này nhạt màu + ít việc mở.
+          </p>
+        </div>
+      </div>
+    </>
+  );
+}

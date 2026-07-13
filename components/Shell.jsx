@@ -182,6 +182,7 @@ const NAV = [
   { key: 'tasks', label: 'Công việc', icon: 'tasks', roles: ALL },
   { key: 'timesheet', label: 'Chấm công giờ', icon: 'clock', roles: ALL },
   { key: 'gantt', label: 'Gantt tiến độ', icon: 'reports', roles: ALL },
+  { key: 'resources', label: 'Nguồn lực', icon: 'staff', roles: ['PM', 'HR', 'LEAD'] },
   { section: 'Tài chính' },
   { key: 'invoices', label: 'Hóa đơn', icon: 'invoices', roles: ['ACCOUNTANT', 'AM'] },
   { key: 'commissions', label: 'Hoa hồng Sales', icon: 'percent', roles: ['ACCOUNTANT', 'AM', 'PM'] },
