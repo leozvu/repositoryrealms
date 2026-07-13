@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { SessionProvider, signOut } from 'next-auth/react';
-import { Icon, Modal, ToastProvider, useToast } from './ui';
+import { Icon, Modal, ToastProvider, useToast, RoleLabelsCtx } from './ui';
 import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
 
@@ -213,6 +213,15 @@ export default function Shell({ user, company, children }) {
   const [showSearch, setShowSearch] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [unreadNotif, setUnreadNotif] = useState(0);
+  const [roleLabels, setRoleLabels] = useState(ROLE_LABEL);
+  useEffect(() => { // v3.6: chức danh tùy biến theo công ty
+    fetch('/api/settings').then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d) return;
+        const overrides = Object.fromEntries(Object.entries(d.roleLabels || {}).filter(([, v]) => v && String(v).trim()));
+        setRoleLabels({ ...ROLE_LABEL, ...overrides });
+      }).catch(() => {});
+  }, []);
   const pathname = usePathname();
   const current = NAV.find(n => n.key && pathname.startsWith('/' + n.key));
   const myRoles = rolesOf(user);
@@ -245,6 +254,7 @@ export default function Shell({ user, company, children }) {
   return (
     <SessionProvider>
     <ToastProvider>
+    <RoleLabelsCtx.Provider value={roleLabels}>
       <div id="app">
         <aside id="sidebar" className={open ? 'open' : ''}>
           <div className="brand">
@@ -276,7 +286,7 @@ export default function Shell({ user, company, children }) {
             <span className="avatar">{initials(user.name)}</span>
             <div>
               <div className="uc-name">{user.name}</div>
-              <div className="uc-role">{myRoles.map(r => ROLE_LABEL[r] || r).join(' · ')}</div>
+              <div className="uc-role">{myRoles.map(r => roleLabels[r] || r).join(' · ')}</div>
             </div>
             <button onClick={() => setShow2fa(true)} title="Bảo mật 2 lớp (2FA)" aria-label="Bảo mật 2 lớp">
               <Icon name="shield" size={16} />
@@ -304,12 +314,13 @@ export default function Shell({ user, company, children }) {
                 {unreadNotif > 0 && <span className="count" style={{ position: 'absolute', top: -7, right: -7, background: 'var(--danger)', color: '#fff' }}>{unreadNotif}</span>}
               </button>
               <span id="today-label">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
-              <span className={`role-chip role-${myRoles[0]}`}>{myRoles.map(r => ROLE_LABEL[r] || r).join(' · ')}</span>
+              <span className={`role-chip role-${myRoles[0]}`}>{myRoles.map(r => roleLabels[r] || r).join(' · ')}</span>
             </div>
           </header>
           <main id="view">{children}</main>
         </div>
       </div>
+    </RoleLabelsCtx.Provider>
     </ToastProvider>
     </SessionProvider>
   );

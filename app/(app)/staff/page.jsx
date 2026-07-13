@@ -1,12 +1,13 @@
 'use client';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Modal, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, FormModal, ConfirmDialog, EmptyState, Badge, useToast, useRoleLabels } from '@/components/ui';
 import { money, fmtDate, todayISO, initials } from '@/lib/format';
 import { ROLES, ROLE_LABEL, rolesOf, hasAny, isDirector } from '@/lib/perm';
 
 /* ---------- Modal tài khoản: đa vai trò (checkbox) + nhóm ---------- */
 function UserModal({ row, teams, canRoles, onSave, onClose }) {
+  const RL = useRoleLabels();
   const [f, setF] = useState(() => row
     ? { name: row.name, title: row.title || '', phone: row.phone || '', salary: row.salary || 0, teamId: row.teamId || '', status: row.status, roles: rolesOf(row), password: '', reset2fa: false }
     : { name: '', email: '', password: '', title: '', phone: '', salary: 0, teamId: '', status: 'active', roles: ['STAFF'] });
@@ -36,7 +37,7 @@ function UserModal({ row, teams, canRoles, onSave, onClose }) {
               {ROLES.map(r => (
                 <label key={r} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.83rem', cursor: 'pointer', padding: '7px 12px', border: '1px solid var(--border)', borderRadius: 8, background: f.roles.includes(r) ? 'var(--info-soft)' : 'var(--card)' }}>
                   <input type="checkbox" style={{ width: 'auto' }} checked={f.roles.includes(r)} onChange={() => toggleRole(r)} />
-                  {ROLE_LABEL[r]}
+                  {RL[r] || ROLE_LABEL[r]}
                 </label>
               ))}
             </div>
@@ -58,6 +59,7 @@ function UserModal({ row, teams, canRoles, onSave, onClose }) {
 
 export default function StaffPage() {
   const { data: session } = useSession();
+  const RL = useRoleLabels();
   const me = session?.user;
   const canRoles = isDirector(me);
   const canHR = hasAny(me, ['HR']);
@@ -122,7 +124,7 @@ export default function StaffPage() {
                 <td><span className="cell-person"><span className="avatar">{initials(u.name)}</span>
                   <span><span className="cell-main">{u.name}{u.id === me?.id ? ' (tôi)' : ''}</span><span className="cell-sub">{u.email}</span></span></span></td>
                 <td><div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                  {rolesOf(u).map(r => <span key={r} className={`role-chip role-${r}`}>{ROLE_LABEL[r] || r}</span>)}</div></td>
+                  {rolesOf(u).map(r => <span key={r} className={`role-chip role-${r}`}>{RL[r] || r}</span>)}</div></td>
                 <td>{teamName(u.teamId) || '—'}</td>
                 <td>{u.title || '—'}</td>
                 {canSalary && <td className="num" style={{ fontWeight: 700 }}>{u.salary !== undefined ? money(u.salary) : '•••'}</td>}

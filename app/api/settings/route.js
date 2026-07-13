@@ -10,6 +10,7 @@ const DEFAULTS = {
   // v3.4: xác suất chốt theo giai đoạn pipeline (%) — cho forecast doanh thu
   probNew: 10, probContacted: 20, probProposal: 40, probNegotiation: 60,
   autoAssignLeads: false, // v3.4: tự chia lead chưa gán cho AM ít lead mở nhất
+  roleLabels: {}, // v3.6: đổi tên chức danh theo công ty (quyền giữ nguyên theo nhóm)
 };
 
 export async function GET() {

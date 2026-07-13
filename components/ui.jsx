@@ -2,6 +2,12 @@
 // UI kit dùng chung: icon, toast, modal, form động, hook dữ liệu — port từ v1
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { BADGE } from '@/lib/format';
+import { ROLE_LABEL } from '@/lib/perm';
+
+/* ---------- v3.6: tên chức danh tùy biến theo công ty (Settings.roleLabels) ---------- */
+export const RoleLabelsCtx = createContext(null);
+// Trả map {DIRECTOR: 'Giám đốc', ...} — công ty đổi tên trong Cài đặt thì mọi nơi đổi theo
+export const useRoleLabels = () => useContext(RoleLabelsCtx) || ROLE_LABEL;
 
 /* ---------- Icons (Lucide-style, giữ nguyên từ v1) ---------- */
 const RAW = {

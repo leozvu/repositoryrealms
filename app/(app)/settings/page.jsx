@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { Icon, Forbidden, useToast, useResource, Modal } from '@/components/ui';
+import { Icon, Forbidden, useToast, useResource, Modal, useRoleLabels } from '@/components/ui';
 import { ROLES, ROLE_LABEL } from '@/lib/perm';
 
 /* ---------- v3.3: API key + Webhook (chỉ Giám đốc) ---------- */
 function ApiSection() {
+  const RL = useRoleLabels();
   const [keys, setKeys] = useState([]);
   const [newKey, setNewKey] = useState(null); // {name, key} — hiện raw đúng 1 lần
   const [kName, setKName] = useState('');
@@ -46,7 +47,7 @@ function ApiSection() {
             <div key={k.id} className="act-item" style={{ alignItems: 'center' }}>
               <div style={{ flex: 1 }}>
                 <div className="act-title">{k.name} <code style={{ fontSize: '.72rem' }}>{k.prefix}…</code>{!k.active && <span className="badge b-gray" style={{ marginLeft: 6 }}><span className="dot"></span>Đã khóa</span>}</div>
-                <div className="act-sub">{JSON.parse(k.roles || '[]').map(r => ROLE_LABEL[r] || r).join(', ')} · dùng lần cuối: {k.lastUsed ? new Date(k.lastUsed).toLocaleString('vi-VN') : 'chưa'}</div>
+                <div className="act-sub">{JSON.parse(k.roles || '[]').map(r => RL[r] || r).join(', ')} · dùng lần cuối: {k.lastUsed ? new Date(k.lastUsed).toLocaleString('vi-VN') : 'chưa'}</div>
               </div>
               <button className="btn btn-outline btn-sm" onClick={() => toggleKey(k)}>{k.active ? 'Khóa' : 'Mở'}</button>
               <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={() => delKey(k)}><Icon name="trash" size={14} /></button>
@@ -55,7 +56,7 @@ function ApiSection() {
           <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
             <input style={{ flex: 1, minWidth: 140 }} placeholder="Tên key (VD: n8n, Zapier…)" value={kName} onChange={e => setKName(e.target.value)} />
             <select multiple size={3} value={kRoles} onChange={e => setKRoles([...e.target.selectedOptions].map(o => o.value))} title="Ctrl+click chọn nhiều vai trò">
-              {ROLES.map(r => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}
+              {ROLES.map(r => <option key={r} value={r}>{RL[r] || ROLE_LABEL[r]}</option>)}
             </select>
             <button className="btn btn-primary btn-sm" onClick={createKey}><Icon name="plus" size={14} /> Tạo key</button>
           </div>
@@ -157,6 +158,16 @@ export default function SettingsPage() {
                   onChange={e => setS({ ...s, autoAssignLeads: e.target.checked })} />
                 Tự chia lead chưa gán cho AM đang giữ ít lead mở nhất
               </label>
+            </div>
+            <div className="field full">
+              <label>Tên gọi chức danh theo công ty (v3.6) — để trống dùng tên mặc định; quyền hạn không đổi</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 8, marginTop: 4 }}>
+                {ROLES.map(r => (
+                  <input key={r} placeholder={ROLE_LABEL[r]} value={s.roleLabels?.[r] ?? ''}
+                    onChange={e => setS({ ...s, roleLabels: { ...(s.roleLabels || {}), [r]: e.target.value } })} />
+                ))}
+              </div>
+              <div className="hint">VD: công ty thương mại điện tử đổi "Quản lý dự án" → "Trưởng phòng Vận hành", "Account/Sales" → "Kinh doanh"</div>
             </div>
             <div className="field full">
               <label>Claude API key (bật AI Copilot)</label>
