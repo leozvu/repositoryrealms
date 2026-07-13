@@ -1,4 +1,4 @@
-# Agency ERP v3.4 — Đa người dùng, phân quyền theo cấp bậc
+# Agency ERP v3.5 — Đa người dùng, phân quyền theo cấp bậc
 
 Next.js 14 + Prisma + NextAuth. Dev chạy SQLite ngay trên máy, deploy đổi sang Postgres.
 
@@ -78,6 +78,13 @@ npm run dev          # → http://localhost:3300
 - **Chăm lead tự động**: cảnh báo đỏ lead mới quá 48h chưa liên hệ; tự chia lead chưa gán cho AM ít lead nhất (bật trong Cài đặt)
 - **Tìm kiếm toàn cục Ctrl+K**: khách, lead, dự án, việc, hóa đơn, ticket, NCC, hợp đồng, nhân sự — tôn trọng phân quyền
 - **Xuất CSV**: khách hàng, pipeline, hóa đơn, giờ công (BOM UTF-8, Excel đọc tiếng Việt chuẩn)
+
+**v3.5 — ERP vận hành**:
+- **Chuông thông báo 🔔**: gán việc, giao ticket, yêu cầu chờ duyệt, kết quả duyệt — gom một chỗ trên topbar, click nhảy thẳng trang, đánh dấu đọc
+- **Nguồn lực**: ma trận giờ công người × 4 tuần (màu theo tải, chuẩn 40h/tuần) + việc mở/trễ hạn/đến hạn 7 ngày — PM/HR nhìn 1 màn hình biết ai quá tải, ai trống
+- **Gắn tài liệu 📎**: dán link Drive/Notion/Figma vào dự án, khách hàng, hợp đồng
+- **In phiếu hợp đồng** (lưu PDF qua hộp thoại in) + **RFQ so giá NCC**: một hạng mục nhiều báo giá, tick chọn NCC thắng kèm lý do
+- **Onboarding nhân sự**: ứng viên "Nhận việc" → checklist 6 bước tự tạo + báo HR
 
 ## Import dữ liệu từ bản offline v1
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**
