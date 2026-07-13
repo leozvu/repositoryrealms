@@ -73,6 +73,45 @@ function GlobalSearch({ onClose }) {
   );
 }
 
+// v3.5: chuông thông báo — gom gán việc, phê duyệt, kết quả duyệt một chỗ
+function NotificationsModal({ onClose, onChanged }) {
+  const [data, setData] = useState(null);
+  const router = useRouter();
+  const load = () => fetch('/api/notifications').then(r => r.ok ? r.json() : null).then(setData);
+  useEffect(() => { load(); }, []);
+  const open = async n => {
+    await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: n.id }) });
+    onChanged?.(); onClose();
+    if (n.route) router.push(n.route);
+  };
+  const readAll = async () => {
+    await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ all: true }) });
+    onChanged?.(); load();
+  };
+  const ago = t => {
+    const m = Math.round((Date.now() - new Date(t)) / 60000);
+    return m < 60 ? m + ' phút' : m < 1440 ? Math.round(m / 60) + ' giờ' : Math.round(m / 1440) + ' ngày';
+  };
+  return (
+    <Modal title="Thông báo" onClose={onClose}
+      footer={<><button className="btn btn-outline" onClick={readAll}>Đọc tất cả</button>
+        <button className="btn btn-primary" onClick={onClose}>Đóng</button></>}>
+      <div style={{ maxHeight: 420, overflowY: 'auto' }}>
+        {(data?.rows || []).map(n => (
+          <div key={n.id} className="act-item" style={{ cursor: 'pointer', opacity: n.readAt ? .55 : 1 }} onClick={() => open(n)}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: n.readAt ? 'var(--border)' : 'var(--primary)', flex: 'none', marginTop: 7 }}></span>
+            <div style={{ flex: 1 }}>
+              <div className="act-title" style={{ fontWeight: n.readAt ? 400 : 700 }}>{n.text}</div>
+              <div className="act-sub">{ago(n.createdAt)} trước</div>
+            </div>
+          </div>
+        ))}
+        {data && !data.rows.length && <p style={{ fontSize: '.85rem', color: 'var(--muted)' }}>Chưa có thông báo nào — khi bạn được gán việc, được giao ticket hoặc có yêu cầu chờ duyệt, chúng sẽ hiện ở đây.</p>}
+      </div>
+    </Modal>
+  );
+}
+
 // v3.2: modal bật/tắt đăng nhập 2 lớp TOTP cho tài khoản của mình
 function TwoFAModal({ onClose }) {
   const [info, setInfo] = useState(null); // {enabled, secret, url}
@@ -171,6 +210,8 @@ export default function Shell({ user, company, children }) {
   const [unreadChat, setUnreadChat] = useState(0);
   const [show2fa, setShow2fa] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
+  const [unreadNotif, setUnreadNotif] = useState(0);
   const pathname = usePathname();
   const current = NAV.find(n => n.key && pathname.startsWith('/' + n.key));
   const myRoles = rolesOf(user);
@@ -182,6 +223,8 @@ export default function Shell({ user, company, children }) {
         .then(d => d && setPendingCount(d.pendingCount || 0)).catch(() => {});
       fetch('/api/chat').then(r => r.ok ? r.json() : null)
         .then(d => d && setUnreadChat(d.totalUnread || 0)).catch(() => {});
+      fetch('/api/notifications').then(r => r.ok ? r.json() : null)
+        .then(d => d && setUnreadNotif(d.unread || 0)).catch(() => {});
     };
     load();
     const t = setInterval(load, 15000);
@@ -244,6 +287,8 @@ export default function Shell({ user, company, children }) {
         </aside>
         {show2fa && <TwoFAModal onClose={() => setShow2fa(false)} />}
         {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
+        {showNotif && <NotificationsModal onClose={() => setShowNotif(false)}
+          onChanged={() => fetch('/api/notifications').then(r => r.ok ? r.json() : null).then(d => d && setUnreadNotif(d.unread || 0)).catch(() => {})} />}
         <div id="backdrop" className={open ? 'show' : ''} onClick={() => setOpen(false)}></div>
         <div id="main">
           <header id="topbar">
@@ -252,6 +297,10 @@ export default function Shell({ user, company, children }) {
             <div className="topbar-right">
               <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
                 <Icon name="search" size={14} /><span> Ctrl+K</span>
+              </button>
+              <button className="btn btn-outline btn-sm" onClick={() => setShowNotif(true)} title="Thông báo" style={{ position: 'relative' }} aria-label="Thông báo">
+                <span>🔔</span>
+                {unreadNotif > 0 && <span className="count" style={{ position: 'absolute', top: -7, right: -7, background: 'var(--danger)', color: '#fff' }}>{unreadNotif}</span>}
               </button>
               <span id="today-label">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
               <span className={`role-chip role-${myRoles[0]}`}>{myRoles.map(r => ROLE_LABEL[r] || r).join(' · ')}</span>

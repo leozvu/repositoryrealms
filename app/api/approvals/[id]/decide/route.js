@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { executeApproval, rejectSideEffect, currentStep, canDecide } from '@/lib/approvals';
+import { notify, usersWithRole } from '@/lib/events';
 
 export async function POST(req, { params }) {
   const user = await currentUser();
@@ -28,5 +29,16 @@ export async function POST(req, { params }) {
   });
   if (status === 'approved') await executeApproval(updated, user);
   if (status === 'rejected') await rejectSideEffect(updated);
+  // v3.5: báo chuông — người yêu cầu biết kết quả; còn bước tiếp thì báo người duyệt kế
+  if (status !== 'pending') {
+    if (ap.requesterId !== user.id)
+      await notify(ap.requesterId, `Yêu cầu "${ap.title}" đã được ${status === 'approved' ? 'DUYỆT ✅' : 'TỪ CHỐI ❌'} bởi ${user.name}`, '/approvals');
+  } else {
+    const next = steps.find(s => s.status === 'pending');
+    if (next) {
+      const targets = next.userId ? [next.userId] : (await usersWithRole(next.role)).map(u => u.id);
+      await notify(targets.filter(id => id !== user.id), `Chờ bạn duyệt (bước tiếp): ${ap.title}`, '/approvals');
+    }
+  }
   return NextResponse.json(updated);
 }

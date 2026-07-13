@@ -26,7 +26,8 @@ async function main() {
   console.log('⚠ Seed v3.2 — xóa toàn bộ dữ liệu cũ và tạo lại bộ demo (chỉ dùng cho dev).');
 
   /* ---------- Xóa theo thứ tự con → cha ---------- */
-  for (const m of ['contact', 'apiKey', 'webhook', 'rule', 'csatResponse',
+  for (const m of ['notification', 'docLink', 'rfq', 'onboarding',
+    'contact', 'apiKey', 'webhook', 'rule', 'csatResponse',
     'message', 'convMember', 'conversation', 'auditLog', 'approval', 'commission',
     'npsResponse', 'okr', 'ticket', 'budget', 'payroll', 'candidate', 'attendance', 'activity',
     'timeLog', 'task', 'milestone', 'invoice', 'quote', 'vendorBill', 'transaction', 'leave',

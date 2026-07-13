@@ -447,6 +447,51 @@ model CsatResponse {
   comment  String?
 }
 
+// ===== v3.5: Thông báo trong app (chuông) =====
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String // người nhận
+  text      String
+  route     String? // trang đích khi click, VD: /approvals
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// ===== v3.5: Gắn link tài liệu ngoài (Drive/Notion/Figma…) =====
+model DocLink {
+  id        String   @id @default(cuid())
+  refType   String // project | client | contract
+  refId     String
+  title     String
+  url       String
+  addedBy   String?
+  createdAt DateTime @default(now())
+}
+
+// ===== v3.5: RFQ so giá nhà cung cấp cho một hạng mục =====
+// quotes: JSON [{vendorId, price, note, chosen}]
+model Rfq {
+  id        String   @id @default(cuid())
+  title     String
+  status    String   @default("open") // open | decided
+  quotes    String   @default("[]")
+  note      String?
+  createdAt DateTime @default(now())
+}
+
+// ===== v3.5: Checklist onboarding nhân sự mới =====
+// items: JSON [{text, done}]
+model Onboarding {
+  id          String   @id @default(cuid())
+  name        String // tên nhân sự mới
+  candidateId String?
+  position    String?
+  startDate   String?
+  items       String   @default("[]")
+  status      String   @default("active") // active | done
+  createdAt   DateTime @default(now())
+}
+
 model Setting {
   id   Int    @id @default(1)
   json String @default("{}")
