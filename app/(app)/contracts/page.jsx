@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
+import { DocLinksModal } from '@/components/DocLinks';
 import { money, fmtDate, todayISO, daysFromNow } from '@/lib/format';
 
 const TYPE_LABEL = { client: ['HĐ khách hàng', 'b-blue'], vendor: ['HĐ nhà cung cấp', 'b-violet'], labor: ['HĐ lao động', 'b-gray'] };
@@ -67,6 +68,7 @@ export default function ContractsPage() {
                     : c.status === 'expired' ? <span className="badge b-red"><span className="dot"></span>Hết hạn</span>
                     : <span className="badge b-gray"><span className="dot"></span>Đã thanh lý</span>}</td>
                   <td><div className="row-actions">
+                    <button className="icon-btn" title="Tài liệu / bản scan hợp đồng" onClick={() => setModal({ mode: 'docs', row: c })}>📎</button>
                     <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: c })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
                     <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: c })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
                   </div></td>
@@ -81,6 +83,7 @@ export default function ContractsPage() {
         onClose={() => setModal(null)} onSave={async d => { await create({ ...d, value: +d.value || 0 }); toast('Đã thêm hợp đồng'); }} />}
       {modal?.mode === 'edit' && <FormModal title="Sửa hợp đồng" fields={FIELDS} data={modal.row}
         onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, { ...d, value: +d.value || 0 }); toast('Đã cập nhật'); }} />}
+      {modal?.mode === 'docs' && <DocLinksModal refType="contract" refId={modal.row.id} name={modal.row.code} onClose={() => setModal(null)} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa hợp đồng ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
     </>

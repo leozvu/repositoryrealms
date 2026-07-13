@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
+import { DocLinks } from '@/components/DocLinks';
 import { money, moneyShort, fmtDate, initials, docGrand, paidOf, remainOf, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
@@ -119,6 +120,13 @@ export default function ClientDetailPage() {
               ? <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Bạn không có quyền xem danh bạ thương mại.</p>
               : <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Chưa có ai — người liên hệ cũ: {client.contact || '—'}</p>)}
             {client.note && <p style={{ fontSize: '.78rem', color: 'var(--muted)', borderTop: '1px solid var(--border)', paddingTop: 10, marginTop: 8 }}>📝 {client.note}</p>}
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-head"><span className="card-title">📎 Tài liệu</span></div>
+          <div className="card-body" style={{ paddingTop: 8 }}>
+            <DocLinks refType="client" refId={id} />
           </div>
         </div>
 

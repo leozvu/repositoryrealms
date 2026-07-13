@@ -397,6 +397,15 @@ async function main() {
     ],
   });
 
+  /* ---------- Link tài liệu mẫu (v3.5) ---------- */
+  await prisma.docLink.createMany({
+    data: [
+      { refType: 'project', refId: p1.id, title: 'Brief BST Thu Đông (Notion)', url: 'https://notion.so/brief-bst-thu-dong', addedBy: pm.id },
+      { refType: 'project', refId: p1.id, title: 'Thư mục ảnh sản phẩm (Drive)', url: 'https://drive.google.com/drive/folders/eva-bst', addedBy: nhanvien.id },
+      { refType: 'client', refId: eva.id, title: 'Guideline thương hiệu EVA', url: 'https://drive.google.com/file/eva-guideline', addedBy: am.id },
+    ],
+  });
+
   /* ---------- Rule tự động mẫu (v3.3) ---------- */
   await prisma.rule.createMany({
     data: [

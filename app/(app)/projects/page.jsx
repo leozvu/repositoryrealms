@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
+import { DocLinksModal } from '@/components/DocLinks';
 import { money, fmtDate, todayISO, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
@@ -63,6 +64,7 @@ export default function ProjectsPage() {
                   <td><Badge map="project" k={p.status} /></td>
                   {isMgmt && (
                     <td><div className="row-actions">
+                      <button className="icon-btn" title="Tài liệu (Drive/Notion…)" onClick={() => setModal({ mode: 'docs', row: p })}>📎</button>
                       <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: p })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
                       <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: p })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
                     </div></td>
@@ -78,6 +80,7 @@ export default function ProjectsPage() {
         onClose={() => setModal(null)} onSave={async d => { await create(d); toast('Đã thêm dự án'); }} />}
       {modal?.mode === 'edit' && <FormModal title="Sửa dự án" fields={FIELDS} data={modal.row}
         onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, d); toast('Đã cập nhật'); }} />}
+      {modal?.mode === 'docs' && <DocLinksModal refType="project" refId={modal.row.id} name={modal.row.name} onClose={() => setModal(null)} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa dự án "${modal.row.name}"? Công việc thuộc dự án cần được xóa/chuyển trước.`}
         onClose={() => setModal(null)} onYes={async () => { const r = await remove(modal.row.id); if (r) toast('Đã xóa'); }} />}
     </>
