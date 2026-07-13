@@ -26,7 +26,7 @@ async function main() {
   console.log('⚠ Seed v3.2 — xóa toàn bộ dữ liệu cũ và tạo lại bộ demo (chỉ dùng cho dev).');
 
   /* ---------- Xóa theo thứ tự con → cha ---------- */
-  for (const m of ['notification', 'docLink', 'rfq', 'onboarding',
+  for (const m of ['taskComment', 'notification', 'docLink', 'rfq', 'onboarding',
     'contact', 'apiKey', 'webhook', 'rule', 'csatResponse',
     'message', 'convMember', 'conversation', 'auditLog', 'approval', 'commission',
     'npsResponse', 'okr', 'ticket', 'budget', 'payroll', 'candidate', 'attendance', 'activity',
@@ -122,7 +122,19 @@ async function main() {
   /* ---------- Công việc: đủ 4 cột kanban, 3 việc trễ hạn ---------- */
   // Chuỗi phụ thuộc P1 (v3.2): kịch bản → quay dựng → setup ads (tạo riêng để lấy id)
   const tScript = await prisma.task.create({ data: { title: 'Kịch bản video hero 45s', projectId: p1.id, assigneeId: content.id, priority: 'high', status: 'done', dueDate: D(-18) } });
-  const tShoot = await prisma.task.create({ data: { title: 'Quay + dựng video hero', projectId: p1.id, assigneeId: lead.id, priority: 'high', status: 'review', dueDate: D(+2), dependsOn: J([tScript.id]) } });
+  const tShoot = await prisma.task.create({
+    data: {
+      title: 'Quay + dựng video hero', projectId: p1.id, assigneeId: lead.id, priority: 'high', status: 'review', dueDate: D(+2), dependsOn: J([tScript.id]),
+      checklist: J([{ text: 'Quay đủ 3 bối cảnh', done: true }, { text: 'Dựng bản nháp 60s', done: true }, { text: 'Chèn nhạc + màu', done: false }, { text: 'Xuất bản final 45s', done: false }]),
+    },
+  });
+  await prisma.taskComment.createMany({
+    data: [
+      { taskId: tShoot.id, userId: pm.id, content: 'Khách muốn tone ấm hơn ở cảnh cuối nhé, xem lại bản màu.' },
+      { taskId: tShoot.id, userId: lead.id, content: 'Ok anh, chiều nay em gửi bản chỉnh màu v2.' },
+    ],
+  });
+  await prisma.task.create({ data: { title: 'Báo cáo ads tuần gửi khách retainer', projectId: p2.id, assigneeId: media.id, priority: 'medium', status: 'todo', dueDate: D(+2), recur: 'weekly', note: 'Việc định kỳ — xong tự tạo kỳ sau', checklist: J([{ text: 'Tổng hợp số liệu ads', done: false }, { text: 'Viết nhận xét + đề xuất', done: false }]) } });
   await prisma.task.create({ data: { title: 'Setup chiến dịch ads giai đoạn 1', projectId: p1.id, assigneeId: media.id, priority: 'medium', status: 'doing', dueDate: D(+5), dependsOn: J([tShoot.id]), note: 'Chỉ chạy ads sau khi video hero hoàn thành' } });
   await prisma.task.createMany({
     data: [

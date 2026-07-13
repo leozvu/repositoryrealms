@@ -113,6 +113,17 @@ model Task {
   dueDate    String?
   note       String?
   dependsOn  String   @default("[]") // v3.2: JSON [taskId] — việc phải xong trước mới được hoàn thành
+  checklist  String   @default("[]") // v3.7: JSON [{text, done}] — các bước con trong việc
+  recur      String? // v3.7: weekly | monthly — xong tự tạo kỳ sau
+}
+
+// ===== v3.7: Bình luận trao đổi trên công việc =====
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
 }
 
 // ===== v3.2: Mốc dự án hiển thị trên Gantt =====

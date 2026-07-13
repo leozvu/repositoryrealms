@@ -1,9 +1,133 @@
 'use client';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, FormModal, ConfirmDialog, Badge, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, FormModal, ConfirmDialog, Badge, useToast } from '@/components/ui';
 import { fmtDate, todayISO, daysFromNow, initials, parseItems, TASK_COLS, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
+
+const RECUR_OPTS = [{ value: '', label: 'Không lặp' }, { value: 'weekly', label: '🔁 Hàng tuần' }, { value: 'monthly', label: '🔁 Hàng tháng' }];
+
+/* ---------- v3.7: modal chi tiết việc — form + checklist + bình luận + ghi giờ ---------- */
+function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, onDelete, onClose }) {
+  const comments = useResource('taskcomments');
+  const timelogs = useResource('timelogs');
+  const toast = useToast();
+  const [f, setF] = useState({
+    title: task.title, projectId: task.projectId || '', assigneeId: task.assigneeId || '',
+    priority: task.priority, status: task.status, dueDate: task.dueDate || '',
+    recur: task.recur || '', note: task.note || '',
+    dependsOn: parseItems(task.dependsOn), checklist: parseItems(task.checklist),
+  });
+  const [cmt, setCmt] = useState('');
+  const [newItem, setNewItem] = useState('');
+  const [logH, setLogH] = useState('');
+  const set = (k, v) => setF(x => ({ ...x, [k]: v }));
+  const myComments = comments.rows.filter(c => c.taskId === task.id);
+  const uName = id => users.find(u => u.id === id)?.name || '—';
+  const doneN = f.checklist.filter(c => c.done).length;
+
+  const sendCmt = async () => {
+    if (!cmt.trim()) return;
+    await comments.create({ taskId: task.id, content: cmt.trim() });
+    setCmt('');
+  };
+  const quickLog = async () => {
+    const h = +logH;
+    if (!h || h <= 0) return toast('Nhập số giờ hợp lệ', 'error');
+    if (!f.projectId) return toast('Việc chung không gắn dự án — ghi giờ trong trang Chấm công giờ', 'error');
+    const r = await timelogs.create({ projectId: f.projectId, date: todayISO(), hours: h, billable: true, note: f.title });
+    if (r) { toast(`Đã ghi ${h}h cho hôm nay`); setLogH(''); }
+  };
+
+  return (
+    <Modal title={`Chi tiết công việc`} onClose={onClose} large
+      footer={<>
+        {isMgmt && <button className="btn btn-ghost" style={{ marginRight: 'auto', color: 'var(--danger)' }} onClick={onDelete}><Icon name="trash" size={16} /> Xóa</button>}
+        <button className="btn btn-outline" onClick={onClose}>Hủy</button>
+        <button className="btn btn-primary" onClick={() => { if (!f.title.trim()) return; onSave(f); onClose(); }}>Lưu</button>
+      </>}>
+      <div className="form-grid">
+        <div className="field full"><label>Tên công việc *</label><input value={f.title} onChange={e => set('title', e.target.value)} /></div>
+        <div className="field"><label>Dự án</label>
+          <select value={f.projectId} onChange={e => set('projectId', e.target.value)}>
+            <option value="">— Việc chung —</option>
+            {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select></div>
+        <div className="field"><label>Người phụ trách</label>
+          <select value={f.assigneeId} onChange={e => set('assigneeId', e.target.value)} disabled={!isMgmt && task.assigneeId !== me?.id}>
+            {users.filter(u => u.status === 'active').map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+          </select></div>
+        <div className="field"><label>Ưu tiên</label>
+          <select value={f.priority} onChange={e => set('priority', e.target.value)}>
+            {Object.entries(BADGE.priority).map(([v, [l]]) => <option key={v} value={v}>{l}</option>)}
+          </select></div>
+        <div className="field"><label>Trạng thái</label>
+          <select value={f.status} onChange={e => set('status', e.target.value)}>
+            {TASK_COLS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+          </select></div>
+        <div className="field"><label>Hạn hoàn thành</label><input type="date" value={f.dueDate} onChange={e => set('dueDate', e.target.value)} /></div>
+        <div className="field"><label>Lặp lại (v3.7)</label>
+          <select value={f.recur} onChange={e => set('recur', e.target.value)}>
+            {RECUR_OPTS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select></div>
+        <div className="field full"><label>Phụ thuộc vào (Ctrl+click chọn nhiều)</label>
+          <select multiple size={3} value={f.dependsOn} onChange={e => set('dependsOn', [...e.target.selectedOptions].map(o => o.value))}>
+            {allTasks.filter(t => t.id !== task.id).map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+          </select></div>
+        <div className="field full"><label>Mô tả</label><textarea value={f.note} onChange={e => set('note', e.target.value)} /></div>
+
+        {/* Checklist các bước con */}
+        <div className="field full">
+          <label>Checklist ({doneN}/{f.checklist.length})</label>
+          {f.checklist.map((c, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '3px 0' }}>
+              <input type="checkbox" style={{ width: 'auto' }} checked={!!c.done}
+                onChange={() => set('checklist', f.checklist.map((x, j) => j === i ? { ...x, done: !x.done } : x))} />
+              <span style={{ flex: 1, fontSize: '.85rem', ...(c.done ? { textDecoration: 'line-through', color: 'var(--muted)' } : {}) }}>{c.text}</span>
+              <button className="icon-btn" onClick={() => set('checklist', f.checklist.filter((_, j) => j !== i))}><Icon name="x" size={13} /></button>
+            </div>
+          ))}
+          <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+            <input style={{ flex: 1 }} placeholder="Thêm bước con… (Enter)" value={newItem} onChange={e => setNewItem(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && newItem.trim()) { e.preventDefault(); set('checklist', [...f.checklist, { text: newItem.trim(), done: false }]); setNewItem(''); } }} />
+            <button className="btn btn-outline btn-sm" onClick={() => { if (newItem.trim()) { set('checklist', [...f.checklist, { text: newItem.trim(), done: false }]); setNewItem(''); } }}><Icon name="plus" size={13} /></button>
+          </div>
+          <div className="hint">Nhớ bấm Lưu để giữ thay đổi checklist.</div>
+        </div>
+
+        {/* Ghi giờ nhanh */}
+        <div className="field full" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ fontSize: '.85rem' }}>⏱ Ghi giờ hôm nay cho việc này:</span>
+          <input style={{ width: 90 }} type="number" min="0.5" step="0.5" placeholder="giờ" value={logH} onChange={e => setLogH(e.target.value)} />
+          <button className="btn btn-outline btn-sm" onClick={quickLog}>Ghi giờ</button>
+        </div>
+
+        {/* Bình luận trao đổi */}
+        <div className="field full" style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+          <label>Trao đổi ({myComments.length})</label>
+          <div style={{ maxHeight: 180, overflowY: 'auto', display: 'grid', gap: 6 }}>
+            {myComments.map(c => (
+              <div key={c.id} className="act-item" style={{ alignItems: 'flex-start' }}>
+                <span className="avatar" style={{ flex: 'none' }}>{initials(uName(c.userId))}</span>
+                <div style={{ flex: 1 }}>
+                  <div className="act-title">{uName(c.userId)} <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '.72rem' }}>· {new Date(c.createdAt).toLocaleString('vi-VN')}</span></div>
+                  <div style={{ fontSize: '.84rem', whiteSpace: 'pre-wrap' }}>{c.content}</div>
+                </div>
+                {c.userId === me?.id && <button className="icon-btn danger" onClick={() => comments.remove(c.id)}><Icon name="x" size={12} /></button>}
+              </div>
+            ))}
+            {!myComments.length && <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Chưa có trao đổi nào — người phụ trách sẽ nhận thông báo khi bạn bình luận.</p>}
+          </div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+            <input style={{ flex: 1 }} placeholder="Viết bình luận… (Enter gửi)" value={cmt} onChange={e => setCmt(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); sendCmt(); } }} />
+            <button className="btn btn-primary btn-sm" onClick={sendCmt}>Gửi</button>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
 
 export default function TasksPage() {
   const { data: session } = useSession();
@@ -21,21 +145,17 @@ export default function TasksPage() {
 
   const userName = id => users.rows.find(u => u.id === id)?.name || '—';
   const projName = id => projects.rows.find(p => p.id === id)?.name || 'Việc chung';
-  const FIELDS = [
+  const ADD_FIELDS = [
     { key: 'title', label: 'Tên công việc', required: true, full: true },
     { key: 'projectId', label: 'Dự án', type: 'select', options: [{ value: '', label: '— Việc chung —' }, ...projects.rows.map(p => ({ value: p.id, label: p.name }))] },
     { key: 'assigneeId', label: 'Người phụ trách', type: 'select', options: users.rows.filter(u => u.status === 'active').map(u => ({ value: u.id, label: u.name })) },
     { key: 'priority', label: 'Ưu tiên', type: 'select', options: Object.entries(BADGE.priority).map(([v, [l]]) => ({ value: v, label: l })) },
-    { key: 'status', label: 'Trạng thái', type: 'select', options: TASK_COLS.map(c => ({ value: c.key, label: c.label })) },
     { key: 'dueDate', label: 'Hạn hoàn thành', type: 'date' },
-    { key: 'dependsOn', label: 'Phụ thuộc vào (Ctrl+click chọn nhiều)', type: 'multiselect', full: true,
-      options: rows.filter(t => t.id !== modal?.row?.id).map(t => ({ value: t.id, label: `${t.title} · ${projName(t.projectId)}` })),
-      hint: 'Việc này chỉ hoàn thành được sau khi các việc đã chọn xong' },
+    { key: 'recur', label: 'Lặp lại', type: 'select', options: RECUR_OPTS },
     { key: 'note', label: 'Mô tả', type: 'textarea', full: true },
   ];
   const visible = rows.filter(t => (proj === 'all' || String(t.projectId || '') === proj) && (!mine || t.assigneeId === user?.id));
   const canDrag = t => isMgmt || t.assigneeId === user?.id;
-  // v3.2: việc bị chặn = còn việc phụ thuộc chưa xong
   const blockers = t => parseItems(t.dependsOn).map(id => rows.find(r => r.id === id)).filter(d => d && d.status !== 'done');
 
   const drop = async status => {
@@ -73,14 +193,17 @@ export default function TasksPage() {
               <div className="kan-head"><span className="dot" style={{ background: c.color }}></span>{c.label}<span className="count">{items.length}</span></div>
               {items.map(t => {
                 const late = t.status !== 'done' && t.dueDate && t.dueDate < todayISO();
+                const cl = parseItems(t.checklist);
                 return (
                   <div key={t.id} className="kan-card" draggable={canDrag(t)}
                     onDragStart={() => canDrag(t) && setDragId(t.id)}
                     onClick={() => setModal({ mode: 'edit', row: t })}
                     style={canDrag(t) ? {} : { opacity: .75, cursor: 'default' }}>
                     <div className="kan-title">{blockers(t).length > 0 && t.status !== 'done' &&
-                      <span title={`Chờ: ${blockers(t).map(b => b.title).join(', ')}`} style={{ marginRight: 4 }}>⛓</span>}{t.title}</div>
-                    <div className="kan-sub">{projName(t.projectId)}</div>
+                      <span title={`Chờ: ${blockers(t).map(b => b.title).join(', ')}`} style={{ marginRight: 4 }}>⛓</span>}
+                      {t.recur && <span title={t.recur === 'weekly' ? 'Lặp hàng tuần' : 'Lặp hàng tháng'} style={{ marginRight: 4 }}>🔁</span>}
+                      {t.title}</div>
+                    <div className="kan-sub">{projName(t.projectId)}{cl.length > 0 && <> · ☑ {cl.filter(x => x.done).length}/{cl.length}</>}</div>
                     <div className="kan-foot">
                       <Badge map="priority" k={t.priority} />
                       <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -96,19 +219,24 @@ export default function TasksPage() {
         })}
       </div>
       <p style={{ fontSize: '.76rem', color: 'var(--muted)', marginTop: 4 }}>
-        {isMgmt ? 'Kéo thả để đổi trạng thái.' : 'Bạn chỉ kéo được thẻ việc được gán cho mình.'}
+        {isMgmt ? 'Kéo thả để đổi trạng thái · nhấp thẻ để mở chi tiết (checklist, trao đổi, ghi giờ).' : 'Bạn chỉ kéo được thẻ việc được gán cho mình · nhấp thẻ để mở chi tiết.'}
       </p>
 
-      {modal?.mode === 'add' && <FormModal title="Thêm công việc" fields={FIELDS}
-        data={{ status: 'todo', priority: 'medium', dueDate: daysFromNow(3), projectId: proj !== 'all' ? proj : '' }}
+      {modal?.mode === 'add' && <FormModal title="Thêm công việc" fields={ADD_FIELDS}
+        data={{ priority: 'medium', dueDate: daysFromNow(3), projectId: proj !== 'all' ? proj : '', recur: '' }}
         onClose={() => setModal(null)}
-        onSave={async d => { await create({ ...d, projectId: d.projectId || null, dependsOn: JSON.stringify(d.dependsOn || []) }); toast('Đã thêm công việc'); }} />}
-      {modal?.mode === 'edit' && <FormModal title="Chi tiết công việc" fields={FIELDS}
-        data={{ ...modal.row, projectId: modal.row.projectId || '', dependsOn: parseItems(modal.row.dependsOn) }}
-        onClose={() => setModal(null)}
-        onSave={async d => { await update(modal.row.id, { ...d, projectId: d.projectId || null, dependsOn: JSON.stringify(d.dependsOn || []) }); toast('Đã cập nhật'); }}
-        extraFooter={isMgmt && <button className="btn btn-ghost" style={{ marginRight: 'auto', color: 'var(--danger)' }}
-          onClick={() => setModal({ mode: 'del', row: modal.row })}><Icon name="trash" size={16} /> Xóa</button>} />}
+        onSave={async d => { await create({ ...d, status: 'todo', projectId: d.projectId || null, recur: d.recur || null }); toast('Đã thêm công việc'); }} />}
+      {modal?.mode === 'edit' && <TaskDetailModal task={modal.row} projects={projects.rows} users={users.rows} allTasks={rows}
+        isMgmt={isMgmt} me={user} onClose={() => setModal(null)}
+        onDelete={() => setModal({ mode: 'del', row: modal.row })}
+        onSave={async f => {
+          await update(modal.row.id, {
+            title: f.title, projectId: f.projectId || null, assigneeId: f.assigneeId || null,
+            priority: f.priority, status: f.status, dueDate: f.dueDate || null, recur: f.recur || null,
+            note: f.note, dependsOn: JSON.stringify(f.dependsOn || []), checklist: JSON.stringify(f.checklist || []),
+          });
+          toast('Đã cập nhật');
+        }} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa công việc "${modal.row.title}"?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
     </>

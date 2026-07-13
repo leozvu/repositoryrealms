@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { RESOURCES, canWrite, canDelete } from '@/lib/registry';
+import { isDirector } from '@/lib/perm';
 import { interceptWrite } from '@/lib/approvals';
 import { emitEvent } from '@/lib/events';
 
@@ -48,6 +49,10 @@ export async function DELETE(req, { params }) {
   if (!cfg || !canDelete(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
+  // v3.7: xóa cũng phải qua kiểm tra hàng (VD bình luận chỉ chủ nhân xóa; GĐ luôn được)
+  if (cfg.canWriteRow && !isDirector(user) && !cfg.canWriteRow(row, user)) {
+    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  }
   try {
     await prisma[cfg.model].delete({ where: { id: params.id } });
     await audit(user, 'delete', params.resource, params.id, row.name || row.title || row.code || null);
