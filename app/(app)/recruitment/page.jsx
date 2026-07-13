@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useResource, Icon, FormModal, ConfirmDialog, Forbidden, useToast } from '@/components/ui';
-import { todayISO, initials } from '@/lib/format';
+import { todayISO, initials, fmtDate, parseItems } from '@/lib/format';
 
 const STAGES = [
   { key: 'applied', label: 'Ứng tuyển', color: '#94A3B8' },
@@ -14,6 +14,7 @@ const STAGES = [
 
 export default function RecruitmentPage() {
   const { rows, forbidden, create, update, remove } = useResource('candidates');
+  const onboardings = useResource('onboardings');
   const [modal, setModal] = useState(null);
   const [dragId, setDragId] = useState(null);
   const [overCol, setOverCol] = useState(null);
@@ -70,7 +71,44 @@ export default function RecruitmentPage() {
           );
         })}
       </div>
-      <p style={{ fontSize: '.76rem', color: 'var(--muted)', marginTop: 4 }}>Kéo thả ứng viên qua các vòng. Ứng viên "Nhận việc" → tạo tài khoản trong mục Nhân sự.</p>
+      <p style={{ fontSize: '.76rem', color: 'var(--muted)', marginTop: 4 }}>Kéo thả ứng viên qua các vòng. Ứng viên "Nhận việc" → checklist onboarding tự tạo bên dưới.</p>
+
+      {/* v3.5: checklist onboarding nhân sự mới — tự tạo khi ứng viên "Nhận việc" */}
+      {onboardings.rows.length > 0 && (
+        <>
+          <div className="section-title" style={{ marginTop: 20 }}>Onboarding nhân sự mới</div>
+          <div className="grid two-col">
+            {onboardings.rows.map(ob => {
+              const items = parseItems(ob.items);
+              const doneN = items.filter(i => i.done).length;
+              const allDone = doneN === items.length && items.length > 0;
+              const toggle = async idx => {
+                const next = items.map((it, j) => j === idx ? { ...it, done: !it.done } : it);
+                await onboardings.update(ob.id, { items: JSON.stringify(next), status: next.every(i => i.done) ? 'done' : 'active' });
+              };
+              return (
+                <div key={ob.id} className="card" style={allDone ? { opacity: .65 } : {}}>
+                  <div className="card-head">
+                    <span className="card-title">{ob.name}{ob.position ? ` — ${ob.position}` : ''}</span>
+                    <span className="badge" style={{ background: allDone ? 'var(--accent-soft, #d1fae5)' : 'var(--warn-soft, #fef3c7)' }}>
+                      {doneN}/{items.length}{allDone ? ' ✓ xong' : ''}</span>
+                    <button className="icon-btn danger" onClick={() => setModal({ mode: 'delOb', row: ob })} aria-label="Xóa"><Icon name="trash" size={14} /></button>
+                  </div>
+                  <div className="card-body" style={{ paddingTop: 8 }}>
+                    {items.map((it, idx) => (
+                      <label key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.84rem', padding: '5px 0', cursor: 'pointer' }}>
+                        <input type="checkbox" style={{ width: 'auto' }} checked={!!it.done} onChange={() => toggle(idx)} />
+                        <span style={it.done ? { textDecoration: 'line-through', color: 'var(--muted)' } : {}}>{it.text}</span>
+                      </label>
+                    ))}
+                    <div className="hint" style={{ marginTop: 6 }}>Tạo từ {fmtDate(String(ob.createdAt).slice(0, 10))} · tài khoản đăng nhập tạo trong mục Nhân sự</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {modal?.mode === 'add' && <FormModal title="Thêm ứng viên" fields={FIELDS} data={{ stage: 'applied', source: 'TopCV' }}
         onClose={() => setModal(null)} onSave={async d => { await create({ ...d, createdAt: todayISO() }); toast('Đã thêm ứng viên'); }} />}
@@ -80,6 +118,8 @@ export default function RecruitmentPage() {
           onClick={() => setModal({ mode: 'del', row: modal.row })}><Icon name="trash" size={16} /> Xóa</button>} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa hồ sơ ứng viên "${modal.row.name}"?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
+      {modal?.mode === 'delOb' && <ConfirmDialog msg={`Xóa checklist onboarding của "${modal.row.name}"?`}
+        onClose={() => setModal(null)} onYes={async () => { await onboardings.remove(modal.row.id); toast('Đã xóa'); }} />}
     </>
   );
 }

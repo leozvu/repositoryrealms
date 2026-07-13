@@ -397,6 +397,32 @@ async function main() {
     ],
   });
 
+  /* ---------- RFQ so giá + onboarding mẫu (v3.5) ---------- */
+  await prisma.rfq.create({
+    data: {
+      title: 'In 500 standee + backdrop chiến dịch EVA', status: 'decided',
+      quotes: J([
+        { vendorId: vPrint.id, price: 8000000, note: 'Giao 3 ngày, chất lượng quen' },
+        { vendorId: vStudio.id, price: 9500000, note: 'Giao 1 ngày nhưng đắt hơn', chosen: false },
+      ].map((q, i) => i === 0 ? { ...q, chosen: true } : q)),
+      note: 'Chọn Nhà in Sao Việt — rẻ hơn 1.5tr, deadline không gấp',
+    },
+  });
+  const hired = await prisma.candidate.findFirst({ where: { stage: 'hired' } });
+  await prisma.onboarding.create({
+    data: {
+      name: hired?.name || 'Hồ Minh Nhật', candidateId: hired?.id || null, position: hired?.position || 'Video Editor',
+      items: J([
+        { text: 'Ký hợp đồng lao động + nhận hồ sơ', done: true },
+        { text: 'Tạo tài khoản ERP + email công ty', done: true },
+        { text: 'Chuẩn bị laptop / thiết bị làm việc', done: false },
+        { text: 'Thêm vào Kênh chung + nhóm làm việc', done: false },
+        { text: 'Giới thiệu team + chỉ định người hướng dẫn', done: false },
+        { text: 'Hướng dẫn chấm công, nghỉ phép, quy trình nội bộ', done: false },
+      ]),
+    },
+  });
+
   /* ---------- Link tài liệu mẫu (v3.5) ---------- */
   await prisma.docLink.createMany({
     data: [
