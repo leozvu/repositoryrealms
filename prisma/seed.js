@@ -26,7 +26,7 @@ async function main() {
   console.log('⚠ Seed v3.2 — xóa toàn bộ dữ liệu cũ và tạo lại bộ demo (chỉ dùng cho dev).');
 
   /* ---------- Xóa theo thứ tự con → cha ---------- */
-  for (const m of ['taskComment', 'notification', 'docLink', 'rfq', 'onboarding',
+  for (const m of ['review', 'taskComment', 'notification', 'docLink', 'rfq', 'onboarding',
     'contact', 'apiKey', 'webhook', 'rule', 'csatResponse',
     'message', 'convMember', 'conversation', 'auditLog', 'approval', 'commission',
     'npsResponse', 'okr', 'ticket', 'budget', 'payroll', 'candidate', 'attendance', 'activity',
@@ -61,7 +61,8 @@ async function main() {
   const pm = await mkUser({ email: 'pm@agency.vn', name: 'Trần Quốc Việt', passwordHash: mk('pm123456'), role: 'PM', roles: J(['PM']), title: 'Project Manager', salary: 22000000 });
   const hr = await mkUser({ email: 'hr@agency.vn', name: 'Lê Thị Hồng Nhung', passwordHash: mk('hr123456'), role: 'HR', roles: J(['HR']), title: 'HR Executive', salary: 15000000 });
   const lead = await mkUser({ email: 'truongnhom@agency.vn', name: 'Đỗ Văn Khánh', passwordHash: mk('lead1234'), role: 'LEAD', roles: J(['LEAD']), title: 'Trưởng nhóm Sáng tạo', salary: 19000000, teamId: teamCreative.id });
-  const nhanvien = await mkUser({ email: 'nhanvien@agency.vn', name: 'Lê Thu Hà', passwordHash: mk('nhanvien123'), role: 'STAFF', roles: J(['STAFF']), title: 'Designer', salary: 14000000, teamId: teamCreative.id });
+  const bdayThisWeek = (() => { const d = new Date(); d.setDate(d.getDate() + 3); return `1998-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
+  const nhanvien = await mkUser({ email: 'nhanvien@agency.vn', name: 'Lê Thu Hà', passwordHash: mk('nhanvien123'), role: 'STAFF', roles: J(['STAFF']), title: 'Designer', salary: 14000000, teamId: teamCreative.id, birthday: bdayThisWeek });
   const quanly = await mkUser({ email: 'quanly@agency.vn', name: 'Trần Quốc Bảo', passwordHash: mk('quanly123'), role: 'MANAGER', roles: J(['PM', 'AM', 'ACCOUNTANT']), title: 'Quản lý (đa vai trò)', salary: 25000000 });
   const content = await mkUser({ email: 'content@agency.vn', name: 'Ngô Mai Phương', passwordHash: mk('demo1234'), role: 'STAFF', roles: J(['STAFF']), title: 'Content Writer', salary: 12000000, teamId: teamCreative.id });
   const media = await mkUser({ email: 'media@agency.vn', name: 'Bùi Đức Mạnh', passwordHash: mk('demo1234'), role: 'STAFF', roles: J(['STAFF']), title: 'Media Buyer', salary: 13000000, teamId: teamMedia.id });
@@ -441,6 +442,16 @@ async function main() {
       { refType: 'project', refId: p1.id, title: 'Brief BST Thu Đông (Notion)', url: 'https://notion.so/brief-bst-thu-dong', addedBy: pm.id },
       { refType: 'project', refId: p1.id, title: 'Thư mục ảnh sản phẩm (Drive)', url: 'https://drive.google.com/drive/folders/eva-bst', addedBy: nhanvien.id },
       { refType: 'client', refId: eva.id, title: 'Guideline thương hiệu EVA', url: 'https://drive.google.com/file/eva-guideline', addedBy: am.id },
+    ],
+  });
+
+  /* ---------- Đợt đánh giá hiệu suất quý này (v3.8) ---------- */
+  const CRIT = ['Chất lượng công việc', 'Tiến độ & deadline', 'Chủ động & sáng tạo', 'Phối hợp nhóm', 'Kỷ luật & thái độ'];
+  await prisma.review.createMany({
+    data: [
+      { userId: nhanvien.id, quarter: Q(), status: 'final', selfNote: 'Em muốn học thêm motion graphics', mgrNote: 'Thiết kế ổn định, cần chủ động deadline hơn', scores: J(CRIT.map((name, i) => ({ name, self: [4, 3, 4, 5, 4][i], mgr: [4, 3, 4, 5, 5][i] }))) },
+      { userId: content.id, quarter: Q(), status: 'self_done', selfNote: 'Quý này em viết đều 20 bài/tháng', scores: J(CRIT.map((name, i) => ({ name, self: [4, 4, 3, 4, 5][i], mgr: 0 }))) },
+      { userId: media.id, quarter: Q(), status: 'pending', scores: '[]' },
     ],
   });
 

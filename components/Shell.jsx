@@ -196,6 +196,7 @@ const NAV = [
   { key: 'attendance', label: 'Chấm công ngày', icon: 'calendar', roles: ALL },
   { key: 'payroll', label: 'Bảng lương', icon: 'wallet', roles: ALL },
   { key: 'recruitment', label: 'Tuyển dụng', icon: 'leads', roles: ['HR'] },
+  { key: 'reviews', label: 'Đánh giá hiệu suất', icon: 'trendUp', roles: ALL },
   { section: 'Công ty' },
   { key: 'assets', label: 'Tài sản', icon: 'projects', roles: ALL },
   { key: 'reports', label: 'Báo cáo', icon: 'reports', roles: ['ACCOUNTANT', 'PM'] },

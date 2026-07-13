@@ -27,6 +27,7 @@ model User {
   salary       Int       @default(0) // chỉ DIRECTOR và chính chủ được xem
   status       String    @default("active") // active | inactive
   totpSecret   String? // v3.2: 2FA TOTP — null = chưa bật
+  birthday     String? // v3.8: YYYY-MM-DD — AI Summary nhắc sinh nhật
   createdAt    DateTime  @default(now())
   tasks        Task[]
   timeLogs     TimeLog[]
@@ -115,6 +116,21 @@ model Task {
   dependsOn  String   @default("[]") // v3.2: JSON [taskId] — việc phải xong trước mới được hoàn thành
   checklist  String   @default("[]") // v3.7: JSON [{text, done}] — các bước con trong việc
   recur      String? // v3.7: weekly | monthly — xong tự tạo kỳ sau
+}
+
+// ===== v3.8: Đánh giá hiệu suất theo quý =====
+// scores: JSON [{name, self, mgr}] — điểm 1-5 theo tiêu chí
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  quarter   String // VD: 2026-Q3
+  scores    String   @default("[]")
+  selfNote  String?
+  mgrNote   String?
+  status    String   @default("pending") // pending (chờ tự chấm) | self_done | final
+  createdAt DateTime @default(now())
+
+  @@unique([userId, quarter])
 }
 
 // ===== v3.7: Bình luận trao đổi trên công việc =====
