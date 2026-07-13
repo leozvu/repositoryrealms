@@ -2,12 +2,20 @@
 
 Next.js 14 + Prisma + NextAuth + **Supabase Postgres**.
 
-## 🌐 Production (đã deploy)
+## 🌐 Production — hệ 3 doanh nghiệp + Master (v3.6)
 
-- **App**: https://agency-erp-mu.vercel.app (Vercel, region Singapore)
-- **Database**: Supabase project `agency-erp` (`sueqktvmwgonaflogobe`, ap-southeast-1)
-- Redeploy sau khi sửa code: `npx vercel deploy --prod` (đã link sẵn trong `.vercel/`)
-- Env production quản lý trên Vercel: `DATABASE_URL` (pooler 6543 + pgbouncer), `DIRECT_URL` (5432), `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
+| Entity | URL | Postgres schema |
+|---|---|---|
+| **AIm Agency** | https://agency-erp-mu.vercel.app | `public` (có dữ liệu demo) |
+| **Egoric Agency** | https://erp-egoric.vercel.app | `egoric` (sạch) |
+| **Vnecom LLC** | https://erp-vnecom.vercel.app | `vnecom` (sạch) |
+| **Master Dashboard** | https://erp-master-leoz.vercel.app | — (repo riêng `../erp-master`) |
+
+- Một codebase → 3 Vercel project (`agency-erp`, `erp-egoric`, `erp-vnecom`), khác nhau chỉ ở env; DB chung Supabase `sueqktvmwgonaflogobe` (Singapore) tách bằng **3 Postgres schema** qua `?schema=` — dữ liệu, người dùng, vai trò, cài đặt cách ly hoàn toàn
+- Mỗi công ty tự đặt **tên chức danh** trong Cài đặt (roleLabels) + tự gán vai trò/quyền cho người của mình
+- Master gọi `/api/v1/summary` của từng instance bằng API key vai trò Giám đốc (key tên `master-dashboard` trong Cài đặt mỗi instance — xóa key là master mất quyền đọc instance đó)
+- **Redeploy một instance**: `npx vercel link --yes --project <tên-project> --scope leozs-projects-64a5f0c8` rồi `npx vercel deploy --prod` (nhớ relink về `agency-erp` sau khi xong)
+- Env mỗi project trên Vercel: `DATABASE_URL` (pooler 6543 + pgbouncer + schema), `DIRECT_URL` (5432 + schema), `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
 
 ## Chạy trên máy (dev)
 
