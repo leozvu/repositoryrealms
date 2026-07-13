@@ -25,6 +25,36 @@ export default function ContractsPage() {
     { key: 'note', label: 'Điều khoản chính / ghi chú', type: 'textarea', full: true },
   ];
 
+  // v3.5: in phiếu hợp đồng (dùng #print-area như hóa đơn/báo giá)
+  const printContract = async c => {
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    const s = await (await fetch('/api/settings')).json();
+    const fmtD = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('vi-VN') : '—';
+    const [tl] = TYPE_LABEL[c.type] || [c.type];
+    let area = document.getElementById('print-area');
+    if (!area) { area = document.createElement('div'); area.id = 'print-area'; document.body.appendChild(area); }
+    area.innerHTML = `
+      <div class="doc">
+        <div class="doc-head">
+          <div><h2>${esc(s.company)}</h2><div>${esc(s.address || '')}</div>
+            <div>MST: ${esc(s.taxCode || '')} · ${esc(s.phone || '')}</div><div>${esc(s.email || '')}</div></div>
+          <div style="text-align:right"><h1>PHIẾU HỢP ĐỒNG</h1>
+            <div><b>Số: ${esc(c.code)}</b></div><div>${esc(tl)}</div></div>
+        </div>
+        <table><tbody>
+          <tr><td style="width:180px"><b>Đối tác</b></td><td>${esc(c.partner)}</td></tr>
+          <tr><td><b>Giá trị hợp đồng</b></td><td><b>${money(c.value)}</b></td></tr>
+          <tr><td><b>Ngày ký</b></td><td>${fmtD(c.signDate)}</td></tr>
+          <tr><td><b>Hiệu lực</b></td><td>${fmtD(c.startDate)} → ${fmtD(c.endDate)}</td></tr>
+          <tr><td><b>Trạng thái</b></td><td>${c.status === 'active' ? 'Đang hiệu lực' : c.status === 'expired' ? 'Đã hết hạn' : 'Đã thanh lý'}</td></tr>
+        </tbody></table>
+        ${c.note ? `<p style="margin-top:14px"><b>Điều khoản chính / ghi chú:</b><br>${esc(c.note).replace(/\n/g, '<br>')}</p>` : ''}
+        <p style="margin-top:14px;font-size:.85em;color:#666">Phiếu tóm tắt phục vụ lưu trữ nội bộ — không thay thế bản hợp đồng có chữ ký pháp lý.</p>
+        <div class="sign"><div><b>${esc(s.company)}</b><br><br><br><br>___________</div><div><b>${esc(c.partner)}</b><br><br><br><br>___________</div></div>
+      </div>`;
+    window.print();
+  };
+
   const expiringSoon = rows.filter(c => c.status === 'active' && c.endDate && c.endDate >= todayISO() && c.endDate <= daysFromNow(30));
   const expired = rows.filter(c => c.status === 'active' && c.endDate && c.endDate < todayISO());
   const visible = rows.filter(c => f === 'all' || c.type === f);
@@ -68,6 +98,7 @@ export default function ContractsPage() {
                     : c.status === 'expired' ? <span className="badge b-red"><span className="dot"></span>Hết hạn</span>
                     : <span className="badge b-gray"><span className="dot"></span>Đã thanh lý</span>}</td>
                   <td><div className="row-actions">
+                    <button className="icon-btn" title="In phiếu hợp đồng (PDF qua hộp thoại in)" onClick={() => printContract(c)}><Icon name="print" size={16} /></button>
                     <button className="icon-btn" title="Tài liệu / bản scan hợp đồng" onClick={() => setModal({ mode: 'docs', row: c })}>📎</button>
                     <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: c })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
                     <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: c })} aria-label="Xóa"><Icon name="trash" size={16} /></button>

@@ -1,14 +1,53 @@
 'use client';
 import { useState } from 'react';
-import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
 import { money, fmtDate, todayISO, daysFromNow, initials } from '@/lib/format';
 
 const VENDOR_TYPES = ['KOL / Influencer', 'Freelancer', 'Nhà in', 'Studio', 'Media / Báo chí', 'Phần mềm', 'Khác'];
+const parseQuotes = s => { try { return JSON.parse(s || '[]'); } catch { return []; } };
+
+/* v3.5: modal RFQ — nhập báo giá nhiều NCC cho một hạng mục, chọn NCC thắng */
+function RfqModal({ row, vendors, onSave, onClose }) {
+  const [f, setF] = useState(() => row
+    ? { title: row.title, note: row.note || '', quotes: parseQuotes(row.quotes) }
+    : { title: '', note: '', quotes: [{ vendorId: vendors[0]?.id || '', price: '', note: '' }] });
+  const setQ = (i, k, v) => setF(x => ({ ...x, quotes: x.quotes.map((q, j) => j === i ? { ...q, [k]: v } : q) }));
+  const choose = i => setF(x => ({ ...x, quotes: x.quotes.map((q, j) => ({ ...q, chosen: j === i ? !q.chosen : false })) }));
+  return (
+    <Modal title={row ? 'Sửa RFQ' : 'Tạo RFQ so giá'} onClose={onClose} large
+      footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
+        <button className="btn btn-primary" onClick={() => { if (!f.title.trim()) return; onSave(f); onClose(); }}>Lưu</button></>}>
+      <div style={{ display: 'grid', gap: 12, fontSize: '.85rem' }}>
+        <div className="field"><label>Hạng mục cần mua / thuê *</label>
+          <input value={f.title} onChange={e => setF({ ...f, title: e.target.value })} placeholder="VD: In 500 standee chiến dịch EVA" /></div>
+        <div>
+          <b>Báo giá từ các NCC</b> — tick ✓ để chọn NCC thắng
+          {f.quotes.map((q, i) => (
+            <div key={i} style={{ display: 'flex', gap: 6, marginTop: 6, alignItems: 'center' }}>
+              <input type="checkbox" style={{ width: 'auto' }} checked={!!q.chosen} onChange={() => choose(i)} title="Chọn NCC này" />
+              <select style={{ flex: 2 }} value={q.vendorId} onChange={e => setQ(i, 'vendorId', e.target.value)}>
+                {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+              </select>
+              <input style={{ flex: 1 }} type="number" min="0" placeholder="Giá (đ)" value={q.price} onChange={e => setQ(i, 'price', e.target.value)} />
+              <input style={{ flex: 2 }} placeholder="Ghi chú (thời gian, chất lượng…)" value={q.note || ''} onChange={e => setQ(i, 'note', e.target.value)} />
+              <button className="icon-btn" onClick={() => setF(x => ({ ...x, quotes: x.quotes.filter((_, j) => j !== i) }))}><Icon name="x" size={14} /></button>
+            </div>
+          ))}
+          <button className="btn btn-ghost btn-sm" style={{ marginTop: 6 }}
+            onClick={() => setF(x => ({ ...x, quotes: [...x.quotes, { vendorId: vendors[0]?.id || '', price: '', note: '' }] }))}>
+            <Icon name="plus" size={13} /> Thêm báo giá</button>
+        </div>
+        <div className="field"><label>Ghi chú chung</label><textarea value={f.note} onChange={e => setF({ ...f, note: e.target.value })} /></div>
+      </div>
+    </Modal>
+  );
+}
 
 export default function VendorsPage() {
   const vendors = useResource('vendors');
   const bills = useResource('vendorbills');
   const projects = useResource('projects');
+  const rfqs = useResource('rfqs');
   const [modal, setModal] = useState(null);
   const toast = useToast();
   if (vendors.forbidden) return <Forbidden />;
@@ -125,6 +164,37 @@ export default function VendorsPage() {
         </table>
       </div>
 
+      {/* v3.5: RFQ so giá NCC */}
+      <div className="section-title">RFQ — so giá nhà cung cấp</div>
+      <div className="toolbar">
+        <span style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Một hạng mục, nhiều báo giá — chọn NCC tốt nhất, lưu lại lý do.</span>
+        <div className="spacer"></div>
+        <button className="btn btn-outline" onClick={() => {
+          if (!vendors.rows.length) return toast('Hãy thêm nhà cung cấp trước', 'error');
+          setModal({ mode: 'addRfq' });
+        }}><Icon name="plus" size={16} /><span>Tạo RFQ</span></button>
+      </div>
+      <div className="card"><div className="card-body" style={{ display: 'grid', gap: 4 }}>
+        {rfqs.rows.map(r => {
+          const qs = parseQuotes(r.quotes).filter(q => q.price !== '' && q.price != null);
+          const best = qs.length ? Math.min(...qs.map(q => +q.price)) : null;
+          const chosen = qs.find(q => q.chosen);
+          return (
+            <div key={r.id} className="act-item" style={{ alignItems: 'center', cursor: 'pointer' }} onClick={() => setModal({ mode: 'editRfq', row: r })}>
+              <span style={{ flex: 'none' }}>⚖️</span>
+              <div style={{ flex: 1 }}>
+                <div className="act-title">{r.title}{chosen
+                  ? <span className="badge b-green" style={{ marginLeft: 8 }}><span className="dot"></span>Đã chọn: {vName(chosen.vendorId)}</span>
+                  : <span className="badge b-amber" style={{ marginLeft: 8 }}><span className="dot"></span>Đang so giá</span>}</div>
+                <div className="act-sub">{qs.length} báo giá{best !== null ? ` · thấp nhất ${money(best)}` : ''}{chosen?.price ? ` · giá chọn ${money(+chosen.price)}` : ''}</div>
+              </div>
+              <button className="icon-btn danger" onClick={e => { e.stopPropagation(); setModal({ mode: 'delRfq', row: r }); }}><Icon name="trash" size={14} /></button>
+            </div>
+          );
+        })}
+        {!rfqs.rows.length && <p style={{ fontSize: '.83rem', color: 'var(--muted)', margin: 4 }}>Chưa có RFQ nào — trước khi thuê ngoài khoản lớn, tạo RFQ để so 2-3 báo giá.</p>}
+      </div></div>
+
       {modal?.mode === 'addVendor' && <FormModal title="Thêm nhà cung cấp" fields={VENDOR_FIELDS} data={{ type: 'Freelancer', rating: 5 }}
         onClose={() => setModal(null)} onSave={async d => { await vendors.create({ ...d, rating: +d.rating || 0 }); toast('Đã thêm NCC'); }} />}
       {modal?.mode === 'editVendor' && <FormModal title="Sửa nhà cung cấp" fields={VENDOR_FIELDS} data={modal.row}
@@ -137,6 +207,15 @@ export default function VendorsPage() {
         onClose={() => setModal(null)} onSave={async d => { await bills.update(modal.row.id, { ...d, amount: +d.amount || 0, projectId: d.projectId || null }); toast('Đã cập nhật'); }} />}
       {modal?.mode === 'payBill' && <ConfirmDialog yesLabel="Thanh toán" msg={`Thanh toán ${money(modal.row.amount)} cho ${vName(modal.row.vendorId)}? Khoản chi sẽ tự ghi vào sổ quỹ.`}
         onClose={() => setModal(null)} onYes={() => payBill(modal.row)} />}
+      {(modal?.mode === 'addRfq' || modal?.mode === 'editRfq') && <RfqModal row={modal.row} vendors={vendors.rows}
+        onClose={() => setModal(null)}
+        onSave={async f => {
+          const data = { title: f.title.trim(), note: f.note || null, quotes: JSON.stringify(f.quotes), status: f.quotes.some(q => q.chosen) ? 'decided' : 'open' };
+          if (modal.row) await rfqs.update(modal.row.id, data); else await rfqs.create(data);
+          toast('Đã lưu RFQ');
+        }} />}
+      {modal?.mode === 'delRfq' && <ConfirmDialog msg={`Xóa RFQ "${modal.row.title}"?`}
+        onClose={() => setModal(null)} onYes={async () => { await rfqs.remove(modal.row.id); toast('Đã xóa'); }} />}
       {modal?.mode === 'delBill' && <ConfirmDialog msg={`Xóa hóa đơn ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await bills.remove(modal.row.id); toast('Đã xóa'); }} />}
     </>
