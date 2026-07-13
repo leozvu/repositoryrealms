@@ -5,3 +5,5 @@ node_modules/
 *.db-journal
 .DS_Store
 .claude/
+
+.vercel

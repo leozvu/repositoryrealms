@@ -1,14 +1,23 @@
 # Agency ERP v3.5 — Đa người dùng, phân quyền theo cấp bậc
 
-Next.js 14 + Prisma + NextAuth. Dev chạy SQLite ngay trên máy, deploy đổi sang Postgres.
+Next.js 14 + Prisma + NextAuth + **Supabase Postgres**.
+
+## 🌐 Production (đã deploy)
+
+- **App**: https://agency-erp-mu.vercel.app (Vercel, region Singapore)
+- **Database**: Supabase project `agency-erp` (`sueqktvmwgonaflogobe`, ap-southeast-1)
+- Redeploy sau khi sửa code: `npx vercel deploy --prod` (đã link sẵn trong `.vercel/`)
+- Env production quản lý trên Vercel: `DATABASE_URL` (pooler 6543 + pgbouncer), `DIRECT_URL` (5432), `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
 
 ## Chạy trên máy (dev)
+
+Dev dùng **chung database Supabase** với production (cấu hình trong `.env` — không commit).
 
 ```bash
 cd agency-erp
 npm install          # lần đầu
-npm run db:push      # tạo database (lần đầu)
-npm run db:seed      # 8 tài khoản + dữ liệu demo phủ mọi module (⚠ chạy lại = reset toàn bộ dữ liệu)
+npm run db:push      # đồng bộ schema (khi đổi schema.prisma)
+npm run db:seed      # ⚠ RESET toàn bộ dữ liệu về bộ demo — đừng chạy khi team đã nhập liệu thật!
 npm run dev          # → http://localhost:3300
 ```
 
@@ -90,11 +99,9 @@ npm run dev          # → http://localhost:3300
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**
 2. Đăng nhập ERP bằng Giám đốc → **Cài đặt → Import từ bản offline** → chọn file
 
-## Deploy lên cloud (phương án A đã chọn)
-1. Tạo project Postgres miễn phí tại [supabase.com](https://supabase.com) hoặc [neon.tech](https://neon.tech) → copy connection string
-2. Sửa `prisma/schema.prisma`: `provider = "postgresql"`
-3. Push code lên GitHub → import vào [vercel.com](https://vercel.com)
-4. Khai báo biến môi trường trên Vercel: `DATABASE_URL`, `NEXTAUTH_SECRET` (chuỗi ngẫu nhiên dài), `NEXTAUTH_URL` (https://ten-mien.vercel.app)
-5. Chạy `npx prisma db push && npm run db:seed` với DATABASE_URL trỏ tới Postgres (⚠ seed sẽ tạo dữ liệu demo — bỏ qua bước seed nếu muốn bắt đầu sạch, tạo tài khoản Giám đốc bằng script riêng)
+## Ghi chú vận hành production
+- ⚠ **Trước khi đưa team vào dùng thật**: đổi toàn bộ mật khẩu demo (Hồ sơ & nhóm → sửa từng người), bật 2FA cho Giám đốc/Kế toán, và **không chạy `db:seed` nữa** (seed xóa sạch dữ liệu)
+- Deploy dùng Vercel CLI trực tiếp từ máy (`.vercel/` đã link) — muốn auto-deploy theo git thì push repo lên GitHub rồi import vào Vercel sau
+- Supabase free tier: tự backup 7 ngày; nâng Pro khi dữ liệu quan trọng
 
-**Kế tiếp**: Deploy Vercel + Supabase (cần tạo tài khoản) · v3.4 đề xuất: đồng bộ Google Calendar 2 chiều (OAuth — cần Google Cloud project) · forecast doanh thu theo pipeline · custom dashboard — xem DOI-CHIEU-YEU-CAU.md
+**Kế tiếp**: đồng bộ Google Calendar 2 chiều (OAuth — cần Google Cloud project) · gửi email báo giá/hóa đơn (SMTP/Resend) · custom dashboard — xem DOI-CHIEU-YEU-CAU.md

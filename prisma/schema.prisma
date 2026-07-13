@@ -1,8 +1,10 @@
-// Agency ERP v2.0 — schema đơn tenant (1 công ty)
-// Dev: SQLite. Deploy: đổi provider = "postgresql" + DATABASE_URL của Supabase/Neon.
+// Agency ERP — schema đơn tenant (1 công ty)
+// v3.5+: Postgres (Supabase) cho cả dev lẫn production.
+// DATABASE_URL = pooler (6543, pgbouncer) cho runtime · DIRECT_URL = kết nối thẳng (5432) cho db push
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
