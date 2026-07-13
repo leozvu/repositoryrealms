@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Badge, Forbidden, ExportCsv, useToast } from '@/components/ui';
 import DocEditor, { printDoc } from '@/components/DocEditor';
+import { SendEmailModal } from '@/components/SendEmail';
 import { money, fmtDate, todayISO, docGrand, paidOf, remainOf } from '@/lib/format';
 
 function PayModal({ inv, onDone, onClose }) {
@@ -96,6 +97,7 @@ export default function InvoicesPage() {
                 <td><div className="row-actions">
                   {v.status !== 'paid' && <button className="icon-btn" style={{ color: 'var(--accent)' }} title="Ghi nhận thanh toán"
                     onClick={() => setModal({ mode: 'pay', row: v })}><Icon name="wallet" size={16} /></button>}
+                  <button className="icon-btn" title="Gửi email cho khách" onClick={() => setModal({ mode: 'email', row: v })}>📧</button>
                   <button className="icon-btn" title="In / xuất PDF" onClick={() => printDoc(v, 'invoice', client(v.clientId)?.name || '', client(v.clientId) || {})}><Icon name="print" size={16} /></button>
                   <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: v })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
                   <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: v })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
@@ -111,6 +113,7 @@ export default function InvoicesPage() {
       {modal?.mode === 'edit' && <DocEditor kind="invoice" doc={modal.row} clients={clients.rows} projects={projects.rows} services={services.rows} allDocs={rows}
         onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, d); toast('Đã cập nhật'); }} />}
       {modal?.mode === 'pay' && <PayModal inv={modal.row} onDone={refresh} onClose={() => setModal(null)} />}
+      {modal?.mode === 'email' && <SendEmailModal type="invoice" doc={modal.row} defaultTo={client(modal.row.clientId)?.email || ''} onClose={() => setModal(null)} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa hóa đơn ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
     </>

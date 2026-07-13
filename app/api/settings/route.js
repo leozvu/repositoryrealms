@@ -12,13 +12,20 @@ const DEFAULTS = {
   autoAssignLeads: false, // v3.4: tự chia lead chưa gán cho AM ít lead mở nhất
   roleLabels: {}, // v3.6: đổi tên chức danh theo công ty (quyền giữ nguyên theo nhóm)
   leaveQuota: 12, // v3.7: số ngày phép năm mỗi nhân sự
+  // v3.9: SMTP gửi email báo giá/hóa đơn (mỗi công ty một hộp thư riêng)
+  smtpHost: '', smtpPort: 465, smtpUser: '', smtpPass: '', smtpFrom: '',
 };
+
+// Các trường bí mật — chỉ Giám đốc đọc được (trang Cài đặt); route server đọc thẳng DB
+const SECRET_KEYS = ['anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPort', 'smtpFrom'];
 
 export async function GET() {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const row = await prisma.setting.findUnique({ where: { id: 1 } });
-  return NextResponse.json({ ...DEFAULTS, ...(row ? JSON.parse(row.json) : {}) });
+  const data = { ...DEFAULTS, ...(row ? JSON.parse(row.json) : {}) };
+  if (!isDirector(user)) SECRET_KEYS.forEach(k => delete data[k]);
+  return NextResponse.json(data);
 }
 
 export async function PUT(req) {

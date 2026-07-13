@@ -170,6 +170,26 @@ export default function SettingsPage() {
               </div>
               <div className="hint">VD: công ty thương mại điện tử đổi "Quản lý dự án" → "Trưởng phòng Vận hành", "Account/Sales" → "Kinh doanh"</div>
             </div>
+            <div className="field full" style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+              <label style={{ fontWeight: 700 }}>📧 Email công ty (SMTP) — gửi báo giá/hóa đơn cho khách (v3.9)</label>
+            </div>
+            <F k="smtpHost" label="Máy chủ SMTP" />
+            <F k="smtpPort" label="Port (465=SSL, 587=TLS)" type="number" />
+            <F k="smtpUser" label="Tài khoản email" />
+            <div className="field">
+              <label>Mật khẩu email</label>
+              <input type="password" value={s.smtpPass ?? ''} onChange={e => setS({ ...s, smtpPass: e.target.value })} placeholder="••••••••" />
+            </div>
+            <F k="smtpFrom" label="Địa chỉ gửi (để trống = tài khoản)" full />
+            <div className="field full">
+              <button className="btn btn-outline btn-sm" onClick={async () => {
+                const save = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(s) });
+                if (!save.ok) return toast('Lưu cài đặt thất bại', 'error');
+                const r = await fetch('/api/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'test', to: s.smtpUser }) });
+                const j = await r.json().catch(() => ({}));
+                toast(r.ok ? `Đã gửi email thử tới ${s.smtpUser} — kiểm tra hộp thư` : j.error || 'Gửi thất bại', r.ok ? 'success' : 'error');
+              }}>Lưu &amp; gửi email thử tới chính hộp thư này</button>
+            </div>
             <div className="field full">
               <label>Claude API key (bật AI Copilot)</label>
               <input type="password" value={s.anthropicKey ?? ''} onChange={e => setS({ ...s, anthropicKey: e.target.value })} placeholder="sk-ant-…  (tạo tại console.anthropic.com)" />

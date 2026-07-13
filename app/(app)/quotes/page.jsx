@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, ConfirmDialog, EmptyState, Badge, Forbidden, useToast } from '@/components/ui';
 import DocEditor, { printDoc, nextCode } from '@/components/DocEditor';
+import { SendEmailModal } from '@/components/SendEmail';
 import { money, fmtDate, todayISO, daysFromNow, docGrand } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
@@ -70,6 +71,7 @@ export default function QuotesPage() {
                     onClick={() => setModal({ mode: 'toinv', row: v })}><Icon name="invoices" size={16} /></button>}
                   {canW && v.status === 'accepted' && <button className="icon-btn" title="Tạo dự án từ báo giá"
                     onClick={() => setModal({ mode: 'toproj', row: v })}><Icon name="projects" size={16} /></button>}
+                  {canW && <button className="icon-btn" title="Gửi email cho khách" onClick={() => setModal({ mode: 'email', row: v })}>📧</button>}
                   <button className="icon-btn" title="In / xuất PDF" onClick={() => printDoc(v, 'quote', client(v.clientId)?.name || '', client(v.clientId) || {})}><Icon name="print" size={16} /></button>
                   {canW && <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: v })} aria-label="Sửa"><Icon name="edit" size={16} /></button>}
                   {canW && <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: v })} aria-label="Xóa"><Icon name="trash" size={16} /></button>}
@@ -90,6 +92,7 @@ export default function QuotesPage() {
         onClose={() => setModal(null)} onYes={() => toProject(modal.row)} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa báo giá ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
+      {modal?.mode === 'email' && <SendEmailModal type="quote" doc={modal.row} defaultTo={client(modal.row.clientId)?.email || ''} onClose={() => setModal(null)} />}
     </>
   );
 }

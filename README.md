@@ -1,4 +1,4 @@
-# Agency ERP v3.8 — Đa người dùng, phân quyền theo cấp bậc
+# Agency ERP v3.9 — Đa người dùng, phân quyền theo cấp bậc
 
 Next.js 14 + Prisma + NextAuth + **Supabase Postgres**.
 
@@ -117,6 +117,11 @@ npm run dev          # → http://localhost:3300
 - **Gán việc nhanh**: trang Nguồn lực có nút "+ Gán việc" từng người — thấy ai trống là phân việc chưa gán ngay tại chỗ
 - **In báo cáo tháng**: 1 nút trên trang Báo cáo — doanh thu/chi/lợi nhuận, % mục tiêu, AR, chi theo danh mục, top khách, insight AI (lưu PDF)
 - **Sinh nhật nhân sự 🎂**: ngày sinh trong hồ sơ, AI Summary nhắc sinh nhật trong tuần
+
+**v3.9 — Gửi email cho khách**:
+- Cấu hình SMTP theo từng công ty (Cài đặt → Email công ty, có nút gửi thử)
+- Nút 📧 trên Báo giá & Hóa đơn: email brand công ty kèm bảng chi tiết + thông tin thanh toán, lời nhắn tùy chỉnh; server dựng nội dung từ chứng từ, mọi lần gửi vào Nhật ký hệ thống
+- Bảo mật: các trường bí mật trong Cài đặt (SMTP, Claude API key) chỉ Giám đốc đọc được qua API
 
 ## Import dữ liệu từ bản offline v1
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**
