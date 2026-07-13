@@ -15,7 +15,7 @@ export async function POST(req) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   if (!isDirector(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  const { email, name, password, roles, title, phone, salary, teamId } = await req.json();
+  const { email, name, password, roles, title, phone, birthday, salary, teamId } = await req.json();
   if (!email || !name || !password) return NextResponse.json({ error: 'Thiếu email / tên / mật khẩu' }, { status: 400 });
   if (password.length < 6) return NextResponse.json({ error: 'Mật khẩu tối thiểu 6 ký tự' }, { status: 400 });
   const exists = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
@@ -26,7 +26,7 @@ export async function POST(req) {
       email: email.toLowerCase().trim(), name,
       passwordHash: await bcrypt.hash(password, 10),
       role: finalRoles[0], roles: JSON.stringify(finalRoles),
-      title: title || null, phone: phone || null, salary: +salary || 0, teamId: teamId || null,
+      title: title || null, phone: phone || null, birthday: birthday || null, salary: +salary || 0, teamId: teamId || null,
     },
   });
   await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'create', entity: 'users', refId: row.id, detail: `${row.name} [${finalRoles.join(',')}]` } });
@@ -46,7 +46,7 @@ export async function PUT(req) {
   if (!isDirector(user) && !isHR && !isSelf) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const data = {};
-  const profileKeys = isDirector(user) || isHR ? ['name', 'title', 'phone', 'status'] : ['name', 'phone'];
+  const profileKeys = isDirector(user) || isHR ? ['name', 'title', 'phone', 'birthday', 'status'] : ['name', 'phone', 'birthday'];
   profileKeys.forEach(k => { if (fields[k] !== undefined) data[k] = fields[k]; });
   if ((isDirector(user) || isHR) && fields.salary !== undefined) data.salary = +fields.salary || 0;
   if ((isDirector(user) || isHR) && fields.teamId !== undefined) data.teamId = fields.teamId || null;

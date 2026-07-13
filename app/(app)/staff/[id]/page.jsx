@@ -22,6 +22,7 @@ export default function StaffDetailPage() {
   const attendance = useResource('attendance');
   const assets = useResource('assets');
   const okrs = useResource('okr');
+  const reviews = useResource('reviews');
   const [leaveQuota, setLeaveQuota] = useState(12);
   useEffect(() => { fetch('/api/settings').then(r => r.ok ? r.json() : null).then(d => d && setLeaveQuota(+d.leaveQuota || 12)).catch(() => {}); }, []);
 
@@ -40,6 +41,12 @@ export default function StaffDetailPage() {
   const q = `${new Date().getFullYear()}-Q${Math.ceil((new Date().getMonth() + 1) / 3)}`;
   const myOkrs = okrs.rows.filter(o => o.userId === id && o.quarter === q);
   const att10 = attendance.rows.filter(a => a.userId === id).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10);
+  // v3.8: điểm đánh giá đã chốt gần nhất
+  const lastReview = reviews.rows.filter(r => r.userId === id && r.status === 'final').sort((a, b) => b.quarter.localeCompare(a.quarter))[0];
+  const reviewScore = (() => {
+    if (!lastReview) return null;
+    try { const sc = JSON.parse(lastReview.scores || '[]').filter(s => s.mgr > 0); return sc.length ? Math.round(sc.reduce((a, b) => a + b.mgr, 0) / sc.length * 10) / 10 : null; } catch { return null; }
+  })();
   const ATT = { present: ['Đi làm', 'var(--accent)'], remote: ['Remote', '#7C3AED'], off: ['Nghỉ', 'var(--muted)'] };
 
   return (
@@ -49,6 +56,8 @@ export default function StaffDetailPage() {
         <span className="avatar" style={{ width: 34, height: 34 }}>{initials(u.name)}</span>
         <span style={{ fontSize: '1.05rem', fontWeight: 800 }}>{u.name}{u.id === me?.id ? ' (tôi)' : ''}</span>
         {rolesOf(u).map(r => <span key={r} className={`role-chip role-${r}`}>{RL[r] || r}</span>)}
+        {reviewScore !== null && <span className="badge b-green" title={`Đánh giá ${lastReview.quarter} đã chốt`}><span className="dot"></span>Đánh giá {lastReview.quarter}: {reviewScore}⭐</span>}
+        {u.birthday && <span className="badge b-blue" title="Sinh nhật">🎂 {u.birthday.slice(8)}/{u.birthday.slice(5, 7)}</span>}
         <div className="spacer"></div>
         <span style={{ fontSize: '.78rem', color: 'var(--muted)' }}>{[u.title, team?.name, u.email, u.phone].filter(Boolean).join(' · ')}</span>
       </div>

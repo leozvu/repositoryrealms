@@ -10,8 +10,8 @@ import { ROLES, ROLE_LABEL, rolesOf, hasAny, isDirector } from '@/lib/perm';
 function UserModal({ row, teams, canRoles, onSave, onClose }) {
   const RL = useRoleLabels();
   const [f, setF] = useState(() => row
-    ? { name: row.name, title: row.title || '', phone: row.phone || '', salary: row.salary || 0, teamId: row.teamId || '', status: row.status, roles: rolesOf(row), password: '', reset2fa: false }
-    : { name: '', email: '', password: '', title: '', phone: '', salary: 0, teamId: '', status: 'active', roles: ['STAFF'] });
+    ? { name: row.name, title: row.title || '', phone: row.phone || '', birthday: row.birthday || '', salary: row.salary || 0, teamId: row.teamId || '', status: row.status, roles: rolesOf(row), password: '', reset2fa: false }
+    : { name: '', email: '', password: '', title: '', phone: '', birthday: '', salary: 0, teamId: '', status: 'active', roles: ['STAFF'] });
   const toggleRole = r => setF(x => ({ ...x, roles: x.roles.includes(r) ? x.roles.filter(v => v !== r) : [...x.roles, r] }));
   const set = (k, v) => setF(x => ({ ...x, [k]: v }));
   return (
@@ -24,6 +24,7 @@ function UserModal({ row, teams, canRoles, onSave, onClose }) {
         <div className="field"><label>{row ? 'Đặt lại mật khẩu (bỏ trống nếu giữ)' : 'Mật khẩu *'}</label><input value={f.password} onChange={e => set('password', e.target.value)} placeholder="Tối thiểu 6 ký tự" /></div>
         <div className="field"><label>Chức danh</label><input value={f.title} onChange={e => set('title', e.target.value)} /></div>
         <div className="field"><label>Điện thoại</label><input value={f.phone} onChange={e => set('phone', e.target.value)} /></div>
+        <div className="field"><label>Ngày sinh 🎂</label><input type="date" value={f.birthday || ''} onChange={e => set('birthday', e.target.value)} /></div>
         <div className="field"><label>Lương tháng (đ)</label><input type="number" min="0" value={f.salary} onChange={e => set('salary', e.target.value)} /></div>
         <div className="field"><label>Nhóm</label>
           <select value={f.teamId} onChange={e => set('teamId', e.target.value)}>
@@ -90,7 +91,7 @@ export default function StaffPage() {
     return json;
   };
   const saveUser = async f => {
-    const body = { name: f.name, title: f.title, phone: f.phone, salary: +f.salary || 0, teamId: f.teamId || null, status: f.status, roles: f.roles };
+    const body = { name: f.name, title: f.title, phone: f.phone, birthday: f.birthday || null, salary: +f.salary || 0, teamId: f.teamId || null, status: f.status, roles: f.roles };
     if (f.password) body.password = f.password;
     if (f.reset2fa) body.reset2fa = true;
     let r;

@@ -1,9 +1,11 @@
 'use client';
 // v3.5: Resource planning — ma trận giờ công người × tuần + tải việc hiện tại.
 // PM/HR/GĐ nhìn 1 màn hình biết ai quá tải, ai đang trống để phân việc.
+// v3.8: gán việc chưa phân ngay tại chỗ (PM).
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, EmptyState, Forbidden } from '@/components/ui';
-import { localISO, todayISO, initials } from '@/lib/format';
+import { useResource, Icon, Modal, EmptyState, Forbidden, useToast } from '@/components/ui';
+import { localISO, todayISO, fmtDate, initials } from '@/lib/format';
 import { hasAny, rolesOf } from '@/lib/perm';
 
 const CAP = 40; // giờ/tuần chuẩn
@@ -13,10 +15,17 @@ const cellBg = h => h > CAP ? 'rgba(220,38,38,.14)' : h >= 30 ? 'rgba(5,150,105,
 export default function ResourcesPage() {
   const { data: session } = useSession();
   const canSee = hasAny(session?.user, ['PM', 'HR', 'LEAD']);
+  const canAssign = hasAny(session?.user, ['PM']); // gán việc: PM + GĐ
   const users = useResource('users');
   const timelogs = useResource('timelogs');
   const tasks = useResource('tasks');
+  const projects = useResource('projects');
+  const [assignTo, setAssignTo] = useState(null); // user được gán
+  const toast = useToast();
   if (session && !canSee) return <Forbidden />;
+
+  const unassigned = tasks.rows.filter(t => !t.assigneeId && t.status !== 'done');
+  const pName = id => projects.rows.find(p => p.id === id)?.name || 'Việc chung';
 
   // Mọi nhân sự active trừ Giám đốc (GĐ không log giờ, hiện "trống" sẽ gây nhiễu)
   const staff = users.rows.filter(u => u.status === 'active' && !rolesOf(u).includes('DIRECTOR'));
@@ -69,7 +78,7 @@ export default function ResourcesPage() {
         </div>
         <div className="card-body" style={{ overflowX: 'auto' }}>
           <table style={{ fontSize: '.82rem' }}>
-            <thead><tr><th>Nhân sự</th>{weeks.map((wk, i) => <th key={wk} style={{ textAlign: 'center' }}>Tuần {wkLabel(wk)}{i === 3 ? ' (này)' : ''}</th>)}<th style={{ textAlign: 'center' }}>Việc mở</th><th style={{ textAlign: 'center' }}>Trễ hạn</th><th style={{ textAlign: 'center' }}>Hạn 7 ngày</th></tr></thead>
+            <thead><tr><th>Nhân sự</th>{weeks.map((wk, i) => <th key={wk} style={{ textAlign: 'center' }}>Tuần {wkLabel(wk)}{i === 3 ? ' (này)' : ''}</th>)}<th style={{ textAlign: 'center' }}>Việc mở</th><th style={{ textAlign: 'center' }}>Trễ hạn</th><th style={{ textAlign: 'center' }}>Hạn 7 ngày</th>{canAssign && <th></th>}</tr></thead>
             <tbody>
               {staff.map(u => {
                 const load = loadOf(u.id);
@@ -85,6 +94,8 @@ export default function ResourcesPage() {
                     <td style={{ textAlign: 'center', fontWeight: 700 }}>{load.open}</td>
                     <td style={{ textAlign: 'center', fontWeight: 700, color: load.late ? 'var(--danger)' : 'var(--muted)' }}>{load.late || '—'}</td>
                     <td style={{ textAlign: 'center', fontWeight: 700 }}>{load.week || '—'}</td>
+                    {canAssign && <td><button className="btn btn-outline btn-sm" title={`Gán việc chưa phân cho ${u.name}`}
+                      onClick={() => setAssignTo(u)} disabled={!unassigned.length}>+ Gán việc</button></td>}
                   </tr>
                 );
               })}
@@ -92,9 +103,31 @@ export default function ResourcesPage() {
           </table>
           <p style={{ fontSize: '.74rem', color: 'var(--muted)', marginTop: 10 }}>
             Giờ = tổng giờ công đã log trong tuần · Việc mở = task chưa hoàn thành được gán · Muốn phân việc mới, ưu tiên người ô tuần này nhạt màu + ít việc mở.
+            {canAssign && <> · Đang có <b>{unassigned.length}</b> việc chưa phân.</>}
           </p>
         </div>
       </div>
+
+      {assignTo && (
+        <Modal title={`Gán việc cho ${assignTo.name} (${unassigned.length} việc chưa phân)`} onClose={() => setAssignTo(null)}
+          footer={<button className="btn btn-primary" onClick={() => setAssignTo(null)}>Đóng</button>}>
+          <div style={{ maxHeight: 360, overflowY: 'auto' }}>
+            {unassigned.map(t => (
+              <div key={t.id} className="act-item" style={{ alignItems: 'center' }}>
+                <div style={{ flex: 1 }}>
+                  <div className="act-title">{t.title}</div>
+                  <div className="act-sub">{pName(t.projectId)}{t.dueDate ? ` · hạn ${fmtDate(t.dueDate)}` : ''}</div>
+                </div>
+                <button className="btn btn-outline btn-sm" onClick={async () => {
+                  const r = await tasks.update(t.id, { assigneeId: assignTo.id });
+                  if (r) toast(`Đã gán "${t.title}" cho ${assignTo.name} — họ sẽ nhận chuông thông báo`);
+                }}>Gán</button>
+              </div>
+            ))}
+            {!unassigned.length && <p style={{ fontSize: '.83rem', color: 'var(--muted)' }}>Hết việc chưa phân 🎉</p>}
+          </div>
+        </Modal>
+      )}
     </>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
-import { useResource, Forbidden, EmptyState } from '@/components/ui';
+import { useResource, Icon, Forbidden, EmptyState } from '@/components/ui';
 import { BarChart, DonutChart, Funnel } from '@/components/charts';
-import { money, monthKey, hourRate, paidOf, itemsTotal, LEAD_STAGES } from '@/lib/format';
+import { money, monthKey, hourRate, paidOf, docGrand, itemsTotal, thisMonth, LEAD_STAGES } from '@/lib/format';
 
 export default function ReportsPage() {
   const transactions = useResource('transactions');
@@ -61,8 +61,58 @@ export default function ReportsPage() {
   const top = Object.entries(revByClient).sort((a, b) => b[1] - a[1]).slice(0, 6);
   const maxTop = Math.max(...top.map(t => t[1]), 1);
 
+  // v3.8: in báo cáo tháng cho Giám đốc (lưu PDF qua hộp thoại in)
+  const printMonthly = async () => {
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    const s = await (await fetch('/api/settings')).json();
+    const tm = thisMonth();
+    const lm = (() => { const d = new Date(); d.setMonth(d.getMonth() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; })();
+    const sum = (arr, f) => arr.reduce((a, b) => a + f(b), 0);
+    const mInc = sum(transactions.rows.filter(t => t.type === 'income' && monthKey(t.date) === tm), t => t.amount);
+    const mExp = sum(transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === tm), t => t.amount);
+    const pInc = sum(transactions.rows.filter(t => t.type === 'income' && monthKey(t.date) === lm), t => t.amount);
+    const ar = sum(invoices.rows.filter(v => v.status !== 'draft'), v => Math.max(0, docGrand(v) - paidOf(v)));
+    const mCat = {};
+    transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === tm).forEach(t => mCat[t.category || 'Khác'] = (mCat[t.category || 'Khác'] || 0) + t.amount);
+    const insights = await fetch('/api/insights').then(r => r.ok ? r.json() : []).catch(() => []);
+    let area = document.getElementById('print-area');
+    if (!area) { area = document.createElement('div'); area.id = 'print-area'; document.body.appendChild(area); }
+    area.innerHTML = `
+      <div class="doc">
+        <div class="doc-head">
+          <div><h2>${esc(s.company)}</h2><div>${esc(s.address || '')}</div></div>
+          <div style="text-align:right"><h1>BÁO CÁO THÁNG ${+tm.slice(5)}/${tm.slice(0, 4)}</h1>
+            <div>Lập ngày ${new Date().toLocaleDateString('vi-VN')}</div></div>
+        </div>
+        <table><tbody>
+          <tr><td style="width:220px"><b>Doanh thu tháng</b></td><td><b>${money(mInc)}</b>${pInc ? ` (${mInc >= pInc ? '▲' : '▼'} ${Math.abs(Math.round((mInc - pInc) / pInc * 100))}% so tháng trước)` : ''}</td></tr>
+          <tr><td><b>Chi phí tháng</b></td><td>${money(mExp)}</td></tr>
+          <tr><td><b>Lợi nhuận</b></td><td><b>${money(mInc - mExp)}</b> (biên ${mInc ? Math.round((mInc - mExp) / mInc * 100) : 0}%)</td></tr>
+          <tr><td><b>Mục tiêu tháng</b></td><td>${money(s.monthlyTarget || 0)} — đạt ${s.monthlyTarget ? Math.round(mInc / s.monthlyTarget * 100) : 0}%</td></tr>
+          <tr><td><b>Công nợ phải thu</b></td><td>${money(ar)}</td></tr>
+          <tr><td><b>Pipeline mở</b></td><td>${money(sum(leads.rows.filter(l => !['won', 'lost'].includes(l.stage)), l => l.value || 0))} · tỷ lệ thắng ${winRate}%</td></tr>
+          <tr><td><b>Dự án đang chạy</b></td><td>${projects.rows.filter(p => p.status === 'active').length}</td></tr>
+        </tbody></table>
+        <h3 style="margin-top:16px">Chi phí tháng theo danh mục</h3>
+        <table><tbody>${Object.entries(mCat).sort((a, b) => b[1] - a[1]).map(([c, v]) =>
+          `<tr><td style="width:220px">${esc(c)}</td><td class="num">${money(v)}</td></tr>`).join('')}</tbody></table>
+        <h3 style="margin-top:16px">Top khách hàng (doanh thu đã thu lũy kế)</h3>
+        <table><tbody>${top.map(([cid, v]) =>
+          `<tr><td style="width:220px">${esc(clientName(cid))}</td><td class="num">${money(v)}</td></tr>`).join('')}</tbody></table>
+        ${Array.isArray(insights) && insights.length ? `<h3 style="margin-top:16px">Điểm cần chú ý (AI Summary)</h3>
+        <ul style="font-size:.92em;line-height:1.6">${insights.filter(i => ['bad', 'warn'].includes(i.level)).slice(0, 8).map(i => `<li>${esc(i.text)}</li>`).join('')}</ul>` : ''}
+        <p style="margin-top:16px;font-size:.85em;color:#666">Báo cáo sinh tự động từ Agency ERP.</p>
+      </div>`;
+    window.print();
+  };
+
   return (
     <>
+      <div className="toolbar">
+        <div className="spacer"></div>
+        <button className="btn btn-outline" onClick={printMonthly} title="Lưu PDF qua hộp thoại in">
+          <Icon name="print" size={16} /><span>In báo cáo tháng</span></button>
+      </div>
       <div className="grid kpi-grid" style={{ marginBottom: 16 }}>
         <div className="card kpi"><span className="kpi-label">Doanh thu 12 tháng</span><div className="kpi-value">{money(totalInc)}</div></div>
         <div className="card kpi"><span className="kpi-label">Chi phí 12 tháng</span><div className="kpi-value">{money(totalExp)}</div></div>
