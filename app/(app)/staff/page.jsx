@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, Modal, FormModal, ConfirmDialog, EmptyState, Badge, useToast, useRoleLabels } from '@/components/ui';
 import { money, fmtDate, todayISO, initials } from '@/lib/format';
@@ -68,10 +69,18 @@ export default function StaffPage() {
   const leaves = useResource('leaves');
   const teams = useResource('teams');
   const [modal, setModal] = useState(null);
+  const [leaveQuota, setLeaveQuota] = useState(12);
   const toast = useToast();
+  useEffect(() => { fetch('/api/settings').then(r => r.ok ? r.json() : null).then(d => d && setLeaveQuota(+d.leaveQuota || 12)).catch(() => {}); }, []);
 
   const uName = id => users.rows.find(u => u.id === id)?.name || '—';
   const teamName = id => teams.rows.find(t => t.id === id)?.name;
+  // v3.7: phép năm đã dùng (đơn phép năm được duyệt trong năm nay)
+  const leaveDays = l => Math.round((new Date(l.to) - new Date(l.from)) / 86400000) + 1;
+  const usedLeave = uid => leaves.rows
+    .filter(l => l.userId === uid && l.status === 'approved' && l.type === 'annual' && String(l.from).startsWith(String(new Date().getFullYear())))
+    .reduce((s, l) => s + leaveDays(l), 0);
+  const myRemaining = me ? Math.max(0, leaveQuota - usedLeave(me.id)) : leaveQuota;
 
   const callUsers = async (method, body) => {
     const res = await fetch('/api/users', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -121,8 +130,9 @@ export default function StaffPage() {
           <tbody>
             {users.rows.map(u => (
               <tr key={u.id}>
-                <td><span className="cell-person"><span className="avatar">{initials(u.name)}</span>
-                  <span><span className="cell-main">{u.name}{u.id === me?.id ? ' (tôi)' : ''}</span><span className="cell-sub">{u.email}</span></span></span></td>
+                <td><Link href={`/staff/${u.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <span className="cell-person"><span className="avatar">{initials(u.name)}</span>
+                  <span><span className="cell-main" style={{ color: 'var(--primary)' }}>{u.name}{u.id === me?.id ? ' (tôi)' : ''}</span><span className="cell-sub">{u.email}</span></span></span></Link></td>
                 <td><div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                   {rolesOf(u).map(r => <span key={r} className={`role-chip role-${r}`}>{RL[r] || r}</span>)}</div></td>
                 <td>{teamName(u.teamId) || '—'}</td>
@@ -143,6 +153,8 @@ export default function StaffPage() {
         <div>
           <div className="toolbar" style={{ marginBottom: 10 }}>
             <span className="card-title">Nghỉ phép</span>
+            <span className="badge b-blue" title={`Quota ${leaveQuota} ngày phép năm — chỉnh trong Cài đặt`}>
+              <span className="dot"></span>Tôi còn {myRemaining}/{leaveQuota} ngày phép</span>
             <div className="spacer"></div>
             <button className="btn btn-outline btn-sm" onClick={() => setModal({ mode: 'leave' })}><Icon name="plus" size={14} /><span>Xin nghỉ phép</span></button>
           </div>
@@ -190,8 +202,12 @@ export default function StaffPage() {
       </div>
 
       {modal?.mode === 'user' && <UserModal row={modal.row} teams={teams.rows} canRoles={canRoles} onSave={saveUser} onClose={() => setModal(null)} />}
-      {modal?.mode === 'leave' && <FormModal title="Đơn nghỉ phép" fields={LEAVE_FIELDS} data={{ from: todayISO(), to: todayISO() }}
+      {modal?.mode === 'leave' && <FormModal title={`Đơn nghỉ phép — bạn còn ${myRemaining}/${leaveQuota} ngày phép năm`} fields={LEAVE_FIELDS} data={{ from: todayISO(), to: todayISO(), type: 'annual' }}
         onClose={() => setModal(null)} onSave={async d => {
+          const days = Math.round((new Date(d.to) - new Date(d.from)) / 86400000) + 1;
+          const target = d.userId || me?.id; // HR gửi hộ thì tính quota của người đó
+          const remain = Math.max(0, leaveQuota - usedLeave(target));
+          if (d.type === 'annual' && days > remain && !confirm(`Đơn ${days} ngày VƯỢT số phép còn lại (${remain}) của ${uName(target)}. Vẫn gửi? (phần vượt thường tính không lương)`)) return;
           const r = await leaves.create(d);
           if (r) toast(r._notice || 'Đã gửi đơn — theo dõi trong mục Phê duyệt');
         }} />}

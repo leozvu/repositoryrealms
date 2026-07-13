@@ -11,6 +11,7 @@ const DEFAULTS = {
   probNew: 10, probContacted: 20, probProposal: 40, probNegotiation: 60,
   autoAssignLeads: false, // v3.4: tự chia lead chưa gán cho AM ít lead mở nhất
   roleLabels: {}, // v3.6: đổi tên chức danh theo công ty (quyền giữ nguyên theo nhóm)
+  leaveQuota: 12, // v3.7: số ngày phép năm mỗi nhân sự
 };
 
 export async function GET() {
