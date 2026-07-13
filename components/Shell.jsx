@@ -167,6 +167,7 @@ const ALL = ['PM', 'AM', 'ACCOUNTANT', 'HR', 'LEAD', 'STAFF'];
 const NAV = [
   { section: 'Tổng quan' },
   { key: 'dashboard', label: 'Bảng điều khiển', icon: 'dashboard', roles: ALL },
+  { key: 'myday', label: 'Việc của tôi', icon: 'check', roles: ALL },
   { key: 'calendar', label: 'Lịch làm việc', icon: 'calendar', roles: ALL },
   { key: 'messages', label: 'Tin nhắn', icon: 'mail', roles: ALL, chatBadge: true },
   { key: 'approvals', label: 'Phê duyệt', icon: 'check', roles: ALL, badge: true },
