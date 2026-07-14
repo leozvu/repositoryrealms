@@ -37,12 +37,13 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
     await comments.create({ taskId: task.id, content: cmt.trim() });
     setCmt('');
   };
+  const loggedOnTask = timelogs.rows.filter(l => l.taskId === task.id).reduce((s, l) => s + l.hours, 0);
   const quickLog = async () => {
     const h = +logH;
     if (!h || h <= 0) return toast('Nhập số giờ hợp lệ', 'error');
     if (!f.projectId) return toast('Việc chung không gắn dự án — ghi giờ trong trang Chấm công giờ', 'error');
-    const r = await timelogs.create({ projectId: f.projectId, date: todayISO(), hours: h, billable: true, note: f.title });
-    if (r) { toast(`Đã ghi ${h}h cho hôm nay`); setLogH(''); }
+    const r = await timelogs.create({ projectId: f.projectId, taskId: task.id, date: todayISO(), hours: h, billable: true, note: f.title });
+    if (r) { toast(`Đã ghi ${h}h cho việc này`); setLogH(''); }
   };
 
   return (
@@ -116,11 +117,17 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
           <div className="hint">Nhớ bấm Lưu để giữ thay đổi checklist.</div>
         </div>
 
-        {/* Ghi giờ nhanh */}
-        <div className="field full" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ fontSize: '.85rem' }}>⏱ Ghi giờ hôm nay cho việc này:</span>
+        {/* Ghi giờ nhanh + ước lượng vs thực tế */}
+        <div className="field full" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '.85rem' }}>⏱ Ghi giờ cho việc này:</span>
           <input style={{ width: 90 }} type="number" min="0.5" step="0.5" placeholder="giờ" value={logH} onChange={e => setLogH(e.target.value)} />
           <button className="btn btn-outline btn-sm" onClick={quickLog}>Ghi giờ</button>
+          {(f.estHours > 0 || loggedOnTask > 0) && (
+            <span style={{ fontSize: '.8rem', marginLeft: 'auto' }}>
+              Ước lượng <b>{f.estHours || 0}h</b> · đã log <b style={{ color: loggedOnTask > f.estHours && f.estHours > 0 ? 'var(--danger)' : 'var(--accent)' }}>{Math.round(loggedOnTask * 10) / 10}h</b>
+              {f.estHours > 0 ? ` (${Math.round(loggedOnTask / f.estHours * 100)}%)` : ''}
+            </span>
+          )}
         </div>
 
         {/* Bình luận trao đổi */}
@@ -140,7 +147,7 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
             {!myComments.length && <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Chưa có trao đổi nào — người phụ trách sẽ nhận thông báo khi bạn bình luận.</p>}
           </div>
           <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-            <input style={{ flex: 1 }} placeholder="Viết bình luận… (Enter gửi)" value={cmt} onChange={e => setCmt(e.target.value)}
+            <input style={{ flex: 1 }} placeholder="Viết bình luận… gõ @tên để nhắc (Enter gửi)" value={cmt} onChange={e => setCmt(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); sendCmt(); } }} />
             <button className="btn btn-primary btn-sm" onClick={sendCmt}>Gửi</button>
           </div>
@@ -173,9 +180,13 @@ export default function TasksPage() {
   const [mine, setMine] = useState(false);
   const [assignee, setAssignee] = useState('all');
   const [label, setLabel] = useState('all');
+  const [groupBy, setGroupBy] = useState('status');
+  const [selMode, setSelMode] = useState(false);
+  const [sel, setSel] = useState(() => new Set());
   const [modal, setModal] = useState(null);
   const [dragId, setDragId] = useState(null);
   const [overCol, setOverCol] = useState(null);
+  const phases = useResource('phases');
   const toast = useToast();
 
   const userName = id => users.rows.find(u => u.id === id)?.name || '—';
@@ -198,9 +209,9 @@ export default function TasksPage() {
   const canDrag = t => isMgmt || t.assigneeId === user?.id;
   const blockers = t => parseItems(t.dependsOn).map(id => rows.find(r => r.id === id)).filter(d => d && d.status !== 'done');
 
-  const drop = async status => {
+  const drop = async (status, tid) => {
     setOverCol(null);
-    const t = rows.find(x => x.id === dragId);
+    const t = rows.find(x => x.id === (tid || dragId));
     if (!t || t.status === status) return;
     if (status === 'done') {
       const bl = blockers(t);
@@ -208,6 +219,68 @@ export default function TasksPage() {
     }
     await update(t.id, { status });
   };
+
+  const toggleSel = id => setSel(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const bulkUpdate = async data => {
+    for (const id of sel) await update(id, data);
+    toast(`Đã cập nhật ${sel.size} việc`); setSel(new Set()); setSelMode(false);
+  };
+
+  // v3.12: tuổi việc + thẻ dùng chung
+  const ageDays = t => { const d = t.statusSince; if (!d) return null; return Math.floor((new Date(todayISO()) - new Date(d)) / 86400000); };
+  const Card = t => {
+    const late = t.status !== 'done' && t.dueDate && t.dueDate < todayISO();
+    const cl = parseItems(t.checklist);
+    const age = ageDays(t);
+    const stale = t.status !== 'done' && age != null && age >= 5;
+    return (
+      <div key={t.id} className="kan-card" draggable={!selMode && canDrag(t)}
+        onDragStart={() => !selMode && canDrag(t) && setDragId(t.id)}
+        onClick={() => selMode ? toggleSel(t.id) : setModal({ mode: 'edit', row: t })}
+        style={{ ...(canDrag(t) || selMode ? {} : { opacity: .75, cursor: 'default' }), ...(selMode && sel.has(t.id) ? { outline: '2px solid var(--primary)' } : {}) }}>
+        <div className="kan-title">{selMode && <input type="checkbox" readOnly checked={sel.has(t.id)} style={{ width: 'auto', marginRight: 6 }} />}
+          {blockers(t).length > 0 && t.status !== 'done' && <span title={`Chờ: ${blockers(t).map(b => b.title).join(', ')}`} style={{ marginRight: 4 }}>⛓</span>}
+          {t.recur && <span title={t.recur === 'weekly' ? 'Lặp hàng tuần' : 'Lặp hàng tháng'} style={{ marginRight: 4 }}>🔁</span>}
+          {t.title}</div>
+        <div className="kan-sub">{projName(t.projectId)}{cl.length > 0 && <> · ☑ {cl.filter(x => x.done).length}/{cl.length}</>}{t.estHours ? ` · ${t.estHours}h` : ''}
+          {stale && <span title={`Đã ở cột này ${age} ngày`} style={{ color: 'var(--warn, #D97706)', fontWeight: 700 }}> · 🕰 {age}n</span>}</div>
+        {parseItems(t.labels).length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, margin: '4px 0' }}>
+          {parseItems(t.labels).map(lb => <span key={lb} className="badge b-violet" style={{ fontSize: '.62rem', padding: '1px 6px' }}>{lb}</span>)}</div>}
+        <div className="kan-foot">
+          <Badge map="priority" k={t.priority} />
+          <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <small style={{ fontSize: '.7rem', color: late ? 'var(--danger)' : 'var(--muted)', fontWeight: late ? 700 : 400 }}>{fmtDate(t.dueDate)}</small>
+            <span className="avatar" title={userName(t.assigneeId)}>{initials(userName(t.assigneeId))}</span>
+          </span>
+        </div>
+      </div>
+    );
+  };
+  const Columns = items => (
+    <div className="kanban">
+      {TASK_COLS.map(c => {
+        const list = items.filter(t => t.status === c.key);
+        return (
+          <div key={c.key} className={`kan-col ${overCol === c.key ? 'drag-over' : ''}`}
+            onDragOver={e => { if (!selMode) { e.preventDefault(); setOverCol(c.key); } }}
+            onDragLeave={() => setOverCol(null)} onDrop={() => !selMode && drop(c.key)}>
+            <div className="kan-head"><span className="dot" style={{ background: c.color }}></span>{c.label}<span className="count">{list.length}</span></div>
+            {list.map(Card)}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // nhóm swimlane
+  let groups = null;
+  if (groupBy === 'assignee') {
+    const ids = [...new Set(visible.map(t => t.assigneeId || 'none'))];
+    groups = ids.map(id => ({ key: id, label: id === 'none' ? 'Chưa gán' : userName(id), items: visible.filter(t => (t.assigneeId || 'none') === id) }));
+  } else if (groupBy === 'phase') {
+    const ids = [...new Set(visible.map(t => t.phaseId || 'none'))];
+    groups = ids.map(id => ({ key: id, label: id === 'none' ? 'Chưa xếp giai đoạn' : (phases.rows.find(p => p.id === id)?.name || '—'), items: visible.filter(t => (t.phaseId || 'none') === id) }));
+  }
 
   return (
     <>
@@ -225,51 +298,47 @@ export default function TasksPage() {
           <option value="all">Mọi nhãn</option>
           {allLabels.map(l => <option key={l} value={l}>{l}</option>)}
         </select>}
+        <select className="filter" value={groupBy} onChange={e => setGroupBy(e.target.value)} title="Cách nhóm bảng">
+          <option value="status">Nhóm: Trạng thái</option>
+          <option value="assignee">Nhóm: Người phụ trách</option>
+          <option value="phase">Nhóm: Giai đoạn</option>
+        </select>
         <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: '.83rem', cursor: 'pointer' }}>
           <input type="checkbox" checked={mine} onChange={e => setMine(e.target.checked)} /> Chỉ việc của tôi
         </label>
         <div className="spacer"></div>
-        {isMgmt && <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm công việc</span></button>}
+        {isMgmt && <button className={selMode ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'} onClick={() => { setSelMode(!selMode); setSel(new Set()); }}>{selMode ? 'Xong' : '☑ Chọn nhiều'}</button>}
+        {isMgmt && !selMode && <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm công việc</span></button>}
       </div>
-      <div className="kanban">
-        {TASK_COLS.map(c => {
-          const items = visible.filter(t => t.status === c.key);
-          return (
-            <div key={c.key} className={`kan-col ${overCol === c.key ? 'drag-over' : ''}`}
-              onDragOver={e => { e.preventDefault(); setOverCol(c.key); }}
-              onDragLeave={() => setOverCol(null)} onDrop={() => drop(c.key)}>
-              <div className="kan-head"><span className="dot" style={{ background: c.color }}></span>{c.label}<span className="count">{items.length}</span></div>
-              {items.map(t => {
-                const late = t.status !== 'done' && t.dueDate && t.dueDate < todayISO();
-                const cl = parseItems(t.checklist);
-                return (
-                  <div key={t.id} className="kan-card" draggable={canDrag(t)}
-                    onDragStart={() => canDrag(t) && setDragId(t.id)}
-                    onClick={() => setModal({ mode: 'edit', row: t })}
-                    style={canDrag(t) ? {} : { opacity: .75, cursor: 'default' }}>
-                    <div className="kan-title">{blockers(t).length > 0 && t.status !== 'done' &&
-                      <span title={`Chờ: ${blockers(t).map(b => b.title).join(', ')}`} style={{ marginRight: 4 }}>⛓</span>}
-                      {t.recur && <span title={t.recur === 'weekly' ? 'Lặp hàng tuần' : 'Lặp hàng tháng'} style={{ marginRight: 4 }}>🔁</span>}
-                      {t.title}</div>
-                    <div className="kan-sub">{projName(t.projectId)}{cl.length > 0 && <> · ☑ {cl.filter(x => x.done).length}/{cl.length}</>}{t.estHours ? ` · ${t.estHours}h` : ''}</div>
-                    {parseItems(t.labels).length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, margin: '4px 0' }}>
-                      {parseItems(t.labels).map(lb => <span key={lb} className="badge b-violet" style={{ fontSize: '.62rem', padding: '1px 6px' }}>{lb}</span>)}</div>}
-                    <div className="kan-foot">
-                      <Badge map="priority" k={t.priority} />
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                        <small style={{ fontSize: '.7rem', color: late ? 'var(--danger)' : 'var(--muted)', fontWeight: late ? 700 : 400 }}>{fmtDate(t.dueDate)}</small>
-                        <span className="avatar" title={userName(t.assigneeId)}>{initials(userName(t.assigneeId))}</span>
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+
+      {selMode && sel.size > 0 && (
+        <div className="card" style={{ marginBottom: 12, padding: '10px 14px', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', borderLeft: '4px solid var(--primary)' }}>
+          <b style={{ fontSize: '.85rem' }}>Đã chọn {sel.size} việc:</b>
+          <select className="filter" defaultValue="" onChange={e => { if (e.target.value) { bulkUpdate({ assigneeId: e.target.value }); e.target.value = ''; } }}>
+            <option value="">Gán cho…</option>
+            {users.rows.filter(u => u.status === 'active').map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+          </select>
+          <select className="filter" defaultValue="" onChange={e => { if (e.target.value) { bulkUpdate({ status: e.target.value }); e.target.value = ''; } }}>
+            <option value="">Đổi trạng thái…</option>
+            {TASK_COLS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+          </select>
+          <input type="date" onChange={e => { if (e.target.value) bulkUpdate({ dueDate: e.target.value }); }} title="Đổi hạn cho tất cả" />
+          <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Bỏ chọn</button>
+        </div>
+      )}
+
+      {groupBy === 'status' ? Columns(visible) : (
+        <div style={{ display: 'grid', gap: 14 }}>
+          {groups.map(g => (
+            <div key={g.key} className="card" style={{ padding: 0 }}>
+              <div className="card-head" style={{ padding: '10px 14px' }}><span className="card-title">{g.label} <span style={{ color: 'var(--muted)', fontWeight: 400, fontSize: '.8rem' }}>({g.items.length})</span></span></div>
+              <div style={{ padding: '0 8px 8px' }}>{Columns(g.items)}</div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
       <p style={{ fontSize: '.76rem', color: 'var(--muted)', marginTop: 4 }}>
-        {isMgmt ? 'Kéo thả để đổi trạng thái · nhấp thẻ để mở chi tiết (checklist, trao đổi, ghi giờ).' : 'Bạn chỉ kéo được thẻ việc được gán cho mình · nhấp thẻ để mở chi tiết.'}
+        {selMode ? 'Nhấp thẻ để chọn/bỏ chọn · dùng thanh trên để đổi hàng loạt.' : isMgmt ? 'Kéo thả để đổi trạng thái · nhấp thẻ để mở chi tiết · 🕰 = việc ứ đọng lâu.' : 'Bạn chỉ kéo được thẻ việc của mình · nhấp thẻ để mở chi tiết.'}
       </p>
 
       {modal?.mode === 'add' && <FormModal title="Thêm công việc" fields={ADD_FIELDS}
