@@ -3,19 +3,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
-import { hasAny } from '@/lib/perm';
+import { hasAny, isFreelancer } from '@/lib/perm';
 import { projectStats } from '@/lib/projectStats';
 
 export async function GET() {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const canSeeMoney = hasAny(user, ['ACCOUNTANT', 'PM', 'LEAD']); // + DIRECTOR ngầm định trong hasAny
 
   const [projects, tasks, timeLogs, users, bills] = await Promise.all([
     prisma.project.findMany(),
     prisma.task.findMany(),
     prisma.timeLog.findMany(),
-    prisma.user.findMany({ select: { id: true, salary: true } }),
+    prisma.user.findMany({ select: { id: true, salary: true, userType: true, hourlyRate: true } }),
     canSeeMoney ? prisma.vendorBill.findMany({ select: { projectId: true, amount: true } }) : [],
   ]);
   const usersById = Object.fromEntries(users.map(u => [u.id, u]));

@@ -10,23 +10,33 @@ const cleanRoles = roles => {
   return r.length ? r : ['STAFF'];
 };
 
-// Tạo tài khoản — chỉ DIRECTOR (HR tạo hồ sơ qua Giám đốc cấp quyền sau)
+// Tạo tài khoản — DIRECTOR tạo nhân viên; HR/PM tạo được FREELANCER (v3.11)
 export async function POST(req) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-  if (!isDirector(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  const { email, name, password, roles, title, phone, birthday, salary, teamId } = await req.json();
+  const body = await req.json();
+  const { email, name, password, roles, title, phone, birthday, salary, teamId } = body;
+  const isFL = body.userType === 'freelancer';
+  const canCreate = isDirector(user) || (isFL && hasAny(user, ['HR', 'PM', 'LEAD']));
+  if (!canCreate) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   if (!email || !name || !password) return NextResponse.json({ error: 'Thiếu email / tên / mật khẩu' }, { status: 400 });
   if (password.length < 6) return NextResponse.json({ error: 'Mật khẩu tối thiểu 6 ký tự' }, { status: 400 });
   const exists = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
   if (exists) return NextResponse.json({ error: 'Email đã tồn tại' }, { status: 400 });
-  const finalRoles = cleanRoles(roles) || ['STAFF'];
+  // Freelancer luôn là vai trò FREELANCER (không được cấp quyền nhân viên)
+  const finalRoles = isFL ? ['FREELANCER'] : (cleanRoles(roles) || ['STAFF']);
   const row = await prisma.user.create({
     data: {
       email: email.toLowerCase().trim(), name,
       passwordHash: await bcrypt.hash(password, 10),
       role: finalRoles[0], roles: JSON.stringify(finalRoles),
-      title: title || null, phone: phone || null, birthday: birthday || null, salary: +salary || 0, teamId: teamId || null,
+      title: title || (isFL ? 'Freelancer' : null), phone: phone || null, birthday: birthday || null,
+      salary: isFL ? 0 : (+salary || 0), teamId: isFL ? null : (teamId || null),
+      userType: isFL ? 'freelancer' : 'employee',
+      hourlyRate: isFL ? (+body.hourlyRate || 0) : 0,
+      skills: isFL ? (body.skills || null) : null,
+      portfolio: isFL ? (body.portfolio || null) : null,
+      accessUntil: isFL ? (body.accessUntil || null) : null,
     },
   });
   await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'create', entity: 'users', refId: row.id, detail: `${row.name} [${finalRoles.join(',')}]` } });
@@ -43,9 +53,16 @@ export async function PUT(req) {
   const { id, password, ...fields } = await req.json();
   const isSelf = id === user.id;
   const isHR = hasAny(user, ['HR']);
-  if (!isDirector(user) && !isHR && !isSelf) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  const canFL = hasAny(user, ['HR', 'PM', 'LEAD']); // v3.11: quản lý freelancer
+  if (!isDirector(user) && !isHR && !isSelf && !canFL) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const data = {};
+  // v3.11: HR/PM/Lead sửa thông tin freelancer (hạn truy cập, đơn giá, kỹ năng)
+  if (canFL) {
+    ['skills', 'portfolio'].forEach(k => { if (fields[k] !== undefined) data[k] = fields[k] || null; });
+    if (fields.accessUntil !== undefined) data.accessUntil = fields.accessUntil || null;
+    if (fields.hourlyRate !== undefined) data.hourlyRate = +fields.hourlyRate || 0;
+  }
   const profileKeys = isDirector(user) || isHR ? ['name', 'title', 'phone', 'birthday', 'status'] : ['name', 'phone', 'birthday'];
   profileKeys.forEach(k => { if (fields[k] !== undefined) data[k] = fields[k]; });
   if ((isDirector(user) || isHR) && fields.salary !== undefined) data.salary = +fields.salary || 0;

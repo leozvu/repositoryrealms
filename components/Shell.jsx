@@ -200,6 +200,7 @@ const NAV = [
   { key: 'payroll', label: 'Bảng lương', icon: 'wallet', roles: ALL },
   { key: 'recruitment', label: 'Tuyển dụng', icon: 'leads', roles: ['HR'] },
   { key: 'reviews', label: 'Đánh giá hiệu suất', icon: 'trendUp', roles: ALL },
+  { key: 'freelancers', label: 'Freelancer', icon: 'clients', roles: ['HR', 'PM', 'LEAD'] },
   { section: 'Công ty' },
   { key: 'assets', label: 'Tài sản', icon: 'projects', roles: ALL },
   { key: 'reports', label: 'Báo cáo', icon: 'reports', roles: ['ACCOUNTANT', 'PM'] },
@@ -228,9 +229,15 @@ export default function Shell({ user, company, children }) {
       }).catch(() => {});
   }, []);
   const pathname = usePathname();
-  const current = NAV.find(n => n.key && pathname.startsWith('/' + n.key));
+  const router = useRouter();
+  const isFL = user?.userType === 'freelancer';
+  // v3.11: freelancer chỉ được ở /freelancer — chuyển hướng nếu lạc sang trang nhân viên
+  useEffect(() => { if (isFL && pathname !== '/freelancer') router.replace('/freelancer'); }, [isFL, pathname, router]);
+  const NAV_FL = [{ key: 'freelancer', label: 'Công việc của tôi', icon: 'tasks', roles: ['FREELANCER'] }];
+  const navList = isFL ? NAV_FL : NAV;
+  const current = navList.find(n => n.key && pathname.startsWith('/' + n.key));
   const myRoles = rolesOf(user);
-  const visible = item => hasAny(user, item.roles);
+  const visible = item => isFL ? true : hasAny(user, item.roles);
 
   useEffect(() => {
     const load = () => {
@@ -270,10 +277,10 @@ export default function Shell({ user, company, children }) {
             </div>
           </div>
           <nav id="nav">
-            {NAV.map((item, i) => {
+            {navList.map((item, i) => {
               if (item.section) {
-                const next = NAV.findIndex((x, j) => j > i && x.section);
-                const group = NAV.slice(i + 1, next === -1 ? undefined : next);
+                const next = navList.findIndex((x, j) => j > i && x.section);
+                const group = navList.slice(i + 1, next === -1 ? undefined : next);
                 return group.some(visible) ? <div key={i} className="nav-section">{item.section}</div> : null;
               }
               if (!visible(item)) return null;
@@ -322,7 +329,9 @@ export default function Shell({ user, company, children }) {
               <span className={`role-chip role-${myRoles[0]}`}>{myRoles.map(r => roleLabels[r] || r).join(' · ')}</span>
             </div>
           </header>
-          <main id="view">{children}</main>
+          <main id="view">{isFL && pathname !== '/freelancer'
+            ? <div className="empty" style={{ paddingTop: 80 }}><p>Đang chuyển tới trang của bạn…</p></div>
+            : children}</main>
         </div>
       </div>
     </RoleLabelsCtx.Provider>
