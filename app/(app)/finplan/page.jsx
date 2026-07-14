@@ -25,6 +25,7 @@ export default function FinPlanPage() {
   const budgets = useResource('budgets');
   const transactions = useResource('transactions');
   const users = useResource('users');
+  const payouts = useResource('payouts');
   const [m, setM] = useState(thisMonth());
   const [modal, setModal] = useState(null);
   const toast = useToast();
@@ -36,8 +37,14 @@ export default function FinPlanPage() {
   /* ---------- AR / AP aging ---------- */
   const ar = invoices.rows.filter(v => !['paid', 'draft'].includes(v.status) && remainOf(v) > 0)
     .map(v => ({ code: v.code, who: cName(v.clientId), due: v.dueDate, amount: remainOf(v), bucket: bucketOf(v.dueDate) }));
-  const ap = bills.rows.filter(b => b.status !== 'paid')
-    .map(b => ({ code: b.code, who: vName(b.vendorId), due: b.dueDate, amount: b.amount, bucket: bucketOf(b.dueDate) }));
+  const uName = id => users.rows.find(u => u.id === id)?.name || 'Freelancer';
+  const ap = [
+    ...bills.rows.filter(b => b.status !== 'paid')
+      .map(b => ({ code: b.code, who: vName(b.vendorId), due: b.dueDate, amount: b.amount, bucket: bucketOf(b.dueDate) })),
+    // v3.12: công nợ freelancer chưa trả cũng là phải trả
+    ...payouts.rows.filter(p => p.status === 'pending')
+      .map(p => ({ code: 'FL', who: uName(p.userId), due: null, amount: p.amount, bucket: bucketOf(null) })),
+  ];
   const sumBucket = (list, b) => list.filter(x => x.bucket === b).reduce((s, x) => s + x.amount, 0);
 
   /* ---------- Ngân sách vs thực tế ---------- */

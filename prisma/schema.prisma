@@ -178,6 +178,7 @@ model Task {
   estHours   Float    @default(0) // v3.10: giờ ước lượng — so với giờ đã log
   phaseId    String? // v3.10: thuộc giai đoạn nào của dự án
   labels     String   @default("[]") // v3.10: JSON nhãn phân loại
+  statusSince String? // v3.12: YYYY-MM-DD vào cột hiện tại từ khi nào — tính tuổi việc
 }
 
 // ===== v3.8: Đánh giá hiệu suất theo quý =====
@@ -221,10 +222,25 @@ model TimeLog {
   user      User    @relation(fields: [userId], references: [id])
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
+  taskId    String? // v3.12: gắn giờ vào công việc cụ thể → ước lượng vs thực tế
   date      String
   hours     Float   @default(0)
   billable  Boolean @default(true)
   note      String?
+}
+
+// ===== v3.12: Công nợ thanh toán freelancer theo job =====
+model Payout {
+  id        String   @id @default(cuid())
+  userId    String // freelancer
+  projectId String?
+  kind      String   @default("hourly") // hourly (giờ×đơn giá) | fixed (khoán)
+  hours     Float    @default(0) // nếu hourly
+  amount    Int      @default(0)
+  status    String   @default("pending") // pending | paid
+  note      String?
+  createdAt DateTime @default(now())
+  paidDate  String?
 }
 
 model Quote {

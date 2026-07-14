@@ -8,10 +8,11 @@ export async function GET() {
   try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message }, { status: e.status || 403 }); }
   const { user, projectIds } = ctx;
 
-  const [projects, tasks, myLogs] = await Promise.all([
+  const [projects, tasks, myLogs, payouts] = await Promise.all([
     prisma.project.findMany({ where: { id: { in: projectIds } }, select: { id: true, name: true, service: true, deadline: true, status: true } }),
     prisma.task.findMany({ where: { assigneeId: user.id }, orderBy: { dueDate: 'asc' } }),
     prisma.timeLog.findMany({ where: { userId: user.id } }),
+    prisma.payout.findMany({ where: { userId: user.id }, orderBy: { createdAt: 'desc' } }),
   ]);
   const tm = new Date().toISOString().slice(0, 7);
   const hoursThisMonth = myLogs.filter(l => l.date.startsWith(tm)).reduce((s, l) => s + l.hours, 0);
@@ -22,5 +23,7 @@ export async function GET() {
     tasks: tasks.filter(t => projectIds.includes(t.projectId)),
     hoursThisMonth: Math.round(hoursThisMonth * 10) / 10,
     totalHours: Math.round(myLogs.reduce((s, l) => s + l.hours, 0) * 10) / 10,
+    payouts: payouts.map(p => ({ id: p.id, amount: p.amount, status: p.status, note: p.note, kind: p.kind, hours: p.hours, paidDate: p.paidDate })),
+    pendingPay: payouts.filter(p => p.status === 'pending').reduce((s, p) => s + p.amount, 0),
   });
 }

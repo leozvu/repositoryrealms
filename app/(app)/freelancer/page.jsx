@@ -66,7 +66,26 @@ export default function FreelancerPage() {
         <div className="card kpi"><span className="kpi-label">Việc đang mở</span><div className="kpi-value">{data.tasks.filter(t => t.status !== 'done').length}</div></div>
         <div className="card kpi"><span className="kpi-label">Giờ tháng này</span><div className="kpi-value">{data.hoursThisMonth}h</div>
           <div className="kpi-sub">tổng {data.totalHours}h</div></div>
+        <div className="card kpi"><span className="kpi-label">Chờ thanh toán</span>
+          <div className="kpi-value" style={{ color: data.pendingPay ? 'var(--warn, #D97706)' : 'var(--accent)' }}>{money(data.pendingPay)}</div></div>
       </div>
+
+      {data.payouts?.length > 0 && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <div className="card-head"><span className="card-title">Thanh toán ({data.payouts.length})</span></div>
+          <div className="card-body" style={{ paddingTop: 6 }}>
+            {data.payouts.map(p => (
+              <div key={p.id} className="act-item" style={{ alignItems: 'center' }}>
+                <div style={{ flex: 1 }}>
+                  <div className="act-title">{money(p.amount)}{p.kind === 'hourly' && p.hours ? ` · ${p.hours}h` : ' · khoán'}</div>
+                  <div className="act-sub">{p.note || ''}{p.paidDate ? ' · đã trả ' + fmtDate(p.paidDate) : ''}</div>
+                </div>
+                <span className={`badge ${p.status === 'paid' ? 'b-green' : 'b-amber'}`}><span className="dot"></span>{p.status === 'paid' ? 'Đã trả' : 'Chờ trả'}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {data.projects.map(p => {
         const pt = data.tasks.filter(t => t.projectId === p.id);

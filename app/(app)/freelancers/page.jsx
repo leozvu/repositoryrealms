@@ -13,6 +13,8 @@ export default function FreelancersPage() {
   const users = useResource('users');
   const projects = useResource('projects');
   const members = useResource('projectmembers');
+  const timelogs = useResource('timelogs');
+  const payouts = useResource('payouts');
   const [modal, setModal] = useState(null);
   const toast = useToast();
   if (users.forbidden) return <Forbidden />;
@@ -21,6 +23,20 @@ export default function FreelancersPage() {
   const projName = id => projects.rows.find(p => p.id === id)?.name || '—';
   const flProjects = uid => members.rows.filter(m => m.userId === uid);
   const expired = u => u.accessUntil && u.accessUntil < todayISO();
+  const flPayouts = uid => payouts.rows.filter(p => p.userId === uid);
+  const loggedHours = (uid, pid) => timelogs.rows.filter(l => l.userId === uid && l.projectId === pid).reduce((s, l) => s + l.hours, 0);
+
+  const settle = async (f) => {
+    const amount = f.kind === 'hourly' ? Math.round((+f.hours || 0) * (+f.rate || 0)) : (+f.amount || 0);
+    if (amount <= 0) return toast('Số tiền không hợp lệ', 'error');
+    await payouts.create({ userId: f.userId, projectId: f.projectId || null, kind: f.kind, hours: f.kind === 'hourly' ? +f.hours || 0 : 0, amount, note: f.note || (f.projectId ? projName(f.projectId) : '') });
+    toast('Đã tạo khoản phải trả freelancer');
+  };
+  const payNow = async (p) => {
+    const r = await fetch(`/api/payouts/${p.id}/pay`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); return toast(j.error || 'Lỗi', 'error'); }
+    await payouts.refresh(); toast('Đã trả + ghi sổ quỹ');
+  };
 
   const callUsers = async (method, body) => {
     const res = await fetch('/api/users', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -100,6 +116,25 @@ export default function FreelancersPage() {
                       </select>
                     )}
                   </div>
+                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8, marginTop: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontWeight: 600 }}>Thanh toán</span>
+                      {(() => { const pend = flPayouts(u.id).filter(p => p.status === 'pending').reduce((s, p) => s + p.amount, 0); return pend > 0 ? <span className="badge b-amber"><span className="dot"></span>chờ trả {money(pend)}</span> : null; })()}
+                      <div className="spacer"></div>
+                      {canManage && <button className="btn btn-outline btn-sm" onClick={() => setModal({ mode: 'settle', row: u })}>Chốt thanh toán</button>}
+                    </div>
+                    {flPayouts(u.id).slice(0, 5).map(p => (
+                      <div key={p.id} className="act-item" style={{ padding: '3px 0', alignItems: 'center' }}>
+                        <div style={{ flex: 1 }}>
+                          <span>{money(p.amount)}{p.kind === 'hourly' && p.hours ? ` (${p.hours}h)` : ''}</span>
+                          <span style={{ fontSize: '.72rem', color: 'var(--muted)' }}> · {p.note || '—'}</span>
+                        </div>
+                        {p.status === 'paid'
+                          ? <span className="badge b-green"><span className="dot"></span>Đã trả</span>
+                          : (canManage && <button className="btn btn-primary btn-sm" onClick={() => payNow(p)}>Trả</button>)}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             );
@@ -108,9 +143,48 @@ export default function FreelancersPage() {
       )}
 
       {modal?.mode === 'add' && <FreelancerModal onClose={() => setModal(null)} onSave={createFL} />}
+      {modal?.mode === 'settle' && <SettleModal fl={modal.row} projects={flProjects(modal.row.id).map(m => ({ id: m.projectId, name: projName(m.projectId) }))}
+        loggedHours={loggedHours} onClose={() => setModal(null)} onSave={settle} />}
       {modal?.mode === 'deactivate' && <ConfirmDialog yesLabel="Khóa" msg={`Khóa đăng nhập freelancer "${modal.row.name}"? (có thể mở lại sau)`}
         onClose={() => setModal(null)} onYes={async () => { await callUsers('PUT', { id: modal.row.id, status: 'inactive' }); users.refresh(); toast('Đã khóa'); }} />}
     </>
+  );
+}
+
+function SettleModal({ fl, projects, loggedHours, onClose, onSave }) {
+  const [kind, setKind] = useState('hourly');
+  const [projectId, setProjectId] = useState(projects[0]?.id || '');
+  const [hours, setHours] = useState(projectId ? loggedHours(fl.id, projectId) : 0);
+  const [amount, setAmount] = useState(0);
+  const [note, setNote] = useState('');
+  const rate = fl.hourlyRate || 0;
+  const pickProject = pid => { setProjectId(pid); setHours(pid ? Math.round(loggedHours(fl.id, pid) * 10) / 10 : 0); };
+  const preview = kind === 'hourly' ? Math.round((+hours || 0) * rate) : (+amount || 0);
+  return (
+    <Modal title={`Chốt thanh toán — ${fl.name}`} onClose={onClose}
+      footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
+        <button className="btn btn-primary" onClick={() => { if (preview <= 0) return; onSave({ userId: fl.id, projectId, kind, hours, amount, rate, note }); onClose(); }}>Tạo khoản phải trả</button></>}>
+      <div className="form-grid">
+        <div className="field"><label>Dự án</label>
+          <select value={projectId} onChange={e => pickProject(e.target.value)}>
+            <option value="">— Không gắn dự án —</option>
+            {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select></div>
+        <div className="field"><label>Cách tính</label>
+          <select value={kind} onChange={e => setKind(e.target.value)}>
+            <option value="hourly">Theo giờ × đơn giá</option>
+            <option value="fixed">Khoán (số tiền cố định)</option>
+          </select></div>
+        {kind === 'hourly' ? <>
+          <div className="field"><label>Số giờ (mặc định = giờ đã log)</label><input type="number" min="0" step="0.5" value={hours} onChange={e => setHours(e.target.value)} /></div>
+          <div className="field"><label>Đơn giá giờ</label><input value={money(rate)} disabled /></div>
+        </> : (
+          <div className="field"><label>Số tiền khoán (đ)</label><input type="number" min="0" value={amount} onChange={e => setAmount(e.target.value)} /></div>
+        )}
+        <div className="field full"><label>Ghi chú</label><input value={note} onChange={e => setNote(e.target.value)} placeholder="VD: Dựng 5 video social" /></div>
+        <div className="field full" style={{ fontSize: '.9rem' }}>Sẽ tạo khoản phải trả: <b style={{ color: 'var(--primary)' }}>{money(preview)}</b></div>
+      </div>
+    </Modal>
   );
 }
 
