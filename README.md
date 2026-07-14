@@ -1,4 +1,4 @@
-# Agency ERP v3.9 — Đa người dùng, phân quyền theo cấp bậc
+# Agency ERP v3.10 — Đa người dùng, phân quyền theo cấp bậc
 
 Next.js 14 + Prisma + NextAuth + **Supabase Postgres**.
 
@@ -122,6 +122,15 @@ npm run dev          # → http://localhost:3300
 - Cấu hình SMTP theo từng công ty (Cài đặt → Email công ty, có nút gửi thử)
 - Nút 📧 trên Báo giá & Hóa đơn: email brand công ty kèm bảng chi tiết + thông tin thanh toán, lời nhắn tùy chỉnh; server dựng nội dung từ chứng từ, mọi lần gửi vào Nhật ký hệ thống
 - Bảo mật: các trường bí mật trong Cài đặt (SMTP, Claude API key) chỉ Giám đốc đọc được qua API
+
+**v3.10 — Vận hành dự án chuyên sâu (Project Ops)**:
+- **Tiến độ tự động**: % dự án tính từ công việc (trọng số theo giờ ước lượng), tự cập nhật khi task đổi
+- **Ước lượng giờ vs thực tế**: task có giờ ước lượng, dự án có ngân sách giờ → % đốt ngân sách, cảnh báo vượt
+- **Sức khỏe dự án 🔴🟡🟢**: tự tính từ trễ deadline + vượt giờ + vượt ngân sách + việc trễ
+- **Chi phí & biên lợi nhuận**: chi phí thực = giờ log × đơn giá lương + hóa đơn NCC; biên = ngân sách − chi phí (chỉ CEO/Kế toán/PM/Lead thấy tiền)
+- **Giai đoạn dự án (phases)**: nhóm việc theo phase với tiến độ riêng; **nhãn công việc** + lọc theo người/nhãn; **lịch sử thay đổi** từng việc
+- **Mẫu dự án**: 1 nút sinh cả bộ giai đoạn + việc + mốc chuẩn (branding, chiến dịch…)
+- **Sở chỉ huy dự án (`/portfolio`)**: mọi dự án theo mức rủi ro + giờ đốt + biên LN + việc trễ + ma trận tải nhân sự
 
 ## Import dữ liệu từ bản offline v1
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**

@@ -266,7 +266,7 @@ export default function Shell({ user, company, children }) {
             <div className="brand-logo">{(company || 'A')[0].toUpperCase()}</div>
             <div className="brand-text">
               <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">ERP v3.8 · 7 vai trò</span>
+              <span className="brand-sub">ERP v3.10 · 7 vai trò</span>
             </div>
           </div>
           <nav id="nav">
