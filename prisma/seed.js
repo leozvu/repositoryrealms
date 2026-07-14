@@ -26,7 +26,7 @@ async function main() {
   console.log('⚠ Seed v3.2 — xóa toàn bộ dữ liệu cũ và tạo lại bộ demo (chỉ dùng cho dev).');
 
   /* ---------- Xóa theo thứ tự con → cha ---------- */
-  for (const m of ['review', 'taskEvent', 'phase', 'projectTemplate', 'taskComment', 'notification', 'docLink', 'rfq', 'onboarding',
+  for (const m of ['projectMember', 'holiday', 'review', 'taskEvent', 'phase', 'projectTemplate', 'taskComment', 'notification', 'docLink', 'rfq', 'onboarding',
     'contact', 'apiKey', 'webhook', 'rule', 'csatResponse',
     'message', 'convMember', 'conversation', 'auditLog', 'approval', 'commission',
     'npsResponse', 'okr', 'ticket', 'budget', 'payroll', 'candidate', 'attendance', 'activity',
@@ -282,11 +282,30 @@ async function main() {
   /* ---------- Chấm công: 5 người × 10 ngày làm việc gần nhất ---------- */
   const attDays = workdays(10);
   const attData = [];
+  const clockIns = ['08:52', '09:05', '08:58', '09:14', '08:45']; // vài buổi muộn để demo
   [nhanvien, content, media, lead, pm].forEach((u, ui) => attDays.forEach((date, di) => {
     const s = (di + ui) % 7 === 3 ? 'remote' : (di + ui) % 11 === 5 ? 'off' : 'present';
-    attData.push({ userId: u.id, date, status: s });
+    const ci = s === 'off' ? null : clockIns[(di + ui) % clockIns.length];
+    const co = s === 'off' ? null : (di === 0 ? null : '18:0' + ((di + ui) % 6)); // hôm nay chưa tan ca
+    attData.push({ userId: u.id, date, status: s, checkIn: ci, checkOut: co, otHours: (di + ui) % 9 === 4 ? 2 : 0 });
   }));
   await prisma.attendance.createMany({ data: attData });
+
+  /* ---------- Ngày lễ + Freelancer (v3.11) ---------- */
+  await prisma.holiday.createMany({ data: [{ date: MD(0, 2), name: 'Nghỉ mát công ty' }] });
+  const flVideo = await prisma.user.create({ data: {
+    email: 'freelancer.video@demo.vn', name: 'Trần Video Editor', passwordHash: mk('demo1234'),
+    role: 'FREELANCER', roles: J(['FREELANCER']), userType: 'freelancer', title: 'Freelancer',
+    hourlyRate: 250000, skills: 'Video editor, Motion graphics', portfolio: 'https://behance.net/demo',
+    accessUntil: D(+35), // theo deadline dự án EVA
+  } });
+  await prisma.projectMember.create({ data: { projectId: p1.id, userId: flVideo.id, role: 'Video Editor' } });
+  // giao freelancer 1 việc trong dự án EVA + ghi ít giờ
+  const flTask = await prisma.task.create({ data: { title: 'Dựng 5 video ngắn cho social', projectId: p1.id, phaseId: phEva2.id, assigneeId: flVideo.id, priority: 'medium', status: 'doing', dueDate: D(+6), estHours: 30, labels: J(['Video', 'Freelance']), checklist: J([{ text: 'Nhận brief + footage', done: true }, { text: 'Dựng bản nháp', done: false }, { text: 'Chỉnh theo góp ý', done: false }]) } });
+  await prisma.timeLog.createMany({ data: [
+    { userId: flVideo.id, projectId: p1.id, date: D(-3), hours: 6, billable: true, note: 'Dựng nháp video 1-2' },
+    { userId: flVideo.id, projectId: p1.id, date: D(-1), hours: 5, billable: true, note: 'Dựng nháp video 3' },
+  ] });
 
   /* ---------- Nghỉ phép ---------- */
   await prisma.leave.createMany({

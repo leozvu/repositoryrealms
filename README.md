@@ -1,4 +1,4 @@
-# Agency ERP v3.10 — Đa người dùng, phân quyền theo cấp bậc
+# Agency ERP v3.11 — Đa người dùng, phân quyền theo cấp bậc
 
 Next.js 14 + Prisma + NextAuth + **Supabase Postgres**.
 
@@ -131,6 +131,11 @@ npm run dev          # → http://localhost:3300
 - **Giai đoạn dự án (phases)**: nhóm việc theo phase với tiến độ riêng; **nhãn công việc** + lọc theo người/nhãn; **lịch sử thay đổi** từng việc
 - **Mẫu dự án**: 1 nút sinh cả bộ giai đoạn + việc + mốc chuẩn (branding, chiến dịch…)
 - **Sở chỉ huy dự án (`/portfolio`)**: mọi dự án theo mức rủi ro + giờ đốt + biên LN + việc trễ + ma trận tải nhân sự
+
+**v3.11 — Chấm công chuyên sâu + Freelancer**:
+- **Chấm công giờ vào/ra thật**: bấm Vào ca / Tan ca ghi timestamp, tự tính giờ làm; ca chuẩn + hệ số OT trong Cài đặt; **phát hiện đi muộn**; **ngày lễ công ty** (không tính vắng); **ghi OT**; bảng công tháng (đi muộn/giờ làm/OT) nối vào bảng lương
+- **Quản lý Freelancer** (`/freelancers`, HR/PM/Lead): tạo tài khoản freelancer với đơn giá giờ + kỹ năng; gắn vào dự án → **hạn truy cập tự đặt theo deadline dự án**; giờ freelancer log tính vào chi phí/biên dự án theo đơn giá freelancer
+- **Cổng Freelancer** (`/freelancer`): freelancer đăng nhập vào view **khóa chặt** — chỉ dự án được gán + việc của mình (đổi trạng thái, checklist, ghi giờ) + hạn hợp đồng còn lại. **Chặn ở tầng API** (403 mọi dữ liệu nội bộ), **tài khoản hết hạn theo dự án tự chặn đăng nhập**
 
 ## Import dữ liệu từ bản offline v1
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**
