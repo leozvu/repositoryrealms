@@ -12,6 +12,7 @@ const DEFAULTS = {
   autoAssignLeads: false, // v3.4: tự chia lead chưa gán cho AM ít lead mở nhất
   roleLabels: {}, // v3.6: đổi tên chức danh theo công ty (quyền giữ nguyên theo nhóm)
   leaveQuota: 12, // v3.7: số ngày phép năm mỗi nhân sự
+  workStart: '09:00', workEnd: '18:00', otMultiplier: 1.5, // v3.11: ca làm chuẩn + hệ số OT
   // v3.9: SMTP gửi email báo giá/hóa đơn (mỗi công ty một hộp thư riêng)
   smtpHost: '', smtpPort: 465, smtpUser: '', smtpPass: '', smtpFrom: '',
 };

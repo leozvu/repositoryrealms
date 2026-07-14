@@ -149,6 +149,9 @@ export default function SettingsPage() {
             <F k="approveExpenseDirectorOver" label="Chi cần thêm Giám đốc duyệt từ (đ)" type="number" />
             <F k="commissionRate" label="Tỷ lệ hoa hồng mặc định (%)" type="number" />
             <F k="leaveQuota" label="Ngày phép năm / nhân sự" type="number" />
+            <F k="workStart" label="Giờ vào ca chuẩn (HH:MM)" />
+            <F k="workEnd" label="Giờ tan ca chuẩn (HH:MM)" />
+            <F k="otMultiplier" label="Hệ số lương làm thêm (OT)" type="number" />
             <F k="probNew" label="Xác suất chốt: Mới (%)" type="number" />
             <F k="probContacted" label="Xác suất: Đã liên hệ (%)" type="number" />
             <F k="probProposal" label="Xác suất: Gửi đề xuất (%)" type="number" />
