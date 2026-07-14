@@ -11,18 +11,24 @@ const RECUR_OPTS = [{ value: '', label: 'Không lặp' }, { value: 'weekly', lab
 function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, onDelete, onClose }) {
   const comments = useResource('taskcomments');
   const timelogs = useResource('timelogs');
+  const phases = useResource('phases');
+  const events = useResource('taskevents');
   const toast = useToast();
   const [f, setF] = useState({
     title: task.title, projectId: task.projectId || '', assigneeId: task.assigneeId || '',
     priority: task.priority, status: task.status, dueDate: task.dueDate || '',
-    recur: task.recur || '', note: task.note || '',
+    recur: task.recur || '', note: task.note || '', estHours: task.estHours || 0,
+    phaseId: task.phaseId || '', labels: parseItems(task.labels),
     dependsOn: parseItems(task.dependsOn), checklist: parseItems(task.checklist),
   });
   const [cmt, setCmt] = useState('');
   const [newItem, setNewItem] = useState('');
+  const [newLabel, setNewLabel] = useState('');
   const [logH, setLogH] = useState('');
   const set = (k, v) => setF(x => ({ ...x, [k]: v }));
   const myComments = comments.rows.filter(c => c.taskId === task.id);
+  const myEvents = events.rows.filter(e => e.taskId === task.id);
+  const myPhases = phases.rows.filter(p => p.projectId === f.projectId).sort((a, b) => a.order - b.order);
   const uName = id => users.find(u => u.id === id)?.name || '—';
   const doneN = f.checklist.filter(c => c.done).length;
 
@@ -66,10 +72,25 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
             {TASK_COLS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
           </select></div>
         <div className="field"><label>Hạn hoàn thành</label><input type="date" value={f.dueDate} onChange={e => set('dueDate', e.target.value)} /></div>
-        <div className="field"><label>Lặp lại (v3.7)</label>
+        <div className="field"><label>Giờ ước lượng</label>
+          <input type="number" min="0" step="0.5" value={f.estHours} onChange={e => set('estHours', +e.target.value || 0)} placeholder="VD: 8" /></div>
+        <div className="field"><label>Lặp lại</label>
           <select value={f.recur} onChange={e => set('recur', e.target.value)}>
             {RECUR_OPTS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select></div>
+        {f.projectId && myPhases.length > 0 && <div className="field"><label>Giai đoạn</label>
+          <select value={f.phaseId} onChange={e => set('phaseId', e.target.value)}>
+            <option value="">— Chưa xếp —</option>
+            {myPhases.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select></div>}
+        <div className="field full"><label>Nhãn</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center' }}>
+            {f.labels.map((lb, i) => (
+              <span key={i} className="badge b-violet" style={{ cursor: 'pointer' }} onClick={() => set('labels', f.labels.filter((_, j) => j !== i))}>{lb} ✕</span>
+            ))}
+            <input style={{ flex: 1, minWidth: 120 }} placeholder="Thêm nhãn… (Enter)" value={newLabel} onChange={e => setNewLabel(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && newLabel.trim()) { e.preventDefault(); if (!f.labels.includes(newLabel.trim())) set('labels', [...f.labels, newLabel.trim()]); setNewLabel(''); } }} />
+          </div></div>
         <div className="field full"><label>Phụ thuộc vào (Ctrl+click chọn nhiều)</label>
           <select multiple size={3} value={f.dependsOn} onChange={e => set('dependsOn', [...e.target.selectedOptions].map(o => o.value))}>
             {allTasks.filter(t => t.id !== task.id).map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
@@ -124,6 +145,18 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
             <button className="btn btn-primary btn-sm" onClick={sendCmt}>Gửi</button>
           </div>
         </div>
+
+        {/* v3.10: lịch sử thay đổi */}
+        {myEvents.length > 0 && (
+          <div className="field full" style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+            <label>Lịch sử ({myEvents.length})</label>
+            <div style={{ maxHeight: 150, overflowY: 'auto', display: 'grid', gap: 3, fontSize: '.78rem', color: 'var(--muted)' }}>
+              {myEvents.map(e => (
+                <div key={e.id}><b style={{ color: 'var(--fg)' }}>{e.userName}</b> · {e.text} <span style={{ opacity: .7 }}>· {new Date(e.at).toLocaleString('vi-VN')}</span></div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </Modal>
   );
@@ -138,6 +171,8 @@ export default function TasksPage() {
   const users = useResource('users');
   const [proj, setProj] = useState('all');
   const [mine, setMine] = useState(false);
+  const [assignee, setAssignee] = useState('all');
+  const [label, setLabel] = useState('all');
   const [modal, setModal] = useState(null);
   const [dragId, setDragId] = useState(null);
   const [overCol, setOverCol] = useState(null);
@@ -151,10 +186,15 @@ export default function TasksPage() {
     { key: 'assigneeId', label: 'Người phụ trách', type: 'select', options: users.rows.filter(u => u.status === 'active').map(u => ({ value: u.id, label: u.name })) },
     { key: 'priority', label: 'Ưu tiên', type: 'select', options: Object.entries(BADGE.priority).map(([v, [l]]) => ({ value: v, label: l })) },
     { key: 'dueDate', label: 'Hạn hoàn thành', type: 'date' },
+    { key: 'estHours', label: 'Giờ ước lượng', type: 'number' },
     { key: 'recur', label: 'Lặp lại', type: 'select', options: RECUR_OPTS },
     { key: 'note', label: 'Mô tả', type: 'textarea', full: true },
   ];
-  const visible = rows.filter(t => (proj === 'all' || String(t.projectId || '') === proj) && (!mine || t.assigneeId === user?.id));
+  const allLabels = [...new Set(rows.flatMap(t => parseItems(t.labels)))];
+  const visible = rows.filter(t => (proj === 'all' || String(t.projectId || '') === proj)
+    && (!mine || t.assigneeId === user?.id)
+    && (assignee === 'all' || t.assigneeId === assignee)
+    && (label === 'all' || parseItems(t.labels).includes(label)));
   const canDrag = t => isMgmt || t.assigneeId === user?.id;
   const blockers = t => parseItems(t.dependsOn).map(id => rows.find(r => r.id === id)).filter(d => d && d.status !== 'done');
 
@@ -177,6 +217,14 @@ export default function TasksPage() {
           {projects.rows.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           <option value="">Việc chung</option>
         </select>
+        <select className="filter" value={assignee} onChange={e => setAssignee(e.target.value)}>
+          <option value="all">Mọi người phụ trách</option>
+          {users.rows.filter(u => u.status === 'active').map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+        </select>
+        {allLabels.length > 0 && <select className="filter" value={label} onChange={e => setLabel(e.target.value)}>
+          <option value="all">Mọi nhãn</option>
+          {allLabels.map(l => <option key={l} value={l}>{l}</option>)}
+        </select>}
         <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: '.83rem', cursor: 'pointer' }}>
           <input type="checkbox" checked={mine} onChange={e => setMine(e.target.checked)} /> Chỉ việc của tôi
         </label>
@@ -203,7 +251,9 @@ export default function TasksPage() {
                       <span title={`Chờ: ${blockers(t).map(b => b.title).join(', ')}`} style={{ marginRight: 4 }}>⛓</span>}
                       {t.recur && <span title={t.recur === 'weekly' ? 'Lặp hàng tuần' : 'Lặp hàng tháng'} style={{ marginRight: 4 }}>🔁</span>}
                       {t.title}</div>
-                    <div className="kan-sub">{projName(t.projectId)}{cl.length > 0 && <> · ☑ {cl.filter(x => x.done).length}/{cl.length}</>}</div>
+                    <div className="kan-sub">{projName(t.projectId)}{cl.length > 0 && <> · ☑ {cl.filter(x => x.done).length}/{cl.length}</>}{t.estHours ? ` · ${t.estHours}h` : ''}</div>
+                    {parseItems(t.labels).length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, margin: '4px 0' }}>
+                      {parseItems(t.labels).map(lb => <span key={lb} className="badge b-violet" style={{ fontSize: '.62rem', padding: '1px 6px' }}>{lb}</span>)}</div>}
                     <div className="kan-foot">
                       <Badge map="priority" k={t.priority} />
                       <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -225,7 +275,7 @@ export default function TasksPage() {
       {modal?.mode === 'add' && <FormModal title="Thêm công việc" fields={ADD_FIELDS}
         data={{ priority: 'medium', dueDate: daysFromNow(3), projectId: proj !== 'all' ? proj : '', recur: '' }}
         onClose={() => setModal(null)}
-        onSave={async d => { await create({ ...d, status: 'todo', projectId: d.projectId || null, recur: d.recur || null }); toast('Đã thêm công việc'); }} />}
+        onSave={async d => { await create({ ...d, status: 'todo', projectId: d.projectId || null, recur: d.recur || null, estHours: +d.estHours || 0 }); toast('Đã thêm công việc'); }} />}
       {modal?.mode === 'edit' && <TaskDetailModal task={modal.row} projects={projects.rows} users={users.rows} allTasks={rows}
         isMgmt={isMgmt} me={user} onClose={() => setModal(null)}
         onDelete={() => setModal({ mode: 'del', row: modal.row })}
@@ -233,6 +283,7 @@ export default function TasksPage() {
           await update(modal.row.id, {
             title: f.title, projectId: f.projectId || null, assigneeId: f.assigneeId || null,
             priority: f.priority, status: f.status, dueDate: f.dueDate || null, recur: f.recur || null,
+            estHours: +f.estHours || 0, phaseId: f.phaseId || null, labels: JSON.stringify(f.labels || []),
             note: f.note, dependsOn: JSON.stringify(f.dependsOn || []), checklist: JSON.stringify(f.checklist || []),
           });
           toast('Đã cập nhật');
