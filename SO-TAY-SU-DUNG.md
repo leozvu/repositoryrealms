@@ -60,7 +60,9 @@
 3. **Công nợ & Dự báo**: aging thu/trả, **ngân sách tháng** (cam 80% / đỏ 100%), dự báo dòng tiền 3 tháng.
 4. **NCC** (+ RFQ so giá) · **Hợp đồng** (nhắc hết hạn 30 ngày, in PDF) · **Bảng lương** (nháp → chỉnh → chốt; tự tính BHXH + thuế TNCN) · duyệt chi **Hoa hồng**.
 
-### 🧑‍🤝‍🧑 HR
+### 🧑‍🤝‍🧑 HR *(hiện kiêm nhiệm Kế toán)*
+
+> 📌 **Ghi chú tổ chức (từ 13/07/2026):** vị trí HR đang kiêm Kế toán — tài khoản HR được cấp thêm toàn bộ quyền ở mục **💰 Kế toán** phía trên (hóa đơn, thu/chi, công nợ, bảng lương, duyệt khoản chi…). Trong app, Cẩm nang của bạn tự hiện cả hai mục. Khi công ty tuyển kế toán riêng, CEO gỡ quyền này trong Hồ sơ & nhóm (bỏ tick "Kế toán") là mọi thứ trở lại như cũ.
 1. **Hồ sơ & nhóm**: sửa hồ sơ/lương/nhóm (vai trò chỉ CEO đổi). Click tên = **hồ sơ 360°** từng người.
 2. **Chấm công ngày** quản trị · duyệt **nghỉ phép** (bước cuối đơn >3 ngày) · quota phép tự trừ.
 3. **Bảng lương** cùng Kế toán · **Tuyển dụng** kanban 6 vòng — sang "Nhận việc" hệ thống **tự tạo checklist onboarding** · mỗi quý bấm **Mở đợt đánh giá** trong Đánh giá hiệu suất.
