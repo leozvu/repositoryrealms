@@ -26,7 +26,7 @@ async function main() {
   console.log('⚠ Seed v3.2 — xóa toàn bộ dữ liệu cũ và tạo lại bộ demo (chỉ dùng cho dev).');
 
   /* ---------- Xóa theo thứ tự con → cha ---------- */
-  for (const m of ['review', 'taskComment', 'notification', 'docLink', 'rfq', 'onboarding',
+  for (const m of ['review', 'taskEvent', 'phase', 'projectTemplate', 'taskComment', 'notification', 'docLink', 'rfq', 'onboarding',
     'contact', 'apiKey', 'webhook', 'rule', 'csatResponse',
     'message', 'convMember', 'conversation', 'auditLog', 'approval', 'commission',
     'npsResponse', 'okr', 'ticket', 'budget', 'payroll', 'candidate', 'attendance', 'activity',
@@ -114,18 +114,23 @@ async function main() {
   });
 
   /* ---------- Dự án (1 active trễ deadline → insight) ---------- */
-  const p1 = await prisma.project.create({ data: { name: 'Chiến dịch BST Thu Đông — EVA', clientId: eva.id, service: 'Ads + KOL + Video', budget: 180000000, status: 'active', startDate: D(-40), deadline: D(+35), progress: 55 } });
-  const p2 = await prisma.project.create({ data: { name: 'Retainer Fanpage & Ads — Cà phê Nhà Mình', clientId: cafe.id, service: 'Quản lý Fanpage + Ads', budget: 90000000, status: 'active', startDate: D(-90), deadline: D(+90), progress: 45 } });
-  const p3 = await prisma.project.create({ data: { name: 'Website & Landing page — Smile Plus', clientId: smile.id, service: 'Landing page', budget: 60000000, status: 'active', startDate: D(-60), deadline: D(-5), progress: 80 } });
+  const p1 = await prisma.project.create({ data: { name: 'Chiến dịch BST Thu Đông — EVA', clientId: eva.id, service: 'Ads + KOL + Video', budget: 180000000, budgetHours: 260, status: 'active', startDate: D(-40), deadline: D(+35), progress: 55 } });
+  const p2 = await prisma.project.create({ data: { name: 'Retainer Fanpage & Ads — Cà phê Nhà Mình', clientId: cafe.id, service: 'Quản lý Fanpage + Ads', budget: 90000000, budgetHours: 120, status: 'active', startDate: D(-90), deadline: D(+90), progress: 45 } });
+  const p3 = await prisma.project.create({ data: { name: 'Website & Landing page — Smile Plus', clientId: smile.id, service: 'Landing page', budget: 60000000, budgetHours: 90, status: 'active', startDate: D(-60), deadline: D(-5), progress: 80 } });
+
+  // v3.10: giai đoạn cho dự án EVA (P1)
+  const phEva1 = await prisma.phase.create({ data: { projectId: p1.id, name: 'Concept & Kịch bản', order: 0, color: '#2563EB' } });
+  const phEva2 = await prisma.phase.create({ data: { projectId: p1.id, name: 'Sản xuất', order: 1, color: '#7C3AED' } });
+  const phEva3 = await prisma.phase.create({ data: { projectId: p1.id, name: 'Phân phối & Ads', order: 2, color: '#059669' } });
   const p4 = await prisma.project.create({ data: { name: 'Bộ nhận diện thương hiệu — Minh Phát', clientId: minhphat.id, service: 'Branding', budget: 45000000, status: 'planning', startDate: D(+7), deadline: D(+60), progress: 0 } });
   await prisma.project.create({ data: { name: 'TVC 30s — EVA', clientId: eva.id, service: 'Sản xuất video', budget: 120000000, status: 'done', startDate: D(-150), deadline: D(-60), progress: 100 } });
 
   /* ---------- Công việc: đủ 4 cột kanban, 3 việc trễ hạn ---------- */
   // Chuỗi phụ thuộc P1 (v3.2): kịch bản → quay dựng → setup ads (tạo riêng để lấy id)
-  const tScript = await prisma.task.create({ data: { title: 'Kịch bản video hero 45s', projectId: p1.id, assigneeId: content.id, priority: 'high', status: 'done', dueDate: D(-18) } });
+  const tScript = await prisma.task.create({ data: { title: 'Kịch bản video hero 45s', projectId: p1.id, phaseId: phEva1.id, assigneeId: content.id, priority: 'high', status: 'done', dueDate: D(-18), estHours: 16, labels: J(['Nội dung']) } });
   const tShoot = await prisma.task.create({
     data: {
-      title: 'Quay + dựng video hero', projectId: p1.id, assigneeId: lead.id, priority: 'high', status: 'review', dueDate: D(+2), dependsOn: J([tScript.id]),
+      title: 'Quay + dựng video hero', projectId: p1.id, phaseId: phEva2.id, assigneeId: lead.id, priority: 'high', status: 'review', dueDate: D(+2), dependsOn: J([tScript.id]), estHours: 40, labels: J(['Sản xuất', 'Video']),
       checklist: J([{ text: 'Quay đủ 3 bối cảnh', done: true }, { text: 'Dựng bản nháp 60s', done: true }, { text: 'Chèn nhạc + màu', done: false }, { text: 'Xuất bản final 45s', done: false }]),
     },
   });
@@ -136,13 +141,13 @@ async function main() {
     ],
   });
   await prisma.task.create({ data: { title: 'Báo cáo ads tuần gửi khách retainer', projectId: p2.id, assigneeId: media.id, priority: 'medium', status: 'todo', dueDate: D(+2), recur: 'weekly', note: 'Việc định kỳ — xong tự tạo kỳ sau', checklist: J([{ text: 'Tổng hợp số liệu ads', done: false }, { text: 'Viết nhận xét + đề xuất', done: false }]) } });
-  await prisma.task.create({ data: { title: 'Setup chiến dịch ads giai đoạn 1', projectId: p1.id, assigneeId: media.id, priority: 'medium', status: 'doing', dueDate: D(+5), dependsOn: J([tShoot.id]), note: 'Chỉ chạy ads sau khi video hero hoàn thành' } });
+  await prisma.task.create({ data: { title: 'Setup chiến dịch ads giai đoạn 1', projectId: p1.id, phaseId: phEva3.id, assigneeId: media.id, priority: 'medium', status: 'doing', dueDate: D(+5), dependsOn: J([tShoot.id]), estHours: 20, labels: J(['Ads']), note: 'Chỉ chạy ads sau khi video hero hoàn thành' } });
   await prisma.task.createMany({
     data: [
       // P1 — EVA Thu Đông
-      { title: 'Moodboard & concept BST', projectId: p1.id, assigneeId: nhanvien.id, priority: 'high', status: 'done', dueDate: D(-30) },
-      { title: 'Thiết kế 12 key visual', projectId: p1.id, assigneeId: nhanvien.id, priority: 'high', status: 'doing', dueDate: D(-2), note: 'Trễ vì chờ ảnh sản phẩm từ khách' },
-      { title: 'Chốt danh sách 8 KOL', projectId: p1.id, assigneeId: am.id, priority: 'medium', status: 'todo', dueDate: D(+8) },
+      { title: 'Moodboard & concept BST', projectId: p1.id, phaseId: phEva1.id, assigneeId: nhanvien.id, priority: 'high', status: 'done', dueDate: D(-30), estHours: 24, labels: J(['Thiết kế']) },
+      { title: 'Thiết kế 12 key visual', projectId: p1.id, phaseId: phEva2.id, assigneeId: nhanvien.id, priority: 'high', status: 'doing', dueDate: D(-2), estHours: 48, labels: J(['Thiết kế']), note: 'Trễ vì chờ ảnh sản phẩm từ khách' },
+      { title: 'Chốt danh sách 8 KOL', projectId: p1.id, phaseId: phEva3.id, assigneeId: am.id, priority: 'medium', status: 'todo', dueDate: D(+8), estHours: 12, labels: J(['KOL']) },
       // P2 — retainer Cà phê
       { title: 'Content lịch tháng này (20 bài)', projectId: p2.id, assigneeId: content.id, priority: 'medium', status: 'doing', dueDate: D(+10) },
       { title: 'Thiết kế bộ ảnh menu mới', projectId: p2.id, assigneeId: nhanvien.id, priority: 'medium', status: 'todo', dueDate: D(+12) },
@@ -452,6 +457,49 @@ async function main() {
       { userId: nhanvien.id, quarter: Q(), status: 'final', selfNote: 'Em muốn học thêm motion graphics', mgrNote: 'Thiết kế ổn định, cần chủ động deadline hơn', scores: J(CRIT.map((name, i) => ({ name, self: [4, 3, 4, 5, 4][i], mgr: [4, 3, 4, 5, 5][i] }))) },
       { userId: content.id, quarter: Q(), status: 'self_done', selfNote: 'Quý này em viết đều 20 bài/tháng', scores: J(CRIT.map((name, i) => ({ name, self: [4, 4, 3, 4, 5][i], mgr: 0 }))) },
       { userId: media.id, quarter: Q(), status: 'pending', scores: '[]' },
+    ],
+  });
+
+  /* ---------- Mẫu dự án (v3.10) ---------- */
+  await prisma.projectTemplate.createMany({
+    data: [
+      {
+        name: 'Bộ nhận diện thương hiệu', service: 'Branding', budgetHours: 120,
+        phases: J([
+          { name: 'Nghiên cứu & Định hướng', tasks: [
+            { title: 'Brief & nghiên cứu thị trường', estHours: 8, priority: 'high', offsetDays: 3 },
+            { title: 'Moodboard & định hướng thị giác', estHours: 12, priority: 'high', offsetDays: 7 },
+          ] },
+          { name: 'Thiết kế', tasks: [
+            { title: 'Phác thảo 3 hướng logo', estHours: 20, priority: 'high', offsetDays: 14 },
+            { title: 'Hoàn thiện logo chọn', estHours: 16, priority: 'medium', offsetDays: 20 },
+            { title: 'Bộ nhận diện cơ bản (namecard, letterhead…)', estHours: 24, priority: 'medium', offsetDays: 28 },
+          ] },
+          { name: 'Bàn giao', tasks: [
+            { title: 'Brand guideline PDF', estHours: 16, priority: 'medium', offsetDays: 34 },
+            { title: 'Đóng gói & bàn giao file gốc', estHours: 8, priority: 'low', offsetDays: 38 },
+          ] },
+        ]),
+        milestones: J([{ name: 'Chốt hướng logo', offsetDays: 14 }, { name: 'Nghiệm thu & bàn giao', offsetDays: 38 }]),
+      },
+      {
+        name: 'Chiến dịch Social + Ads', service: 'Social Media', budgetHours: 90,
+        phases: J([
+          { name: 'Lên kế hoạch', tasks: [
+            { title: 'Chiến lược nội dung + lịch đăng', estHours: 12, priority: 'high', offsetDays: 5 },
+            { title: 'Kế hoạch ads & ngân sách', estHours: 8, priority: 'high', offsetDays: 5 },
+          ] },
+          { name: 'Sản xuất', tasks: [
+            { title: 'Thiết kế bộ ấn phẩm tháng', estHours: 30, priority: 'medium', offsetDays: 15 },
+            { title: 'Viết nội dung 20 bài', estHours: 20, priority: 'medium', offsetDays: 15 },
+          ] },
+          { name: 'Vận hành', tasks: [
+            { title: 'Setup & chạy ads', estHours: 12, priority: 'high', offsetDays: 18 },
+            { title: 'Báo cáo hiệu quả cuối kỳ', estHours: 8, priority: 'medium', offsetDays: 30 },
+          ] },
+        ]),
+        milestones: J([{ name: 'Golive chiến dịch', offsetDays: 16 }, { name: 'Báo cáo tổng kết', offsetDays: 30 }]),
+      },
     ],
   });
 
