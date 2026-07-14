@@ -26,7 +26,7 @@ async function main() {
   console.log('⚠ Seed v3.2 — xóa toàn bộ dữ liệu cũ và tạo lại bộ demo (chỉ dùng cho dev).');
 
   /* ---------- Xóa theo thứ tự con → cha ---------- */
-  for (const m of ['projectMember', 'holiday', 'review', 'taskEvent', 'phase', 'projectTemplate', 'taskComment', 'notification', 'docLink', 'rfq', 'onboarding',
+  for (const m of ['payout', 'projectMember', 'holiday', 'review', 'taskEvent', 'phase', 'projectTemplate', 'taskComment', 'notification', 'docLink', 'rfq', 'onboarding',
     'contact', 'apiKey', 'webhook', 'rule', 'csatResponse',
     'message', 'convMember', 'conversation', 'auditLog', 'approval', 'commission',
     'npsResponse', 'okr', 'ticket', 'budget', 'payroll', 'candidate', 'attendance', 'activity',
@@ -146,7 +146,7 @@ async function main() {
     data: [
       // P1 — EVA Thu Đông
       { title: 'Moodboard & concept BST', projectId: p1.id, phaseId: phEva1.id, assigneeId: nhanvien.id, priority: 'high', status: 'done', dueDate: D(-30), estHours: 24, labels: J(['Thiết kế']) },
-      { title: 'Thiết kế 12 key visual', projectId: p1.id, phaseId: phEva2.id, assigneeId: nhanvien.id, priority: 'high', status: 'doing', dueDate: D(-2), estHours: 48, labels: J(['Thiết kế']), note: 'Trễ vì chờ ảnh sản phẩm từ khách' },
+      { title: 'Thiết kế 12 key visual', projectId: p1.id, phaseId: phEva2.id, assigneeId: nhanvien.id, priority: 'high', status: 'doing', dueDate: D(-2), estHours: 48, labels: J(['Thiết kế']), statusSince: D(-8), note: 'Trễ vì chờ ảnh sản phẩm từ khách' },
       { title: 'Chốt danh sách 8 KOL', projectId: p1.id, phaseId: phEva3.id, assigneeId: am.id, priority: 'medium', status: 'todo', dueDate: D(+8), estHours: 12, labels: J(['KOL']) },
       // P2 — retainer Cà phê
       { title: 'Content lịch tháng này (20 bài)', projectId: p2.id, assigneeId: content.id, priority: 'medium', status: 'doing', dueDate: D(+10) },
@@ -303,9 +303,11 @@ async function main() {
   // giao freelancer 1 việc trong dự án EVA + ghi ít giờ
   const flTask = await prisma.task.create({ data: { title: 'Dựng 5 video ngắn cho social', projectId: p1.id, phaseId: phEva2.id, assigneeId: flVideo.id, priority: 'medium', status: 'doing', dueDate: D(+6), estHours: 30, labels: J(['Video', 'Freelance']), checklist: J([{ text: 'Nhận brief + footage', done: true }, { text: 'Dựng bản nháp', done: false }, { text: 'Chỉnh theo góp ý', done: false }]) } });
   await prisma.timeLog.createMany({ data: [
-    { userId: flVideo.id, projectId: p1.id, date: D(-3), hours: 6, billable: true, note: 'Dựng nháp video 1-2' },
-    { userId: flVideo.id, projectId: p1.id, date: D(-1), hours: 5, billable: true, note: 'Dựng nháp video 3' },
+    { userId: flVideo.id, projectId: p1.id, taskId: flTask.id, date: D(-3), hours: 6, billable: true, note: 'Dựng nháp video 1-2' },
+    { userId: flVideo.id, projectId: p1.id, taskId: flTask.id, date: D(-1), hours: 5, billable: true, note: 'Dựng nháp video 3' },
   ] });
+  // v3.12: 1 khoản phải trả freelancer đang chờ (11h × 250k)
+  await prisma.payout.create({ data: { userId: flVideo.id, projectId: p1.id, kind: 'hourly', hours: 11, amount: 2750000, status: 'pending', note: 'Dựng video social — đợt 1' } });
 
   /* ---------- Nghỉ phép ---------- */
   await prisma.leave.createMany({

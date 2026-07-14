@@ -20,6 +20,7 @@ export default function ResourcesPage() {
   const timelogs = useResource('timelogs');
   const tasks = useResource('tasks');
   const projects = useResource('projects');
+  const leaves = useResource('leaves');
   const [assignTo, setAssignTo] = useState(null); // user được gán
   const toast = useToast();
   if (session && !canSee) return <Forbidden />;
@@ -27,8 +28,8 @@ export default function ResourcesPage() {
   const unassigned = tasks.rows.filter(t => !t.assigneeId && t.status !== 'done');
   const pName = id => projects.rows.find(p => p.id === id)?.name || 'Việc chung';
 
-  // Mọi nhân sự active trừ Giám đốc (GĐ không log giờ, hiện "trống" sẽ gây nhiễu)
-  const staff = users.rows.filter(u => u.status === 'active' && !rolesOf(u).includes('DIRECTOR'));
+  // Nhân sự nội bộ active trừ Giám đốc (freelancer tính riêng ở "Hôm nay")
+  const staff = users.rows.filter(u => u.status === 'active' && u.userType !== 'freelancer' && !rolesOf(u).includes('DIRECTOR'));
   if (!staff.length) return <EmptyState title="Chưa có nhân sự" />;
 
   // 4 tuần gần nhất, mốc thứ Hai
@@ -55,6 +56,21 @@ export default function ResourcesPage() {
   const overloaded = staff.filter((u, i) => thisWeekTotal[i] > CAP);
   const idle = staff.filter((u, i) => thisWeekTotal[i] < 15);
 
+  /* ---------- v3.12: Ai đang làm gì HÔM NAY ---------- */
+  const DAY_CAP = 8;
+  const onLeaveToday = uid => leaves.rows.some(l => l.status === 'approved' && l.userId === uid && l.from <= today && l.to >= today);
+  const teamToday = [...staff, ...users.rows.filter(u => u.status === 'active' && u.userType === 'freelancer')].map(u => {
+    const open = tasks.rows.filter(t => t.assigneeId === u.id && t.status !== 'done');
+    const doing = open.filter(t => t.status === 'doing');
+    const dueToday = open.filter(t => t.dueDate === today);
+    const overdue = open.filter(t => t.dueDate && t.dueDate < today);
+    const committed = [...new Set([...doing, ...dueToday])].reduce((s, t) => s + (t.estHours || 0), 0);
+    const leave = onLeaveToday(u.id);
+    const state = leave ? 'leave' : committed > DAY_CAP ? 'over' : (doing.length || dueToday.length) ? 'busy' : 'free';
+    return { u, doing, dueToday, overdue, committed, state, isFL: u.userType === 'freelancer' };
+  }).sort((a, b) => ({ over: 0, busy: 1, leave: 2, free: 3 }[a.state] - { over: 0, busy: 1, leave: 2, free: 3 }[b.state]));
+  const STATE = { free: ['🟢 Rảnh', 'var(--accent)'], busy: ['🟡 Đang làm', 'var(--warn, #D97706)'], over: ['🔴 Quá tải', 'var(--danger)'], leave: ['🌴 Nghỉ phép', 'var(--muted)'] };
+
   return (
     <>
       <div className="grid kpi-grid" style={{ marginBottom: 16 }}>
@@ -65,6 +81,36 @@ export default function ResourcesPage() {
         <div className="card kpi"><span className="kpi-label">Đang trống (&lt;15h log)</span>
           <div className="kpi-value">{idle.length}</div>
           <div className="kpi-sub">{idle.slice(0, 3).map(u => u.name).join(', ') || '—'}</div></div>
+      </div>
+
+      {/* v3.12: Ai đang làm gì hôm nay */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div className="card-head"><span className="card-title">Hôm nay ({fmtDate(today)}) — ai đang làm gì, ai rảnh</span>
+          <span style={{ fontSize: '.74rem', color: 'var(--muted)' }}>{teamToday.filter(x => x.state === 'free').length} rảnh · {teamToday.filter(x => x.state === 'over').length} quá tải · chuẩn {DAY_CAP}h/ngày</span>
+        </div>
+        <div className="card-body" style={{ paddingTop: 6 }}>
+          {teamToday.map(({ u, doing, dueToday, overdue, committed, state, isFL }) => {
+            const [lb, color] = STATE[state];
+            return (
+              <div key={u.id} className="act-item" style={{ alignItems: 'flex-start', gap: 10 }}>
+                <span className="avatar" style={{ flex: 'none', marginTop: 2 }}>{initials(u.name)}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="act-title">{u.name}{isFL && <span className="badge b-violet" style={{ marginLeft: 6, fontSize: '.6rem' }}>FL</span>}
+                    <span style={{ marginLeft: 8, fontSize: '.72rem', color, fontWeight: 700 }}>{lb}</span>
+                    {committed > 0 && <span style={{ marginLeft: 6, fontSize: '.72rem', color: 'var(--muted)' }}>· cam kết {committed}h/{DAY_CAP}h</span>}
+                    {overdue.length > 0 && <span style={{ marginLeft: 6, fontSize: '.72rem', color: 'var(--danger)', fontWeight: 700 }}>· {overdue.length} trễ</span>}</div>
+                  <div className="act-sub">
+                    {state === 'leave' ? 'Đang nghỉ phép hôm nay.'
+                      : doing.length || dueToday.length
+                        ? [...new Set([...doing, ...dueToday])].map(t => t.title).slice(0, 3).join(' · ')
+                        : 'Không có việc đang làm / đến hạn hôm nay — có thể nhận thêm việc.'}
+                  </div>
+                </div>
+                {canAssign && state === 'free' && <button className="btn btn-outline btn-sm" onClick={() => setAssignTo(u)} disabled={!unassigned.length}>+ Giao việc</button>}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="card">

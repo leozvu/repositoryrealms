@@ -44,7 +44,7 @@ export default function PortfolioPage() {
         <span style={{ fontSize: '.8rem', color: 'var(--muted)' }}>{active.length} dự án đang chạy</span>
         <div className="spacer"></div>
         <Link href="/projects" className="btn btn-outline btn-sm">Danh sách dự án</Link>
-        <Link href="/resource" className="btn btn-outline btn-sm">Nguồn lực</Link>
+        <Link href="/resources" className="btn btn-outline btn-sm">Nguồn lực</Link>
       </div>
 
       <div className="grid kpi-grid">
