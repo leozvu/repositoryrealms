@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
+import { isFreelancer } from '@/lib/perm';
 
 // Đảm bảo kênh #Chung tồn tại và người gọi là thành viên
 async function ensureGeneral(userId) {
@@ -15,6 +16,7 @@ async function ensureGeneral(userId) {
 export async function GET() {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   await ensureGeneral(user.id);
   const myMemberships = await prisma.convMember.findMany({ where: { userId: user.id } });
   const convIds = myMemberships.map(m => m.convId);
@@ -50,6 +52,7 @@ export async function GET() {
 export async function POST(req) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { type, userId, name, memberIds } = await req.json();
   if (type === 'dm') {
     if (!userId || userId === user.id) return NextResponse.json({ error: 'Chọn người nhận' }, { status: 400 });

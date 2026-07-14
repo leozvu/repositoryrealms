@@ -28,10 +28,33 @@ model User {
   status       String    @default("active") // active | inactive
   totpSecret   String? // v3.2: 2FA TOTP — null = chưa bật
   birthday     String? // v3.8: YYYY-MM-DD — AI Summary nhắc sinh nhật
+  userType     String    @default("employee") // v3.11: employee | freelancer
+  accessUntil  String? // v3.11: YYYY-MM-DD — freelancer hết hạn thì chặn đăng nhập
+  hourlyRate   Int       @default(0) // v3.11: đơn giá giờ freelancer (nhân viên dùng lương÷176)
+  skills       String? // v3.11: kỹ năng freelancer
+  portfolio    String? // v3.11: link portfolio freelancer
   createdAt    DateTime  @default(now())
   tasks        Task[]
   timeLogs     TimeLog[]
   leaves       Leave[]
+}
+
+// ===== v3.11: Thành viên dự án — gắn freelancer (và nhân sự) vào dự án cụ thể =====
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  role      String? // vai trò trong dự án: Designer, Editor…
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId])
+}
+
+// ===== v3.11: Ngày lễ công ty — không tính là vắng =====
+model Holiday {
+  id   String @id @default(cuid())
+  date String @unique // YYYY-MM-DD
+  name String
 }
 
 model Client {
@@ -349,11 +372,14 @@ model Approval {
 
 // ===== v2.2 HRM =====
 model Attendance {
-  id     String  @id @default(cuid())
-  userId String
-  date   String
-  status String  @default("present") // present | remote | off
-  note   String?
+  id       String  @id @default(cuid())
+  userId   String
+  date     String
+  status   String  @default("present") // present | remote | off
+  checkIn  String? // v3.11: HH:MM giờ vào ca
+  checkOut String? // v3.11: HH:MM giờ tan ca
+  otHours  Float   @default(0) // v3.11: giờ làm thêm
+  note     String?
 
   @@unique([userId, date])
 }

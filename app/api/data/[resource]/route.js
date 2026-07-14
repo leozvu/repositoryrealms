@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { RESOURCES, canRead, canWrite } from '@/lib/registry';
+import { isFreelancer } from '@/lib/perm';
 import { interceptWrite } from '@/lib/approvals';
 import { emitEvent } from '@/lib/events';
 
@@ -14,6 +15,7 @@ async function audit(user, action, entity, refId, detail) {
 export async function GET(req, { params }) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canRead(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const where = cfg.scope ? cfg.scope(user) : {};
@@ -25,6 +27,7 @@ export async function GET(req, { params }) {
 export async function POST(req, { params }) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   let data = await req.json();
