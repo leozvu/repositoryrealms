@@ -1,4 +1,4 @@
-# Agency ERP v3.11 — Đa người dùng, phân quyền theo cấp bậc
+# Agency ERP v3.12 — Đa người dùng, phân quyền theo cấp bậc
 
 Next.js 14 + Prisma + NextAuth + **Supabase Postgres**.
 
@@ -136,6 +136,11 @@ npm run dev          # → http://localhost:3300
 - **Chấm công giờ vào/ra thật**: bấm Vào ca / Tan ca ghi timestamp, tự tính giờ làm; ca chuẩn + hệ số OT trong Cài đặt; **phát hiện đi muộn**; **ngày lễ công ty** (không tính vắng); **ghi OT**; bảng công tháng (đi muộn/giờ làm/OT) nối vào bảng lương
 - **Quản lý Freelancer** (`/freelancers`, HR/PM/Lead): tạo tài khoản freelancer với đơn giá giờ + kỹ năng; gắn vào dự án → **hạn truy cập tự đặt theo deadline dự án**; giờ freelancer log tính vào chi phí/biên dự án theo đơn giá freelancer
 - **Cổng Freelancer** (`/freelancer`): freelancer đăng nhập vào view **khóa chặt** — chỉ dự án được gán + việc của mình (đổi trạng thái, checklist, ghi giờ) + hạn hợp đồng còn lại. **Chặn ở tầng API** (403 mọi dữ liệu nội bộ), **tài khoản hết hạn theo dự án tự chặn đăng nhập**
+
+**v3.12 — Vận hành công việc trơn tru + thanh toán freelancer**:
+- **Thanh toán freelancer** (`/freelancers`, `/finplan`): chốt công nợ phải trả theo job — theo **giờ đã log × đơn giá** hoặc **phí job cố định**; chốt trả tự sinh phiếu chi vào sổ quỹ; freelancer thấy "Chờ thanh toán" trong cổng riêng
+- **Xem nguồn lực hằng ngày** (`/resources` → *Team hôm nay*): mỗi người 🟢 rảnh / 🟡 bận / 🔴 quá tải / 🌴 nghỉ theo giờ cam kết vs 8h/ngày; người rảnh có nút **+ Giao việc**; gồm cả freelancer
+- **Quản lý công việc sâu hơn** (`/tasks`): bám giờ theo từng việc (**ước lượng vs thực tế**); **nhóm board theo người / giai đoạn** (swimlane); **chọn nhiều việc** đổi người/hạn/trạng thái hàng loạt; **@nhắc tên** trong bình luận (bỏ dấu tiếng Việt khi khớp) + **badge tuổi việc** cảnh báo việc ứ đọng
 
 ## Import dữ liệu từ bản offline v1
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**
