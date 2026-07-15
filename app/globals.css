@@ -19,6 +19,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--fg);line-height:1.
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,select,textarea{font-family:inherit;font-size:.9rem;color:var(--fg)}
 svg{width:20px;height:20px;flex:none}
+/* v3.14: iOS TỰ PHÓNG TO cả màn hình khi focus vào ô nhập có cỡ chữ < 16px — người dùng
+   gõ xong phải tự pinch thu lại. Trên máy tính giữ .9rem cho gọn (ERP dữ liệu dày);
+   trên cảm ứng ép đúng 16px. pointer:coarse bắt cả tablet lẫn màn hình cảm ứng. */
+@media(max-width:900px),(pointer:coarse){
+  input,select,textarea{font-size:16px}
+}
 ::selection{background:#BFDBFE}
 
 #app{display:flex;min-height:100dvh}
@@ -29,15 +35,18 @@ svg{width:20px;height:20px;flex:none}
 .brand-logo{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--primary),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem}
 .brand-text{display:flex;flex-direction:column;line-height:1.2}
 .brand-name{color:#fff;font-weight:700;font-size:.95rem}
-.brand-sub{font-size:.7rem;color:#64748B}
+/* v3.14: #64748B trên nền sidebar #0F172A chỉ đạt 3.75:1 — chữ nhỏ cần 4.5:1. Lên slate-400 (6.96:1). */
+.brand-sub{font-size:.7rem;color:#94A3B8}
 #nav{flex:1;overflow-y:auto;padding:6px 10px 10px}
-.nav-section{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:#475569;padding:14px 10px 6px;font-weight:600}
+/* v3.14: #475569 trên #0F172A chỉ 2.36:1 — gần như chìm vào nền, đây là lỗi tương phản
+   nặng nhất toàn app. Lên slate-400 (6.96:1) + 0.7rem cho dễ đọc. */
+.nav-section{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#94A3B8;padding:14px 10px 6px;font-weight:600}
 .nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:9px 10px;border-radius:8px;color:var(--sidebar-fg);font-size:.875rem;font-weight:500;margin-bottom:2px;transition:background .15s,color .15s;text-align:left}
 .nav-item:hover{background:var(--sidebar-active);color:#fff}
 .nav-item.active{background:var(--primary);color:#fff}
 .nav-item svg{width:18px;height:18px}
-.nav-item .count{margin-left:auto;background:rgba(255,255,255,.12);font-size:.68rem;padding:1px 7px;border-radius:99px;font-weight:600}
-.sidebar-footer{padding:12px 18px;font-size:.7rem;color:#475569;border-top:1px solid #1E293B}
+.nav-item .count{margin-left:auto;background:rgba(255,255,255,.12);font-size:.7rem;padding:1px 7px;border-radius:99px;font-weight:600}
+.sidebar-footer{padding:12px 18px;font-size:.7rem;color:#94A3B8;border-top:1px solid #1E293B}
 #backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:40}
 
 /* ============ Main ============ */
@@ -68,6 +77,20 @@ svg{width:20px;height:20px;flex:none}
 .icon-btn:hover{background:var(--muted-bg);color:var(--fg)}
 .icon-btn.danger:hover{background:var(--danger-soft);color:var(--danger)}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+
+/* v3.14: VÙNG CHẠM. Đo thực tế: .btn ~38px, .btn-sm ~28px, .icon-btn ~28px, .nav-item ~39px —
+   đều dưới chuẩn cảm ứng (Apple 44pt / Material 48dp).
+   Chủ ý KHÔNG ép 44px trên máy tính: đây là ERP dữ liệu dày, chuột trỏ chính xác nên
+   ~32-38px là vừa (vẫn qua chuẩn WCAG 2.5.8 AA là 24px). Chỉ ép đủ 44px khi là cảm ứng. */
+@media(max-width:900px),(pointer:coarse){
+  .btn{min-height:44px}
+  .btn-sm{min-height:44px;padding:8px 14px}
+  .icon-btn,.btn-ghost,#menu-btn{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+  .nav-item{min-height:44px}
+  .kan-card{min-height:44px}
+  /* ô tick/radio nhỏ xíu — nới vùng bấm bằng nhãn bọc ngoài */
+  input[type=checkbox],input[type=radio]{min-width:22px;min-height:22px}
+}
 
 /* ============ Cards / KPI ============ */
 .grid{display:grid;gap:16px}
@@ -231,7 +254,7 @@ a.link:hover{text-decoration:underline}
 /* ============ Topbar extras ============ */
 .topbar-icon{color:var(--muted)}
 .topbar-icon svg{width:19px;height:19px}
-.bell-badge{position:absolute;top:-2px;right:-3px;background:var(--danger);color:#fff;font-size:.6rem;font-weight:700;min-width:16px;height:16px;border-radius:99px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.bell-badge{position:absolute;top:-2px;right:-3px;background:var(--danger);color:#fff;font-size:.7rem;font-weight:700;min-width:16px;height:16px;border-radius:99px;display:flex;align-items:center;justify-content:center;padding:0 4px}
 
 /* ============ Notification dropdown ============ */
 .notif-panel{position:fixed;top:58px;right:20px;width:340px;max-height:70dvh;overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);z-index:90;animation:slideUp .18s ease}
@@ -253,7 +276,7 @@ a.link:hover{text-decoration:underline}
 .palette-item:hover,.palette-item.sel{background:var(--muted-bg)}
 .palette-item svg{width:16px;height:16px;color:var(--muted);flex:none}
 .palette-item b{font-size:.86rem;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.palette-item .ptype{font-size:.68rem;color:var(--muted);background:var(--muted-bg);padding:2px 8px;border-radius:99px;flex:none}
+.palette-item .ptype{font-size:.7rem;color:var(--muted);background:var(--muted-bg);padding:2px 8px;border-radius:99px;flex:none}
 
 /* ============ Tabs (detail modals) ============ */
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
@@ -279,16 +302,16 @@ a.link:hover{text-decoration:underline}
 .cal-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .cal-title{font-size:1.05rem;font-weight:800;min-width:170px;text-align:center}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.cal-dow{text-align:center;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;padding:5px 0}
+.cal-dow{text-align:center;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;padding:5px 0}
 .cal-cell{background:var(--card);border:1px solid var(--border);border-radius:9px;min-height:96px;padding:6px 7px;cursor:pointer;transition:border-color .15s,box-shadow .15s;overflow:hidden}
 .cal-cell:hover{border-color:var(--primary);box-shadow:var(--shadow)}
 .cal-cell.other{opacity:.42;cursor:default}
 .cal-cell.today{border-color:var(--primary);border-width:2px}
 .cal-date{font-size:.74rem;font-weight:700;margin-bottom:4px}
 .cal-cell.today .cal-date{color:var(--primary)}
-.cal-ev{display:flex;align-items:center;gap:5px;font-size:.66rem;padding:2px 5px;border-radius:5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--muted-bg)}
+.cal-ev{display:flex;align-items:center;gap:5px;font-size:.7rem;padding:2px 5px;border-radius:5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--muted-bg)}
 .cal-ev i{width:6px;height:6px;border-radius:50%;flex:none}
-.cal-more{font-size:.64rem;color:var(--muted);font-weight:600}
+.cal-more{font-size:.7rem;color:var(--muted);font-weight:600}
 @media(max-width:900px){.cal-cell{min-height:64px}.cal-ev{display:none}.cal-cell .cal-dots{display:flex;gap:3px;flex-wrap:wrap}.cal-dots i{width:6px;height:6px;border-radius:50%}}
 .cal-dots{display:none}
 
@@ -348,7 +371,7 @@ a.link:hover{text-decoration:underline}
 .login-sub{text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:22px}
 .login-err{background:var(--danger-soft);color:var(--danger);font-size:.8rem;padding:9px 13px;border-radius:8px;margin-bottom:14px;font-weight:600}
 .login-card .field{margin-bottom:14px}
-.role-chip{font-size:.66rem;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.03em}
+.role-chip{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.03em}
 .role-DIRECTOR{background:#EDE9FE;color:#7C3AED}
 .role-MANAGER{background:#DBEAFE;color:#1D4ED8}
 .role-STAFF{background:#F1F5F9;color:#475569}
@@ -358,7 +381,7 @@ a.link:hover{text-decoration:underline}
 .user-chip{display:flex;align-items:center;gap:10px;padding:10px 18px;border-top:1px solid #1E293B}
 .user-chip .avatar{background:#1E3A8A;color:#93C5FD}
 .user-chip .uc-name{font-size:.8rem;color:#E2E8F0;font-weight:600;line-height:1.2}
-.user-chip .uc-role{font-size:.66rem;color:#64748B}
+.user-chip .uc-role{font-size:.7rem;color:#64748B}
 .user-chip button{margin-left:auto;color:#64748B;padding:5px;border-radius:6px}
 .user-chip button:hover{background:#1E293B;color:#fff}
 
@@ -398,7 +421,7 @@ a.link:hover{text-decoration:underline}
 .chat-item.active{background:var(--info-soft)}
 .chat-item .ci-name{font-size:.84rem;font-weight:700;display:flex;justify-content:space-between;gap:6px}
 .chat-item .ci-last{font-size:.73rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
-.chat-unread{background:var(--danger);color:#fff;font-size:.64rem;font-weight:800;min-width:18px;height:18px;border-radius:99px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;flex:none}
+.chat-unread{background:var(--danger);color:#fff;font-size:.7rem;font-weight:800;min-width:18px;height:18px;border-radius:99px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;flex:none}
 .chat-thread{flex:1;display:flex;flex-direction:column;min-width:0}
 .chat-thread-head{padding:13px 18px;border-bottom:1px solid var(--border)}
 .chat-msgs{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
@@ -407,7 +430,7 @@ a.link:hover{text-decoration:underline}
 .msg-bubble{padding:8px 13px;border-radius:14px;font-size:.87rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:var(--muted-bg)}
 .msg-row.mine .msg-bubble{background:var(--primary);color:#fff;border-bottom-right-radius:4px}
 .msg-row:not(.mine) .msg-bubble{border-bottom-left-radius:4px}
-.msg-meta{font-size:.64rem;color:var(--muted);margin:2px 6px 8px}
+.msg-meta{font-size:.7rem;color:var(--muted);margin:2px 6px 8px}
 .msg-row.mine .msg-meta{text-align:right}
 .chat-input{display:flex;gap:9px;padding:12px 14px;border-top:1px solid var(--border)}
 .chat-input input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--fg);font-size:.88rem}
