@@ -24,7 +24,16 @@ export default function FreelancersPage() {
   const flProjects = uid => members.rows.filter(m => m.userId === uid);
   const expired = u => u.accessUntil && u.accessUntil < todayISO();
   const flPayouts = uid => payouts.rows.filter(p => p.userId === uid);
+  const r1 = n => Math.round(n * 10) / 10;
   const loggedHours = (uid, pid) => timelogs.rows.filter(l => l.userId === uid && l.projectId === pid).reduce((s, l) => s + l.hours, 0);
+  // v3.13: giờ ĐÃ nằm trong phiếu thanh toán rồi — tính cả phiếu 'pending', vì phiếu chờ trả
+  // cũng đã là cam kết trả cho số giờ đó; bỏ qua nó là chốt trùng lần hai.
+  const settledHours = (uid, pid) => payouts.rows
+    .filter(p => p.userId === uid && p.kind === 'hourly' && (p.projectId || '') === (pid || ''))
+    .reduce((s, p) => s + (+p.hours || 0), 0);
+  // v3.13: giờ CHƯA thanh toán — trước đây modal mặc định điền TỔNG giờ log từ trước tới nay,
+  // nên chốt lần 2 là trả trùng nếu người dùng không tự nhớ trừ ra.
+  const unpaidHours = (uid, pid) => Math.max(0, r1(loggedHours(uid, pid) - settledHours(uid, pid)));
 
   const settle = async (f) => {
     const amount = f.kind === 'hourly' ? Math.round((+f.hours || 0) * (+f.rate || 0)) : (+f.amount || 0);
@@ -144,22 +153,28 @@ export default function FreelancersPage() {
 
       {modal?.mode === 'add' && <FreelancerModal onClose={() => setModal(null)} onSave={createFL} />}
       {modal?.mode === 'settle' && <SettleModal fl={modal.row} projects={flProjects(modal.row.id).map(m => ({ id: m.projectId, name: projName(m.projectId) }))}
-        loggedHours={loggedHours} onClose={() => setModal(null)} onSave={settle} />}
+        loggedHours={loggedHours} settledHours={settledHours} unpaidHours={unpaidHours}
+        onClose={() => setModal(null)} onSave={settle} />}
       {modal?.mode === 'deactivate' && <ConfirmDialog yesLabel="Khóa" msg={`Khóa đăng nhập freelancer "${modal.row.name}"? (có thể mở lại sau)`}
         onClose={() => setModal(null)} onYes={async () => { await callUsers('PUT', { id: modal.row.id, status: 'inactive' }); users.refresh(); toast('Đã khóa'); }} />}
     </>
   );
 }
 
-function SettleModal({ fl, projects, loggedHours, onClose, onSave }) {
+function SettleModal({ fl, projects, loggedHours, settledHours, unpaidHours, onClose, onSave }) {
   const [kind, setKind] = useState('hourly');
   const [projectId, setProjectId] = useState(projects[0]?.id || '');
-  const [hours, setHours] = useState(projectId ? loggedHours(fl.id, projectId) : 0);
+  // v3.13: mặc định = giờ CHƯA thanh toán, không phải tổng giờ log (tránh trả trùng)
+  const [hours, setHours] = useState(projectId ? unpaidHours(fl.id, projectId) : 0);
   const [amount, setAmount] = useState(0);
   const [note, setNote] = useState('');
   const rate = fl.hourlyRate || 0;
-  const pickProject = pid => { setProjectId(pid); setHours(pid ? Math.round(loggedHours(fl.id, pid) * 10) / 10 : 0); };
+  const pickProject = pid => { setProjectId(pid); setHours(pid ? unpaidHours(fl.id, pid) : 0); };
   const preview = kind === 'hourly' ? Math.round((+hours || 0) * rate) : (+amount || 0);
+  const daLog = projectId ? Math.round(loggedHours(fl.id, projectId) * 10) / 10 : 0;
+  const daChot = projectId ? Math.round(settledHours(fl.id, projectId) * 10) / 10 : 0;
+  const conLai = projectId ? unpaidHours(fl.id, projectId) : 0;
+  const vuot = kind === 'hourly' && projectId && +hours > conLai; // chốt quá số giờ còn lại
   return (
     <Modal title={`Chốt thanh toán — ${fl.name}`} onClose={onClose}
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
@@ -176,12 +191,20 @@ function SettleModal({ fl, projects, loggedHours, onClose, onSave }) {
             <option value="fixed">Khoán (số tiền cố định)</option>
           </select></div>
         {kind === 'hourly' ? <>
-          <div className="field"><label>Số giờ (mặc định = giờ đã log)</label><input type="number" min="0" step="0.5" value={hours} onChange={e => setHours(e.target.value)} /></div>
+          <div className="field"><label>Số giờ (mặc định = giờ chưa thanh toán)</label><input type="number" min="0" step="0.5" value={hours} onChange={e => setHours(e.target.value)} /></div>
           <div className="field"><label>Đơn giá giờ</label><input value={money(rate)} disabled /></div>
+          {/* v3.13: bày rõ sổ giờ để không phải tự nhớ đã trả bao nhiêu */}
+          {projectId && <div className="field full" style={{ fontSize: '.8rem', color: 'var(--muted)', background: 'var(--bg)', padding: '8px 10px', borderRadius: 8 }}>
+            Dự án này: đã log <b>{daLog}h</b> · đã chốt phiếu <b>{daChot}h</b> · <b style={{ color: conLai > 0 ? 'var(--accent)' : 'var(--muted)' }}>còn {conLai}h chưa trả</b>
+            {daChot > 0 && <span> — số giờ đã nằm trong phiếu trước (kể cả phiếu chờ trả) đã được trừ sẵn.</span>}
+          </div>}
         </> : (
           <div className="field"><label>Số tiền khoán (đ)</label><input type="number" min="0" value={amount} onChange={e => setAmount(e.target.value)} /></div>
         )}
         <div className="field full"><label>Ghi chú</label><input value={note} onChange={e => setNote(e.target.value)} placeholder="VD: Dựng 5 video social" /></div>
+        {vuot && <div className="field full" style={{ fontSize: '.82rem', color: 'var(--danger)', fontWeight: 600 }}>
+          ⚠ Đang chốt {hours}h nhưng dự án chỉ còn {conLai}h chưa trả — kiểm tra lại kẻo trả trùng.
+        </div>}
         <div className="field full" style={{ fontSize: '.9rem' }}>Sẽ tạo khoản phải trả: <b style={{ color: 'var(--primary)' }}>{money(preview)}</b></div>
       </div>
     </Modal>
