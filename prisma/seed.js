@@ -4,6 +4,7 @@
    Ngày tháng sinh tương đối so với hôm nay để dashboard/AI Summary/aging luôn "sống". */
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const prisma = new PrismaClient();
 
 /* ---------- Helpers ngày tương đối (local, không UTC) ---------- */
@@ -53,19 +54,24 @@ async function main() {
   const teamCreative = await prisma.team.create({ data: { name: 'Nhóm Sáng tạo' } });
   const teamMedia = await prisma.team.create({ data: { name: 'Nhóm Media' } });
 
+  // v3.13: KHÔNG nhúng mật khẩu vào mã nguồn nữa. Trước đây seed đặt sẵn admin123 /
+  // pm123456… mà file này nằm trong git → ai đọc mã nguồn là đăng nhập được thẳng vào
+  // bản AIm đang chạy thật với quyền Giám đốc. Nay mỗi lần seed sinh mật khẩu ngẫu nhiên
+  // và in ra cuối; muốn mật khẩu cố định cho tiện dev thì đặt SEED_PASSWORD.
+  const DEMO_PW = process.env.SEED_PASSWORD || crypto.randomBytes(9).toString('base64').replace(/[+/=]/g, '').slice(0, 10);
   const mk = pw => bcrypt.hashSync(pw, 10);
   const mkUser = d => prisma.user.create({ data: d });
-  const giamdoc = await mkUser({ email: 'giamdoc@agency.vn', name: 'Vũ Minh Long', passwordHash: mk('admin123'), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Founder / CEO', salary: 40000000, phone: '0901111222' });
-  const ketoan = await mkUser({ email: 'ketoan@agency.vn', name: 'Nguyễn Thu Trang', passwordHash: mk('ketoan123'), role: 'ACCOUNTANT', roles: J(['ACCOUNTANT']), title: 'Kế toán trưởng', salary: 18000000 });
-  const am = await mkUser({ email: 'am@agency.vn', name: 'Phạm Hoàng Anh', passwordHash: mk('am123456'), role: 'AM', roles: J(['AM']), title: 'Account Manager', salary: 20000000, phone: '0903334455' });
-  const pm = await mkUser({ email: 'pm@agency.vn', name: 'Trần Quốc Việt', passwordHash: mk('pm123456'), role: 'PM', roles: J(['PM']), title: 'Project Manager', salary: 22000000 });
-  const hr = await mkUser({ email: 'hr@agency.vn', name: 'Lê Thị Hồng Nhung', passwordHash: mk('hr123456'), role: 'HR', roles: J(['HR']), title: 'HR Executive', salary: 15000000 });
-  const lead = await mkUser({ email: 'truongnhom@agency.vn', name: 'Đỗ Văn Khánh', passwordHash: mk('lead1234'), role: 'LEAD', roles: J(['LEAD']), title: 'Trưởng nhóm Sáng tạo', salary: 19000000, teamId: teamCreative.id });
+  const giamdoc = await mkUser({ email: 'giamdoc@agency.vn', name: 'Vũ Minh Long', passwordHash: mk(DEMO_PW), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Founder / CEO', salary: 40000000, phone: '0901111222' });
+  const ketoan = await mkUser({ email: 'ketoan@agency.vn', name: 'Nguyễn Thu Trang', passwordHash: mk(DEMO_PW), role: 'ACCOUNTANT', roles: J(['ACCOUNTANT']), title: 'Kế toán trưởng', salary: 18000000 });
+  const am = await mkUser({ email: 'am@agency.vn', name: 'Phạm Hoàng Anh', passwordHash: mk(DEMO_PW), role: 'AM', roles: J(['AM']), title: 'Account Manager', salary: 20000000, phone: '0903334455' });
+  const pm = await mkUser({ email: 'pm@agency.vn', name: 'Trần Quốc Việt', passwordHash: mk(DEMO_PW), role: 'PM', roles: J(['PM']), title: 'Project Manager', salary: 22000000 });
+  const hr = await mkUser({ email: 'hr@agency.vn', name: 'Lê Thị Hồng Nhung', passwordHash: mk(DEMO_PW), role: 'HR', roles: J(['HR']), title: 'HR Executive', salary: 15000000 });
+  const lead = await mkUser({ email: 'truongnhom@agency.vn', name: 'Đỗ Văn Khánh', passwordHash: mk(DEMO_PW), role: 'LEAD', roles: J(['LEAD']), title: 'Trưởng nhóm Sáng tạo', salary: 19000000, teamId: teamCreative.id });
   const bdayThisWeek = (() => { const d = new Date(); d.setDate(d.getDate() + 3); return `1998-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
-  const nhanvien = await mkUser({ email: 'nhanvien@agency.vn', name: 'Lê Thu Hà', passwordHash: mk('nhanvien123'), role: 'STAFF', roles: J(['STAFF']), title: 'Designer', salary: 14000000, teamId: teamCreative.id, birthday: bdayThisWeek });
-  const quanly = await mkUser({ email: 'quanly@agency.vn', name: 'Trần Quốc Bảo', passwordHash: mk('quanly123'), role: 'MANAGER', roles: J(['PM', 'AM', 'ACCOUNTANT']), title: 'Quản lý (đa vai trò)', salary: 25000000 });
-  const content = await mkUser({ email: 'content@agency.vn', name: 'Ngô Mai Phương', passwordHash: mk('demo1234'), role: 'STAFF', roles: J(['STAFF']), title: 'Content Writer', salary: 12000000, teamId: teamCreative.id });
-  const media = await mkUser({ email: 'media@agency.vn', name: 'Bùi Đức Mạnh', passwordHash: mk('demo1234'), role: 'STAFF', roles: J(['STAFF']), title: 'Media Buyer', salary: 13000000, teamId: teamMedia.id });
+  const nhanvien = await mkUser({ email: 'nhanvien@agency.vn', name: 'Lê Thu Hà', passwordHash: mk(DEMO_PW), role: 'STAFF', roles: J(['STAFF']), title: 'Designer', salary: 14000000, teamId: teamCreative.id, birthday: bdayThisWeek });
+  const quanly = await mkUser({ email: 'quanly@agency.vn', name: 'Trần Quốc Bảo', passwordHash: mk(DEMO_PW), role: 'MANAGER', roles: J(['PM', 'AM', 'ACCOUNTANT']), title: 'Quản lý (đa vai trò)', salary: 25000000 });
+  const content = await mkUser({ email: 'content@agency.vn', name: 'Ngô Mai Phương', passwordHash: mk(DEMO_PW), role: 'STAFF', roles: J(['STAFF']), title: 'Content Writer', salary: 12000000, teamId: teamCreative.id });
+  const media = await mkUser({ email: 'media@agency.vn', name: 'Bùi Đức Mạnh', passwordHash: mk(DEMO_PW), role: 'STAFF', roles: J(['STAFF']), title: 'Media Buyer', salary: 13000000, teamId: teamMedia.id });
   await prisma.team.update({ where: { id: teamCreative.id }, data: { leadId: lead.id } });
 
   /* ---------- Khách hàng (1 khách "nguội" >45 ngày → cảnh báo churn) ---------- */
@@ -294,7 +300,7 @@ async function main() {
   /* ---------- Ngày lễ + Freelancer (v3.11) ---------- */
   await prisma.holiday.createMany({ data: [{ date: MD(0, 2), name: 'Nghỉ mát công ty' }] });
   const flVideo = await prisma.user.create({ data: {
-    email: 'freelancer.video@demo.vn', name: 'Trần Video Editor', passwordHash: mk('demo1234'),
+    email: 'freelancer.video@demo.vn', name: 'Trần Video Editor', passwordHash: mk(DEMO_PW),
     role: 'FREELANCER', roles: J(['FREELANCER']), userType: 'freelancer', title: 'Freelancer',
     hourlyRate: 250000, skills: 'Video editor, Motion graphics', portfolio: 'https://behance.net/demo',
     accessUntil: D(+35), // theo deadline dự án EVA
@@ -544,16 +550,20 @@ async function main() {
   });
 
   /* ---------- Tổng kết ---------- */
-  console.log('✔ Seed v3.2 hoàn tất. Tài khoản đăng nhập (http://localhost:3300):');
-  console.log('  Giám đốc   : giamdoc@agency.vn / admin123');
-  console.log('  Kế toán    : ketoan@agency.vn / ketoan123');
-  console.log('  Account/AM : am@agency.vn / am123456');
-  console.log('  Quản lý DA : pm@agency.vn / pm123456');
-  console.log('  HR         : hr@agency.vn / hr123456');
-  console.log('  Trưởng nhóm: truongnhom@agency.vn / lead1234');
-  console.log('  Nhân viên  : nhanvien@agency.vn / nhanvien123');
-  console.log('  Đa vai trò : quanly@agency.vn / quanly123 (PM+AM+Kế toán)');
-  console.log('  Phụ        : content@agency.vn, media@agency.vn / demo1234');
+  console.log('✔ Seed hoàn tất. Đăng nhập (http://localhost:3300):');
+  console.log('');
+  console.log('  MẬT KHẨU CHUNG CHO MỌI TÀI KHOẢN DEMO: ' + DEMO_PW);
+  console.log('  (sinh ngẫu nhiên mỗi lần seed — đặt SEED_PASSWORD nếu muốn cố định)');
+  console.log('');
+  console.log('  Giám đốc   : giamdoc@agency.vn');
+  console.log('  Kế toán    : ketoan@agency.vn');
+  console.log('  Account/AM : am@agency.vn');
+  console.log('  Quản lý DA : pm@agency.vn');
+  console.log('  HR         : hr@agency.vn');
+  console.log('  Trưởng nhóm: truongnhom@agency.vn');
+  console.log('  Nhân viên  : nhanvien@agency.vn');
+  console.log('  Đa vai trò : quanly@agency.vn (PM+AM+Kế toán)');
+  console.log('  Phụ        : content@agency.vn, media@agency.vn');
 }
 
 main()

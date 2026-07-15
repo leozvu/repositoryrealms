@@ -1,8 +1,15 @@
 /* Nâng cấp v2.0 → v2.1: chuyển role đơn sang roles đa vai trò
-   + tạo tài khoản demo cho các vai trò mới. Chạy: node prisma/migrate-v21.js */
+   + tạo tài khoản demo cho các vai trò mới. Chạy: node prisma/migrate-v21.js
+
+   ⚠ ĐÃ LỖI THỜI (v3.13): cả 3 bản AIm/Egoric/Vnecom đều đã qua v2.1 từ lâu.
+   Giữ lại chỉ để tham khảo lịch sử — nhiều khả năng xóa được.
+   v3.13: mật khẩu demo không còn nhúng sẵn; phải đặt SEED_PASSWORD mới chạy được. */
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const prisma = new PrismaClient();
+
+const DEMO_PW = process.env.SEED_PASSWORD || crypto.randomBytes(9).toString('base64').replace(/[+/=]/g, '').slice(0, 10);
 
 const MAP = { DIRECTOR: ['DIRECTOR'], MANAGER: ['PM', 'AM', 'ACCOUNTANT'], STAFF: ['STAFF'] };
 
@@ -18,19 +25,20 @@ async function main() {
     }
   }
   const demos = [
-    ['ketoan@agency.vn', 'Kế toán Demo', 'ketoan123', ['ACCOUNTANT'], 'Kế toán'],
-    ['hr@agency.vn', 'HR Demo', 'hr123456', ['HR'], 'HR Manager'],
-    ['pm@agency.vn', 'PM Demo', 'pm123456', ['PM'], 'Project Manager'],
-    ['am@agency.vn', 'Sale Demo', 'am123456', ['AM'], 'Account Manager'],
-    ['truongnhom@agency.vn', 'Trưởng nhóm Demo', 'lead1234', ['LEAD', 'STAFF'], 'Design Lead'],
+    ['ketoan@agency.vn', 'Kế toán Demo', ['ACCOUNTANT'], 'Kế toán'],
+    ['hr@agency.vn', 'HR Demo', ['HR'], 'HR Manager'],
+    ['pm@agency.vn', 'PM Demo', ['PM'], 'Project Manager'],
+    ['am@agency.vn', 'Sale Demo', ['AM'], 'Account Manager'],
+    ['truongnhom@agency.vn', 'Trưởng nhóm Demo', ['LEAD', 'STAFF'], 'Design Lead'],
   ];
-  for (const [email, name, pw, roles, title] of demos) {
+  for (const [email, name, roles, title] of demos) {
     const exists = await prisma.user.findUnique({ where: { email } });
     if (!exists) {
-      await prisma.user.create({ data: { email, name, passwordHash: bcrypt.hashSync(pw, 10), role: 'STAFF', roles: JSON.stringify(roles), title, salary: 18000000 } });
-      console.log(`  + demo: ${email} / ${pw} [${roles.join(',')}]`);
+      await prisma.user.create({ data: { email, name, passwordHash: bcrypt.hashSync(DEMO_PW, 10), role: 'STAFF', roles: JSON.stringify(roles), title, salary: 18000000 } });
+      console.log(`  + demo: ${email} [${roles.join(',')}]`);
     }
   }
+  console.log(`  (mật khẩu chung cho tài khoản demo vừa tạo: ${DEMO_PW})`);
   // Nhóm mẫu: Design do Trưởng nhóm Demo dẫn, Lê Thu Hà là thành viên
   const teamCount = await prisma.team.count();
   if (!teamCount) {

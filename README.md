@@ -31,19 +31,26 @@ npm run dev          # → http://localhost:3300
 
 ## Tài khoản mẫu (7 vai trò, một người giữ được nhiều vai trò)
 
-| Vai trò | Email | Mật khẩu | Phạm vi chính |
-|---|---|---|---|
-| **Giám đốc** | giamdoc@agency.vn | admin123 | Toàn quyền + duyệt mọi bước + Cài đặt + Nhật ký hệ thống |
-| **Kế toán** | ketoan@agency.vn | ketoan123 | Hóa đơn, thu chi, NCC, hợp đồng, báo cáo, lương (số liệu), duyệt khoản chi |
-| **Account/Sales** | am@agency.vn | am123456 | Leads (của mình), khách hàng, báo giá, bảng giá — báo giá lớn phải chờ GĐ duyệt |
-| **Quản lý dự án** | pm@agency.vn | pm123456 | Dự án, công việc, Gantt + mốc dự án, NCC/PO, báo cáo vận hành |
-| **HR** | hr@agency.vn | hr123456 | Hồ sơ nhân sự, lương, nhóm, duyệt nghỉ phép, tài sản, tuyển dụng |
-| **Trưởng nhóm** | truongnhom@agency.vn | lead1234 | Việc/giờ công/nghỉ phép của nhóm mình, duyệt bước 1 nghỉ phép |
-| **Nhân viên** | nhanvien@agency.vn | nhanvien123 | Việc + giờ công của mình, xin nghỉ phép |
-| Quản lý cũ (đa vai trò) | quanly@agency.vn | quanly123 | PM + AM + Kế toán (minh họa cộng quyền) |
-| Nhân viên phụ | content@agency.vn · media@agency.vn | demo1234 | Content Writer / Media Buyer |
+> **v3.13 — mật khẩu không còn ghi ở đây.** Trước đây bảng này (và `prisma/seed.js`) công bố
+> mật khẩu demo, mà bản AIm chạy thật ở địa chỉ công khai → ai đọc mã nguồn là vào được với
+> quyền Giám đốc. Nay `npm run db:seed` **sinh mật khẩu ngẫu nhiên mỗi lần chạy và in ra
+> màn hình khi seed xong**. Muốn mật khẩu cố định khi dev: `SEED_PASSWORD=... npm run db:seed`.
+> Mật khẩu đang dùng thật nằm trong `CREDENTIALS-NOI-BO.txt` (không được git theo dõi).
+
+| Vai trò | Email | Phạm vi chính |
+|---|---|---|
+| **Giám đốc** | giamdoc@agency.vn | Toàn quyền + duyệt mọi bước + Cài đặt + Nhật ký hệ thống |
+| **Kế toán** | ketoan@agency.vn | Hóa đơn, thu chi, NCC, hợp đồng, báo cáo, lương (số liệu), duyệt khoản chi |
+| **Account/Sales** | am@agency.vn | Leads (của mình), khách hàng, báo giá, bảng giá — báo giá lớn phải chờ GĐ duyệt |
+| **Quản lý dự án** | pm@agency.vn | Dự án, công việc, Gantt + mốc dự án, NCC/PO, báo cáo vận hành |
+| **HR** | hr@agency.vn | Hồ sơ nhân sự, lương, nhóm, duyệt nghỉ phép, tài sản, tuyển dụng |
+| **Trưởng nhóm** | truongnhom@agency.vn | Việc/giờ công/nghỉ phép của nhóm mình, duyệt bước 1 nghỉ phép |
+| **Nhân viên** | nhanvien@agency.vn | Việc + giờ công của mình, xin nghỉ phép |
+| Quản lý cũ (đa vai trò) | quanly@agency.vn | PM + AM + Kế toán (minh họa cộng quyền) |
+| Nhân viên phụ | content@agency.vn · media@agency.vn | Content Writer / Media Buyer |
 
 ⚠ Đổi mật khẩu khi dùng thật. Bật **đăng nhập 2 lớp (2FA)** bằng nút 🛡 cạnh tên mình ở sidebar.
+Sai mật khẩu 8 lần liên tiếp → khóa đăng nhập 15 phút (v3.13).
 
 ## Chuỗi phê duyệt
 - **Báo giá ≥ 50tr** (chỉnh trong Cài đặt): AM bấm "Đã gửi" → giữ Nháp + gửi Giám đốc duyệt → duyệt xong tự chuyển "Đã gửi"

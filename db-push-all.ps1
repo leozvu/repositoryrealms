@@ -1,10 +1,22 @@
 # Đồng bộ schema Prisma lên CẢ 3 schema Postgres (khi sửa prisma/schema.prisma).
 #   .\db-push-all.ps1                → push cả 3
 #   .\db-push-all.ps1 -Only egoric   → chỉ 1 schema (aim | egoric | vnecom)
-# ⚠ Dừng dev server trước khi chạy (prisma generate cần ghi DLL).
+# ⚠ Dừng dev server trước khi chạy (prisma generate cần ghi DLL — dev server giữ file này).
+#
+# v3.13: mật khẩu Postgres KHÔNG còn nằm trong file này nữa (file này được git theo dõi).
+# Chuỗi kết nối đọc từ .env — .env đã nằm trong .gitignore.
 param([string]$Only = '')
 $ErrorActionPreference = 'Stop'
-$BASE = 'postgresql://postgres.sueqktvmwgonaflogobe:DA_XOA_XEM_ENV@aws-0-ap-southeast-1.pooler.supabase.com'
+
+# --- Lấy máy chủ + thông tin đăng nhập từ .env, không hardcode ---
+$envFile = Join-Path $PSScriptRoot '.env'
+if (-not (Test-Path $envFile)) { throw "Không thấy .env — cần DATABASE_URL trong đó để biết máy chủ Postgres." }
+$line = Get-Content $envFile | Where-Object { $_ -match '^\s*DATABASE_URL\s*=' } | Select-Object -First 1
+if (-not $line) { throw "Không thấy DATABASE_URL trong .env" }
+$url = ($line -replace '^\s*DATABASE_URL\s*=\s*', '').Trim().Trim('"').Trim("'")
+# postgresql://user:mật_khẩu@host  (cắt bỏ :port/db?query)
+if ($url -notmatch '^(postgresql://[^@]+@[^:/?]+)') { throw "DATABASE_URL trong .env sai định dạng — cần dạng postgresql://user:pass@host:port/db" }
+$BASE = $Matches[1]
 
 $schemas = @(
   @{ key = 'aim';    schema = 'public' },
