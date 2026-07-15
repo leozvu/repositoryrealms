@@ -18,7 +18,7 @@ export async function GET(req, { params }) {
   if (!user) return NextResponse.json({ error: 'unauthorized — thiếu hoặc sai Bearer API key' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canRead(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  const where = cfg.scope ? cfg.scope(user) : {};
+  const where = cfg.scope ? await cfg.scope(user, prisma) : {};
   let rows = await prisma[cfg.model].findMany({ where, orderBy: cfg.orderBy });
   if (cfg.sanitize) rows = rows.map(r => cfg.sanitize(r, user));
   return NextResponse.json(rows);
