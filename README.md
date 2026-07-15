@@ -1,4 +1,4 @@
-# Agency ERP v3.12 — Đa người dùng, phân quyền theo cấp bậc
+# Agency ERP v3.13 — Đa người dùng, phân quyền theo cấp bậc
 
 Next.js 14 + Prisma + NextAuth + **Supabase Postgres**.
 
@@ -149,6 +149,12 @@ Sai mật khẩu 8 lần liên tiếp → khóa đăng nhập 15 phút (v3.13).
 - **Thanh toán freelancer** (`/freelancers`, `/finplan`): chốt công nợ phải trả theo job — theo **giờ đã log × đơn giá** hoặc **phí job cố định**; chốt trả tự sinh phiếu chi vào sổ quỹ; freelancer thấy "Chờ thanh toán" trong cổng riêng
 - **Xem nguồn lực hằng ngày** (`/resources` → *Team hôm nay*): mỗi người 🟢 rảnh / 🟡 bận / 🔴 quá tải / 🌴 nghỉ theo giờ cam kết vs 8h/ngày; người rảnh có nút **+ Giao việc**; gồm cả freelancer
 - **Quản lý công việc sâu hơn** (`/tasks`): bám giờ theo từng việc (**ước lượng vs thực tế**); **nhóm board theo người / giai đoạn** (swimlane); **chọn nhiều việc** đổi người/hạn/trạng thái hàng loạt; **@nhắc tên** trong bình luận (bỏ dấu tiếng Việt khi khớp) + **badge tuổi việc** cảnh báo việc ứ đọng
+
+**v3.13 — Vá bảo mật, nối lại chuỗi tiền, nền hiệu năng + test đầu tiên**:
+- **Bảo mật**: sai mật khẩu 8 lần → khóa 15 phút · gỡ toàn bộ mật khẩu khỏi mã nguồn (seed sinh ngẫu nhiên mỗi lần) · **bịt lỗ lộ bí mật 2FA** (trước đây `/api/data/users` trả `totpSecret` của mọi người → ai cũng sinh được mã 2FA của Giám đốc) · vá 4 lỗ phân quyền: payout (đánh dấu đã trả mà tiền không ra sổ), đánh giá (nhân viên ghi đè nhận xét sếp), chấm công (Lead lấy được cả công ty), link tài liệu (ai cũng sửa URL)
+- **Chuỗi tiền nối lại**: chấm công → **lương có tiền OT thật** (giờ OT × lương giờ × hệ số; đi muộn chỉ cảnh báo, không tự trừ) · giờ billable → **hóa đơn 1 nút** (`Xuất từ giờ công`, đánh dấu giờ đã xuất, không xuất trùng) · báo giá → dự án → hóa đơn **gắn đúng dự án** · retainer **sinh hóa đơn kỳ tới** + sửa MRR/ARR báo sai (cộng dồn mọi kỳ)
+- **Hiệu năng**: 29 index (trước đây schema **không có index nào**) · lọc phía server (`useResource(name, {taskId})`) — mở 1 công việc giảm **96%** dữ liệu tải · cache insights/projectStats
+- **Test đầu tiên**: `npm test` — 47 test cho phân quyền + lương + tiền chứng từ, chạy trước khi deploy vào 3 công ty thật. Lỗi tự động hóa không còn bị nuốt im mà ghi vào Nhật ký hệ thống.
 
 ## Import dữ liệu từ bản offline v1
 1. Mở bản v1 (`agency-crm/index.html`) → Cài đặt → **Xuất dữ liệu (JSON)**
