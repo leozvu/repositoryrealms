@@ -8,6 +8,44 @@ import { Icon, Modal, ToastProvider, useToast, RoleLabelsCtx } from './ui';
 import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
 
+/* v3.14: TỰ GẮN NHÃN CỘT CHO BẢNG.
+   Toàn app có 19 trang bảng, mỗi bảng viết tay riêng. Trên điện thoại, bảng 8 cột buộc phải
+   cuộn ngang mới đọc được — mà ERP thì gần như toàn bảng.
+   Cách làm: thay vì sửa tay 19 trang (dễ sót, dễ lệch), đọc <thead> rồi gắn data-label vào
+   từng <td>. CSS ở globals.css dùng nhãn đó để biến mỗi dòng thành một thẻ khi màn hình hẹp.
+   Một chỗ này lo cho cả 19 trang và mọi bảng viết sau này.
+
+   Lưu ý: chỉ theo dõi childList (KHÔNG theo dõi attributes) — nếu theo dõi attributes thì
+   chính việc gắn data-label sẽ kích hoạt lại observer thành vòng lặp vô tận. */
+function useTableLabels(pathname) {
+  useEffect(() => {
+    let timer = 0;
+    const apply = () => {
+      for (const t of document.querySelectorAll('.table-wrap table')) {
+        const heads = [...t.querySelectorAll('thead th')].map(th => th.textContent.trim());
+        if (!heads.length) continue;
+        for (const tr of t.querySelectorAll('tbody tr')) {
+          const tds = tr.children;
+          // dòng gộp ô (trạng thái rỗng "Chưa có dữ liệu") không khớp số cột → bỏ qua
+          if (tds.length !== heads.length) continue;
+          for (let i = 0; i < tds.length; i++) {
+            if (heads[i] && tds[i].dataset.label !== heads[i]) tds[i].dataset.label = heads[i];
+          }
+        }
+      }
+    };
+    // Gộp nhiều biến động DOM liên tiếp thành 1 lần chạy.
+    // KHÔNG dùng requestAnimationFrame: trình duyệt treo rAF khi tab đang ẩn, nên bảng mở ở
+    // tab nền sẽ không bao giờ được gắn nhãn (đã dính đúng lỗi này lúc kiểm thử).
+    const schedule = () => { clearTimeout(timer); timer = setTimeout(apply, 0); };
+    schedule();
+    const root = document.getElementById('view');
+    const mo = new MutationObserver(schedule);
+    if (root) mo.observe(root, { childList: true, subtree: true });
+    return () => { mo.disconnect(); clearTimeout(timer); };
+  }, [pathname]);
+}
+
 // v3.4: tìm kiếm toàn cục Ctrl+K — gom mọi resource user được đọc
 const SEARCH_GROUPS = [
   { res: 'clients', label: 'Khách hàng', icon: 'clients', text: r => [r.name, r.contact, r.industry, r.phone], title: r => r.name, sub: r => r.industry || '', href: r => `/clients/${r.id}` },
@@ -230,6 +268,7 @@ export default function Shell({ user, company, children }) {
   }, []);
   const pathname = usePathname();
   const router = useRouter();
+  useTableLabels(pathname); // v3.14: bảng đọc được trên điện thoại
   const isFL = user?.userType === 'freelancer';
   // v3.11: freelancer chỉ được ở /freelancer — chuyển hướng nếu lạc sang trang nhân viên
   useEffect(() => { if (isFL && pathname !== '/freelancer') router.replace('/freelancer'); }, [isFL, pathname, router]);

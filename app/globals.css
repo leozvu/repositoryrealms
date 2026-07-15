@@ -359,6 +359,53 @@ a.link:hover{text-decoration:underline}
   .form-grid{grid-template-columns:1fr}
   #quick-add-btn span{display:none}
 }
+/* v3.14: BẢNG TRÊN ĐIỆN THOẠI — mỗi dòng thành một tấm thẻ.
+   Trước đây table{min-width:640px} ép mọi bảng cuộn ngang trên máy 375px; ERP có 19 trang
+   bảng nên gần như trang nào cũng phải kéo qua kéo lại mới đọc được một dòng.
+   Nhãn cột lấy từ data-label — Shell.jsx tự đọc <thead> gắn vào, không phải sửa tay 19 trang. */
+@media(max-width:768px){
+  .table-wrap{background:transparent;border:none;box-shadow:none;overflow-x:visible}
+  table{min-width:0;display:block;font-size:.9rem}
+  thead{display:none} /* nhãn đã chuyển vào từng ô */
+  tbody{display:block}
+  tbody tr{
+    display:block;background:var(--card);border:1px solid var(--border);
+    border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden;
+  }
+  tbody tr:hover{background:var(--card)} /* bỏ hiệu ứng hover kiểu bảng, trên cảm ứng vô nghĩa */
+  tbody tr td{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:10px 14px;border-bottom:1px solid var(--border);text-align:right;
+  }
+  tbody tr td:last-child{border-bottom:none}
+  /* nhãn cột nằm bên trái, giá trị bên phải */
+  td[data-label]::before{
+    content:attr(data-label);flex:none;text-align:left;
+    font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--muted);font-weight:600;
+  }
+  /* ô không có nhãn (cột thao tác, dòng gộp ô trạng thái rỗng) thì trải rộng */
+  td:not([data-label]){justify-content:center;text-align:center}
+  td .cell-main,td .cell-sub{display:inline}
+  .cell-person{justify-content:flex-end}
+  .row-actions{justify-content:flex-end;gap:4px}
+  /* dòng gộp ô: trạng thái rỗng, tổng cộng… giữ nguyên kiểu khối */
+  tbody tr td[colspan]{display:block;text-align:center}
+}
+
+/* v3.14: MODAL TRÊN ĐIỆN THOẠI — dán đáy màn hình như sheet, thay vì hộp lửng giữa trang.
+   Modal cũ có padding 38px trên/dưới + max-height trừ 220px: trên máy 375px thì phần thân
+   còn rất ít, form dài phải cuộn trong một khung bé tí. */
+@media(max-width:640px){
+  .modal-overlay{padding:0;align-items:flex-end}
+  .modal,.modal.modal-lg{max-width:100%;border-radius:16px 16px 0 0;max-height:94dvh;display:flex;flex-direction:column}
+  .modal-body{max-height:none;flex:1;padding:16px}
+  .modal-head,.modal-foot{padding:14px 16px}
+  /* nút trong modal xếp dọc, đủ rộng để bấm bằng ngón cái */
+  .modal-foot{flex-direction:column-reverse;gap:8px}
+  .modal-foot .btn{width:100%;justify-content:center}
+}
+
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
