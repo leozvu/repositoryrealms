@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { hasAny } from '@/lib/perm';
+import { parseStrict } from '@/lib/format';
 
 // Chốt bảng lương: khóa sửa + ghi tổng chi phí công ty vào sổ quỹ (1 giao dịch nguyên tử)
 export async function POST(req, { params }) {
@@ -11,7 +12,14 @@ export async function POST(req, { params }) {
   const p = await prisma.payroll.findUnique({ where: { id: params.id } });
   if (!p) return NextResponse.json({ error: 'not found' }, { status: 404 });
   if (p.status === 'final') return NextResponse.json({ error: 'Đã chốt rồi' }, { status: 400 });
-  const lines = JSON.parse(p.lines);
+  // v3.13: lines hỏng thì dừng. Trước đây JSON.parse trần → ném 500 chặn chốt lương cả tháng;
+  // mà nuốt lỗi trả [] còn tệ hơn: chốt lương xong ghi phiếu chi 0đ, coi như đã trả lương.
+  const lines = parseStrict(p.lines);
+  if (!lines || !lines.length) {
+    return NextResponse.json({
+      error: `Bảng lương tháng ${p.month} không đọc được dòng lương nào — chưa chốt để tránh ghi phiếu chi sai. Thử tạo lại bảng lương tháng này.`,
+    }, { status: 400 });
+  }
   const totalCost = lines.reduce((s, l) => s + (l.employerCost || 0), 0);
   const [updated] = await prisma.$transaction([
     prisma.payroll.update({ where: { id: p.id }, data: { status: 'final' } }),

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { hasAny } from '@/lib/perm';
 import { computeLine } from '@/lib/payroll';
+import { parseItems } from '@/lib/format';
 
 const canManage = user => hasAny(user, ['HR', 'ACCOUNTANT']);
 
@@ -13,7 +14,7 @@ export async function GET() {
   const rows = await prisma.payroll.findMany({ orderBy: { month: 'desc' } });
   if (canManage(user)) return NextResponse.json({ manage: true, payrolls: rows });
   const mine = rows
-    .map(p => ({ id: p.id, month: p.month, status: p.status, line: JSON.parse(p.lines).find(l => l.userId === user.id) }))
+    .map(p => ({ id: p.id, month: p.month, status: p.status, line: parseItems(p.lines).find(l => l.userId === user.id) }))
     .filter(p => p.line);
   return NextResponse.json({ manage: false, payslips: mine });
 }

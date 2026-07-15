@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import { Icon, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
-import { money, thisMonth } from '@/lib/format';
+import { money, thisMonth, parseItems } from '@/lib/format';
 
 /* ---------- Phiếu lương cá nhân (nhân viên) ---------- */
 function Payslips({ payslips }) {
@@ -40,7 +40,7 @@ export default function PayrollPage() {
   if (!data.manage) return <Payslips payslips={data.payslips} />;
 
   const cur = data.payrolls.find(p => p.id === sel);
-  const lines = cur ? JSON.parse(cur.lines) : [];
+  const lines = cur ? parseItems(cur.lines) : [];
   const total = k => lines.reduce((s, l) => s + (l[k] || 0), 0);
 
   const generate = async () => {

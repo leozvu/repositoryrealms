@@ -40,7 +40,7 @@ export async function POST(req) {
     },
   });
   await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'create', entity: 'users', refId: row.id, detail: `${row.name} [${finalRoles.join(',')}]` } });
-  const { passwordHash, ...safe } = row;
+  const { passwordHash, totpSecret, ...safe } = row; // v3.13: không trả bí mật 2FA ra ngoài
   return NextResponse.json(safe);
 }
 
@@ -80,6 +80,6 @@ export async function PUT(req) {
   }
   const row = await prisma.user.update({ where: { id }, data });
   await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'users', refId: id, detail: row.name } });
-  const { passwordHash, ...safe } = row;
+  const { passwordHash, totpSecret, ...safe } = row; // v3.13: không trả bí mật 2FA ra ngoài
   return NextResponse.json(safe);
 }

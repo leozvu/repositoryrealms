@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import { Icon, useToast, EmptyState } from '@/components/ui';
-import { money, fmtDate } from '@/lib/format';
+import { money, fmtDate, parseItems } from '@/lib/format';
 
 const TYPE_META = {
   quote: ['Báo giá', 'quotes'], expense: ['Khoản chi', 'finance'],
@@ -9,7 +9,7 @@ const TYPE_META = {
 };
 
 function Steps({ ap }) {
-  const steps = JSON.parse(ap.steps || '[]');
+  const steps = parseItems(ap.steps); // v3.13: parse an toàn — tránh 1 bản ghi hỏng làm trắng cả trang
   const curIdx = steps.findIndex(s => s.status === 'pending');
   return (
     <div className="ap-steps">

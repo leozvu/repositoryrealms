@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { executeApproval, rejectSideEffect, currentStep, canDecide } from '@/lib/approvals';
 import { notify, usersWithRole } from '@/lib/events';
+import { parseItems } from '@/lib/format';
 
 export async function POST(req, { params }) {
   const user = await currentUser();
@@ -10,7 +11,7 @@ export async function POST(req, { params }) {
   const { decision, note } = await req.json(); // approve | reject
   const ap = await prisma.approval.findUnique({ where: { id: params.id } });
   if (!ap || ap.status !== 'pending') return NextResponse.json({ error: 'Yêu cầu không tồn tại hoặc đã xử lý' }, { status: 400 });
-  const steps = JSON.parse(ap.steps || '[]');
+  const steps = parseItems(ap.steps); // v3.13: parse an toàn
   const idx = steps.findIndex(s => s.status === 'pending');
   const step = steps[idx];
   if (!canDecide(step, user)) return NextResponse.json({ error: 'Bạn không có quyền duyệt bước này' }, { status: 403 });

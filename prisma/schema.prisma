@@ -33,6 +33,8 @@ model User {
   hourlyRate   Int       @default(0) // v3.11: đơn giá giờ freelancer (nhân viên dùng lương÷176)
   skills       String? // v3.11: kỹ năng freelancer
   portfolio    String? // v3.11: link portfolio freelancer
+  loginFails   Int       @default(0) // v3.13: số lần nhập sai liên tiếp — chống dò mật khẩu
+  lockedUntil  DateTime? // v3.13: khóa đăng nhập tạm đến thời điểm này
   createdAt    DateTime  @default(now())
   tasks        Task[]
   timeLogs     TimeLog[]
