@@ -7,6 +7,29 @@ import { parseItems } from '@/lib/format';
 
 const canManage = user => hasAny(user, ['HR', 'ACCOUNTANT']);
 
+// v3.13: đọc Cài đặt để lấy hệ số OT + giờ vào ca chuẩn (dùng chung quy tắc đi muộn
+// với trang Chấm công: checkIn > workStart là muộn)
+async function shiftCfg() {
+  const row = await prisma.setting.findUnique({ where: { id: 1 } });
+  let s = {};
+  try { s = row ? JSON.parse(row.json) : {}; } catch { s = {}; }
+  return { otMultiplier: +s.otMultiplier || 1.5, workStart: s.workStart || '09:00' };
+}
+
+// v3.13: tổng hợp chấm công tháng theo từng người → giờ OT, số lần muộn, số ngày nghỉ
+async function attendanceOf(month) {
+  const rows = await prisma.attendance.findMany({ where: { date: { startsWith: month } } });
+  const { workStart } = await shiftCfg();
+  const by = {};
+  for (const r of rows) {
+    const a = (by[r.userId] ||= { otHours: 0, lateCount: 0, offDays: 0 });
+    a.otHours += +r.otHours || 0;
+    if (r.checkIn && r.checkIn > workStart) a.lateCount++;
+    if (r.status === 'off') a.offDays++;
+  }
+  return by;
+}
+
 // GET: HR/Kế toán/GĐ thấy toàn bộ; nhân viên chỉ nhận phiếu lương của mình
 export async function GET() {
   const user = await currentUser();
@@ -28,8 +51,17 @@ export async function POST(req) {
   if (!/^\d{4}-\d{2}$/.test(month || '')) return NextResponse.json({ error: 'Tháng không hợp lệ' }, { status: 400 });
   const exists = await prisma.payroll.findUnique({ where: { month } });
   if (exists) return NextResponse.json({ error: `Bảng lương tháng ${month.slice(5)}/${month.slice(0, 4)} đã tồn tại` }, { status: 400 });
-  const staff = await prisma.user.findMany({ where: { status: 'active' }, orderBy: { name: 'asc' } });
-  const lines = staff.map(s => computeLine({ userId: s.id, name: s.name, base: s.salary || 0, allowance: 0, bonus: 0 }));
+  // v3.13: chỉ nhân viên — freelancer trả theo phiếu payout riêng, không nằm trong bảng lương
+  const staff = await prisma.user.findMany({
+    where: { status: 'active', userType: { not: 'freelancer' } },
+    orderBy: { name: 'asc' },
+  });
+  const { otMultiplier } = await shiftCfg();
+  const att = await attendanceOf(month); // v3.13: giờ OT/đi muộn/nghỉ lấy thẳng từ chấm công
+  const lines = staff.map(s => computeLine({
+    userId: s.id, name: s.name, base: s.salary || 0, allowance: 0, bonus: 0,
+    ...(att[s.id] || { otHours: 0, lateCount: 0, offDays: 0 }),
+  }, otMultiplier));
   const row = await prisma.payroll.create({ data: { month, lines: JSON.stringify(lines) } });
   await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'create', entity: 'payroll', refId: row.id, detail: 'Bảng lương ' + month } });
   return NextResponse.json(row);
@@ -40,11 +72,39 @@ export async function PUT(req) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   if (!canManage(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  const { id, lines } = await req.json();
+  const { id, lines, regenerate } = await req.json();
   const p = await prisma.payroll.findUnique({ where: { id } });
   if (!p) return NextResponse.json({ error: 'not found' }, { status: 404 });
   if (p.status === 'final') return NextResponse.json({ error: 'Bảng lương đã chốt — không sửa được' }, { status: 400 });
-  const computed = (lines || []).map(computeLine);
+  const { otMultiplier } = await shiftCfg();
+
+  // v3.13: "Tính lại từ chấm công". Từ khi lương ăn theo chấm công, bảng tạo giữa tháng
+  // sẽ thiếu OT của những ngày sau đó — mà tạo lại thì báo "đã tồn tại" và không có nút xóa.
+  // Nút này nạp lại giờ OT/đi muộn từ chấm công nhưng GIỮ NGUYÊN phụ cấp/thưởng HR đã nhập.
+  if (regenerate) {
+    const att = await attendanceOf(p.month);
+    const old = parseItems(p.lines);
+    const staff = await prisma.user.findMany({
+      where: { status: 'active', userType: { not: 'freelancer' } }, orderBy: { name: 'asc' },
+    });
+    const fresh = staff.map(s => {
+      const prev = old.find(l => l.userId === s.id) || {};
+      return computeLine({
+        userId: s.id, name: s.name, base: s.salary || 0,
+        allowance: prev.allowance || 0, bonus: prev.bonus || 0, // giữ tay HR đã nhập
+        ...(att[s.id] || { otHours: 0, lateCount: 0, offDays: 0 }),
+      }, otMultiplier);
+    });
+    const row = await prisma.payroll.update({ where: { id }, data: { lines: JSON.stringify(fresh) } });
+    await prisma.auditLog.create({
+      data: { userId: user.id, userName: user.name, action: 'update', entity: 'payroll', refId: id, detail: `Tính lại bảng lương ${p.month} từ chấm công` },
+    }).catch(() => {});
+    return NextResponse.json(row);
+  }
+
+  // v3.13: HR sửa được giờ OT nếu chấm công sai. Giữ nguyên otRate đã chốt lúc tạo bảng
+  // (computeLine ưu tiên l.otRate) để đổi hệ số trong Cài đặt không âm thầm sửa bảng cũ.
+  const computed = (lines || []).map(l => computeLine(l, otMultiplier));
   const row = await prisma.payroll.update({ where: { id }, data: { lines: JSON.stringify(computed) } });
   return NextResponse.json(row);
 }

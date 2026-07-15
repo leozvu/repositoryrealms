@@ -140,7 +140,8 @@ Sai mật khẩu 8 lần liên tiếp → khóa đăng nhập 15 phút (v3.13).
 - **Sở chỉ huy dự án (`/portfolio`)**: mọi dự án theo mức rủi ro + giờ đốt + biên LN + việc trễ + ma trận tải nhân sự
 
 **v3.11 — Chấm công chuyên sâu + Freelancer**:
-- **Chấm công giờ vào/ra thật**: bấm Vào ca / Tan ca ghi timestamp, tự tính giờ làm; ca chuẩn + hệ số OT trong Cài đặt; **phát hiện đi muộn**; **ngày lễ công ty** (không tính vắng); **ghi OT**; bảng công tháng (đi muộn/giờ làm/OT) nối vào bảng lương
+- **Chấm công giờ vào/ra thật**: bấm Vào ca / Tan ca ghi timestamp, tự tính giờ làm; ca chuẩn + hệ số OT trong Cài đặt; **phát hiện đi muộn**; **ngày lễ công ty** (không tính vắng); **ghi OT**
+  - ⚠ *Đính chính*: dòng này ở v3.11 từng ghi "bảng công tháng nối vào bảng lương" — **sai**, lương khi đó không hề đọc chấm công. Đã nối thật ở **v3.13** (xem bên dưới).
 - **Quản lý Freelancer** (`/freelancers`, HR/PM/Lead): tạo tài khoản freelancer với đơn giá giờ + kỹ năng; gắn vào dự án → **hạn truy cập tự đặt theo deadline dự án**; giờ freelancer log tính vào chi phí/biên dự án theo đơn giá freelancer
 - **Cổng Freelancer** (`/freelancer`): freelancer đăng nhập vào view **khóa chặt** — chỉ dự án được gán + việc của mình (đổi trạng thái, checklist, ghi giờ) + hạn hợp đồng còn lại. **Chặn ở tầng API** (403 mọi dữ liệu nội bộ), **tài khoản hết hạn theo dự án tự chặn đăng nhập**
 

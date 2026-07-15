@@ -1,12 +1,19 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
 import { money, docGrand, todayISO } from '@/lib/format';
-import { hasAny } from '@/lib/perm';
+import { hasAny, rolesOf } from '@/lib/perm';
 
 export default function CommissionsPage() {
   const { data: session } = useSession();
+  // v3.13: đọc tỷ lệ hoa hồng mặc định từ Cài đặt. Ô "Tỷ lệ hoa hồng mặc định (%)" trong
+  // Cài đặt trước đây là nút chết — không chỗ nào đọc, trang này hardcode 5%.
+  const [defaultRate, setDefaultRate] = useState(5);
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && d.commissionRate) setDefaultRate(+d.commissionRate); }).catch(() => {});
+  }, []);
   const commissions = useResource('commissions');
   const invoices = useResource('invoices');
   const users = useResource('users');
@@ -32,12 +39,17 @@ export default function CommissionsPage() {
   const inv = id => invoices.rows.find(v => v.id === id);
 
   // Chỉ lấy AM có trong users
-  const amUsers = users.rows.filter(u => {
-    try { return JSON.parse(u.roles || '[]').includes('AM'); } catch { return false; }
-  });
+  // v3.13: dùng rolesOf thay vì tự JSON.parse — bản cũ bỏ sót người giữ vai trò MANAGER cũ
+  // (rolesOf mới quy MANAGER = PM+AM+Kế toán), nên họ được coi là AM ở mọi nơi khác
+  // nhưng lại không hiện trong ô chọn AM ở đây.
+  const amUsers = users.rows.filter(u => rolesOf(u).includes('AM'));
 
-  // Hóa đơn hợp lệ (đã phát hành hoặc đã thanh toán)
-  const validInvoices = invoices.rows.filter(v => ['issued', 'paid', 'partial'].includes(v.status));
+  // Hóa đơn được tính hoa hồng = hóa đơn ĐÃ THU ĐỦ.
+  // v3.13: bản cũ lọc ['issued','paid','partial'] nhưng 'issued'/'partial' KHÔNG phải trạng thái
+  // có thật (chỉ có draft | sent | paid | overdue) → xưa nay thực tế chỉ 'paid' lọt qua.
+  // Giữ nguyên hành vi đó vì trả hoa hồng trên tiền đã về là an toàn; muốn tính cả hóa đơn
+  // đã gửi chưa thu thì thêm 'sent' vào đây.
+  const validInvoices = invoices.rows.filter(v => v.status === 'paid');
 
   const selectedInvoice = useMemo(
     () => validInvoices.find(v => v.id === form.invoiceId),
@@ -49,7 +61,7 @@ export default function CommissionsPage() {
   };
 
   const openAdd = () => {
-    setForm({ rate: 5 });
+    setForm({ rate: defaultRate }); // v3.13: lấy từ Cài đặt thay vì cứng 5%
     setModal('add');
   };
 
