@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Badge, Forbidden, ExportCsv, useToast } from '@/components/ui';
-import DocEditor, { printDoc } from '@/components/DocEditor';
+import DocEditor, { printDoc, nextCode } from '@/components/DocEditor';
 import { SendEmailModal } from '@/components/SendEmail';
 import { money, fmtDate, todayISO, docGrand, paidOf, remainOf } from '@/lib/format';
 
@@ -41,6 +41,73 @@ function PayModal({ inv, onDone, onClose }) {
   );
 }
 
+/* ---------- v3.13: Xuất hóa đơn từ giờ công đã log ----------
+   Trước đây giờ "có tính phí" ghi trong Bảng chấm giờ không đi đâu cả — muốn xuất hóa đơn
+   theo giờ phải gõ tay lại từng dòng, và không có gì đánh dấu giờ nào đã xuất rồi. */
+function FromHoursModal({ projects, onClose, onDone }) {
+  const [projectId, setProjectId] = useState(projects[0]?.id || '');
+  const [rate, setRate] = useState('');
+  const [dueDays, setDueDays] = useState(15);
+  const [pv, setPv] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (!projectId) { setPv(null); return; }
+    setPv(null);
+    fetch(`/api/invoices/from-hours?projectId=${projectId}`).then(r => r.ok ? r.json() : null).then(setPv).catch(() => {});
+  }, [projectId]);
+
+  const tong = pv && +rate ? Math.round(pv.totalHours * +rate) : 0;
+  const submit = async () => {
+    setBusy(true);
+    const res = await fetch('/api/invoices/from-hours', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectId, rate: +rate, dueDays: +dueDays }),
+    });
+    const j = await res.json().catch(() => ({}));
+    setBusy(false);
+    if (!res.ok) return toast(j.error || 'Có lỗi', 'error');
+    toast(`Đã tạo ${j.code} từ ${j._hours}h của ${j._people} người — giờ đó đã đánh dấu là đã xuất`);
+    onDone(); onClose();
+  };
+
+  return (
+    <Modal title="Xuất hóa đơn từ giờ công" onClose={onClose}
+      footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
+        <button className="btn btn-primary" disabled={busy || !pv?.totalHours || !+rate} onClick={submit}>
+          {busy ? 'Đang tạo…' : 'Tạo hóa đơn nháp'}</button></>}>
+      <div className="form-grid">
+        <div className="field"><label>Dự án <span className="req">*</span></label>
+          <select value={projectId} onChange={e => setProjectId(e.target.value)}>
+            {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select></div>
+        <div className="field"><label>Đơn giá giờ xuất cho khách (đ) <span className="req">*</span></label>
+          <input type="number" min="0" value={rate} onChange={e => setRate(e.target.value)} placeholder="VD: 300000" />
+          <div className="hint">Đây là giá bán cho khách, khác đơn giá trả nhân sự</div></div>
+        <div className="field"><label>Hạn thu (ngày)</label>
+          <input type="number" min="0" value={dueDays} onChange={e => setDueDays(e.target.value)} /></div>
+
+        <div className="field full">
+          {!pv ? <div style={{ fontSize: '.85rem', color: 'var(--muted)' }}>Đang xem giờ chưa xuất…</div>
+            : !pv.totalHours ? <div style={{ fontSize: '.85rem', color: 'var(--muted)' }}>Dự án này không còn giờ nào chưa xuất hóa đơn.</div>
+              : <>
+                <div style={{ fontSize: '.85rem', marginBottom: 6 }}><b>{pv.totalHours}h</b> chưa xuất — sẽ thành {pv.lines.length} dòng hóa đơn:</div>
+                <table style={{ fontSize: '.82rem' }}>
+                  <thead><tr><th>Nhân sự</th><th className="num">Giờ</th><th className="num">Thành tiền</th></tr></thead>
+                  <tbody>{pv.lines.map(l => (
+                    <tr key={l.userId}><td>{l.name}</td><td className="num">{l.hours}h</td>
+                      <td className="num">{+rate ? money(Math.round(l.hours * +rate)) : '—'}</td></tr>
+                  ))}</tbody>
+                </table>
+                <div style={{ fontSize: '.9rem', marginTop: 8 }}>Tạm tính (chưa VAT): <b style={{ color: 'var(--primary)' }}>{money(tong)}</b></div>
+              </>}
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 export default function InvoicesPage() {
   const { rows, forbidden, create, update, remove, refresh } = useResource('invoices');
   const clients = useResource('clients');
@@ -54,6 +121,28 @@ export default function InvoicesPage() {
   const client = id => clients.rows.find(c => c.id === id);
   const totalOf = s => rows.filter(v => v.status === s).reduce((sum, v) => sum + docGrand(v), 0);
   const filtered = rows.filter(v => f === 'all' || v.status === f);
+
+  // v3.13: sinh hóa đơn kỳ tới cho retainer. Trước đây "định kỳ" chỉ là cái tick trang trí:
+  // không có cron, không có nút nhân bản — tháng nào cũng phải gõ lại tay từ đầu.
+  const nextPeriod = async v => {
+    const d = new Date(v.date + 'T00:00:00');
+    d.setMonth(d.getMonth() + 1);
+    const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const dd = new Date(date + 'T00:00:00'); dd.setDate(dd.getDate() + 15);
+    const dueDate = `${dd.getFullYear()}-${String(dd.getMonth() + 1).padStart(2, '0')}-${String(dd.getDate()).padStart(2, '0')}`;
+    const code = nextCode('INV', rows);
+    if (rows.some(x => x.recGroup && x.recGroup === v.recGroup && x.date === date)) {
+      return toast(`Kỳ ${date.slice(0, 7)} của retainer này đã có hóa đơn rồi`, 'error');
+    }
+    const r = await create({
+      code, clientId: v.clientId, projectId: v.projectId || null,
+      items: v.items, vat: v.vat, status: 'draft', date, dueDate,
+      payments: '[]', recurring: true,
+      // cùng nhóm với kỳ trước → Phân tích chỉ tính kỳ mới nhất vào MRR, không cộng dồn
+      recGroup: v.recGroup || `RET-${v.clientId}-${Date.now().toString(36)}`,
+    });
+    if (r) toast(`Đã tạo ${code} cho kỳ ${date.slice(0, 7)} — kiểm tra rồi gửi khách`);
+  };
 
   return (
     <>
@@ -75,6 +164,11 @@ export default function InvoicesPage() {
           { label: 'Tổng tiền', value: v => docGrand(v) }, { label: 'Đã thu', value: v => paidOf(v) },
           { label: 'Còn lại', value: v => remainOf(v) }, { key: 'status', label: 'Trạng thái' },
         ]} />
+        {/* v3.13: nối giờ công vào hóa đơn — trước đây phải gõ tay lại */}
+        <button className="btn btn-outline" onClick={() => {
+          if (!projects.rows.length) return toast('Chưa có dự án nào', 'error');
+          setModal({ mode: 'fromHours' });
+        }}><Icon name="clock" size={16} /><span>Xuất từ giờ công</span></button>
         <button className="btn btn-primary" onClick={() => {
           if (!clients.rows.length) return toast('Hãy thêm khách hàng trước', 'error');
           setModal({ mode: 'add' });
@@ -97,6 +191,9 @@ export default function InvoicesPage() {
                 <td><div className="row-actions">
                   {v.status !== 'paid' && <button className="icon-btn" style={{ color: 'var(--accent)' }} title="Ghi nhận thanh toán"
                     onClick={() => setModal({ mode: 'pay', row: v })}><Icon name="wallet" size={16} /></button>}
+                  {/* v3.13: nhân bản retainer sang kỳ tới, cùng recGroup để MRR không cộng dồn */}
+                  {v.recurring && <button className="icon-btn" style={{ color: 'var(--primary)' }} title="Sinh hóa đơn kỳ tới (tháng sau)"
+                    onClick={() => nextPeriod(v)}><Icon name="repeat" size={16} /></button>}
                   <button className="icon-btn" title="Gửi email cho khách" onClick={() => setModal({ mode: 'email', row: v })}>📧</button>
                   <button className="icon-btn" title="In / xuất PDF" onClick={() => printDoc(v, 'invoice', client(v.clientId)?.name || '', client(v.clientId) || {})}><Icon name="print" size={16} /></button>
                   <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: v })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
@@ -113,6 +210,8 @@ export default function InvoicesPage() {
       {modal?.mode === 'edit' && <DocEditor kind="invoice" doc={modal.row} clients={clients.rows} projects={projects.rows} services={services.rows} allDocs={rows}
         onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, d); toast('Đã cập nhật'); }} />}
       {modal?.mode === 'pay' && <PayModal inv={modal.row} onDone={refresh} onClose={() => setModal(null)} />}
+      {modal?.mode === 'fromHours' && <FromHoursModal projects={projects.rows.filter(p => p.status !== 'done')}
+        onDone={refresh} onClose={() => setModal(null)} />}
       {modal?.mode === 'email' && <SendEmailModal type="invoice" doc={modal.row} defaultTo={client(modal.row.clientId)?.email || ''} onClose={() => setModal(null)} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa hóa đơn ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}

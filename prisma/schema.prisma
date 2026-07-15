@@ -225,6 +225,7 @@ model TimeLog {
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
   taskId    String? // v3.12: gắn giờ vào công việc cụ thể → ước lượng vs thực tế
+  invoiceId String? // v3.13: giờ này đã xuất vào hóa đơn nào → không xuất lại lần hai
   date      String
   hours     Float   @default(0)
   billable  Boolean @default(true)
@@ -246,15 +247,16 @@ model Payout {
 }
 
 model Quote {
-  id       String  @id @default(cuid())
-  code     String  @unique
-  clientId String
-  client   Client  @relation(fields: [clientId], references: [id])
-  items    String  @default("[]") // JSON [{desc, qty, price}]
-  vat      Int     @default(8)
-  status   String  @default("draft")
-  date     String
-  note     String?
+  id        String  @id @default(cuid())
+  code      String  @unique
+  clientId  String
+  client    Client  @relation(fields: [clientId], references: [id])
+  projectId String? // v3.13: dự án sinh ra từ báo giá này → hóa đơn sau đó tự gắn đúng dự án
+  items     String  @default("[]") // JSON [{desc, qty, price}]
+  vat       Int     @default(8)
+  status    String  @default("draft")
+  date      String
+  note      String?
 }
 
 model Invoice {

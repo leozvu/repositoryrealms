@@ -4,11 +4,9 @@ import { useState } from 'react';
 import { Modal, Icon, useToast } from './ui';
 import { money, todayISO, daysFromNow, parseItems } from '@/lib/format';
 
-export function nextCode(prefix, list) {
-  const year = new Date().getFullYear();
-  const nums = list.map(d => { const m = (d.code || '').match(/(\d+)$/); return m ? +m[1] : 0; });
-  return `${prefix}-${year}-${String(Math.max(0, ...nums) + 1).padStart(3, '0')}`;
-}
+// v3.13: nextCode dọn về lib/format để server (API xuất hóa đơn từ giờ công) dùng chung
+// một logic. Re-export ở đây để các trang đang import từ DocEditor không phải sửa.
+export { nextCode } from '@/lib/format';
 
 const STATUS = {
   invoice: [['draft', 'Nháp'], ['sent', 'Đã gửi'], ['overdue', 'Quá hạn'], ['paid', 'Đã thu']],
@@ -34,7 +32,15 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
       items: JSON.stringify(items.map(it => ({ desc: it.desc, qty: +it.qty || 0, price: +it.price || 0 }))),
       vat: +d.vat || 0, status: d.status, date: d.date,
     };
-    if (isInv) { out.projectId = d.projectId || null; out.dueDate = d.dueDate; out.recurring = !!d.recurring; }
+    if (isInv) {
+      out.projectId = d.projectId || null; out.dueDate = d.dueDate; out.recurring = !!d.recurring;
+      // v3.13: đánh dấu retainer thì phải có recGroup. Trước đây ô tick này chỉ vẽ ra cái icon
+      // lặp, recGroup không bao giờ set được từ giao diện — mà Phân tích gom MRR theo
+      // (recGroup || id), nên MỖI hóa đơn retainer thành một nhóm riêng và MRR cộng dồn hết
+      // mọi kỳ đã xuất thay vì chỉ kỳ mới nhất. Retainer 10tr/tháng chạy 6 tháng báo MRR 60tr.
+      if (out.recurring) out.recGroup = d.recGroup || `RET-${d.clientId}-${Date.now().toString(36)}`;
+      else out.recGroup = null; // bỏ tick = tách khỏi nhóm định kỳ
+    }
     else out.note = d.note || null;
     onSave(out);
     onClose();

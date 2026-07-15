@@ -21,15 +21,21 @@ export default function QuotesPage() {
   if (forbidden) return <Forbidden />;
 
   const client = id => clients.rows.find(c => c.id === id);
+  const projName = id => projects.rows.find(p => p.id === id)?.name || '—';
   const filtered = rows.filter(v => f === 'all' || v.status === f);
 
+  // v3.13: hóa đơn tự gắn dự án đã sinh ra từ chính báo giá này. Trước đây luôn để
+  // projectId: null nên doanh thu không về dự án nào — báo cáo lãi/lỗ theo dự án
+  // (lọc theo Transaction.projectId) thiếu hẳn phần doanh thu, chỉ còn chi phí.
   const toInvoice = async q => {
     const r = await invoices.create({
-      code: nextCode('INV', invoices.rows), clientId: q.clientId, projectId: null,
+      code: nextCode('INV', invoices.rows), clientId: q.clientId, projectId: q.projectId || null,
       items: q.items, vat: q.vat, status: 'draft', date: todayISO(), dueDate: daysFromNow(15),
       payments: '[]', recurring: false,
     });
-    if (r) toast(`Đã tạo hóa đơn từ báo giá ${q.code} — xem ở mục Hóa đơn`);
+    if (r) toast(q.projectId
+      ? `Đã tạo hóa đơn từ ${q.code}, gắn vào dự án "${projName(q.projectId)}"`
+      : `Đã tạo hóa đơn từ báo giá ${q.code} — chưa gắn dự án nào (tạo dự án từ báo giá này trước nếu muốn theo dõi lãi/lỗ theo dự án)`);
     setModal(null);
   };
   const toProject = async q => {
@@ -37,7 +43,9 @@ export default function QuotesPage() {
       name: 'Dự án từ ' + q.code, clientId: q.clientId, service: 'Khác',
       budget: docGrand(q), status: 'planning', startDate: todayISO(), deadline: daysFromNow(30), progress: 0,
     });
-    if (r) toast('Đã tạo dự án — hãy sửa tên và deadline cho đúng');
+    // v3.13: ghi ngược lại vào báo giá để hóa đơn sau đó biết đường gắn
+    if (r?.id) await update(q.id, { projectId: r.id });
+    if (r) toast('Đã tạo dự án — hãy sửa tên và deadline cho đúng. Hóa đơn xuất từ báo giá này sẽ tự gắn vào dự án đó.');
     setModal(null);
   };
 
