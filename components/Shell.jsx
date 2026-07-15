@@ -361,7 +361,9 @@ export default function Shell({ user, company, children }) {
                 <Icon name="search" size={14} /><span> Ctrl+K</span>
               </button>
               <button className="btn btn-outline btn-sm" onClick={() => setShowNotif(true)} title="Thông báo" style={{ position: 'relative' }} aria-label="Thông báo">
-                <span>🔔</span>
+                {/* v3.14: 🔔 -> icon SVG. Emoji vẽ khác nhau trên Windows/Mac/Android và
+                    không đổi màu theo theme — đây lại là nút điều khiển chính trên thanh trên. */}
+                <Icon name="bell" size={15} />
                 {unreadNotif > 0 && <span className="count" style={{ position: 'absolute', top: -7, right: -7, background: 'var(--danger)', color: '#fff' }}>{unreadNotif}</span>}
               </button>
               <span id="today-label">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>

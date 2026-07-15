@@ -154,7 +154,7 @@ export default function MessagesPage() {
                     <div key={m.id}>
                       {showName && thread.conv.type !== 'dm' && <div className="msg-meta" style={{ marginLeft: 44 }}>{m.senderName}</div>}
                       <div className={`msg-row ${mine ? 'mine' : ''}`}>
-                        {!mine && <span className="avatar" style={{ width: 30, height: 30, fontSize: '.62rem' }}>{initials(m.senderName)}</span>}
+                        {!mine && <span className="avatar" style={{ width: 30, height: 30, fontSize: '.7rem' }}>{initials(m.senderName)}</span>}
                         <div>
                           <div className="msg-bubble">{m.content}</div>
                           <div className="msg-meta">{fmtTime(m.at)}</div>

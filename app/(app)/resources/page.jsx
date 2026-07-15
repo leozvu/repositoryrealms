@@ -69,7 +69,14 @@ export default function ResourcesPage() {
     const state = leave ? 'leave' : committed > DAY_CAP ? 'over' : (doing.length || dueToday.length) ? 'busy' : 'free';
     return { u, doing, dueToday, overdue, committed, state, isFL: u.userType === 'freelancer' };
   }).sort((a, b) => ({ over: 0, busy: 1, leave: 2, free: 3 }[a.state] - { over: 0, busy: 1, leave: 2, free: 3 }[b.state]));
-  const STATE = { free: ['🟢 Rảnh', 'var(--accent)'], busy: ['🟡 Đang làm', 'var(--warn, #D97706)'], over: ['🔴 Quá tải', 'var(--danger)'], leave: ['🌴 Nghỉ phép', 'var(--muted)'] };
+  // v3.14: bỏ emoji 🟢🟡🔴🌴 — thay bằng badge + chấm màu SVG có sẵn của app.
+  // Emoji vẽ khác nhau trên từng hệ điều hành và không đổi màu theo dark mode.
+  // Chấm màu LUÔN đi kèm chữ ("Rảnh"/"Quá tải"…) nên người mù màu vẫn đọc được —
+  // không bao giờ truyền tin chỉ bằng màu.
+  const STATE = {
+    free: ['Rảnh', 'b-green'], busy: ['Đang làm', 'b-amber'],
+    over: ['Quá tải', 'b-red'], leave: ['Nghỉ phép', 'b-gray'],
+  };
 
   return (
     <>
@@ -90,13 +97,13 @@ export default function ResourcesPage() {
         </div>
         <div className="card-body" style={{ paddingTop: 6 }}>
           {teamToday.map(({ u, doing, dueToday, overdue, committed, state, isFL }) => {
-            const [lb, color] = STATE[state];
+            const [lb, cls] = STATE[state];
             return (
               <div key={u.id} className="act-item" style={{ alignItems: 'flex-start', gap: 10 }}>
                 <span className="avatar" style={{ flex: 'none', marginTop: 2 }}>{initials(u.name)}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="act-title">{u.name}{isFL && <span className="badge b-violet" style={{ marginLeft: 6, fontSize: '.6rem' }}>FL</span>}
-                    <span style={{ marginLeft: 8, fontSize: '.72rem', color, fontWeight: 700 }}>{lb}</span>
+                  <div className="act-title">{u.name}{isFL && <span className="badge b-violet" style={{ marginLeft: 6, fontSize: '.7rem' }}>FL</span>}
+                    <span className={`badge ${cls}`} style={{ marginLeft: 8 }}><span className="dot"></span>{lb}</span>
                     {committed > 0 && <span style={{ marginLeft: 6, fontSize: '.72rem', color: 'var(--muted)' }}>· cam kết {committed}h/{DAY_CAP}h</span>}
                     {overdue.length > 0 && <span style={{ marginLeft: 6, fontSize: '.72rem', color: 'var(--danger)', fontWeight: 700 }}>· {overdue.length} trễ</span>}</div>
                   <div className="act-sub">

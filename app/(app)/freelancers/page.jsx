@@ -107,8 +107,10 @@ export default function FreelancersPage() {
                 <div className="card-body" style={{ fontSize: '.83rem' }}>
                   <div style={{ color: 'var(--muted)', marginBottom: 4 }}>{u.email}{u.skills ? ' · ' + u.skills : ''}</div>
                   <div style={{ display: 'flex', gap: 14, marginBottom: 8 }}>
-                    <span>💵 <b>{u.hourlyRate ? money(u.hourlyRate) + '/giờ' : '—'}</b></span>
-                    <span style={expired(u) ? { color: 'var(--danger)', fontWeight: 700 } : {}}>⏳ {u.accessUntil ? 'đến ' + fmtDate(u.accessUntil) : 'không hạn'}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Icon name="wallet" size={13} />
+                      <b>{u.hourlyRate ? money(u.hourlyRate) + '/giờ' : '—'}</b></span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, ...(expired(u) ? { color: 'var(--danger)', fontWeight: 700 } : {}) }}>
+                      <Icon name="clock" size={13} />{u.accessUntil ? 'đến ' + fmtDate(u.accessUntil) : 'không hạn'}</span>
                   </div>
                   <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8 }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Dự án ({mine.length})</div>

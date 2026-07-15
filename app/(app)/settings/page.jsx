@@ -174,7 +174,7 @@ export default function SettingsPage() {
               <div className="hint">VD: công ty thương mại điện tử đổi "Quản lý dự án" → "Trưởng phòng Vận hành", "Account/Sales" → "Kinh doanh"</div>
             </div>
             <div className="field full" style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
-              <label style={{ fontWeight: 700 }}>📧 Email công ty (SMTP) — gửi báo giá/hóa đơn cho khách (v3.9)</label>
+              <label style={{ fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="mail" size={15} /> Email công ty (SMTP) — gửi báo giá/hóa đơn cho khách (v3.9)</label>
             </div>
             <F k="smtpHost" label="Máy chủ SMTP" />
             <F k="smtpPort" label="Port (465=SSL, 587=TLS)" type="number" />

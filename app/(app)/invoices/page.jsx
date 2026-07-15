@@ -194,7 +194,8 @@ export default function InvoicesPage() {
                   {/* v3.13: nhân bản retainer sang kỳ tới, cùng recGroup để MRR không cộng dồn */}
                   {v.recurring && <button className="icon-btn" style={{ color: 'var(--primary)' }} title="Sinh hóa đơn kỳ tới (tháng sau)"
                     onClick={() => nextPeriod(v)}><Icon name="repeat" size={16} /></button>}
-                  <button className="icon-btn" title="Gửi email cho khách" onClick={() => setModal({ mode: 'email', row: v })}>📧</button>
+                  <button className="icon-btn" title="Gửi email cho khách" aria-label={`Gửi email hóa đơn ${v.code}`}
+                    onClick={() => setModal({ mode: 'email', row: v })}><Icon name="mail" size={16} /></button>
                   <button className="icon-btn" title="In / xuất PDF" onClick={() => printDoc(v, 'invoice', client(v.clientId)?.name || '', client(v.clientId) || {})}><Icon name="print" size={16} /></button>
                   <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: v })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
                   <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: v })} aria-label="Xóa"><Icon name="trash" size={16} /></button>

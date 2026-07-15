@@ -10,7 +10,8 @@ import { DocLinks } from '@/components/DocLinks';
 import { money, moneyShort, fmtDate, todayISO, initials, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
-const HEALTH = { green: ['#059669', '🟢 Ổn'], amber: ['#D97706', '🟡 Cần chú ý'], red: ['#DC2626', '🔴 Rủi ro'] };
+// v3.14: bỏ emoji — màu đã có trong biến, chữ đứng riêng (không truyền tin bằng màu đơn thuần)
+const HEALTH = { green: ['#059669', 'Ổn'], amber: ['#D97706', 'Cần chú ý'], red: ['#DC2626', 'Rủi ro'] };
 const PHASE_COLORS = ['#2563EB', '#7C3AED', '#059669', '#D97706', '#DB2777', '#0891B2'];
 
 export default function ProjectDetailPage() {

@@ -24,7 +24,7 @@ export function SendEmailModal({ type, doc, defaultTo, onClose }) {
   };
 
   return (
-    <Modal title={`📧 Gửi ${type === 'invoice' ? 'hóa đơn' : 'báo giá'} ${doc.code}`} onClose={onClose}
+    <Modal title={`Gửi ${type === 'invoice' ? 'hóa đơn' : 'báo giá'} ${doc.code}`} onClose={onClose}
       footer={<>
         <button className="btn btn-outline" onClick={onClose}>Hủy</button>
         <button className="btn btn-primary" disabled={busy} onClick={send}>{busy ? 'Đang gửi…' : 'Gửi email'}</button>

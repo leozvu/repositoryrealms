@@ -24,7 +24,7 @@ function UserModal({ row, teams, canRoles, onSave, onClose }) {
         <div className="field"><label>{row ? 'Đặt lại mật khẩu (bỏ trống nếu giữ)' : 'Mật khẩu *'}</label><input value={f.password} onChange={e => set('password', e.target.value)} placeholder="Tối thiểu 6 ký tự" /></div>
         <div className="field"><label>Chức danh</label><input value={f.title} onChange={e => set('title', e.target.value)} /></div>
         <div className="field"><label>Điện thoại</label><input value={f.phone} onChange={e => set('phone', e.target.value)} /></div>
-        <div className="field"><label>Ngày sinh 🎂</label><input type="date" value={f.birthday || ''} onChange={e => set('birthday', e.target.value)} /></div>
+        <div className="field"><label>Ngày sinh</label><input type="date" value={f.birthday || ''} onChange={e => set('birthday', e.target.value)} /></div>
         <div className="field"><label>Lương tháng (đ)</label><input type="number" min="0" value={f.salary} onChange={e => set('salary', e.target.value)} /></div>
         <div className="field"><label>Nhóm</label>
           <select value={f.teamId} onChange={e => set('teamId', e.target.value)}>

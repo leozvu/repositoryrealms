@@ -110,7 +110,7 @@ export default function LeadsPage() {
                     <span>{l.company || l.name}</span>
                     {!['won', 'lost'].includes(l.stage) && (() => { const sc = leadScore(l); return (
                       <span title={`AI Lead Score: ${sc}/100 — dựa trên giá trị, nguồn, độ đầy đủ thông tin, tiến độ`}
-                        style={{ fontSize: '.66rem', fontWeight: 800, color: '#fff', background: scoreColor(sc), borderRadius: 99, padding: '1px 7px', flex: 'none', height: 'fit-content' }}>{sc}</span>
+                        style={{ fontSize: '.7rem', fontWeight: 800, color: '#fff', background: scoreColor(sc), borderRadius: 99, padding: '1px 7px', flex: 'none', height: 'fit-content' }}>{sc}</span>
                     ); })()}
                   </div>
                   <div className="kan-sub">{l.name} · {l.source || ''}</div>

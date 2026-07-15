@@ -40,7 +40,8 @@ export default function PortfolioPage() {
   return (
     <>
       <div className="toolbar">
-        <span style={{ fontSize: '1.05rem', fontWeight: 800 }}>📊 Sở chỉ huy dự án</span>
+        <span style={{ fontSize: '1.05rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+          <Icon name="reports" size={18} />Sở chỉ huy dự án</span>
         <span style={{ fontSize: '.8rem', color: 'var(--muted)' }}>{active.length} dự án đang chạy</span>
         <div className="spacer"></div>
         <Link href="/projects" className="btn btn-outline btn-sm">Danh sách dự án</Link>
@@ -50,9 +51,10 @@ export default function PortfolioPage() {
       <div className="grid kpi-grid">
         <div className="card kpi"><span className="kpi-label">Sức khỏe dự án</span>
           <div className="kpi-value" style={{ display: 'flex', gap: 12, fontSize: '1.15rem' }}>
-            <span style={{ color: HEALTH.red[0] }}>🔴 {count('red')}</span>
-            <span style={{ color: HEALTH.amber[0] }}>🟡 {count('amber')}</span>
-            <span style={{ color: HEALTH.green[0] }}>🟢 {count('green')}</span>
+            {/* v3.14: bỏ emoji 🔴🟡🟢 — badge + chấm màu, luôn kèm số nên không truyền tin bằng màu đơn thuần */}
+            <span className="badge b-red"><span className="dot"></span>{count('red')} rủi ro</span>
+            <span className="badge b-amber"><span className="dot"></span>{count('amber')} chú ý</span>
+            <span className="badge b-green"><span className="dot"></span>{count('green')} ổn</span>
           </div></div>
         <div className="card kpi"><span className="kpi-label">Việc trễ hạn (toàn bộ)</span>
           <div className="kpi-value" style={{ color: totalOverdue ? 'var(--danger)' : 'inherit' }}>{totalOverdue}</div></div>

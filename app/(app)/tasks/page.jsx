@@ -5,7 +5,7 @@ import { useResource, Icon, Modal, FormModal, ConfirmDialog, Badge, useToast } f
 import { fmtDate, todayISO, daysFromNow, initials, parseItems, TASK_COLS, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
-const RECUR_OPTS = [{ value: '', label: 'Không lặp' }, { value: 'weekly', label: '🔁 Hàng tuần' }, { value: 'monthly', label: '🔁 Hàng tháng' }];
+const RECUR_OPTS = [{ value: '', label: 'Không lặp' }, { value: 'weekly', label: 'Hàng tuần' }, { value: 'monthly', label: 'Hàng tháng' }];
 
 /* ---------- v3.7: modal chi tiết việc — form + checklist + bình luận + ghi giờ ---------- */
 function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, onDelete, onClose }) {
@@ -244,13 +244,13 @@ export default function TasksPage() {
         onClick={() => selMode ? toggleSel(t.id) : setModal({ mode: 'edit', row: t })}
         style={{ ...(canDrag(t) || selMode ? {} : { opacity: .75, cursor: 'default' }), ...(selMode && sel.has(t.id) ? { outline: '2px solid var(--primary)' } : {}) }}>
         <div className="kan-title">{selMode && <input type="checkbox" readOnly checked={sel.has(t.id)} style={{ width: 'auto', marginRight: 6 }} />}
-          {blockers(t).length > 0 && t.status !== 'done' && <span title={`Chờ: ${blockers(t).map(b => b.title).join(', ')}`} style={{ marginRight: 4 }}>⛓</span>}
-          {t.recur && <span title={t.recur === 'weekly' ? 'Lặp hàng tuần' : 'Lặp hàng tháng'} style={{ marginRight: 4 }}>🔁</span>}
+          {blockers(t).length > 0 && t.status !== 'done' && <span title={`Chờ: ${blockers(t).map(b => b.title).join(', ')}`} aria-label="Bị chặn bởi việc khác" style={{ marginRight: 4, display: 'inline-flex', verticalAlign: '-2px', color: 'var(--muted)' }}><Icon name="link" size={13} /></span>}
+          {t.recur && <span title={t.recur === 'weekly' ? 'Lặp hàng tuần' : 'Lặp hàng tháng'} aria-label="Việc lặp lại" style={{ marginRight: 4, display: 'inline-flex', verticalAlign: '-2px', color: 'var(--muted)' }}><Icon name="repeat" size={13} /></span>}
           {t.title}</div>
-        <div className="kan-sub">{projName(t.projectId)}{cl.length > 0 && <> · ☑ {cl.filter(x => x.done).length}/{cl.length}</>}{t.estHours ? ` · ${t.estHours}h` : ''}
-          {stale && <span title={`Đã ở cột này ${age} ngày`} style={{ color: 'var(--warn, #D97706)', fontWeight: 700 }}> · 🕰 {age}n</span>}</div>
+        <div className="kan-sub">{projName(t.projectId)}{cl.length > 0 && <> · <Icon name="check" size={11} /> {cl.filter(x => x.done).length}/{cl.length}</>}{t.estHours ? ` · ${t.estHours}h` : ''}
+          {stale && <span title={`Đã ở cột này ${age} ngày`} style={{ color: 'var(--warn, #D97706)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3 }}> · <Icon name="clock" size={11} />{age}n</span>}</div>
         {parseItems(t.labels).length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, margin: '4px 0' }}>
-          {parseItems(t.labels).map(lb => <span key={lb} className="badge b-violet" style={{ fontSize: '.62rem', padding: '1px 6px' }}>{lb}</span>)}</div>}
+          {parseItems(t.labels).map(lb => <span key={lb} className="badge b-violet" style={{ fontSize: '.7rem', padding: '1px 6px' }}>{lb}</span>)}</div>}
         <div className="kan-foot">
           <Badge map="priority" k={t.priority} />
           <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -312,7 +312,7 @@ export default function TasksPage() {
           <input type="checkbox" checked={mine} onChange={e => setMine(e.target.checked)} /> Chỉ việc của tôi
         </label>
         <div className="spacer"></div>
-        {isMgmt && <button className={selMode ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'} onClick={() => { setSelMode(!selMode); setSel(new Set()); }}>{selMode ? 'Xong' : '☑ Chọn nhiều'}</button>}
+        {isMgmt && <button className={selMode ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'} onClick={() => { setSelMode(!selMode); setSel(new Set()); }}>{selMode ? 'Xong' : <><Icon name="check" size={15} /><span>Chọn nhiều</span></>}</button>}
         {isMgmt && !selMode && <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm công việc</span></button>}
       </div>
 
@@ -343,7 +343,7 @@ export default function TasksPage() {
         </div>
       )}
       <p style={{ fontSize: '.76rem', color: 'var(--muted)', marginTop: 4 }}>
-        {selMode ? 'Nhấp thẻ để chọn/bỏ chọn · dùng thanh trên để đổi hàng loạt.' : isMgmt ? 'Kéo thả để đổi trạng thái · nhấp thẻ để mở chi tiết · 🕰 = việc ứ đọng lâu.' : 'Bạn chỉ kéo được thẻ việc của mình · nhấp thẻ để mở chi tiết.'}
+        {selMode ? 'Nhấp thẻ để chọn/bỏ chọn · dùng thanh trên để đổi hàng loạt.' : isMgmt ? 'Kéo thả để đổi trạng thái · nhấp thẻ để mở chi tiết · thẻ có số ngày kèm đồng hồ = việc ứ đọng lâu.' : 'Bạn chỉ kéo được thẻ việc của mình · nhấp thẻ để mở chi tiết.'}
       </p>
 
       {modal?.mode === 'add' && <FormModal title="Thêm công việc" fields={ADD_FIELDS}

@@ -57,7 +57,7 @@ export default function StaffDetailPage() {
         <span style={{ fontSize: '1.05rem', fontWeight: 800 }}>{u.name}{u.id === me?.id ? ' (tôi)' : ''}</span>
         {rolesOf(u).map(r => <span key={r} className={`role-chip role-${r}`}>{RL[r] || r}</span>)}
         {reviewScore !== null && <span className="badge b-green" title={`Đánh giá ${lastReview.quarter} đã chốt`}><span className="dot"></span>Đánh giá {lastReview.quarter}: {reviewScore}⭐</span>}
-        {u.birthday && <span className="badge b-blue" title="Sinh nhật">🎂 {u.birthday.slice(8)}/{u.birthday.slice(5, 7)}</span>}
+        {u.birthday && <span className="badge b-blue" title="Sinh nhật"><Icon name="cake" size={12} /> {u.birthday.slice(8)}/{u.birthday.slice(5, 7)}</span>}
         <div className="spacer"></div>
         <span style={{ fontSize: '.78rem', color: 'var(--muted)' }}>{[u.title, team?.name, u.email, u.phone].filter(Boolean).join(' · ')}</span>
       </div>

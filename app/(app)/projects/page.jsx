@@ -66,7 +66,7 @@ export default function ProjectsPage() {
           {Object.entries(BADGE.project).map(([v, [l]]) => <option key={v} value={v}>{l}</option>)}
         </select>
         <div className="spacer"></div>
-        {isMgmt && <Link href="/portfolio" className="btn btn-outline">📊 Sở chỉ huy</Link>}
+        {isMgmt && <Link href="/portfolio" className="btn btn-outline"><Icon name="reports" size={16} /><span>Sở chỉ huy</span></Link>}
         {isMgmt && <button className="btn btn-primary" onClick={() => {
           if (!clients.rows.length) return toast('Hãy thêm khách hàng trước', 'error');
           setModal({ mode: 'add' });

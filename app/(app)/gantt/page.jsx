@@ -98,7 +98,7 @@ export default function GanttPage() {
             {/* Lưới tháng */}
             <div style={{ position: 'relative', height: 22, marginLeft: 220 }}>
               {monthTicks.map((t, i) => (
-                <span key={i} style={{ position: 'absolute', left: X(t) + '%', fontSize: '.68rem', color: 'var(--muted)', transform: 'translateX(-50%)' }}>
+                <span key={i} style={{ position: 'absolute', left: X(t) + '%', fontSize: '.7rem', color: 'var(--muted)', transform: 'translateX(-50%)' }}>
                   T{t.getMonth() + 1}/{t.getFullYear()}</span>
               ))}
             </div>
@@ -155,7 +155,7 @@ export default function GanttPage() {
               </div>
             )}
             <div style={{ marginLeft: 220, position: 'relative', height: 18 }}>
-              <span style={{ position: 'absolute', left: X(todayISO()) + '%', transform: 'translateX(-50%)', fontSize: '.66rem', color: 'var(--primary)', fontWeight: 700 }}>Hôm nay</span>
+              <span style={{ position: 'absolute', left: X(todayISO()) + '%', transform: 'translateX(-50%)', fontSize: '.7rem', color: 'var(--primary)', fontWeight: 700 }}>Hôm nay</span>
             </div>
           </div>
         </div>
