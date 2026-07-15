@@ -18,7 +18,12 @@ async function shiftCfg() {
 
 // v3.13: tổng hợp chấm công tháng theo từng người → giờ OT, số lần muộn, số ngày nghỉ
 async function attendanceOf(month) {
-  const rows = await prisma.attendance.findMany({ where: { date: { startsWith: month } } });
+  // v3.13: so sánh khoảng, KHÔNG dùng startsWith. startsWith dịch ra LIKE '2026-07%' mà
+  // btree thường không phục vụ được LIKE (đã thử: planner vẫn Seq Scan dù có index).
+  // Cột date là chuỗi 'YYYY-MM-DD' nên so sánh chuỗi = so sánh ngày, dùng được index.
+  const rows = await prisma.attendance.findMany({
+    where: { date: { gte: `${month}-01`, lte: `${month}-31` } },
+  });
   const { workStart } = await shiftCfg();
   const by = {};
   for (const r of rows) {

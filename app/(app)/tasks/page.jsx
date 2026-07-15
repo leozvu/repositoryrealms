@@ -9,10 +9,12 @@ const RECUR_OPTS = [{ value: '', label: 'Không lặp' }, { value: 'weekly', lab
 
 /* ---------- v3.7: modal chi tiết việc — form + checklist + bình luận + ghi giờ ---------- */
 function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, onDelete, onClose }) {
-  const comments = useResource('taskcomments');
-  const timelogs = useResource('timelogs');
-  const phases = useResource('phases');
-  const events = useResource('taskevents');
+  // v3.13: lọc ngay ở server theo taskId/projectId. Trước đây mỗi lần MỞ MỘT công việc là
+  // kéo về NGUYÊN bảng TaskComment + TimeLog + TaskEvent + Phase của cả công ty rồi lọc
+  // bằng JS trong trình duyệt — 30 người mở việc cả ngày, mỗi lần vài chục nghìn dòng.
+  const comments = useResource('taskcomments', { taskId: task.id });
+  const timelogs = useResource('timelogs', { taskId: task.id });
+  const events = useResource('taskevents', { taskId: task.id });
   const toast = useToast();
   const [f, setF] = useState({
     title: task.title, projectId: task.projectId || '', assigneeId: task.assigneeId || '',
@@ -21,6 +23,9 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
     phaseId: task.phaseId || '', labels: parseItems(task.labels),
     dependsOn: parseItems(task.dependsOn), checklist: parseItems(task.checklist),
   });
+  // Lọc theo f.projectId (không phải task.projectId): người dùng đổi dự án trong form thì
+  // danh sách giai đoạn phải nạp lại theo dự án mới.
+  const phases = useResource('phases', { projectId: f.projectId || undefined });
   const [cmt, setCmt] = useState('');
   const [newItem, setNewItem] = useState('');
   const [newLabel, setNewLabel] = useState('');

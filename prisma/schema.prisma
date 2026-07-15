@@ -138,6 +138,7 @@ model Phase {
   name      String
   order     Int     @default(0)
   color     String?
+  @@index([projectId])
 }
 
 // ===== v3.10: Lịch sử thay đổi công việc =====
@@ -148,6 +149,7 @@ model TaskEvent {
   userName String
   text     String
   at       DateTime @default(now())
+  @@index([taskId])
 }
 
 // ===== v3.10: Mẫu dự án — nhân bản bộ task/mốc/phase chuẩn =====
@@ -181,6 +183,9 @@ model Task {
   phaseId    String? // v3.10: thuộc giai đoạn nào của dự án
   labels     String   @default("[]") // v3.10: JSON nhãn phân loại
   statusSince String? // v3.12: YYYY-MM-DD vào cột hiện tại từ khi nào — tính tuổi việc
+  @@index([assigneeId])
+  @@index([projectId])
+  @@index([status])
 }
 
 // ===== v3.8: Đánh giá hiệu suất theo quý =====
@@ -205,6 +210,7 @@ model TaskComment {
   userId    String
   content   String
   createdAt DateTime @default(now())
+  @@index([taskId])
 }
 
 // ===== v3.2: Mốc dự án hiển thị trên Gantt =====
@@ -216,6 +222,7 @@ model Milestone {
   date      String // YYYY-MM-DD
   done      Boolean @default(false)
   note      String?
+  @@index([projectId])
 }
 
 model TimeLog {
@@ -230,6 +237,11 @@ model TimeLog {
   hours     Float   @default(0)
   billable  Boolean @default(true)
   note      String?
+  @@index([userId])
+  @@index([projectId])
+  @@index([date])
+  @@index([taskId])
+  @@index([invoiceId])
 }
 
 // ===== v3.12: Công nợ thanh toán freelancer theo job =====
@@ -244,6 +256,8 @@ model Payout {
   note      String?
   createdAt DateTime @default(now())
   paidDate  String?
+  @@index([userId])
+  @@index([status])
 }
 
 model Quote {
@@ -274,6 +288,9 @@ model Invoice {
   payments  String  @default("[]") // JSON [{id, amount, date, note}]
   recurring Boolean @default(false)
   recGroup  String?
+  @@index([clientId])
+  @@index([projectId])
+  @@index([status])
 }
 
 model Transaction {
@@ -285,6 +302,8 @@ model Transaction {
   desc        String?
   projectId   String?
   createdById String?
+  @@index([date])
+  @@index([projectId])
 }
 
 model Leave {
@@ -296,6 +315,7 @@ model Leave {
   type   String  @default("annual")
   status String  @default("pending")
   note   String?
+  @@index([userId])
 }
 
 // ===== CRM: nhật ký hoạt động / lịch hẹn =====
@@ -402,6 +422,7 @@ model Attendance {
   note     String?
 
   @@unique([userId, date])
+  @@index([date])
 }
 
 model Candidate {
@@ -449,6 +470,8 @@ model Ticket {
   createdAt  DateTime  @default(now())
   dueAt      DateTime? // hạn SLA
   resolvedAt DateTime?
+  @@index([assigneeId])
+  @@index([status])
 }
 
 // ===== v2.5: KPI/OKR theo quý + khảo sát NPS =====
@@ -498,6 +521,7 @@ model Message {
   senderId  String
   content   String
   createdAt DateTime     @default(now())
+  @@index([convId, createdAt])
 }
 
 // ===== v3.2: Hoa hồng sales =====
@@ -512,6 +536,8 @@ model Commission {
   status    String  @default("pending") // pending | paid
   note      String?
   createdAt String?
+  @@index([userId])
+  @@index([invoiceId])
 }
 
 // ===== v3.3: API mở — key hoạt động như "user ảo" với vai trò riêng =====
@@ -569,6 +595,12 @@ model Notification {
   route     String? // trang đích khi click, VD: /approvals
   readAt    DateTime?
   createdAt DateTime  @default(now())
+
+  // v3.13: mọi người đăng nhập đều gọi /api/notifications mỗi 15 giây, nên đây là query
+  // chạy nhiều nhất hệ thống. Index ghép khớp đúng "lọc userId, sắp createdAt giảm dần";
+  // index thứ hai cho phần đếm chưa đọc.
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
 }
 
 // ===== v3.5: Gắn link tài liệu ngoài (Drive/Notion/Figma…) =====
@@ -620,4 +652,5 @@ model AuditLog {
   refId    String?
   detail   String?
   at       DateTime @default(now())
+  @@index([at])
 }

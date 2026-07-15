@@ -173,17 +173,24 @@ export function FormModal({ title, fields, data = {}, onSave, onClose, large, ex
 }
 
 /* ---------- Hook dữ liệu: gọi API generic có phân quyền ---------- */
-export function useResource(name) {
+// v3.13: useResource(name, filter) — filter lọc Ở SERVER, VD useResource('timelogs', { taskId }).
+// Chỉ các cột có trong danh sách trắng FILTERABLE (lib/registry) mới có tác dụng.
+// Không truyền filter thì hành xử y như cũ (lấy tất cả trong phạm vi quyền của mình).
+export function useResource(name, filter) {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
   const toast = useToast();
+  // Chuỗi hóa filter để useCallback không chạy lại mỗi lần render (object literal luôn khác nhau)
+  const qs = filter
+    ? new URLSearchParams(Object.entries(filter).filter(([, v]) => v !== undefined && v !== null && v !== '')).toString()
+    : '';
   const refresh = useCallback(async () => {
-    const res = await fetch(`/api/data/${name}`);
+    const res = await fetch(`/api/data/${name}${qs ? '?' + qs : ''}`);
     if (res.status === 403) { setForbidden(true); setLoading(false); return; }
     if (res.ok) setRows(await res.json());
     setLoading(false);
-  }, [name]);
+  }, [name, qs]);
   useEffect(() => { refresh(); }, [refresh]);
 
   const call = async (method, url, body) => {
