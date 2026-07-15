@@ -179,6 +179,22 @@ export function FormModal({ title, fields, data = {}, onSave, onClose, large, ex
 }
 
 /* ---------- Hook dữ liệu: gọi API generic có phân quyền ---------- */
+/* v3.14: đếm số lượt tải đang bay, để EmptyState biết mà đừng nói dối.
+   Vấn đề: rows khởi tạo [] nên lần render ĐẦU của mọi trang đều rơi vào nhánh
+   {!rows.length && <EmptyState title="Chưa có hóa đơn"/>} — người dùng đọc "Chưa có hóa đơn"
+   trong lúc dữ liệu đang về. Ở máy dev chỉ ~100ms nên không ai để ý, nhưng trên production
+   lúc hàm serverless nguội thì đứng 1-2 giây, gây hiểu nhầm là mất dữ liệu.
+   Sửa ở đây thay vì sửa 17 trang: mỗi trang đặt tên biến khác nhau (rows/visible/filtered),
+   sửa tay từng chỗ vừa dễ sót vừa dễ gãy — mà bảng viết sau này lại quên. */
+let inflight = 0;
+const inflightSubs = new Set();
+const bumpInflight = n => { inflight = Math.max(0, inflight + n); inflightSubs.forEach(f => f(inflight)); };
+function useAnyLoading() {
+  const [n, setN] = useState(inflight);
+  useEffect(() => { inflightSubs.add(setN); setN(inflight); return () => inflightSubs.delete(setN); }, []);
+  return n > 0;
+}
+
 // v3.13: useResource(name, filter) — filter lọc Ở SERVER, VD useResource('timelogs', { taskId }).
 // Chỉ các cột có trong danh sách trắng FILTERABLE (lib/registry) mới có tác dụng.
 // Không truyền filter thì hành xử y như cũ (lấy tất cả trong phạm vi quyền của mình).
@@ -192,10 +208,15 @@ export function useResource(name, filter) {
     ? new URLSearchParams(Object.entries(filter).filter(([, v]) => v !== undefined && v !== null && v !== '')).toString()
     : '';
   const refresh = useCallback(async () => {
-    const res = await fetch(`/api/data/${name}${qs ? '?' + qs : ''}`);
-    if (res.status === 403) { setForbidden(true); setLoading(false); return; }
-    if (res.ok) setRows(await res.json());
-    setLoading(false);
+    bumpInflight(1); // v3.14: báo cho EmptyState biết đang tải
+    try {
+      const res = await fetch(`/api/data/${name}${qs ? '?' + qs : ''}`);
+      if (res.status === 403) { setForbidden(true); return; }
+      if (res.ok) setRows(await res.json());
+    } finally {
+      setLoading(false);
+      bumpInflight(-1); // luôn trừ lại kể cả khi lỗi, nếu không skeleton treo vĩnh viễn
+    }
   }, [name, qs]);
   useEffect(() => { refresh(); }, [refresh]);
 
@@ -249,6 +270,19 @@ export function Forbidden() {
 }
 
 export function EmptyState({ title, sub }) {
+  // v3.14: đang tải thì hiện khung xám, KHÔNG khẳng định "Chưa có dữ liệu" — nói vậy là sai
+  // sự thật và làm người dùng tưởng mất dữ liệu (nhất là khi hàm serverless nguội, đứng 1-2s).
+  const loading = useAnyLoading();
+  if (loading) {
+    return (
+      <div className="empty" aria-busy="true" aria-live="polite">
+        <span className="sr-only">Đang tải dữ liệu…</span>
+        <div className="sk sk-line" style={{ width: 180 }}></div>
+        <div className="sk sk-line" style={{ width: 260 }}></div>
+        <div className="sk sk-line" style={{ width: 210 }}></div>
+      </div>
+    );
+  }
   return (
     <div className="empty">
       <Icon name="alert" size={38} />

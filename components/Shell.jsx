@@ -46,6 +46,21 @@ function useTableLabels(pathname) {
   }, [pathname]);
 }
 
+/* v3.14: đo chiều cao thật của thanh trên → --topbar-h, để header bảng dính đúng ngay dưới nó.
+   Thanh trên xuống 2 dòng khi màn hẹp (57px ở màn rộng, 108px ở màn ~657px) nên đặt số cứng
+   trong CSS là header dính sai chỗ và đè lên nhau. */
+function useTopbarHeight() {
+  useEffect(() => {
+    const el = document.getElementById('topbar');
+    if (!el) return;
+    const set = () => document.documentElement.style.setProperty('--topbar-h', Math.round(el.getBoundingClientRect().height) + 'px');
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+}
+
 // v3.4: tìm kiếm toàn cục Ctrl+K — gom mọi resource user được đọc
 const SEARCH_GROUPS = [
   { res: 'clients', label: 'Khách hàng', icon: 'clients', text: r => [r.name, r.contact, r.industry, r.phone], title: r => r.name, sub: r => r.industry || '', href: r => `/clients/${r.id}` },
@@ -269,6 +284,7 @@ export default function Shell({ user, company, children }) {
   const pathname = usePathname();
   const router = useRouter();
   useTableLabels(pathname); // v3.14: bảng đọc được trên điện thoại
+  useTopbarHeight();        // v3.14: header bảng dính đúng dưới thanh trên
   const isFL = user?.userType === 'freelancer';
   // v3.11: freelancer chỉ được ở /freelancer — chuyển hướng nếu lạc sang trang nhân viên
   useEffect(() => { if (isFL && pathname !== '/freelancer') router.replace('/freelancer'); }, [isFL, pathname, router]);
@@ -312,7 +328,7 @@ export default function Shell({ user, company, children }) {
             <div className="brand-logo">{(company || 'A')[0].toUpperCase()}</div>
             <div className="brand-text">
               <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">ERP v3.13 · 7 vai trò</span>
+              <span className="brand-sub">ERP v3.14 · 7 vai trò</span>
             </div>
           </div>
           <nav id="nav">
