@@ -271,6 +271,8 @@ model Quote {
   status    String  @default("draft")
   date      String
   note      String?
+  currency  String  @default("VND") // v3.18: đa tiền tệ
+  fxRate    Float   @default(1)
 }
 
 model Invoice {
@@ -288,6 +290,8 @@ model Invoice {
   payments  String  @default("[]") // JSON [{id, amount, date, note}]
   recurring Boolean @default(false)
   recGroup  String?
+  currency  String  @default("VND") // v3.18: đa tiền tệ
+  fxRate    Float   @default(1)
   @@index([clientId])
   @@index([projectId])
   @@index([status])
@@ -298,6 +302,8 @@ model Transaction {
   type        String // income | expense
   category    String?
   amount      Int     @default(0)
+  currency    String  @default("VND") // v3.18: đa tiền tệ — amount lưu theo đơn vị chính của currency
+  fxRate      Float   @default(1) // v3.18: 1 currency = fxRate VND (để quy đổi báo cáo)
   date        String
   desc        String?
   projectId   String?
@@ -653,4 +659,137 @@ model AuditLog {
   detail   String?
   at       DateTime @default(now())
   @@index([at])
+}
+
+// ===== v3.19: XUẤT NHẬP KHẨU NÔNG SẢN (phân hệ 'export' — Fretas) =====
+// Vùng trồng (PUC) + cơ sở đóng gói (PHC). Gộp một model, phân biệt bằng type.
+model GrowingArea {
+  id        String   @id @default(cuid())
+  type      String   @default("PUC") // PUC (vùng trồng) | PHC (cơ sở đóng gói)
+  name      String
+  crop      String? // chanh dây | chôm chôm | ...
+  province  String?
+  areaHa    Float    @default(0) // diện tích (ha) — với PUC
+  owner     String? // chủ vườn / đơn vị
+  note      String?
+  createdAt DateTime @default(now())
+  codes     AreaCode[]
+}
+
+// Mã số theo TỪNG thị trường. NĐ 38/2026: đuôi mã = mã nước NK, mỗi thị trường có mã +
+// trạng thái riêng (TQ đình chỉ không kéo theo EU). Đình chỉ mã là chuyện thường ngày.
+model AreaCode {
+  id         String      @id @default(cuid())
+  areaId     String
+  area       GrowingArea @relation(fields: [areaId], references: [id])
+  market     String // CN | EU | US ... (ISO nước NK)
+  code       String // mã mới NĐ 38/2026
+  legacyCode String? // mã cũ (đối tác/chứng từ cũ vẫn dùng)
+  status     String      @default("active") // active | suspended | revoked | pending
+  validFrom  String?
+  validTo    String?
+  note       String?
+  @@index([areaId])
+}
+
+// Lô hàng xuất khẩu.
+model Shipment {
+  id             String   @id @default(cuid())
+  code           String   @unique
+  clientId       String? // người mua (buyer nước ngoài)
+  crop           String? // mặt hàng
+  market         String // thị trường đích: CN | EU | US
+  incoterm       String   @default("FOB") // FOB | CIF | CFR | EXW | DAP | FCA | CPT | CIP
+  transportMode  String   @default("SEA") // SEA | AIR
+  currency       String   @default("USD")
+  fxRate         Float    @default(1)
+  amount         Int      @default(0) // giá trị lô (theo currency)
+  paymentMethod  String   @default("TT") // TT | LC | DP | DA
+  containerType  String? // 20RF | 40HC-RF
+  containerNo    String?
+  sealNo         String?
+  weightKg       Float    @default(0)
+  etd            String? // ngày tàu chạy dự kiến (YYYY-MM-DD)
+  eta            String?
+  blNo           String? // số vận đơn
+  lcNo           String? // số L/C (nếu thanh toán L/C)
+  lcExpiry       String? // ngày hết hạn L/C
+  presentDeadline String? // hạn xuất trình chứng từ (min(etd+21, lcExpiry))
+  growingAreaId  String? // vùng trồng nguồn (truy xuất)
+  packingHouseId String? // cơ sở đóng gói
+  status         String   @default("draft") // draft | booked | packing | customs | shipped | delivered | paid
+  note           String?
+  createdAt      DateTime @default(now())
+  docs           ShipmentDoc[]
+  @@index([status])
+  @@index([market])
+}
+
+// Chứng từ của một lô hàng (checklist).
+model ShipmentDoc {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id])
+  type       String // invoice | packing | bl | phyto | co | irradiation | customs
+  status     String   @default("pending") // pending | done
+  refNo      String? // số chứng từ
+  issuedBy   String? // đơn vị cấp
+  issuedAt   String?
+  note       String?
+  @@index([shipmentId])
+}
+
+// ===== v3.20: LIVESTREAM BÁN HÀNG (phân hệ 'livestream' — Egolive) =====
+// Một ca live. GMV ≠ doanh thu: gmv là chốt trên sóng, netGmv là sau đối soát (trừ hủy/hoàn/phí/thuế).
+model LiveSession {
+  id            String   @id @default(cuid())
+  platform      String   @default("tiktok") // tiktok | shopee
+  shop          String? // kênh/shop
+  clientId      String? // nhãn hàng (nếu live thuê)
+  date          String // YYYY-MM-DD
+  startAt       String? // HH:MM
+  durationMin   Int      @default(0)
+  hostId        String? // host chính (thường là freelancer)
+  assistantId   String? // trợ live
+  contractType  String   @default("affiliate") // affiliate | booking | revshare | kpi
+  // chỉ số phiên (chốt trên sóng)
+  gmv           Int      @default(0) // GMV chốt trên sóng (VND)
+  orders        Int      @default(0)
+  uniqueViewers Int      @default(0)
+  peakViewers   Int      @default(0)
+  ctr           Float    @default(0) // % click vào SP
+  ctor          Float    @default(0) // % click -> đơn
+  // đối soát (sau khi sàn quyết toán)
+  netGmv        Int      @default(0) // GMV ròng sau hủy/hoàn
+  platformFee   Int      @default(0) // phí sàn + thanh toán
+  taxWithheld   Int      @default(0) // thuế sàn khấu trừ (NĐ 117/2025)
+  netReceived   Int      @default(0) // tiền thực nhận
+  status        String   @default("scheduled") // scheduled | live | done | reconciled
+  // công host
+  hostPayBase   Int      @default(0) // lương cứng ca
+  hostPayRate   Float    @default(0) // % hoa hồng trên GMV
+  hostAdvance   Int      @default(0) // tạm ứng theo GMV sóng
+  hostSettled   Int      @default(0) // quyết toán theo GMV ròng
+  note          String?
+  createdAt     DateTime @default(now())
+  @@index([date])
+  @@index([status])
+  @@index([hostId])
+}
+
+// Điểm vi phạm nền tảng — tích lũy rolling 180 ngày, 36đ = hạn chế live, 48đ = đóng shop.
+model Violation {
+  id            String   @id @default(cuid())
+  platform      String   @default("tiktok")
+  shop          String?
+  points        Int      @default(0)
+  reason        String
+  category      String? // vận hành | nội dung | sản phẩm
+  occurredAt    String // YYYY-MM-DD
+  expiresAt     String? // occurredAt + 180 ngày
+  appealDeadline String?
+  status        String   @default("active") // active | appealing | cleared | expired
+  note          String?
+  createdAt     DateTime @default(now())
+  @@index([occurredAt])
 }

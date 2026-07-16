@@ -240,6 +240,12 @@ const NAV = [
   { key: 'recruitment', label: 'Tuyển dụng', icon: 'leads', roles: ['HR'], mod: 'recruitment' },
   { key: 'reviews', label: 'Đánh giá hiệu suất', icon: 'trendUp', roles: ALL, mod: 'reviews' },
   { key: 'freelancers', label: 'Freelancer', icon: 'clients', roles: ['HR', 'PM', 'LEAD'], mod: 'freelancers' },
+  { section: 'Xuất nhập khẩu', mod: 'export' },
+  { key: 'growing', label: 'Vùng trồng / Đóng gói', icon: 'clients', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
+  { key: 'shipments', label: 'Lô hàng xuất', icon: 'invoices', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
+  { section: 'Livestream', mod: 'livestream' },
+  { key: 'live', label: 'Ca live', icon: 'calendar', roles: ['LEAD', 'ACCOUNTANT', 'AM', 'PM'], mod: 'livestream' },
+  { key: 'violations', label: 'Điểm vi phạm', icon: 'alert', roles: ['LEAD', 'ACCOUNTANT', 'PM'], mod: 'livestream' },
   { section: 'Công ty' },
   { key: 'assets', label: 'Tài sản', icon: 'projects', roles: ALL },
   { key: 'reports', label: 'Báo cáo', icon: 'reports', roles: ['ACCOUNTANT', 'PM'] },
@@ -324,7 +330,7 @@ export default function Shell({ user, company, children }) {
             <div className="brand-logo">{(company || 'A')[0].toUpperCase()}</div>
             <div className="brand-text">
               <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">ERP v3.17 · 7 vai trò</span>
+              <span className="brand-sub">ERP v3.20 · 7 vai trò</span>
             </div>
           </div>
           <nav id="nav">

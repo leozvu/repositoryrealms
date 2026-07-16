@@ -128,7 +128,10 @@ export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa' }) {
 /* ---------- Form động (port fieldHTML/formModal từ v1) ---------- */
 export function FormModal({ title, fields, data = {}, onSave, onClose, large, extraFooter }) {
   const formRef = useRef(null);
-  const submit = () => {
+  // v3.20: onSave có thể async và trả về false để GIỮ modal mở (validate thất bại).
+  // Trước đây luôn onClose() sau onSave → validate lỗi vẫn đóng modal, người dùng thấy toast
+  // lỗi nhưng mất hết dữ liệu vừa nhập. Ảnh hưởng mọi FormModal toàn app.
+  const submit = async () => {
     const form = formRef.current;
     if (!form.reportValidity()) return;
     const out = {};
@@ -138,8 +141,8 @@ export function FormModal({ title, fields, data = {}, onSave, onClose, large, ex
       if (f.type === 'multiselect') v = [...(form.elements[f.key]?.selectedOptions || [])].map(o => o.value);
       out[f.key] = v;
     });
-    onSave(out);
-    onClose();
+    const res = await onSave(out);
+    if (res !== false) onClose();
   };
   return (
     <Modal title={title} onClose={onClose} large={large}
