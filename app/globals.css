@@ -120,12 +120,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 select.filter{padding:8px 30px 8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);font-size:.85rem;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:640px}
-/* v3.14: header bảng dính khi cuộn. Nhật ký hệ thống / bảng chấm giờ dài vài trăm dòng —
-   cuộn xuống là mất tên cột, phải cuộn ngược lên xem "cột này là gì".
-   Phải nằm ngay dưới thanh trên (thanh đó cũng sticky). KHÔNG dùng số cố định: thanh trên
-   xuống 2 dòng khi màn hẹp (đo được 57px ở màn rộng, 108px ở màn 657px) — đặt cứng là header
-   dính sai chỗ, đè lên nhau. Shell.jsx đo thật rồi ghi vào --topbar-h. */
-th{text-align:left;padding:11px 14px;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:#FBFCFE;white-space:nowrap;position:sticky;top:var(--topbar-h,57px);z-index:2}
+/* v3.15.1: ĐÃ GỠ header dính của v3.14 — nó làm hỏng MỌI bảng trong app.
+   Vì sao hỏng: .table-wrap có overflow-x:auto. Theo chuẩn CSS, một trục không phải `visible`
+   thì trục kia tự tính thành `auto` → .table-wrap LÀ MỘT KHUNG CUỘN. Mà `position:sticky`
+   neo theo khung cuộn gần nhất, không phải theo trang. Nên `top:108px` đẩy hàng tiêu đề
+   xuống 108px BÊN TRONG khung, đè lên dòng dữ liệu đầu tiên — đúng cái "nhảy cột" Leoz thấy.
+   Muốn làm lại cho đúng thì phải cho .table-wrap cuộn dọc thật (max-height + overflow:auto)
+   rồi mới sticky top:0 — đổi bố cục nhiều, để dành làm riêng, không nhét vào đây. */
+th{text-align:left;padding:11px 14px;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:#FBFCFE;white-space:nowrap}
 td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
 tbody tr:last-child td{border-bottom:none}
 tbody tr{transition:background .12s}

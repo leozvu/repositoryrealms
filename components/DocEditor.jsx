@@ -2,11 +2,17 @@
 // Trình soạn báo giá / hóa đơn dùng chung: items động, VAT, chọn nhanh từ bảng giá
 import { useState } from 'react';
 import { Modal, Icon, useToast } from './ui';
-import { money, todayISO, daysFromNow, parseItems } from '@/lib/format';
+import { money, todayISO, daysFromNow, parseItems, nextCode } from '@/lib/format';
 
 // v3.13: nextCode dọn về lib/format để server (API xuất hóa đơn từ giờ công) dùng chung
-// một logic. Re-export ở đây để các trang đang import từ DocEditor không phải sửa.
-export { nextCode } from '@/lib/format';
+// một logic. Re-export để các trang đang import từ DocEditor không phải sửa.
+//
+// v3.15.1: PHẢI import rồi mới `export { nextCode }`. Bản cũ viết
+//   export { nextCode } from '@/lib/format';
+// — cú pháp đó CHỈ re-export ra ngoài, KHÔNG đưa nextCode vào phạm vi của chính file này,
+// nên dòng nextCode(...) bên dưới ném ReferenceError và cả trình soạn báo giá lẫn hóa đơn
+// sập trắng màn hình. Build vẫn xanh vì đây là lỗi lúc chạy, không phải lúc biên dịch.
+export { nextCode };
 
 const STATUS = {
   invoice: [['draft', 'Nháp'], ['sent', 'Đã gửi'], ['overdue', 'Quá hạn'], ['paid', 'Đã thu']],
