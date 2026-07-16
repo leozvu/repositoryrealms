@@ -10,10 +10,14 @@ test('mục lõi (không mod) luôn bật, kể cả khi tắt hết', () => {
   assert.equal(modOn('', []), true);
 });
 
-test('công ty cũ (modules=undefined/null) → bật hết', () => {
-  assert.equal(modOn('delivery', undefined), true);
+test('công ty cũ (modules=null) → agency BẬT, phân hệ chuyên biệt TẮT', () => {
+  // các phân hệ agency cũ vẫn bật → 3 công ty đang chạy không đổi
   assert.equal(modOn('delivery', null), true);
-  assert.equal(modOn('export', undefined), true, 'kể cả phân hệ mới cũng coi là bật cho tới khi công ty tự tắt');
+  assert.equal(modOn('sales', undefined), true);
+  assert.equal(modOn('commissions', null), true);
+  // 🔴 REGRESSION đã bắt: export/livestream KHÔNG được tự hiện cho agency chưa cấu hình
+  assert.equal(modOn('export', null), false, 'agency modules=null KHÔNG thấy menu XNK');
+  assert.equal(modOn('livestream', null), false, 'agency modules=null KHÔNG thấy menu Livestream');
 });
 
 test('có cấu hình modules → chỉ bật cái trong danh sách', () => {
