@@ -4,10 +4,13 @@ import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { ROLES, isDirector, hasAny } from '@/lib/perm';
 
+// v3.16: trả null = không gửi roles (không đổi) · [] = có gửi nhưng rỗng (nơi gọi phải báo lỗi).
+// Bản cũ trả ['STAFF'] khi rỗng → bỏ tick hết vai trò là tài khoản ÂM THẦM tụt xuống Nhân viên,
+// không báo gì. Đã xảy ra thật trên Egoric: 6 tài khoản (CEO, Marketing Lead, Account…) mất
+// hết vai trò về STAFF sau vài lượt sửa, không ai biết cho tới khi Leoz thấy lạ.
 const cleanRoles = roles => {
   if (!Array.isArray(roles)) return null;
-  const r = roles.filter(x => ROLES.includes(x));
-  return r.length ? r : ['STAFF'];
+  return roles.filter(x => ROLES.includes(x));
 };
 
 // Tạo tài khoản — DIRECTOR + HR tạo nhân viên; HR/PM/LEAD tạo được FREELANCER (v3.11)
@@ -29,7 +32,11 @@ export async function POST(req) {
   const exists = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
   if (exists) return NextResponse.json({ error: 'Email đã tồn tại' }, { status: 400 });
   // Freelancer luôn là vai trò FREELANCER (không được cấp quyền nhân viên)
-  const finalRoles = isFL ? ['FREELANCER'] : (cleanRoles(roles) || ['STAFF']);
+  const asked = cleanRoles(roles); // null = không gửi → mặc định Nhân viên · [] = gửi rỗng → lỗi
+  if (asked && !asked.length && !isFL) {
+    return NextResponse.json({ error: 'Phải chọn ít nhất một vai trò' }, { status: 400 });
+  }
+  const finalRoles = isFL ? ['FREELANCER'] : (asked || ['STAFF']);
   // v3.15: CHẶN LEO THANG — chỉ Giám đốc mới cấp được vai trò Giám đốc.
   // Người tạo tài khoản là người đặt mật khẩu đầu tiên, nên tạo được tài khoản vai trò gì
   // là tự đăng nhập vào đó và có quyền đó. Không có chốt này thì HR tự phong mình làm Giám đốc.
@@ -74,13 +81,22 @@ export async function PUT(req) {
     if (fields.accessUntil !== undefined) data.accessUntil = fields.accessUntil || null;
     if (fields.hourlyRate !== undefined) data.hourlyRate = +fields.hourlyRate || 0;
   }
+  // v3.16: tên rỗng là hỏng bản ghi — POST đã chặn từ đầu nhưng PUT thì không, nên xóa trắng
+  // ô tên rồi lưu là tài khoản mất tên vĩnh viễn (đã xảy ra thật trên Egoric).
+  if (fields.name !== undefined && !String(fields.name).trim()) {
+    return NextResponse.json({ error: 'Tên không được để trống' }, { status: 400 });
+  }
   const profileKeys = isDirector(user) || isHR ? ['name', 'title', 'phone', 'birthday', 'status'] : ['name', 'phone', 'birthday'];
   profileKeys.forEach(k => { if (fields[k] !== undefined) data[k] = fields[k]; });
   if ((isDirector(user) || isHR) && fields.salary !== undefined) data.salary = +fields.salary || 0;
   if ((isDirector(user) || isHR) && fields.teamId !== undefined) data.teamId = fields.teamId || null;
   if (isDirector(user) && fields.roles !== undefined) {
     const r = cleanRoles(fields.roles);
-    if (r) { data.roles = JSON.stringify(r); data.role = r[0]; }
+    // v3.16: bỏ tick hết vai trò → BÁO LỖI, không âm thầm hạ xuống Nhân viên như trước
+    if (!r || !r.length) {
+      return NextResponse.json({ error: 'Phải chọn ít nhất một vai trò' }, { status: 400 });
+    }
+    data.roles = JSON.stringify(r); data.role = r[0];
   }
   // v3.2: Giám đốc reset 2FA khi nhân sự mất điện thoại
   if (isDirector(user) && fields.reset2fa) data.totpSecret = null;

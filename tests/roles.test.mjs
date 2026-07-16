@@ -40,6 +40,36 @@ test('Kế toán làm được việc của Kế toán', () => {
   }
 });
 
+// v3.16: LEAD = trưởng nhóm marketing ≈ product lead (sản phẩm của agency là dịch vụ marketing).
+// Leoz báo "quyền của lead có vẻ không đủ" — đúng: LEAD chỉ đọc được dự án, không đặt được mốc,
+// và không thấy báo giá nên không biết đã bán scope gì mà vẫn phải giao đúng.
+test('LEAD chạy được mảng giao hàng (ngang PM)', () => {
+  for (const r of ['projects', 'milestones', 'tasks', 'phases', 'vendors', 'vendorbills', 'rfqs',
+    'projectmembers', 'projecttemplates', 'payouts']) {
+    assert.equal(canWrite(r, LEAD), true, `LEAD phải ghi được ${r}`);
+  }
+  for (const r of ['quotes', 'contracts', 'contacts', 'clients']) {
+    assert.equal(canRead(r, LEAD), true, `LEAD phải đọc được ${r} để biết đã bán/cam kết gì`);
+  }
+});
+
+test('LEAD vẫn KHÔNG đụng được sổ tiền công ty', () => {
+  // Ranh giới cố ý: LEAD lo giao hàng, Kế toán lo sổ. LEAD xem được biên lợi nhuận DỰ ÁN
+  // qua /api/projects/stats, nhưng không phải sổ quỹ công ty.
+  for (const r of ['invoices', 'transactions', 'budgets', 'commissions']) {
+    assert.equal(canWrite(r, LEAD), false, `LEAD KHÔNG được ghi ${r}`);
+  }
+  assert.equal(canWrite('candidates', LEAD), false, 'tuyển dụng là việc của HR');
+  assert.equal(canRead('audit', LEAD), false);
+});
+
+test('LEAD trả được freelancer thì phải thấy được sổ nhà cung cấp', () => {
+  // Trước v3.16 mâu thuẫn: payouts RW nhưng vendors không đọc nổi — tiêu tiền được mà không thấy sổ.
+  assert.equal(canWrite('payouts', LEAD), true);
+  assert.equal(canRead('vendors', LEAD), true);
+  assert.equal(canRead('vendorbills', LEAD), true);
+});
+
 test('Nhân viên làm được việc của mình (phạm vi do scope/canWriteRow chặn)', () => {
   for (const r of ['tasks', 'timelogs', 'leaves', 'attendance', 'taskcomments']) {
     assert.equal(canWrite(r, NV), true, `Nhân viên phải ghi được ${r} (của mình)`);
