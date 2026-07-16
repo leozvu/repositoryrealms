@@ -2,15 +2,15 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, ConfirmDialog, EmptyState, Badge, Forbidden, useToast } from '@/components/ui';
-import DocEditor, { printDoc, nextCode } from '@/components/DocEditor';
+import DocEditor, { printDoc } from '@/components/DocEditor';
 import { SendEmailModal } from '@/components/SendEmail';
-import { money, fmtDate, todayISO, daysFromNow, docGrand } from '@/lib/format';
+import { money, fmtDate, docGrand } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
 export default function QuotesPage() {
   const { data: session } = useSession();
   const canW = hasAny(session?.user, ['AM']);
-  const { rows, forbidden, create, update, remove } = useResource('quotes');
+  const { rows, forbidden, create, update, remove, refresh } = useResource('quotes');
   const invoices = useResource('invoices');
   const projects = useResource('projects');
   const clients = useResource('clients');
@@ -24,29 +24,31 @@ export default function QuotesPage() {
   const projName = id => projects.rows.find(p => p.id === id)?.name || '—';
   const filtered = rows.filter(v => f === 'all' || v.status === f);
 
-  // v3.13: hóa đơn tự gắn dự án đã sinh ra từ chính báo giá này. Trước đây luôn để
-  // projectId: null nên doanh thu không về dự án nào — báo cáo lãi/lỗ theo dự án
-  // (lọc theo Transaction.projectId) thiếu hẳn phần doanh thu, chỉ còn chi phí.
-  const toInvoice = async q => {
-    const r = await invoices.create({
-      code: nextCode('INV', invoices.rows), clientId: q.clientId, projectId: q.projectId || null,
-      items: q.items, vat: q.vat, status: 'draft', date: todayISO(), dueDate: daysFromNow(15),
-      payments: '[]', recurring: false,
+  // v3.15: đi qua /api/quotes/[id]/convert thay vì CRUD chung.
+  // Bản cũ gọi invoices.create()/projects.create() → /api/data/*, mà invoices.write=['ACCOUNTANT']
+  // và projects.write=['PM'] → AM bấm là 403. Hai nút này sinh ra CHO AM (người chốt deal)
+  // nhưng chỉ Giám đốc dùng được, và lỗi im lặng nên không ai báo.
+  // Không mở quyền ghi hóa đơn/dự án cho AM (sẽ thành tự xuất hóa đơn không qua Kế toán,
+  // tự mở dự án không qua PM) — chỉ mở đúng hành động "chuyển từ báo giá".
+  const convert = async (q, to) => {
+    const res = await fetch(`/api/quotes/${q.id}/convert`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to }),
     });
-    if (r) toast(q.projectId
-      ? `Đã tạo hóa đơn từ ${q.code}, gắn vào dự án "${projName(q.projectId)}"`
-      : `Đã tạo hóa đơn từ báo giá ${q.code} — chưa gắn dự án nào (tạo dự án từ báo giá này trước nếu muốn theo dõi lãi/lỗ theo dự án)`);
+    const j = await res.json().catch(() => ({}));
     setModal(null);
+    if (!res.ok) return toast(j.error || 'Có lỗi', 'error');
+    await Promise.all([invoices.refresh(), projects.refresh(), refresh()]);
+    return j;
+  };
+  const toInvoice = async q => {
+    const j = await convert(q, 'invoice');
+    if (j?.code) toast(j.projectId
+      ? `Đã tạo hóa đơn ${j.code} từ ${q.code}, gắn vào dự án "${projName(j.projectId)}"`
+      : `Đã tạo hóa đơn ${j.code} từ báo giá ${q.code} — chưa gắn dự án nào (tạo dự án từ báo giá này trước nếu muốn theo dõi lãi/lỗ theo dự án)`);
   };
   const toProject = async q => {
-    const r = await projects.create({
-      name: 'Dự án từ ' + q.code, clientId: q.clientId, service: 'Khác',
-      budget: docGrand(q), status: 'planning', startDate: todayISO(), deadline: daysFromNow(30), progress: 0,
-    });
-    // v3.13: ghi ngược lại vào báo giá để hóa đơn sau đó biết đường gắn
-    if (r?.id) await update(q.id, { projectId: r.id });
-    if (r) toast('Đã tạo dự án — hãy sửa tên và deadline cho đúng. Hóa đơn xuất từ báo giá này sẽ tự gắn vào dự án đó.');
-    setModal(null);
+    const j = await convert(q, 'project');
+    if (j?.id) toast('Đã tạo dự án — hãy sửa tên và deadline cho đúng. Hóa đơn xuất từ báo giá này sẽ tự gắn vào dự án đó.');
   };
 
   return (

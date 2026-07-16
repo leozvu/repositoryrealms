@@ -10,14 +10,19 @@ const cleanRoles = roles => {
   return r.length ? r : ['STAFF'];
 };
 
-// Tạo tài khoản — DIRECTOR tạo nhân viên; HR/PM tạo được FREELANCER (v3.11)
+// Tạo tài khoản — DIRECTOR + HR tạo nhân viên; HR/PM/LEAD tạo được FREELANCER (v3.11)
+//
+// v3.15: HR TẠO ĐƯỢC NHÂN VIÊN. Trước đây chỉ Giám đốc tạo được, HR chỉ tạo được freelancer
+// — mà tuyển người xong mở tài khoản chính là việc lõi của HR, nên HR đứng hình phải đi nhờ
+// Giám đốc từng người một. Giao diện cũng chỉ hiện nút "Tạo tài khoản" cho Giám đốc, nên lỗi
+// này im lặng: HR không thấy nút, không biết là mình đáng lẽ phải làm được.
 export async function POST(req) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const body = await req.json();
   const { email, name, password, roles, title, phone, birthday, salary, teamId } = body;
   const isFL = body.userType === 'freelancer';
-  const canCreate = isDirector(user) || (isFL && hasAny(user, ['HR', 'PM', 'LEAD']));
+  const canCreate = isFL ? hasAny(user, ['HR', 'PM', 'LEAD']) : hasAny(user, ['HR']); // hasAny luôn cho Giám đốc qua
   if (!canCreate) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   if (!email || !name || !password) return NextResponse.json({ error: 'Thiếu email / tên / mật khẩu' }, { status: 400 });
   if (password.length < 6) return NextResponse.json({ error: 'Mật khẩu tối thiểu 6 ký tự' }, { status: 400 });
@@ -25,6 +30,12 @@ export async function POST(req) {
   if (exists) return NextResponse.json({ error: 'Email đã tồn tại' }, { status: 400 });
   // Freelancer luôn là vai trò FREELANCER (không được cấp quyền nhân viên)
   const finalRoles = isFL ? ['FREELANCER'] : (cleanRoles(roles) || ['STAFF']);
+  // v3.15: CHẶN LEO THANG — chỉ Giám đốc mới cấp được vai trò Giám đốc.
+  // Người tạo tài khoản là người đặt mật khẩu đầu tiên, nên tạo được tài khoản vai trò gì
+  // là tự đăng nhập vào đó và có quyền đó. Không có chốt này thì HR tự phong mình làm Giám đốc.
+  if (!isDirector(user) && finalRoles.includes('DIRECTOR')) {
+    return NextResponse.json({ error: 'Chỉ Giám đốc mới cấp được vai trò Giám đốc' }, { status: 403 });
+  }
   const row = await prisma.user.create({
     data: {
       email: email.toLowerCase().trim(), name,

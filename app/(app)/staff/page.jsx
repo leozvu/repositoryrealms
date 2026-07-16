@@ -7,7 +7,9 @@ import { money, fmtDate, todayISO, initials } from '@/lib/format';
 import { ROLES, ROLE_LABEL, rolesOf, hasAny, isDirector } from '@/lib/perm';
 
 /* ---------- Modal tài khoản: đa vai trò (checkbox) + nhóm ---------- */
-function UserModal({ row, teams, canRoles, onSave, onClose }) {
+// v3.15: canPickRoles = có hiện ô chọn vai trò không · roleOptions = những vai trò người
+// đang thao tác được phép cấp (HR không có Giám đốc trong danh sách).
+function UserModal({ row, teams, canRoles, canPickRoles, roleOptions, onSave, onClose }) {
   const RL = useRoleLabels();
   const [f, setF] = useState(() => row
     ? { name: row.name, title: row.title || '', phone: row.phone || '', birthday: row.birthday || '', salary: row.salary || 0, teamId: row.teamId || '', status: row.status, roles: rolesOf(row), password: '', reset2fa: false }
@@ -33,17 +35,18 @@ function UserModal({ row, teams, canRoles, onSave, onClose }) {
         {row && <div className="field"><label>Trạng thái</label>
           <select value={f.status} onChange={e => set('status', e.target.value)}>
             <option value="active">Đang làm việc</option><option value="inactive">Đã nghỉ (khóa đăng nhập)</option></select></div>}
-        {canRoles && (
+        {canPickRoles && (
           <div className="field full"><label>Vai trò (chọn nhiều — cộng quyền)</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
-              {ROLES.map(r => (
+              {roleOptions.map(r => (
                 <label key={r} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.83rem', cursor: 'pointer', padding: '7px 12px', border: '1px solid var(--border)', borderRadius: 8, background: f.roles.includes(r) ? 'var(--info-soft)' : 'var(--card)' }}>
                   <input type="checkbox" style={{ width: 'auto' }} checked={f.roles.includes(r)} onChange={() => toggleRole(r)} />
                   {RL[r] || ROLE_LABEL[r]}
                 </label>
               ))}
             </div>
-            <div className="hint">Giám đốc = toàn quyền · Trưởng nhóm cần được gán làm lead của một nhóm bên dưới</div>
+            <div className="hint">Giám đốc = toàn quyền · Trưởng nhóm cần được gán làm lead của một nhóm bên dưới
+              {!canRoles && ' · Chỉ Giám đốc mới cấp được vai trò Giám đốc, và chỉ Giám đốc đổi được vai trò sau khi tài khoản đã tạo.'}</div>
           </div>
         )}
         {row && canRoles && (
@@ -66,6 +69,11 @@ export default function StaffPage() {
   const canRoles = isDirector(me);
   const canHR = hasAny(me, ['HR']);
   const canSalary = hasAny(me, ['HR', 'ACCOUNTANT']);
+  // v3.15: HR mở được tài khoản nhân viên (việc lõi của HR). Trước đây chỉ Giám đốc thấy nút
+  // "Tạo tài khoản" nên HR phải nhờ Giám đốc từng người — mà cũng chẳng ai biết là thiếu.
+  const canCreateUser = canRoles || canHR;
+  // HR cấp được mọi vai trò TRỪ Giám đốc (server chặn lần nữa — đây chỉ là để không mời mọc).
+  const grantable = canRoles ? ROLES : ROLES.filter(r => r !== 'DIRECTOR');
   const users = useResource('users');
   const leaves = useResource('leaves');
   const teams = useResource('teams');
@@ -123,7 +131,7 @@ export default function StaffPage() {
           {canSalary && <> · Quỹ lương: <b style={{ color: 'var(--fg)' }}>{money(users.rows.filter(u => u.status === 'active').reduce((s, u) => s + (u.salary || 0), 0))}</b></>}
         </span>
         <div className="spacer"></div>
-        {canRoles && <button className="btn btn-primary" onClick={() => setModal({ mode: 'user', row: null })}><Icon name="plus" size={16} /><span>Tạo tài khoản</span></button>}
+        {canCreateUser && <button className="btn btn-primary" onClick={() => setModal({ mode: 'user', row: null })}><Icon name="plus" size={16} /><span>Tạo tài khoản</span></button>}
       </div>
       <div className="table-wrap">
         <table>
@@ -202,7 +210,12 @@ export default function StaffPage() {
         </div>
       </div>
 
-      {modal?.mode === 'user' && <UserModal row={modal.row} teams={teams.rows} canRoles={canRoles} onSave={saveUser} onClose={() => setModal(null)} />}
+      {/* v3.15: tạo mới → GĐ và HR đều chọn được vai trò (HR không có Giám đốc trong danh sách).
+          Sửa người có sẵn → chỉ Giám đốc, vì API cố tình không cho HR đổi vai trò; hiện ô ra
+          mà server lặng lẽ bỏ qua thì còn khó hiểu hơn là không hiện. */}
+      {modal?.mode === 'user' && <UserModal row={modal.row} teams={teams.rows}
+        canRoles={canRoles} canPickRoles={modal.row ? canRoles : canCreateUser} roleOptions={grantable}
+        onSave={saveUser} onClose={() => setModal(null)} />}
       {modal?.mode === 'leave' && <FormModal title={`Đơn nghỉ phép — bạn còn ${myRemaining}/${leaveQuota} ngày phép năm`} fields={LEAVE_FIELDS} data={{ from: todayISO(), to: todayISO(), type: 'annual' }}
         onClose={() => setModal(null)} onSave={async d => {
           const days = Math.round((new Date(d.to) - new Date(d.from)) / 86400000) + 1;
