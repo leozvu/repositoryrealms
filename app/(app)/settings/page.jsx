@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Icon, Forbidden, useToast, useResource, Modal, useRoleLabels } from '@/components/ui';
 import { ROLES, ROLE_LABEL } from '@/lib/perm';
+import { MODULE_GROUPS, MODULE_PRESETS } from '@/lib/modules';
 
 /* ---------- v3.3: API key + Webhook (chỉ Giám đốc) ---------- */
 function ApiSection() {
@@ -173,6 +174,45 @@ export default function SettingsPage() {
               </div>
               <div className="hint">VD: công ty thương mại điện tử đổi "Quản lý dự án" → "Trưởng phòng Vận hành", "Account/Sales" → "Kinh doanh"</div>
             </div>
+
+            {/* v3.17: bật/tắt phân hệ theo loại hình công ty */}
+            <div className="field full" style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+              <label style={{ fontWeight: 700 }}>Phân hệ sử dụng</label>
+              <div className="hint" style={{ marginBottom: 8 }}>
+                Tắt phân hệ không dùng để menu gọn lại. Phân hệ lõi (Bảng điều khiển, Khách hàng, Hóa đơn, Thu/Chi, Nhân sự, Cài đặt…) luôn bật.
+                {!Array.isArray(s.modules) && <b style={{ color: 'var(--warn, #D97706)' }}> Đang bật tất cả (mặc định) — tick chọn để tùy chỉnh.</b>}
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+                {Object.entries(MODULE_PRESETS).map(([k, p]) => (
+                  <button key={k} type="button" className="btn btn-outline btn-sm"
+                    onClick={() => setS({ ...s, modules: [...p.mods] })}>Mẫu: {p.label}</button>
+                ))}
+                <button type="button" className="btn btn-outline btn-sm"
+                  onClick={() => setS({ ...s, modules: MODULE_GROUPS.filter(g => !g.soon).map(g => g.mod) })}>Bật tất cả</button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 8 }}>
+                {MODULE_GROUPS.map(g => {
+                  // null modules = công ty cũ đang bật hết → tick sẵn để không "mất" phân hệ khi lưu
+                  const cur = Array.isArray(s.modules) ? s.modules : MODULE_GROUPS.filter(x => !x.soon).map(x => x.mod);
+                  const on = cur.includes(g.mod);
+                  return (
+                    <label key={g.mod} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '9px 11px', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', background: on ? 'var(--info-soft)' : 'var(--card)', opacity: g.soon ? 0.6 : 1 }}>
+                      <input type="checkbox" style={{ width: 'auto', marginTop: 2 }} checked={on}
+                        onChange={e => {
+                          const set = new Set(cur);
+                          e.target.checked ? set.add(g.mod) : set.delete(g.mod);
+                          setS({ ...s, modules: [...set] });
+                        }} />
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '.85rem' }}>{g.label}{g.soon && <span className="badge b-gray" style={{ marginLeft: 6 }}>sắp có</span>}</div>
+                        <div style={{ fontSize: '.75rem', color: 'var(--muted)' }}>{g.desc}</div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="field full" style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
               <label style={{ fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icon name="mail" size={15} /> Email công ty (SMTP) — gửi báo giá/hóa đơn cho khách (v3.9)</label>
             </div>

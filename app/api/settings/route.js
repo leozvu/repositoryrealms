@@ -15,6 +15,9 @@ const DEFAULTS = {
   workStart: '09:00', workEnd: '18:00', otMultiplier: 1.5, // v3.11: ca làm chuẩn + hệ số OT
   // v3.9: SMTP gửi email báo giá/hóa đơn (mỗi công ty một hộp thư riêng)
   smtpHost: '', smtpPort: 465, smtpUser: '', smtpPass: '', smtpFrom: '',
+  // v3.17: phân hệ bật/tắt theo công ty. null = chưa cấu hình → client hiểu là BẬT HẾT
+  // (giữ nguyên hành vi 3 công ty cũ). Mảng = danh sách phân hệ đang bật.
+  modules: null,
 };
 
 // Các trường bí mật — chỉ Giám đốc đọc được (trang Cài đặt); route server đọc thẳng DB

@@ -7,6 +7,7 @@ import { SessionProvider, signOut } from 'next-auth/react';
 import { Icon, Modal, ToastProvider, useToast, RoleLabelsCtx } from './ui';
 import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
+import { modOn } from '@/lib/modules';
 
 /* v3.14: TỰ GẮN NHÃN CỘT CHO BẢNG.
    Toàn app có 19 trang bảng, mỗi bảng viết tay riêng. Trên điện thoại, bảng 8 cột buộc phải
@@ -212,37 +213,37 @@ const NAV = [
   { key: 'approvals', label: 'Phê duyệt', icon: 'check', roles: ALL, badge: true },
   { key: 'copilot', label: 'AI Copilot', icon: 'search', roles: ALL },
   { section: 'CRM — Bán hàng' },
-  { key: 'leads', label: 'Khách tiềm năng', icon: 'leads', roles: ['AM'] },
+  { key: 'leads', label: 'Khách tiềm năng', icon: 'leads', roles: ['AM'], mod: 'sales' },
   { key: 'clients', label: 'Khách hàng', icon: 'clients', roles: ALL },
-  { key: 'quotes', label: 'Báo giá', icon: 'quotes', roles: ['AM', 'PM', 'ACCOUNTANT'] },
-  { key: 'services', label: 'Bảng giá dịch vụ', icon: 'tag', roles: ALL },
-  { key: 'tickets', label: 'Ticket hỗ trợ', icon: 'check', roles: ALL },
+  { key: 'quotes', label: 'Báo giá', icon: 'quotes', roles: ['AM', 'PM', 'ACCOUNTANT'], mod: 'sales' },
+  { key: 'services', label: 'Bảng giá dịch vụ', icon: 'tag', roles: ALL, mod: 'sales' },
+  { key: 'tickets', label: 'Ticket hỗ trợ', icon: 'check', roles: ALL, mod: 'support' },
   { section: 'Vận hành' },
-  { key: 'portfolio', label: 'Sở chỉ huy DA', icon: 'reports', roles: ['PM', 'LEAD', 'ACCOUNTANT'] },
-  { key: 'projects', label: 'Dự án', icon: 'projects', roles: ALL },
-  { key: 'tasks', label: 'Công việc', icon: 'tasks', roles: ALL },
-  { key: 'timesheet', label: 'Chấm công giờ', icon: 'clock', roles: ALL },
-  { key: 'gantt', label: 'Gantt tiến độ', icon: 'reports', roles: ALL },
-  { key: 'templates', label: 'Mẫu dự án', icon: 'projects', roles: ['PM', 'LEAD'] },
-  { key: 'resources', label: 'Nguồn lực', icon: 'staff', roles: ['PM', 'HR', 'LEAD'] },
+  { key: 'portfolio', label: 'Sở chỉ huy DA', icon: 'reports', roles: ['PM', 'LEAD', 'ACCOUNTANT'], mod: 'delivery' },
+  { key: 'projects', label: 'Dự án', icon: 'projects', roles: ALL, mod: 'delivery' },
+  { key: 'tasks', label: 'Công việc', icon: 'tasks', roles: ALL, mod: 'delivery' },
+  { key: 'timesheet', label: 'Chấm công giờ', icon: 'clock', roles: ALL, mod: 'delivery' },
+  { key: 'gantt', label: 'Gantt tiến độ', icon: 'reports', roles: ALL, mod: 'delivery' },
+  { key: 'templates', label: 'Mẫu dự án', icon: 'projects', roles: ['PM', 'LEAD'], mod: 'delivery' },
+  { key: 'resources', label: 'Nguồn lực', icon: 'staff', roles: ['PM', 'HR', 'LEAD'], mod: 'delivery' },
   { section: 'Tài chính' },
   { key: 'invoices', label: 'Hóa đơn', icon: 'invoices', roles: ['ACCOUNTANT', 'AM'] },
-  { key: 'commissions', label: 'Hoa hồng Sales', icon: 'percent', roles: ['ACCOUNTANT', 'AM', 'PM'] },
+  { key: 'commissions', label: 'Hoa hồng Sales', icon: 'percent', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'commissions' },
   { key: 'finance', label: 'Thu / Chi', icon: 'finance', roles: ['ACCOUNTANT'] },
   { key: 'finplan', label: 'Công nợ & Dự báo', icon: 'trendUp', roles: ['ACCOUNTANT'] },
-  { key: 'vendors', label: 'Mua hàng / NCC', icon: 'wallet', roles: ['ACCOUNTANT', 'PM'] },
-  { key: 'contracts', label: 'Hợp đồng', icon: 'shield', roles: ['ACCOUNTANT', 'AM', 'PM'] },
+  { key: 'vendors', label: 'Mua hàng / NCC', icon: 'wallet', roles: ['ACCOUNTANT', 'PM'], mod: 'procurement' },
+  { key: 'contracts', label: 'Hợp đồng', icon: 'shield', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'procurement' },
   { section: 'Nhân sự' },
   { key: 'staff', label: 'Hồ sơ & nhóm', icon: 'staff', roles: ALL },
   { key: 'attendance', label: 'Chấm công ngày', icon: 'calendar', roles: ALL },
   { key: 'payroll', label: 'Bảng lương', icon: 'wallet', roles: ALL },
-  { key: 'recruitment', label: 'Tuyển dụng', icon: 'leads', roles: ['HR'] },
-  { key: 'reviews', label: 'Đánh giá hiệu suất', icon: 'trendUp', roles: ALL },
-  { key: 'freelancers', label: 'Freelancer', icon: 'clients', roles: ['HR', 'PM', 'LEAD'] },
+  { key: 'recruitment', label: 'Tuyển dụng', icon: 'leads', roles: ['HR'], mod: 'recruitment' },
+  { key: 'reviews', label: 'Đánh giá hiệu suất', icon: 'trendUp', roles: ALL, mod: 'reviews' },
+  { key: 'freelancers', label: 'Freelancer', icon: 'clients', roles: ['HR', 'PM', 'LEAD'], mod: 'freelancers' },
   { section: 'Công ty' },
   { key: 'assets', label: 'Tài sản', icon: 'projects', roles: ALL },
   { key: 'reports', label: 'Báo cáo', icon: 'reports', roles: ['ACCOUNTANT', 'PM'] },
-  { key: 'analytics', label: 'Analytics (MRR/LTV)', icon: 'trendUp', roles: ['ACCOUNTANT', 'AM', 'PM'] },
+  { key: 'analytics', label: 'Analytics (MRR/LTV)', icon: 'trendUp', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'analytics' },
   { key: 'okr', label: 'KPI / OKR', icon: 'tasks', roles: ALL },
   { key: 'automation', label: 'Tự động hóa', icon: 'repeat', roles: [] }, // chỉ DIRECTOR
   { key: 'audit', label: 'Nhật ký hệ thống', icon: 'search', roles: [] }, // chỉ DIRECTOR
@@ -258,12 +259,14 @@ export default function Shell({ user, company, children }) {
   const [showNotif, setShowNotif] = useState(false);
   const [unreadNotif, setUnreadNotif] = useState(0);
   const [roleLabels, setRoleLabels] = useState(ROLE_LABEL);
-  useEffect(() => { // v3.6: chức danh tùy biến theo công ty
+  const [modules, setModules] = useState(null); // v3.17: null = chưa tải/công ty cũ → bật hết
+  useEffect(() => { // v3.6: chức danh tùy biến theo công ty · v3.17: phân hệ bật/tắt
     fetch('/api/settings').then(r => r.ok ? r.json() : null)
       .then(d => {
         if (!d) return;
         const overrides = Object.fromEntries(Object.entries(d.roleLabels || {}).filter(([, v]) => v && String(v).trim()));
         setRoleLabels({ ...ROLE_LABEL, ...overrides });
+        if (Array.isArray(d.modules)) setModules(d.modules);
       }).catch(() => {});
   }, []);
   const pathname = usePathname();
@@ -272,11 +275,20 @@ export default function Shell({ user, company, children }) {
   const isFL = user?.userType === 'freelancer';
   // v3.11: freelancer chỉ được ở /freelancer — chuyển hướng nếu lạc sang trang nhân viên
   useEffect(() => { if (isFL && pathname !== '/freelancer') router.replace('/freelancer'); }, [isFL, pathname, router]);
+  // v3.17: vào thẳng URL trang có phân hệ đang TẮT → đưa về Dashboard. Chỉ chạy khi đã tải
+  // được modules (tránh redirect nhầm lúc chưa biết công ty bật gì).
+  useEffect(() => {
+    if (isFL || !Array.isArray(modules)) return;
+    const cur = NAV.find(n => n.key && pathname.startsWith('/' + n.key));
+    if (cur && cur.mod && !modOn(cur.mod, modules)) router.replace('/dashboard');
+  }, [pathname, modules, isFL, router]);
   const NAV_FL = [{ key: 'freelancer', label: 'Công việc của tôi', icon: 'tasks', roles: ['FREELANCER'] }];
   const navList = isFL ? NAV_FL : NAV;
   const current = navList.find(n => n.key && pathname.startsWith('/' + n.key));
   const myRoles = rolesOf(user);
-  const visible = item => isFL ? true : hasAny(user, item.roles);
+  // v3.17: mục menu hiện khi (đúng vai trò) VÀ (phân hệ của nó đang bật). Mục lõi (không mod)
+  // luôn qua modOn. Freelancer đi lối riêng.
+  const visible = item => isFL ? true : (hasAny(user, item.roles) && modOn(item.mod, modules));
 
   useEffect(() => {
     const load = () => {
@@ -312,7 +324,7 @@ export default function Shell({ user, company, children }) {
             <div className="brand-logo">{(company || 'A')[0].toUpperCase()}</div>
             <div className="brand-text">
               <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">ERP v3.16 · 7 vai trò</span>
+              <span className="brand-sub">ERP v3.17 · 7 vai trò</span>
             </div>
           </div>
           <nav id="nav">
