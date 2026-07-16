@@ -5,6 +5,7 @@ import { RESOURCES, canWrite, canDelete } from '@/lib/registry';
 import { isDirector, isFreelancer } from '@/lib/perm';
 import { interceptWrite } from '@/lib/approvals';
 import { emitEvent } from '@/lib/events';
+import { resourceEnabled } from '@/lib/module-guard';
 
 async function audit(user, action, entity, refId, detail) {
   await prisma.auditLog.create({
@@ -18,6 +19,7 @@ export async function PUT(req, { params }) {
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
   if (cfg.canWriteRow && !cfg.canWriteRow(row, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
@@ -49,6 +51,7 @@ export async function DELETE(req, { params }) {
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canDelete(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
   // v3.7: xóa cũng phải qua kiểm tra hàng (VD bình luận chỉ chủ nhân xóa; GĐ luôn được)

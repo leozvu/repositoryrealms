@@ -18,10 +18,20 @@ export default function ShipmentsPage() {
   const docs = useResource('shipmentdocs');
   const clients = useResource('clients');
   const areas = useResource('growingareas');
+  const codes = useResource('areacodes');
   const [modal, setModal] = useState(null);
   const [detail, setDetail] = useState(null);
   const toast = useToast();
   if (ships.forbidden) return <Forbidden />;
+
+  // v3.21: mã vùng trồng đang bị đình chỉ/thu hồi cho một thị trường → cảnh báo khi lập lô.
+  const codeSuspendedFor = (areaId, market) => codes.rows.some(c => c.areaId === areaId && c.market === market && c.status !== 'active');
+
+  const payShipment = async s => {
+    const r = await fetch(`/api/shipments/${s.id}/pay`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); return toast(j.error || 'Lỗi', 'error'); }
+    await ships.refresh(); toast('Đã ghi nhận thanh toán + phiếu thu vào sổ quỹ');
+  };
 
   const nextCode = () => {
     const y = new Date().getFullYear();
@@ -40,6 +50,10 @@ export default function ShipmentsPage() {
       return false;
     }
     const present = d.paymentMethod === 'LC' ? presentationDeadline(d.etd, d.lcExpiry) : null;
+    // v3.21: nhắc (không chặn) nếu vùng trồng/cơ sở chọn đang có mã bị đình chỉ cho thị trường này
+    if ((d.growingAreaId && codeSuspendedFor(d.growingAreaId, d.market)) || (d.packingHouseId && codeSuspendedFor(d.packingHouseId, d.market))) {
+      toast(`⚠ Vùng trồng/cơ sở chọn đang có mã bị ĐÌNH CHỈ cho ${MARKETS[d.market] || d.market} — kiểm tra lại trước khi xuất.`, 'error');
+    }
     const row = modal.row;
     const payload = { ...d, presentDeadline: present };
     if (row) { await ships.update(row.id, payload); toast('Đã lưu lô hàng'); }
@@ -118,6 +132,8 @@ export default function ShipmentsPage() {
                     <td style={{ color: ds.length && done === ds.length ? 'var(--accent)' : 'var(--muted)' }}>{done}/{ds.length}</td>
                     <td><span className={`badge ${stColor(s.status)}`}><span className="dot"></span>{st(s.status)}</span></td>
                     <td onClick={e => e.stopPropagation()}><div className="row-actions">
+                      {s.status !== 'paid' && <button className="icon-btn" style={{ color: 'var(--accent)' }} title="Ghi nhận thanh toán → phiếu thu"
+                        onClick={() => setModal({ pay: s })}><Icon name="wallet" size={15} /></button>}
                       <button className="icon-btn" onClick={() => setModal({ row: s })} aria-label="Sửa"><Icon name="edit" size={15} /></button>
                       <button className="icon-btn danger" onClick={() => setModal({ del: s })} aria-label="Xóa"><Icon name="trash" size={15} /></button>
                     </div></td>
@@ -136,6 +152,9 @@ export default function ShipmentsPage() {
           for (const d of docsOf(modal.del.id)) await docs.remove(d.id);
           await ships.remove(modal.del.id); toast('Đã xóa lô hàng');
         }} />}
+      {modal?.pay && <ConfirmDialog yesLabel="Ghi nhận thu"
+        msg={`Ghi nhận thanh toán lô ${modal.pay.code} — ${moneyC(modal.pay.amount, modal.pay.currency)}? Hệ thống tạo phiếu thu (quy về VNĐ theo tỷ giá) vào sổ quỹ và đánh dấu lô "Đã thanh toán".`}
+        onClose={() => setModal(null)} onYes={() => payShipment(modal.pay)} />}
 
       {detail && <ShipmentDetail s={detail} docs={docsOf(detail.id)} area={areas.rows} onToggle={toggleDoc} onClose={() => setDetail(null)} />}
     </>

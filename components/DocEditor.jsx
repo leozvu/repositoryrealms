@@ -2,7 +2,7 @@
 // Trình soạn báo giá / hóa đơn dùng chung: items động, VAT, chọn nhanh từ bảng giá
 import { useState } from 'react';
 import { Modal, Icon, useToast } from './ui';
-import { money, todayISO, daysFromNow, parseItems, nextCode } from '@/lib/format';
+import { money, moneyC, todayISO, daysFromNow, parseItems, nextCode } from '@/lib/format';
 
 // v3.13: nextCode dọn về lib/format để server (API xuất hóa đơn từ giờ công) dùng chung
 // một logic. Re-export để các trang đang import từ DocEditor không phải sửa.
@@ -37,6 +37,8 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
       code: d.code, clientId: d.clientId,
       items: JSON.stringify(items.map(it => ({ desc: it.desc, qty: +it.qty || 0, price: +it.price || 0 }))),
       vat: +d.vat || 0, status: d.status, date: d.date,
+      // v3.18/3.21: đa tiền tệ — mặc định VNĐ. Fretas xuất hóa đơn USD/CNY thì đổi ở đây.
+      currency: d.currency || 'VND', fxRate: d.currency && d.currency !== 'VND' ? (+d.fxRate || 1) : 1,
     };
     if (isInv) {
       out.projectId = d.projectId || null; out.dueDate = d.dueDate; out.recurring = !!d.recurring;
@@ -65,6 +67,12 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
             <option value="">— Không thuộc dự án —</option>
             {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></div>}
         <div className="field"><label>Ngày lập</label><input type="date" value={d.date} onChange={e => setD({ ...d, date: e.target.value })} /></div>
+        {/* v3.21: đa tiền tệ — mặc định VNĐ, chọn ngoại tệ khi cần (hóa đơn XNK). */}
+        <div className="field"><label>Đồng tiền</label>
+          <select value={d.currency || 'VND'} onChange={e => setD({ ...d, currency: e.target.value })}>
+            {['VND', 'USD', 'CNY', 'EUR'].map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+        {d.currency && d.currency !== 'VND' && <div className="field"><label>Tỷ giá → VND</label>
+          <input type="number" value={d.fxRate || ''} onChange={e => setD({ ...d, fxRate: e.target.value })} placeholder="VD: 25400" /></div>}
         {isInv && <div className="field"><label>Hạn thanh toán</label><input type="date" value={d.dueDate || ''} onChange={e => setD({ ...d, dueDate: e.target.value })} /></div>}
         <div className="field"><label>Trạng thái</label>
           <select value={d.status} onChange={e => setD({ ...d, status: e.target.value })}>
@@ -104,9 +112,11 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
         )}
       </div>
       <div className="totals">
-        <div className="trow"><span>Tạm tính</span><b>{money(sub)}</b></div>
-        <div className="trow"><span>VAT ({+d.vat || 0}%)</span><b>{money(sub * (+d.vat || 0) / 100)}</b></div>
-        <div className="trow grand"><span>Tổng cộng</span><span>{money(sub * (1 + (+d.vat || 0) / 100))}</span></div>
+        <div className="trow"><span>Tạm tính</span><b>{moneyC(sub, d.currency)}</b></div>
+        <div className="trow"><span>VAT ({+d.vat || 0}%)</span><b>{moneyC(sub * (+d.vat || 0) / 100, d.currency)}</b></div>
+        <div className="trow grand"><span>Tổng cộng</span><span>{moneyC(sub * (1 + (+d.vat || 0) / 100), d.currency)}</span></div>
+        {d.currency && d.currency !== 'VND' && +d.fxRate > 0 &&
+          <div className="trow" style={{ fontSize: '.8rem', color: 'var(--muted)' }}><span>Quy đổi VNĐ (×{d.fxRate})</span><b>{money(sub * (1 + (+d.vat || 0) / 100) * (+d.fxRate || 1))}</b></div>}
       </div>
     </Modal>
   );

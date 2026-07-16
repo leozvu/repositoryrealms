@@ -75,3 +75,27 @@ test('plus180: cộng đúng 180 ngày', () => {
   assert.equal(plus180('2026-01-01'), '2026-06-30');
   assert.equal(plus180(null), null);
 });
+
+/* ===== v3.21: guard module + validate server ===== */
+import { resourceMod, modOn as modOn2 } from '../lib/modules.js';
+test('guard module: resource phân hệ tắt bị chặn, lõi không bị', () => {
+  // export tắt → shipments/growingareas chặn
+  const off = ['sales']; // chỉ bật sales
+  assert.equal(modOn2(resourceMod('shipments'), off), false, 'shipments thuộc export, export tắt → chặn');
+  assert.equal(modOn2(resourceMod('livesessions'), off), false);
+  // lõi không bao giờ chặn
+  assert.equal(resourceMod('invoices'), null, 'invoices là lõi');
+  assert.equal(resourceMod('transactions'), null);
+  assert.equal(modOn2(resourceMod('clients'), off), true, 'clients lõi → luôn qua');
+  // sales bật → leads/quotes qua
+  assert.equal(modOn2(resourceMod('quotes'), off), true);
+});
+
+test('validate shipment chặn thị trường cấm ở cả tạo mới (row=null)', async () => {
+  const { RESOURCES } = await import('../lib/registry.js');
+  const v = RESOURCES.shipments.validate;
+  assert.ok(v(null, { crop: 'Chanh dây', market: 'JP' }), 'tạo mới lô đi Nhật → chặn');
+  assert.equal(v(null, { crop: 'Chanh dây', market: 'CN' }), null, 'đi TQ → cho qua');
+  // sửa: lấy market từ row nếu data không có
+  assert.ok(v({ crop: 'Chanh dây', market: 'KR' }, {}), 'sửa lô đang đi Hàn → vẫn chặn');
+});

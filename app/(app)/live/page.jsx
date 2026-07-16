@@ -33,12 +33,15 @@ export default function LivePage() {
     setModal(null);
   };
   const saveRecon = async d => {
-    const rec = reconcile({ gmv: recon.gmv, ...d });
-    await sessions.update(recon.id, {
-      netGmv: rec.netGmv, platformFee: rec.platformFee, taxWithheld: rec.taxWithheld,
-      netReceived: rec.netReceived, status: 'reconciled',
+    // v3.21: qua route riêng — vừa chốt tiền vừa sinh phiếu công host (Payout) theo GMV ròng.
+    const r = await fetch(`/api/livesessions/${recon.id}/reconcile`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d),
     });
-    toast('Đã đối soát — chốt tiền thực nhận'); setRecon(null);
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { toast(j.error || 'Lỗi đối soát', 'error'); return; }
+    await sessions.refresh();
+    toast(j.payoutCreated ? 'Đã đối soát + tạo phiếu công host (chờ Kế toán trả)' : 'Đã đối soát — chốt tiền thực nhận');
+    setRecon(null);
   };
 
   const fields = () => [

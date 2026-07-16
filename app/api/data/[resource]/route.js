@@ -5,6 +5,7 @@ import { RESOURCES, canRead, canWrite, filterableOf } from '@/lib/registry';
 import { isFreelancer } from '@/lib/perm';
 import { interceptWrite } from '@/lib/approvals';
 import { emitEvent } from '@/lib/events';
+import { resourceEnabled } from '@/lib/module-guard';
 
 async function audit(user, action, entity, refId, detail) {
   await prisma.auditLog.create({
@@ -18,6 +19,7 @@ export async function GET(req, { params }) {
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canRead(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
   // v3.13: lọc phía server theo danh sách trắng — VD /api/data/timelogs?taskId=abc.
   // Trước đây mọi lời gọi đều kéo NGUYÊN bảng về trình duyệt rồi lọc bằng JS: mở một
   // công việc là tải lại toàn bộ TimeLog/TaskComment/TaskEvent của cả công ty.
@@ -44,8 +46,15 @@ export async function POST(req, { params }) {
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
   let data = await req.json();
   if (cfg.beforeCreate) data = await cfg.beforeCreate(data, user, prisma);
+  // v3.21: validate chạy CẢ khi tạo mới (trước đây chỉ chạy ở PUT). Ràng buộc nghiệp vụ/pháp lý
+  // phải chặn ở server, không chỉ ở trình duyệt — VD lô hàng XNK đi thị trường cấm.
+  if (cfg.validate) {
+    const err = await cfg.validate(null, data, prisma);
+    if (err) return NextResponse.json({ error: err }, { status: 400 });
+  }
   try {
     const icp = await interceptWrite(params.resource, null, data, user);
     if (icp?.block) return NextResponse.json({ _blocked: true, _notice: icp.block });

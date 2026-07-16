@@ -1,9 +1,11 @@
 'use client';
 // v3.9: Cẩm nang sử dụng trong app — phần chung + phần riêng TỰ HIỆN theo vai trò
 // của người đang đăng nhập (nhân viên không bị ngợp bởi tính năng không dùng).
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRoleLabels } from '@/components/ui';
 import { rolesOf, hasAny } from '@/lib/perm';
+import { modOn } from '@/lib/modules';
 
 const S = ({ id, title, children }) => (
   <div className="card" id={id} style={{ marginBottom: 16 }}>
@@ -21,6 +23,10 @@ export default function GuidePage() {
   const RL = useRoleLabels();
   const myRoles = rolesOf(user);
   const is = r => hasAny(user, [r]);
+  // v3.21: chỉ hiện mục cẩm nang của phân hệ đang bật
+  const [modules, setModules] = useState(null);
+  useEffect(() => { fetch('/api/settings').then(r => r.ok ? r.json() : null).then(d => { if (Array.isArray(d?.modules)) setModules(d.modules); }).catch(() => {}); }, []);
+  const modUsed = m => modOn(m, modules);
 
   return (
     <>
@@ -116,6 +122,29 @@ export default function GuidePage() {
           <P><B>Cài đặt</B>: thông tin công ty (in trên báo giá/hóa đơn), <b>ngưỡng phê duyệt</b>, xác suất forecast theo giai đoạn, <b>tên chức danh</b> theo công ty, quota phép, <b>Email SMTP</b> (gửi báo giá/hóa đơn), Claude API key (bật AI Copilot), <b>API key + Webhook</b> nối hệ thống ngoài.</P>
           <H>Vận hành nâng cao</H>
           <P><B>Tự động hóa</B>: rule KHI-THÌ (VD thắng deal → nhắn Kênh chung + tạo việc) · <B>Nhật ký hệ thống</B>: mọi thao tác của mọi người · <B>Báo cáo</B> → in báo cáo tháng PDF · Quản tài khoản: tạo/khóa người dùng, đặt lại mật khẩu, <b>reset 2FA</b> khi nhân sự mất điện thoại (Hồ sơ &amp; nhóm).</P>
+        </S>
+      )}
+
+      {modUsed('export') && hasAny(user, ['PM', 'ACCOUNTANT', 'AM']) && (
+        <S id="xnk" title="🌏 Xuất nhập khẩu nông sản (Fretas)">
+          <H>Vùng trồng &amp; mã số</H>
+          <P><B>Vùng trồng / Đóng gói</B>: khai vùng trồng (PUC) và cơ sở đóng gói (PHC), rồi thêm <b>mã số theo TỪNG thị trường</b> (mã đi Trung Quốc khác mã đi EU). Mỗi mã có trạng thái riêng — mã bị <b>đình chỉ</b> thì <b>không xuất được lô mới</b> bằng mã đó cho thị trường tương ứng.</P>
+          <H>Lập lô hàng</H>
+          <P><B>Lô hàng xuất</B>: chọn mặt hàng + thị trường → hệ thống <b>chặn cứng</b> thị trường chưa mở cửa (VD chanh dây không đi được Nhật/Hàn/Mỹ) và <b>tự sinh checklist chứng từ</b> theo thị trường (Invoice, Packing, B/L, Phyto, C/O, và chiếu xạ nếu chôm chôm đi Mỹ).</P>
+          <P>Nhập theo <b>ngoại tệ</b> (USD/CNY) + tỷ giá → VNĐ. Thanh toán <b>L/C</b> thì hệ thống tính <b>hạn xuất trình chứng từ</b> (ETD+21 ngày) và cảnh báo khi sắp/đã quá hạn — <b>trễ là mất tiền</b>.</P>
+          <H>Thu tiền</H>
+          <P>Lô về tiền → bấm nút <B>ví (Ghi nhận thanh toán)</B> ở dòng lô → hệ thống tạo <b>phiếu thu quy về VNĐ</b> vào Sổ quỹ và đánh dấu lô "Đã thanh toán".</P>
+        </S>
+      )}
+
+      {modUsed('livestream') && hasAny(user, ['LEAD', 'ACCOUNTANT', 'PM', 'AM']) && (
+        <S id="live" title="🎥 Livestream bán hàng (Egolive)">
+          <H>⚠ GMV không phải doanh thu</H>
+          <P>Con số chốt trên sóng (GMV) <b>chưa phải tiền về</b>. Sàn giữ tiền, trừ đơn hủy/hoàn, trừ phí sàn (~23%), trừ thuế. Đừng tính lãi theo GMV.</P>
+          <H>Ca live</H>
+          <P><B>Ca live</B>: tạo ca (nền tảng, host, nhãn hàng, loại hợp đồng) → ghi chỉ số phiên (GMV, đơn, view, CTR/CTOR). Sau khi sàn quyết toán, bấm nút <B>ví (Đối soát)</B> → nhập GMV ròng + phí sàn + thuế → hệ thống chốt <b>tiền thực nhận</b> và <b>tự tạo phiếu công host</b> (theo GMV ròng) để Kế toán trả.</P>
+          <H>Điểm vi phạm</H>
+          <P><B>Điểm vi phạm</B>: ghi lại điểm phạt nền tảng. Hệ thống cộng dồn theo cửa sổ <b>180 ngày</b> và cảnh báo khi chạm ngưỡng (<b>36đ = hạn chế live, 48đ = đóng shop</b>). Điểm tự hết hiệu lực sau 180 ngày.</P>
         </S>
       )}
 

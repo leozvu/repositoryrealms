@@ -17,7 +17,7 @@ export async function GET(req) {
     return NextResponse.json({ error: 'forbidden — cần API key vai trò Giám đốc' }, { status: 403 });
   }
 
-  const [settingRow, txs, invoices, leads, projects, clients, tickets, bills, headcount, insights] = await Promise.all([
+  const [settingRow, txs, invoices, leads, projects, clients, tickets, bills, headcount, insights, shipments, liveSessions] = await Promise.all([
     prisma.setting.findUnique({ where: { id: 1 } }),
     prisma.transaction.findMany(),
     prisma.invoice.findMany(),
@@ -28,6 +28,8 @@ export async function GET(req) {
     prisma.vendorBill.findMany(),
     prisma.user.count({ where: { status: 'active' } }),
     buildInsights(),
+    prisma.shipment.findMany(),      // v3.21: cho công ty XNK
+    prisma.liveSession.findMany(),   // v3.21: cho công ty livestream
   ]);
   const settings = settingRow ? JSON.parse(settingRow.json) : {};
   const tm = mk(0), lm = mk(-1);
@@ -59,6 +61,12 @@ export async function GET(req) {
       ticketsOpen: openTickets.length,
       slaBreach: openTickets.filter(t => t.dueAt && new Date(t.dueAt) < new Date()).length,
       headcount,
+      // v3.21: chỉ số phân hệ dọc — 0 với công ty không bật, Master tự bỏ qua khi = 0
+      shipmentsActive: shipments.filter(s => s.status !== 'paid' && s.status !== 'draft').length,
+      shipmentsUnpaid: shipments.filter(s => s.status !== 'paid').length,
+      liveGmvMonth: sum(liveSessions.filter(s => (s.date || '').startsWith(tm)), s => s.gmv || 0),
+      liveNetMonth: sum(liveSessions.filter(s => (s.date || '').startsWith(tm) && s.status === 'reconciled'), s => s.netReceived || 0),
+      livePendingRecon: liveSessions.filter(s => s.status === 'done').length,
     },
     insights: insights.filter(i => ['bad', 'warn'].includes(i.level)).slice(0, 6).map(i => ({ level: i.level, text: i.text })),
   });
