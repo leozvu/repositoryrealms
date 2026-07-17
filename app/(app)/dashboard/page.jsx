@@ -44,6 +44,10 @@ export default function Dashboard() {
   const seeOps = hasAny(user, ['PM', 'LEAD']);
   const tm = thisMonth();
 
+  // v3.31: Onboarding — vài bước đầu để bắt đầu. Tự ẩn khi xong hết hoặc người dùng tắt.
+  const [onbHidden, setOnbHidden] = useState(() => { try { return localStorage.getItem('onbDismissed') === '1'; } catch { return false; } });
+  const dismissOnb = () => { try { localStorage.setItem('onbDismissed', '1'); } catch {} setOnbHidden(true); };
+
   /* ---- Chỉ số ---- */
   const revenue = transactions.rows.filter(t => t.type === 'income' && monthKey(t.date) === tm).reduce((s, t) => s + t.amount, 0);
   const expense = transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === tm).reduce((s, t) => s + t.amount, 0);
@@ -94,8 +98,42 @@ export default function Dashboard() {
     return href ? <Link href={href} style={{ textDecoration: 'none', color: 'inherit' }}>{inner}</Link> : inner;
   };
 
+  // Bước onboarding theo vai trò/phân hệ (chỉ hiện bước CHƯA xong).
+  const onbSteps = [
+    { label: 'Thêm khách hàng đầu tiên', done: clients.rows.length > 0, href: '/clients' },
+    seeSales && on('sales') && { label: 'Thêm khách tiềm năng', done: leads.rows.length > 0, href: '/leads' },
+    seeFin && { label: 'Ghi giao dịch thu/chi đầu tiên', done: transactions.rows.length > 0, href: '/finance' },
+    on('export') && { label: 'Khai vùng trồng / cơ sở đóng gói', done: false, href: '/growing', optional: true },
+    { label: 'Nhập dữ liệu sẵn có từ Excel', done: clients.rows.length > 3, href: '/import' },
+  ].filter(Boolean);
+  const onbTodo = onbSteps.filter(s => !s.done);
+  const showOnb = !onbHidden && onbTodo.length > 0;
+
   return (
     <>
+      {showOnb && (
+        <div className="card" style={{ marginBottom: 16, borderLeft: '4px solid var(--primary)' }}>
+          <div className="card-head">
+            <span className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Icon name="check" size={17} /> Bắt đầu nhanh</span>
+            <button className="btn btn-ghost btn-sm" onClick={dismissOnb}>Ẩn</button>
+          </div>
+          <div className="card-body" style={{ paddingTop: 6 }}>
+            <p style={{ fontSize: '.83rem', color: 'var(--muted)', marginTop: 0 }}>Vài bước để hệ thống bắt đầu có ích. Bấm để làm ngay:</p>
+            <div style={{ display: 'grid', gap: 6 }}>
+              {onbTodo.map((s, i) => (
+                <Link key={i} href={s.href} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <div className="act-item" style={{ cursor: 'pointer', alignItems: 'center' }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid var(--border)', flex: 'none' }}></span>
+                    <div style={{ flex: 1, fontSize: '.87rem' }}>{s.label}{s.optional && <span style={{ color: 'var(--muted)', fontSize: '.78rem' }}> (tùy chọn)</span>}</div>
+                    <Icon name="search" size={13} />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ============ AI SUMMARY ============ */}
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="card-head">
