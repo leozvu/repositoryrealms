@@ -128,7 +128,7 @@ export default function Dashboard() {
         {seeOps && on('delivery') && <Kpi label="Dự án đang chạy" value={activeProjects.length} sub={lateProjects ? `⚠ ${lateProjects} dự án trễ deadline` : 'Đúng tiến độ'} icon="projects" color={lateProjects ? 'var(--danger)' : undefined} bg={lateProjects ? 'var(--danger-soft)' : undefined} href="/projects" />}
         {seeOps && on('delivery') && <Kpi label="Utilization" value={util + '%'} sub={`${logged}h ghi nhận tháng này`} icon="clock" bg="var(--violet-soft)" color="var(--violet)" href="/timesheet" />}
         {on('support') && <Kpi label="Ticket hỗ trợ" value={openTickets.length} sub={slaBreach ? `⚠ ${slaBreach} vỡ SLA` : 'SLA trong tầm kiểm soát'} icon="check" color={slaBreach ? 'var(--danger)' : undefined} bg={slaBreach ? 'var(--danger-soft)' : undefined} href="/tickets" />}
-        {!seeOps && on('delivery') && <Kpi label="Việc của tôi" value={myTasks.length} icon="tasks" href="/tasks" />}
+        {!seeOps && on('tasks') && <Kpi label="Việc của tôi" value={myTasks.length} icon="tasks" href="/tasks" />}
       </div>
 
       {/* ============ VIỆC / LÔ HÀNG & HÓA ĐƠN (v3.22 module-aware) ============ */}

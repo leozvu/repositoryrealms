@@ -22,6 +22,24 @@ test('công ty cũ (modules=null) → agency BẬT, phân hệ chuyên biệt T�
   assert.equal(modOn('livestream', null), false, 'agency modules=null KHÔNG thấy menu Livestream');
 });
 
+test('v3.23: "Bảng công việc" (tasks) tách khỏi delivery — Fretas CÓ bảng việc, KHÔNG có Gantt/dự án', () => {
+  const ex = MODULE_PRESETS.export.mods;
+  assert.ok(ex.includes('tasks'), 'preset export có bảng công việc');
+  assert.ok(!ex.includes('delivery'), 'nhưng KHÔNG có vận hành dự án (Gantt/timesheet)');
+  assert.equal(modOn('tasks', ex), true, 'Fretas: menu Công việc BẬT');
+  assert.equal(modOn('delivery', ex), false, 'Fretas: Gantt/dự án TẮT');
+  // resource guard: tasks/taskcomments/taskevents thuộc mod tasks; projects/timelogs vẫn delivery
+  assert.equal(resourceMod('tasks'), 'tasks');
+  assert.equal(resourceMod('taskcomments'), 'tasks');
+  assert.equal(modOn(resourceMod('tasks'), ex), true, 'API /api/data/tasks qua ở Fretas');
+  assert.equal(modOn(resourceMod('projects'), ex), false, 'projects (delivery) vẫn chặn ở Fretas');
+  assert.equal(modOn(resourceMod('timelogs'), ex), false, 'ghi giờ dự án (delivery) chặn ở Fretas');
+  // công ty cũ (null) vẫn thấy bảng công việc
+  assert.equal(modOn('tasks', null), true, 'agency cũ vẫn có bảng công việc');
+  // 3 preset đều có tasks (bảng việc dùng chung mọi loại hình)
+  for (const p of ['agency', 'export', 'livestream']) assert.ok(MODULE_PRESETS[p].mods.includes('tasks'), `${p} có tasks`);
+});
+
 test('v3.22: "Bảng giá dịch vụ" là phân hệ agency — Fretas (export) KHÔNG thấy', () => {
   const ex = MODULE_PRESETS.export.mods;
   assert.ok(!ex.includes('services'), 'preset export không có services');

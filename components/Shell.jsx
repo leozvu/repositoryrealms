@@ -221,7 +221,7 @@ const NAV = [
   { section: 'Vận hành' },
   { key: 'portfolio', label: 'Sở chỉ huy DA', icon: 'reports', roles: ['PM', 'LEAD', 'ACCOUNTANT'], mod: 'delivery' },
   { key: 'projects', label: 'Dự án', icon: 'projects', roles: ALL, mod: 'delivery' },
-  { key: 'tasks', label: 'Công việc', icon: 'tasks', roles: ALL, mod: 'delivery' },
+  { key: 'tasks', label: 'Công việc', icon: 'tasks', roles: ALL, mod: 'tasks' },
   { key: 'timesheet', label: 'Chấm công giờ', icon: 'clock', roles: ALL, mod: 'delivery' },
   { key: 'gantt', label: 'Gantt tiến độ', icon: 'reports', roles: ALL, mod: 'delivery' },
   { key: 'templates', label: 'Mẫu dự án', icon: 'projects', roles: ['PM', 'LEAD'], mod: 'delivery' },
