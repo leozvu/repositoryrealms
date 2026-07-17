@@ -1,6 +1,6 @@
-# Đồng bộ schema Prisma lên CẢ 3 schema Postgres (khi sửa prisma/schema.prisma).
-#   .\db-push-all.ps1                → push cả 3
-#   .\db-push-all.ps1 -Only egoric   → chỉ 1 schema (aim | egoric | vnecom)
+# Đồng bộ schema Prisma lên CẢ 5 schema Postgres (khi sửa prisma/schema.prisma).
+#   .\db-push-all.ps1                → push cả 5
+#   .\db-push-all.ps1 -Only egoric   → chỉ 1 schema (aim | egoric | vnecom | fretas | egolive)
 # ⚠ Dừng dev server trước khi chạy (prisma generate cần ghi DLL — dev server giữ file này).
 #
 # v3.13: mật khẩu Postgres KHÔNG còn nằm trong file này nữa (file này được git theo dõi).
@@ -19,9 +19,11 @@ if ($url -notmatch '^(postgresql://[^@]+@[^:/?]+)') { throw "DATABASE_URL trong 
 $BASE = $Matches[1]
 
 $schemas = @(
-  @{ key = 'aim';    schema = 'public' },
-  @{ key = 'egoric'; schema = 'egoric' },
-  @{ key = 'vnecom'; schema = 'vnecom' }
+  @{ key = 'aim';     schema = 'public' },
+  @{ key = 'egoric';  schema = 'egoric' },
+  @{ key = 'vnecom';  schema = 'vnecom' },
+  @{ key = 'fretas';  schema = 'fretas' },
+  @{ key = 'egolive'; schema = 'egolive' }
 )
 foreach ($s in $schemas) {
   if ($Only -and $s.key -ne $Only.ToLower()) { continue }
