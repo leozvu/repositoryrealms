@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
 import { money, fmtDate, todayISO } from '@/lib/format';
-import { PLATFORMS, CONTRACT_TYPES, SESSION_STATUS, reconcile, aov, hostPay } from '@/lib/livestream';
+import { PLATFORMS, CONTRACT_TYPES, SESSION_STATUS, reconcile, aov, hostPay, hostPit, PIT_DEFAULT_PCT } from '@/lib/livestream';
 
 const st = s => (SESSION_STATUS.find(([k]) => k === s) || [s, s])[1];
 const stColor = s => ({ scheduled: 'b-gray', live: 'b-red', done: 'b-amber', reconciled: 'b-green' }[s] || 'b-gray');
@@ -119,18 +119,57 @@ export default function LivePage() {
         </div>
       )}
 
+      {(() => {
+        const stats = hosts.map(h => {
+          const hs = mSessions.filter(s => s.hostId === h.id);
+          if (!hs.length) return null;
+          const gmv = hs.reduce((a, s) => a + (s.gmv || 0), 0);
+          const rec = hs.filter(s => s.status === 'reconciled');
+          const net = rec.reduce((a, s) => a + reconcile(s).netReceived, 0);
+          const orders = hs.reduce((a, s) => a + (s.orders || 0), 0);
+          const ctor = hs.reduce((a, s) => a + (s.ctor || 0), 0) / hs.length;
+          const pay = rec.reduce((a, s) => a + hostPit(hostPay(s).settled).net, 0);
+          return { h, n: hs.length, gmv, net, orders, ctor, pay };
+        }).filter(Boolean).sort((a, b) => b.gmv - a.gmv);
+        return stats.length ? (
+          <div className="card" style={{ marginTop: 16 }}>
+            <div className="card-head"><span className="card-title">Hiệu suất host — tháng {+thisMonth.slice(5)}/{thisMonth.slice(0, 4)}</span></div>
+            <div className="table-wrap" style={{ border: 'none', boxShadow: 'none' }}>
+              <table>
+                <thead><tr><th>Host</th><th className="num">Số ca</th><th className="num">GMV sóng</th><th className="num">Thực nhận</th><th className="num">Đơn</th><th className="num">CTOR TB</th><th className="num">Công host (thực trả)</th></tr></thead>
+                <tbody>
+                  {stats.map(s => (
+                    <tr key={s.h.id}>
+                      <td><span className="cell-main">{s.h.name}</span></td>
+                      <td className="num">{s.n}</td>
+                      <td className="num" style={{ fontWeight: 600 }}>{money(s.gmv)}</td>
+                      <td className="num" style={{ color: 'var(--accent)' }}>{money(s.net)}</td>
+                      <td className="num">{s.orders}</td>
+                      <td className="num">{s.ctor ? s.ctor.toFixed(1) + '%' : '—'}</td>
+                      <td className="num">{money(s.pay)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p style={{ fontSize: '.74rem', color: 'var(--muted)', padding: '0 18px 12px' }}>GMV sóng = chốt trên live (chưa trừ hoàn/phí). Thực nhận + công host chỉ tính ca đã đối soát. Công host = đã trừ TNCN.</p>
+          </div>
+        ) : null;
+      })()}
+
       {modal && !modal.del && <FormModal title={modal.row ? 'Sửa ca live' : 'Ca live mới'} large
         data={modal.row || {}} onClose={() => setModal(null)} onSave={saveSession} fields={fields()} />}
       {modal?.del && <ConfirmDialog msg={`Xóa ca live ngày ${fmtDate(modal.del.date)}?`}
         onClose={() => setModal(null)} onYes={async () => { await sessions.remove(modal.del.id); toast('Đã xóa'); }} />}
 
       {recon && <FormModal title={`Đối soát ca ${fmtDate(recon.date)} — GMV sóng ${money(recon.gmv)}`}
-        data={{ netGmv: recon.netGmv || recon.gmv, platformFee: recon.platformFee, taxWithheld: recon.taxWithheld }}
+        data={{ netGmv: recon.netGmv || recon.gmv, platformFee: recon.platformFee, taxWithheld: recon.taxWithheld, hostPitPct: PIT_DEFAULT_PCT }}
         onClose={() => setRecon(null)} onSave={saveRecon}
         fields={[
           { key: 'netGmv', label: 'GMV ròng (sau hủy/hoàn)', type: 'number', hint: `GMV sóng ${money(recon.gmv)} trừ đơn hủy + đơn hoàn`, full: true },
           { key: 'platformFee', label: 'Phí sàn + thanh toán (đ)', type: 'number' },
           { key: 'taxWithheld', label: 'Thuế sàn khấu trừ (đ)', type: 'number', hint: 'NĐ 117/2025 — sàn khấu trừ GTGT + TNCN' },
+          { key: 'hostPitPct', label: 'Khấu trừ TNCN công host (%)', type: 'number', hint: 'Host freelancer, chi ≥2tr/lần khấu trừ 10% tại nguồn. Phiếu công host sẽ tạo ở mức đã trừ thuế.' },
         ]} />}
     </>
   );

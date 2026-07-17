@@ -811,7 +811,8 @@ model LiveSession {
   hostPayBase   Int      @default(0) // lương cứng ca
   hostPayRate   Float    @default(0) // % hoa hồng trên GMV
   hostAdvance   Int      @default(0) // tạm ứng theo GMV sóng
-  hostSettled   Int      @default(0) // quyết toán theo GMV ròng
+  hostSettled   Int      @default(0) // quyết toán theo GMV ròng (GỘP, trước khấu trừ TNCN)
+  hostPit       Int      @default(0) // v3.27: TNCN khấu trừ tại nguồn từ công host (freelancer)
   note          String?
   createdAt     DateTime @default(now())
   @@index([date])

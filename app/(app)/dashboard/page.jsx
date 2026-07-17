@@ -6,6 +6,7 @@ import { useResource, Icon, Badge, EmptyState, useModules } from '@/components/u
 import { money, moneyShort, fmtDate, todayISO, thisMonth, monthKey, docGrand, remainOf } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 import { modOn } from '@/lib/modules';
+import { reconcile, activePoints } from '@/lib/livestream';
 
 const LEVEL = {
   bad: { icon: 'alert', color: 'var(--danger)', bg: 'var(--danger-soft)' },
@@ -32,6 +33,8 @@ export default function Dashboard() {
   // XNK: công ty không bật 'export' sẽ nhận 403 im lặng (module-guard) → rows rỗng, không lỗi.
   const shipments = useResource('shipments');
   const areaCodes = useResource('areacodes');
+  const liveSessions = useResource('livesessions'); // livestream — 403 im lặng nếu không bật
+  const violations = useResource('violations');
   const [insights, setInsights] = useState(null);
   useEffect(() => { fetch('/api/insights').then(r => r.json()).then(setInsights).catch(() => setInsights([])); }, []);
   if (!user) return null;
@@ -69,6 +72,15 @@ export default function Dashboard() {
   const codeSuspended = areaCodes.rows.filter(c => c.status !== 'active').length;
   const lcAtRisk = shipments.rows.filter(s => s.paymentMethod === 'LC' && s.presentDeadline && s.status !== 'paid'
     && (new Date(s.presentDeadline) - new Date(todayISO())) / 86400000 <= 7).length;
+
+  /* ---- v3.27: chỉ số Livestream (chỉ tính khi bật 'livestream') ---- */
+  const liveThisMonth = liveSessions.rows.filter(s => (s.date || '').startsWith(tm));
+  const liveGmv = liveThisMonth.reduce((a, s) => a + (s.gmv || 0), 0);
+  const liveNet = liveThisMonth.filter(s => s.status === 'reconciled').reduce((a, s) => a + reconcile(s).netReceived, 0);
+  const pendingRecon = liveSessions.rows.filter(s => s.status === 'done').length;
+  const vioByShop = {};
+  violations.rows.forEach(v => { const k = `${v.platform}|${v.shop || ''}`; (vioByShop[k] ||= []).push(v); });
+  const maxVioPts = Math.max(0, ...Object.values(vioByShop).map(list => activePoints(list, todayISO())));
 
   const Kpi = ({ label, value, sub, icon, bg, color, href }) => {
     const inner = (
@@ -122,6 +134,12 @@ export default function Dashboard() {
         {on('export') && lcAtRisk > 0 && <Kpi label="L/C sắp tới hạn" value={lcAtRisk} sub="cần xuất trình chứng từ trong 7 ngày" icon="alert" bg="var(--danger-soft)" color="var(--danger)" href="/shipments" />}
         {on('export') && <Kpi label="Mã vùng bị đình chỉ" value={codeSuspended} sub={codeSuspended ? 'không xuất lô mới bằng mã này' : 'tất cả mã đang hiệu lực'} icon={codeSuspended ? 'alert' : 'check'} color={codeSuspended ? 'var(--danger)' : 'var(--accent)'} bg={codeSuspended ? 'var(--danger-soft)' : 'var(--accent-soft)'} href="/growing" />}
 
+        {/* ---- Khối Livestream: thay các KPI dịch vụ agency cho nhóm bán live ---- */}
+        {on('livestream') && <Kpi label="GMV tháng (chốt sóng)" value={moneyShort(liveGmv)} sub="chưa phải tiền thực nhận" icon="trendUp" bg="var(--info-soft)" color="var(--primary)" href="/live" />}
+        {on('livestream') && <Kpi label="Tiền thực nhận (đã đối soát)" value={moneyShort(liveNet)} sub="sau hủy/hoàn + phí + thuế" icon="wallet" bg="var(--accent-soft)" color="var(--accent)" href="/live" />}
+        {on('livestream') && <Kpi label="Ca chờ đối soát" value={pendingRecon} sub={pendingRecon ? 'xong ca chưa chốt tiền' : 'đã đối soát hết'} icon={pendingRecon ? 'alert' : 'check'} color={pendingRecon ? 'var(--warn)' : 'var(--accent)'} bg={pendingRecon ? 'var(--warn-soft)' : 'var(--accent-soft)'} href="/live" />}
+        {on('livestream') && <Kpi label="Điểm vi phạm cao nhất" value={maxVioPts} sub={maxVioPts >= 36 ? '⚠ đã chạm ngưỡng hạn chế live' : maxVioPts >= 24 ? 'gần ngưỡng hạn chế (36)' : 'trong ngưỡng an toàn'} icon={maxVioPts >= 24 ? 'alert' : 'check'} color={maxVioPts >= 24 ? 'var(--danger)' : 'var(--accent)'} bg={maxVioPts >= 24 ? 'var(--danger-soft)' : 'var(--accent-soft)'} href="/violations" />}
+
         {/* ---- Khối bán hàng / vận hành: chỉ khi bật phân hệ tương ứng ---- */}
         {seeSales && on('sales') && <Kpi label={on('export') ? 'Pipeline người mua' : 'Pipeline bán hàng'} value={money(pipeline)} sub={`${openLeads.length} cơ hội${convRate !== null ? ` · thắng ${convRate}%` : ''}`} icon="leads" href="/leads" />}
         {seeSales && on('delivery') && <Kpi label="Khách hàng active" value={activeClients} sub={`${clients.rows.length} khách trong hệ thống`} icon="clients" href="/clients" />}
@@ -155,6 +173,28 @@ export default function Dashboard() {
                     );
                   })}
                   {!unpaidShip.length && <tr><td colSpan={4}><EmptyState title="Không có lô hàng đang chờ" /></td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : on('livestream') && !on('delivery') ? (
+          /* Livestream: danh sách ca live gần đây, nổi bật ca cần đối soát */
+          <div className="card">
+            <div className="card-head"><span className="card-title">Ca live gần đây</span>
+              <Link href="/live" className="btn btn-ghost btn-sm">Xem tất cả</Link></div>
+            <div className="table-wrap" style={{ border: 'none', boxShadow: 'none' }}>
+              <table>
+                <thead><tr><th>Ngày</th><th>Nền tảng</th><th className="num">GMV sóng</th><th>Trạng thái</th></tr></thead>
+                <tbody>
+                  {[...liveSessions.rows].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 7).map(s => (
+                    <tr key={s.id}>
+                      <td><span className="cell-main">{fmtDate(s.date)}</span>{s.status === 'done' && <div className="cell-sub" style={{ color: 'var(--warn)', fontWeight: 700 }}>cần đối soát</div>}</td>
+                      <td>{s.platform === 'shopee' ? 'Shopee' : 'TikTok'}</td>
+                      <td className="num" style={{ fontWeight: 700 }}>{moneyShort(s.gmv)}</td>
+                      <td>{s.status === 'reconciled' ? <span className="badge b-green"><span className="dot"></span>Đã đối soát</span> : s.status === 'done' ? <span className="badge b-amber"><span className="dot"></span>Xong ca</span> : <span className="badge b-gray"><span className="dot"></span>{s.status}</span>}</td>
+                    </tr>
+                  ))}
+                  {!liveSessions.rows.length && <tr><td colSpan={4}><EmptyState title="Chưa có ca live" /></td></tr>}
                 </tbody>
               </table>
             </div>

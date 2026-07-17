@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { marketBlocked, incotermValid, requiredDocs, presentationDeadline } from '../lib/export-trade.js';
-import { reconcile, hostPay, activePoints, plus180 } from '../lib/livestream.js';
+import { reconcile, hostPay, activePoints, plus180, hostPit } from '../lib/livestream.js';
 
 /* ===== XNK: ma trận thị trường (ràng buộc pháp lý) ===== */
 test('chặn cứng thị trường cấm', () => {
@@ -74,6 +74,16 @@ test('điểm vi phạm: chỉ tính điểm còn hiệu lực (chưa quá 180 n
 test('plus180: cộng đúng 180 ngày', () => {
   assert.equal(plus180('2026-01-01'), '2026-06-30');
   assert.equal(plus180(null), null);
+});
+
+test('khấu trừ TNCN công host: 10% khi ≥2tr, dưới ngưỡng không trừ', () => {
+  const a = hostPit(6_000_000, 10);
+  assert.equal(a.pit, 600_000, 'chi 6tr → khấu trừ 10% = 600k');
+  assert.equal(a.net, 5_400_000, 'host thực nhận 5,4tr');
+  const b = hostPit(1_500_000, 10);
+  assert.equal(b.pit, 0, 'dưới 2tr/lần → không khấu trừ');
+  assert.equal(b.net, 1_500_000);
+  assert.equal(hostPit(6_000_000, 0).pit, 0, 'pct 0 → không trừ');
 });
 
 /* ===== v3.21: guard module + validate server ===== */
