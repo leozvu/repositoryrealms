@@ -312,6 +312,17 @@ model Transaction {
   @@index([projectId])
 }
 
+// v3.32: Chi phí định kỳ — mẫu để sinh nhanh phiếu chi hằng tháng (thuê VP, internet, subscription…).
+model RecurringExpense {
+  id         String   @id @default(cuid())
+  category   String
+  amount     Int      @default(0)
+  note       String?
+  dayOfMonth Int      @default(1) // ngày trong tháng để ghi (kẹp 1–28 tránh lệch tháng)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
 model Leave {
   id     String  @id @default(cuid())
   userId String

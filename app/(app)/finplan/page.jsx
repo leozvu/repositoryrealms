@@ -24,6 +24,7 @@ export default function FinPlanPage() {
   const vendors = useResource('vendors');
   const clients = useResource('clients');
   const budgets = useResource('budgets');
+  const recurring = useResource('recurringexpenses'); // v3.32: chi phí định kỳ
   const transactions = useResource('transactions');
   const users = useResource('users');
   const payouts = useResource('payouts');
@@ -82,6 +83,19 @@ export default function FinPlanPage() {
     { key: 'category', label: 'Danh mục chi', type: 'select', options: CATEGORIES.map(c => ({ value: c, label: c })), required: true },
     { key: 'amount', label: 'Ngân sách tháng (đ)', type: 'number', required: true },
   ];
+  const RECUR_FIELDS = [
+    { key: 'category', label: 'Danh mục chi', type: 'select', options: CATEGORIES.map(c => ({ value: c, label: c })), required: true },
+    { key: 'amount', label: 'Số tiền/tháng (đ)', type: 'number', required: true },
+    { key: 'note', label: 'Diễn giải (VD: Thuê văn phòng)', full: true },
+    { key: 'dayOfMonth', label: 'Ngày ghi trong tháng (1–28)', type: 'number' },
+  ];
+  const genRecurring = async () => {
+    const r = await fetch('/api/recurring/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ month: m }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) return toast(j.error || 'Lỗi', 'error');
+    await transactions.refresh();
+    toast(j.created ? `Đã sinh ${j.created} phiếu chi định kỳ tháng ${+m.slice(5)}/${m.slice(0, 4)}` : (j.note || 'Không có mẫu cần sinh'));
+  };
 
   return (
     <>
@@ -145,6 +159,30 @@ export default function FinPlanPage() {
         </div>
       </div>
 
+      {/* ============ CHI PHÍ ĐỊNH KỲ ============ */}
+      <div className="card" style={{ marginTop: 16 }}>
+        <div className="card-head"><span className="card-title">Chi phí định kỳ hằng tháng</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn btn-outline btn-sm" onClick={() => setModal({ mode: 'addRecur' })}><Icon name="plus" size={14} /> Thêm mẫu</button>
+            <button className="btn btn-primary btn-sm" onClick={genRecurring} disabled={!recurring.rows.some(r => r.active)}><Icon name="repeat" size={14} /> Sinh cho tháng {+m.slice(5)}/{m.slice(0, 4)}</button>
+          </div>
+        </div>
+        <div className="card-body">
+          {recurring.rows.length ? recurring.rows.map(r => {
+            const genned = transactions.rows.some(t => t.type === 'expense' && monthKey(t.date) === m && (t.desc || '').includes(`[recur:${r.id}]`));
+            return (
+              <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0', fontSize: '.84rem', borderBottom: '1px solid var(--border)' }}>
+                <span style={{ width: 180, fontWeight: 600 }}>{r.note || r.category}</span>
+                <span style={{ color: 'var(--muted)', width: 150 }}>{r.category} · ngày {r.dayOfMonth}</span>
+                <b style={{ flex: 1 }}>{money(r.amount)}</b>
+                {genned ? <span className="badge b-green" style={{ flex: 'none' }}><span className="dot"></span>Đã sinh tháng này</span> : r.active ? <span className="badge b-amber" style={{ flex: 'none' }}><span className="dot"></span>Chưa sinh</span> : <span className="badge b-gray" style={{ flex: 'none' }}>Tắt</span>}
+                <button className="icon-btn danger" onClick={() => setModal({ mode: 'delRecur', row: r })} aria-label="Xóa"><Icon name="trash" size={14} /></button>
+              </div>
+            );
+          }) : <EmptyState title="Chưa có chi phí định kỳ" sub="Thêm mẫu cho các khoản chi lặp lại (thuê VP, internet, subscription…), rồi bấm 'Sinh' mỗi tháng thay vì gõ tay." />}
+        </div>
+      </div>
+
       {/* ============ DỰ BÁO DÒNG TIỀN ============ */}
       <div className="card" style={{ marginTop: 16 }}>
         <div className="card-head"><span className="card-title">Dự báo dòng tiền 3 tháng tới</span></div>
@@ -173,6 +211,13 @@ export default function FinPlanPage() {
         }} />}
       {modal?.mode === 'delBudget' && <ConfirmDialog msg={`Xóa ngân sách "${modal.row.category}"?`}
         onClose={() => setModal(null)} onYes={async () => { await budgets.remove(modal.row.id); toast('Đã xóa'); }} />}
+      {modal?.mode === 'addRecur' && <FormModal title="Thêm chi phí định kỳ" fields={RECUR_FIELDS} data={{ dayOfMonth: 1 }}
+        onClose={() => setModal(null)} onSave={async d => {
+          const r = await recurring.create({ category: d.category, amount: +d.amount || 0, note: d.note || null, dayOfMonth: Math.min(28, Math.max(1, +d.dayOfMonth || 1)), active: true });
+          if (r) toast('Đã thêm mẫu định kỳ');
+        }} />}
+      {modal?.mode === 'delRecur' && <ConfirmDialog msg={`Xóa mẫu định kỳ "${modal.row.note || modal.row.category}"? Các phiếu chi đã sinh vẫn giữ nguyên.`}
+        onClose={() => setModal(null)} onYes={async () => { await recurring.remove(modal.row.id); toast('Đã xóa mẫu'); }} />}
     </>
   );
 }
