@@ -25,6 +25,16 @@ export default function LivePage() {
   const sumGmv = mSessions.reduce((a, s) => a + (s.gmv || 0), 0);
   const sumNet = mSessions.filter(s => s.status === 'reconciled').reduce((a, s) => a + reconcile(s).netReceived, 0);
   const pendingRecon = sessions.rows.filter(s => s.status === 'done').length;
+  // v3.33: tiền đã đối soát nhưng sàn chưa về ví (Shopee ~ngày 4, hoàn tới ngày 15).
+  const pendingSettle = sessions.rows.filter(s => s.status === 'reconciled' && !s.settledDate);
+  const sumPendingSettle = pendingSettle.reduce((a, s) => a + reconcile(s).netReceived, 0);
+
+  const settleSession = async s => {
+    const r = await fetch(`/api/livesessions/${s.id}/settle`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) return toast(j.error || 'Lỗi', 'error');
+    await sessions.refresh(); toast('Đã ghi nhận tiền sàn về + phiếu thu vào sổ quỹ');
+  };
 
   const saveSession = async d => {
     const r = modal.row;
@@ -78,6 +88,9 @@ export default function LivePage() {
         <div className="card kpi"><span className="kpi-label">Ca chờ đối soát</span>
           <div className="kpi-value" style={{ color: pendingRecon ? 'var(--warn, #D97706)' : 'inherit' }}>{pendingRecon}</div>
           <div className="kpi-sub">xong ca nhưng chưa chốt tiền</div></div>
+        <div className="card kpi"><span className="kpi-label">Tiền chờ sàn về</span>
+          <div className="kpi-value" style={{ color: sumPendingSettle ? 'var(--warn, #D97706)' : 'inherit', fontSize: '1.15rem' }}>{money(sumPendingSettle)}</div>
+          <div className="kpi-sub">{pendingSettle.length} ca đã đối soát, chưa về ví</div></div>
         <div className="card kpi"><span className="kpi-label">Số ca tháng này</span>
           <div className="kpi-value">{mSessions.length}</div></div>
       </div>
@@ -108,6 +121,8 @@ export default function LivePage() {
                     <td><span className={`badge ${stColor(s.status)}`}><span className="dot"></span>{st(s.status)}</span></td>
                     <td><div className="row-actions">
                       {(s.status === 'done' || s.status === 'reconciled') && <button className="icon-btn" style={{ color: 'var(--primary)' }} title="Đối soát" onClick={() => setRecon(s)}><Icon name="wallet" size={15} /></button>}
+                      {s.status === 'reconciled' && !s.settledDate && <button className="icon-btn" style={{ color: 'var(--accent)' }} title="Ghi nhận tiền sàn về → phiếu thu" onClick={() => setModal({ settle: s })}><Icon name="download" size={15} /></button>}
+                      {s.settledDate && <span title={`Tiền về ${s.settledDate}`} style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center' }}><Icon name="check" size={15} /></span>}
                       <button className="icon-btn" onClick={() => setModal({ row: s })} aria-label="Sửa"><Icon name="edit" size={15} /></button>
                       <button className="icon-btn danger" onClick={() => setModal({ del: s })} aria-label="Xóa"><Icon name="trash" size={15} /></button>
                     </div></td>
@@ -161,6 +176,9 @@ export default function LivePage() {
         data={modal.row || {}} onClose={() => setModal(null)} onSave={saveSession} fields={fields()} />}
       {modal?.del && <ConfirmDialog msg={`Xóa ca live ngày ${fmtDate(modal.del.date)}?`}
         onClose={() => setModal(null)} onYes={async () => { await sessions.remove(modal.del.id); toast('Đã xóa'); }} />}
+      {modal?.settle && <ConfirmDialog yesLabel="Ghi nhận tiền về"
+        msg={`Sàn đã chuyển tiền ca ${fmtDate(modal.settle.date)}? Hệ thống tạo phiếu thu ${money(reconcile(modal.settle).netReceived)} (tiền thực nhận) vào sổ quỹ.`}
+        onClose={() => setModal(null)} onYes={() => { settleSession(modal.settle); setModal(null); }} />}
 
       {recon && <FormModal title={`Đối soát ca ${fmtDate(recon.date)} — GMV sóng ${money(recon.gmv)}`}
         data={{ netGmv: recon.netGmv || recon.gmv, platformFee: recon.platformFee, taxWithheld: recon.taxWithheld, hostPitPct: PIT_DEFAULT_PCT }}

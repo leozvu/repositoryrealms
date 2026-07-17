@@ -824,6 +824,7 @@ model LiveSession {
   hostAdvance   Int      @default(0) // tạm ứng theo GMV sóng
   hostSettled   Int      @default(0) // quyết toán theo GMV ròng (GỘP, trước khấu trừ TNCN)
   hostPit       Int      @default(0) // v3.27: TNCN khấu trừ tại nguồn từ công host (freelancer)
+  settledDate   String? // v3.33: ngày tiền sàn THỰC VỀ ví (Shopee ~ngày 4, có hoàn tới ngày 15) — ghi phiếu thu
   note          String?
   createdAt     DateTime @default(now())
   @@index([date])
