@@ -251,6 +251,7 @@ const NAV = [
   { section: 'Công ty' },
   { key: 'assets', label: 'Tài sản', icon: 'projects', roles: ALL },
   { key: 'reports', label: 'Báo cáo', icon: 'reports', roles: ['ACCOUNTANT', 'PM'] },
+  { key: 'financials', label: 'Báo cáo tài chính', icon: 'wallet', roles: ['ACCOUNTANT'], mod: 'export' },
   { key: 'analytics', label: 'Analytics (MRR/LTV)', icon: 'trendUp', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'analytics' },
   { key: 'okr', label: 'KPI / OKR', icon: 'tasks', roles: ALL },
   { key: 'automation', label: 'Tự động hóa', icon: 'repeat', roles: [] }, // chỉ DIRECTOR
