@@ -245,6 +245,7 @@ const NAV = [
   { key: 'growing', label: 'Vùng trồng / Đóng gói', icon: 'clients', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
   { key: 'inventory', label: 'Kho hàng / Lô', icon: 'wallet', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'inventory' },
   { key: 'shipments', label: 'Lô hàng xuất', icon: 'invoices', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
+  { key: 'markets', label: 'Tra cứu thị trường', icon: 'search', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
   { section: 'Livestream', mod: 'livestream' },
   { key: 'live', label: 'Ca live', icon: 'calendar', roles: ['LEAD', 'ACCOUNTANT', 'AM', 'PM'], mod: 'livestream' },
   { key: 'violations', label: 'Điểm vi phạm', icon: 'alert', roles: ['LEAD', 'ACCOUNTANT', 'PM'], mod: 'livestream' },
