@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { SessionProvider, signOut } from 'next-auth/react';
-import { Icon, Modal, ToastProvider, useToast, RoleLabelsCtx } from './ui';
+import { Icon, Modal, ToastProvider, useToast, RoleLabelsCtx, ModulesCtx } from './ui';
 import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
 import { modOn } from '@/lib/modules';
