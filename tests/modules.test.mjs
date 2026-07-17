@@ -40,6 +40,21 @@ test('v3.23: "Bảng công việc" (tasks) tách khỏi delivery — Fretas CÓ 
   for (const p of ['agency', 'export', 'livestream']) assert.ok(MODULE_PRESETS[p].mods.includes('tasks'), `${p} có tasks`);
 });
 
+test('v3.24: "Kho hàng / Lô" (inventory) — Fretas CÓ, công ty khác mặc định TẮT', () => {
+  const ex = MODULE_PRESETS.export.mods;
+  assert.ok(ex.includes('inventory'), 'preset export có kho hàng');
+  assert.ok(!MODULE_PRESETS.agency.mods.includes('inventory'), 'agency không có kho');
+  assert.ok(!MODULE_PRESETS.livestream.mods.includes('inventory'), 'livestream không có kho');
+  // mặc định TẮT: công ty cũ (null) KHÔNG tự thấy menu kho
+  assert.equal(modOn('inventory', null), false, 'agency cũ (null) KHÔNG thấy Kho hàng');
+  assert.equal(modOn('inventory', ex), true, 'Fretas thấy Kho hàng');
+  // resource guard
+  assert.equal(resourceMod('stocklots'), 'inventory');
+  assert.equal(resourceMod('stockmoves'), 'inventory');
+  assert.equal(modOn(resourceMod('stocklots'), ex), true, 'API stocklots qua ở Fretas');
+  assert.equal(modOn(resourceMod('stocklots'), null), false, 'API stocklots chặn ở agency');
+});
+
 test('v3.22: "Bảng giá dịch vụ" là phân hệ agency — Fretas (export) KHÔNG thấy', () => {
   const ex = MODULE_PRESETS.export.mods;
   assert.ok(!ex.includes('services'), 'preset export không có services');

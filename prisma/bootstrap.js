@@ -11,7 +11,7 @@ const prisma = new PrismaClient();
 // Giữ đồng bộ với lib/modules.js MODULE_PRESETS (bootstrap chạy CommonJS nên khai lại ở đây).
 const PRESETS = {
   agency: ['sales', 'services', 'support', 'tasks', 'delivery', 'commissions', 'procurement', 'freelancers', 'recruitment', 'reviews', 'analytics'],
-  export: ['sales', 'tasks', 'procurement', 'recruitment', 'export'],
+  export: ['sales', 'tasks', 'procurement', 'recruitment', 'export', 'inventory'],
   livestream: ['tasks', 'commissions', 'freelancers', 'reviews', 'livestream'],
 };
 

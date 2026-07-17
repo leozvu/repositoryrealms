@@ -739,6 +739,48 @@ model ShipmentDoc {
   @@index([shipmentId])
 }
 
+// ===== v3.24: KHO HÀNG + LÔ + TRUY XUẤT NGUỒN GỐC (phân hệ 'inventory' — Fretas) =====
+// Mua nông sản từ nông dân → nhập kho theo LÔ (gắn vùng trồng + ngày thu hoạch + hạn dùng)
+// → xuất kho vào lô hàng xuất. Giá vốn theo lô (đích danh — phù hợp nông sản truy xuất từng lô).
+model StockLot {
+  id            String   @id @default(cuid())
+  code          String   @unique // LOT-2026-001
+  crop          String // Chanh dây | Chôm chôm | ...
+  vendorId      String? // nhà cung cấp / nông dân (Vendor)
+  growingAreaId String? // vùng trồng nguồn — TRUY XUẤT NGUỒN GỐC (GrowingArea PUC)
+  warehouse     String? // kho: Kho lạnh | Kho đóng gói | ...
+  harvestDate   String? // ngày thu hoạch (YYYY-MM-DD)
+  expiryDate    String? // hạn sử dụng / nên xuất trước
+  receivedDate  String? // ngày nhập kho
+  qtyIn         Float    @default(0) // kg nhập
+  qtyOut        Float    @default(0) // kg đã xuất (tổng các phiếu xuất)
+  unitCost      Float    @default(0) // giá vốn / kg (theo currency)
+  currency      String   @default("VND")
+  status        String   @default("in_stock") // in_stock | depleted | expired
+  note          String?
+  createdAt     DateTime @default(now())
+  moves         StockMove[]
+  @@index([crop])
+  @@index([status])
+}
+
+// Phiếu nhập/xuất/điều chỉnh cho một lô. Xuất (out) gắn refId = shipmentId để truy xuất
+// lô hàng xuất đi từ những lô tồn nào (→ ra tận vùng trồng).
+model StockMove {
+  id        String   @id @default(cuid())
+  lotId     String
+  lot       StockLot @relation(fields: [lotId], references: [id])
+  type      String // in | out | adjust
+  qty       Float    @default(0) // kg (dương)
+  date      String
+  refType   String? // shipment | manual
+  refId     String? // shipmentId khi xuất cho lô hàng
+  note      String?
+  createdAt DateTime @default(now())
+  @@index([lotId])
+  @@index([refId])
+}
+
 // ===== v3.20: LIVESTREAM BÁN HÀNG (phân hệ 'livestream' — Egolive) =====
 // Một ca live. GMV ≠ doanh thu: gmv là chốt trên sóng, netGmv là sau đối soát (trừ hủy/hoàn/phí/thuế).
 model LiveSession {

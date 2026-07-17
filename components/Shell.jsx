@@ -242,6 +242,7 @@ const NAV = [
   { key: 'freelancers', label: 'Freelancer', icon: 'clients', roles: ['HR', 'PM', 'LEAD'], mod: 'freelancers' },
   { section: 'Xuất nhập khẩu', mod: 'export' },
   { key: 'growing', label: 'Vùng trồng / Đóng gói', icon: 'clients', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
+  { key: 'inventory', label: 'Kho hàng / Lô', icon: 'wallet', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'inventory' },
   { key: 'shipments', label: 'Lô hàng xuất', icon: 'invoices', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
   { section: 'Livestream', mod: 'livestream' },
   { key: 'live', label: 'Ca live', icon: 'calendar', roles: ['LEAD', 'ACCOUNTANT', 'AM', 'PM'], mod: 'livestream' },

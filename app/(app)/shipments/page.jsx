@@ -19,6 +19,8 @@ export default function ShipmentsPage() {
   const clients = useResource('clients');
   const areas = useResource('growingareas');
   const codes = useResource('areacodes');
+  const moves = useResource('stockmoves');  // v3.24: truy xuất lô tồn → lô hàng (inventory tắt → 403 im lặng)
+  const lots = useResource('stocklots');
   const [modal, setModal] = useState(null);
   const [detail, setDetail] = useState(null);
   const toast = useToast();
@@ -178,12 +180,14 @@ export default function ShipmentsPage() {
         msg={`Ghi nhận thanh toán lô ${modal.pay.code} — ${moneyC(modal.pay.amount, modal.pay.currency)}? Hệ thống tạo phiếu thu (quy về VNĐ theo tỷ giá) vào sổ quỹ và đánh dấu lô "Đã thanh toán".`}
         onClose={() => setModal(null)} onYes={() => payShipment(modal.pay)} />}
 
-      {detail && <ShipmentDetail s={detail} docs={docsOf(detail.id)} area={areas.rows} onToggle={toggleDoc} onClose={() => setDetail(null)} />}
+      {detail && <ShipmentDetail s={detail} docs={docsOf(detail.id)} area={areas.rows}
+        sourceLots={moves.rows.filter(m => m.refId === detail.id).map(m => ({ ...m, lot: lots.rows.find(l => l.id === m.lotId) }))}
+        allAreas={areas.rows} onToggle={toggleDoc} onClose={() => setDetail(null)} />}
     </>
   );
 }
 
-function ShipmentDetail({ s, docs, area, onToggle, onClose }) {
+function ShipmentDetail({ s, docs, area, sourceLots = [], allAreas = [], onToggle, onClose }) {
   const notes = marketNotes(s.crop, s.market);
   const aName = id => area.find(a => a.id === id)?.name || '—';
   const DOC_LABEL = { invoice: 'Commercial Invoice', packing: 'Packing List', bl: 'Bill of Lading / AWB', phyto: 'Giấy kiểm dịch thực vật', co: 'C/O', irradiation: 'Chứng nhận chiếu xạ', customs: 'Tờ khai hải quan' };
@@ -214,6 +218,23 @@ function ShipmentDetail({ s, docs, area, onToggle, onClose }) {
             <div><b>ETD → ETA:</b> {fmtDate(s.etd)} → {fmtDate(s.eta)}</div>
             {s.paymentMethod === 'LC' && <div><b>Hạn xuất trình L/C:</b> {fmtDate(s.presentDeadline)}</div>}
           </div>
+
+          {sourceLots.length > 0 && (
+            <div className="card" style={{ marginBottom: 12, borderColor: 'var(--accent)' }}>
+              <div className="card-body" style={{ fontSize: '.82rem' }}>
+                <b style={{ color: 'var(--accent)' }}>Truy xuất nguồn gốc — lô hàng này đóng từ:</b>
+                <ul style={{ margin: '6px 0 0 18px' }}>
+                  {sourceLots.map((m, i) => (
+                    <li key={i}>
+                      <b>{m.qty} kg</b> từ lô <b>{m.lot?.code || m.lotId}</b>
+                      {m.lot?.growingAreaId ? ` · vùng trồng ${allAreas.find(a => a.id === m.lot.growingAreaId)?.name || '—'}` : ''}
+                      {m.lot?.harvestDate ? ` · thu hoạch ${fmtDate(m.lot.harvestDate)}` : ''}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
 
           <div className="card-title" style={{ marginBottom: 8 }}>Bộ chứng từ ({docs.filter(d => d.status === 'done').length}/{docs.length})</div>
           {docs.map(d => (
