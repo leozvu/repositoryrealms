@@ -29,9 +29,12 @@ export default function ShipmentsPage() {
   // v3.21: mã vùng trồng đang bị đình chỉ/thu hồi cho một thị trường → cảnh báo khi lập lô.
   const codeSuspendedFor = (areaId, market) => codes.rows.some(c => c.areaId === areaId && c.market === market && c.status !== 'active');
 
-  const payShipment = async s => {
-    const r = await fetch(`/api/shipments/${s.id}/pay`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
-    if (!r.ok) { const j = await r.json().catch(() => ({})); return toast(j.error || 'Lỗi', 'error'); }
+  const payShipment = async (s, d = {}) => {
+    const r = await fetch(`/api/shipments/${s.id}/pay`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payFxRate: +d.payFxRate || undefined, date: d.date }),
+    });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); toast(j.error || 'Lỗi', 'error'); return false; }
     await ships.refresh(); toast('Đã ghi nhận thanh toán + phiếu thu vào sổ quỹ');
   };
 
@@ -176,9 +179,17 @@ export default function ShipmentsPage() {
           for (const d of docsOf(modal.del.id)) await docs.remove(d.id);
           await ships.remove(modal.del.id); toast('Đã xóa lô hàng');
         }} />}
-      {modal?.pay && <ConfirmDialog yesLabel="Ghi nhận thu"
-        msg={`Ghi nhận thanh toán lô ${modal.pay.code} — ${moneyC(modal.pay.amount, modal.pay.currency)}? Hệ thống tạo phiếu thu (quy về VNĐ theo tỷ giá) vào sổ quỹ và đánh dấu lô "Đã thanh toán".`}
-        onClose={() => setModal(null)} onYes={() => payShipment(modal.pay)} />}
+      {modal?.pay && (modal.pay.currency === 'VND'
+        ? <ConfirmDialog yesLabel="Ghi nhận thu"
+            msg={`Ghi nhận thanh toán lô ${modal.pay.code} — ${moneyC(modal.pay.amount, modal.pay.currency)}? Hệ thống tạo phiếu thu vào sổ quỹ và đánh dấu lô "Đã thanh toán".`}
+            onClose={() => setModal(null)} onYes={() => payShipment(modal.pay)} />
+        : <FormModal title={`Ghi nhận thu lô ${modal.pay.code}`}
+            data={{ payFxRate: modal.pay.fxRate, date: todayISO() }} onClose={() => setModal(null)}
+            onSave={d => payShipment(modal.pay, d)}
+            fields={[
+              { key: 'payFxRate', label: `Tỷ giá THỰC THU (1 ${modal.pay.currency} = ? VNĐ)`, type: 'number', required: true, hint: `Tỷ giá ghi sổ khi lập lô: ${modal.pay.fxRate}. Chênh lệch sẽ ghi lãi/lỗ tỷ giá.` },
+              { key: 'date', label: 'Ngày thu', type: 'date' },
+            ]} />)}
 
       {detail && <ShipmentDetail s={detail} docs={docsOf(detail.id)} area={areas.rows}
         sourceLots={moves.rows.filter(m => m.refId === detail.id).map(m => ({ ...m, lot: lots.rows.find(l => l.id === m.lotId) }))}

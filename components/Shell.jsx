@@ -231,6 +231,7 @@ const NAV = [
   { key: 'commissions', label: 'Hoa hồng Sales', icon: 'percent', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'commissions' },
   { key: 'finance', label: 'Thu / Chi', icon: 'finance', roles: ['ACCOUNTANT'] },
   { key: 'finplan', label: 'Công nợ & Dự báo', icon: 'trendUp', roles: ['ACCOUNTANT'] },
+  { key: 'fxreval', label: 'Đánh giá lại tỷ giá', icon: 'repeat', roles: ['ACCOUNTANT'], mod: 'export' },
   { key: 'vendors', label: 'Mua hàng / NCC', icon: 'wallet', roles: ['ACCOUNTANT', 'PM'], mod: 'procurement' },
   { key: 'contracts', label: 'Hợp đồng', icon: 'shield', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'procurement' },
   { section: 'Nhân sự' },
