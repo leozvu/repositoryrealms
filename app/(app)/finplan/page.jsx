@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
-import { money, moneyShort, fmtDate, todayISO, thisMonth, monthKey, remainOf, localISO } from '@/lib/format';
+import { money, moneyShort, moneyC, fmtDate, todayISO, thisMonth, monthKey, remainOf, localISO } from '@/lib/format';
 
 const CATEGORIES = ['Lương nhân sự', 'Ngân sách quảng cáo', 'Văn phòng', 'Công cụ / phần mềm', 'Marketing nội bộ', 'Thanh toán nhà cung cấp', 'Thuế / phí', 'Khác'];
 
@@ -19,6 +19,7 @@ const BUCKETS = [['current', 'Trong hạn'], ['d30', 'Quá 1–30 ngày'], ['d60
 
 export default function FinPlanPage() {
   const invoices = useResource('invoices');
+  const ships = useResource('shipments');   // v3.25: lô hàng xuất chưa thu = AR chính của DN xuất khẩu
   const bills = useResource('vendorbills');
   const vendors = useResource('vendors');
   const clients = useResource('clients');
@@ -34,9 +35,15 @@ export default function FinPlanPage() {
   const cName = id => clients.rows.find(c => c.id === id)?.name || '—';
   const vName = id => vendors.rows.find(v => v.id === id)?.name || '—';
 
-  /* ---------- AR / AP aging ---------- */
-  const ar = invoices.rows.filter(v => !['paid', 'draft'].includes(v.status) && remainOf(v) > 0)
-    .map(v => ({ code: v.code, who: cName(v.clientId), due: v.dueDate, amount: remainOf(v), bucket: bucketOf(v.dueDate) }));
+  /* ---------- AR / AP aging (v3.25: đa tiền tệ — quy VNĐ để gộp aging, giữ nguyên tệ để hiện) ---------- */
+  const toVnd = (amt, cur, fx) => (cur && cur !== 'VND') ? Math.round(amt * (fx || 1)) : amt;
+  const ar = [
+    ...invoices.rows.filter(v => !['paid', 'draft'].includes(v.status) && remainOf(v) > 0)
+      .map(v => { const rem = remainOf(v); const cur = v.currency || 'VND'; return { code: v.code, who: cName(v.clientId), due: v.dueDate, amount: toVnd(rem, cur, v.fxRate), cur, native: rem, bucket: bucketOf(v.dueDate) }; }),
+    // Lô hàng xuất chưa thu (ngoại tệ) — ngày dự thu ≈ ETA (hàng đến là thu). Đây là công nợ lớn nhất của Fretas.
+    ...ships.rows.filter(s => !['paid', 'draft'].includes(s.status) && s.amount > 0)
+      .map(s => { const cur = s.currency || 'VND'; const due = s.eta || s.etd; return { code: s.code, who: cName(s.clientId), due, amount: toVnd(s.amount, cur, s.fxRate), cur, native: s.amount, bucket: bucketOf(due) }; }),
+  ];
   const uName = id => users.rows.find(u => u.id === id)?.name || 'Freelancer';
   const ap = [
     ...bills.rows.filter(b => b.status !== 'paid')
@@ -63,8 +70,9 @@ export default function FinPlanPage() {
   for (let i = 0; i < 3; i++) {
     const d = new Date(); d.setMonth(d.getMonth() + i);
     const k = localISO(d).slice(0, 7);
-    const inflow = invoices.rows.filter(v => !['paid', 'draft'].includes(v.status) && monthKey(v.dueDate) === k).reduce((s, v) => s + remainOf(v), 0)
-      + invoices.rows.filter(v => v.recurring && v.status === 'paid' && i > 0).reduce((s, v) => 0 + s, 0);
+    const inflow = invoices.rows.filter(v => !['paid', 'draft'].includes(v.status) && monthKey(v.dueDate) === k).reduce((s, v) => s + toVnd(remainOf(v), v.currency, v.fxRate), 0)
+      // v3.25: lô hàng xuất dự thu quanh ngày ETA (quy VNĐ)
+      + ships.rows.filter(s => !['paid', 'draft'].includes(s.status) && monthKey(s.eta || s.etd) === k).reduce((s2, s) => s2 + toVnd(s.amount, s.currency, s.fxRate), 0);
     const outVendor = bills.rows.filter(b => b.status !== 'paid' && monthKey(b.dueDate) === k).reduce((s, b) => s + b.amount, 0);
     const outflow = outVendor + payrollMonthly + fixedAvg;
     forecast.push({ k, label: `Tháng ${+k.slice(5)}/${k.slice(0, 4)}`, inflow, outflow, net: inflow - outflow });
@@ -96,7 +104,10 @@ export default function FinPlanPage() {
                   <tbody>{list.sort((a, b) => (a.due || '').localeCompare(b.due || '')).map((x, i) => (
                     <tr key={i}><td><b>{x.code}</b> · {x.who}</td>
                       <td style={x.bucket !== 'current' ? { color: 'var(--danger)', fontWeight: 600 } : {}}>{fmtDate(x.due)}</td>
-                      <td className="num" style={{ fontWeight: 700 }}>{money(x.amount)}</td></tr>))}</tbody>
+                      <td className="num" style={{ fontWeight: 700 }}>
+                        {x.cur && x.cur !== 'VND'
+                          ? <>{moneyC(x.native, x.cur)}<div className="cell-sub" style={{ fontWeight: 400, color: 'var(--muted)' }}>≈ {money(x.amount)}</div></>
+                          : money(x.amount)}</td></tr>))}</tbody>
                 </table>
               ) : <EmptyState title="Không có khoản nào" />}
             </div>
