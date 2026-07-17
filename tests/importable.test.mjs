@@ -1,7 +1,7 @@
 // v3.28: test nhập liệu hàng loạt. Ép kiểu + kiểm lỗi sai là ghi rác vào DB.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { IMPORTABLE, validateRow, parseIntVnd, splitRows, toCSV } from '../lib/importable.js';
+import { IMPORTABLE, EXPORT_ONLY, validateRow, parseIntVnd, splitRows, toCSV } from '../lib/importable.js';
 
 test('parseIntVnd: bỏ dấu phân tách nghìn + ký hiệu tiền', () => {
   assert.equal(parseIntVnd('1.000.000'), 1000000);
@@ -63,6 +63,16 @@ test('toCSV: có BOM, escape dấu phẩy/ngoặc kép/xuống dòng', () => {
   assert.equal(lines[0], 'Tên,Ghi chú');
   assert.equal(lines[1], '"Cty A, B","có ""trích"""', 'phẩy + ngoặc kép được bọc/nhân đôi');
   assert.ok(csv.includes('"dòng\nhai"'), 'xuống dòng trong ô được bọc ngoặc kép');
+});
+
+test('EXPORT_ONLY: cột tính sẵn (get) — tổng hóa đơn gồm VAT + còn lại', () => {
+  const inv = EXPORT_ONLY.invoices;
+  const row = { code: 'HD-1', items: JSON.stringify([{ qty: 2, price: 1000000 }]), vat: 8, payments: JSON.stringify([{ amount: 1000000 }]) };
+  const csv = toCSV([row], inv.fields);
+  const cells = csv.slice(1).split('\n')[1].split(',');
+  // tổng = 2×1tr ×1.08 = 2.160.000; đã thu 1tr; còn 1.160.000
+  assert.ok(csv.includes('2160000'), 'tổng gồm VAT');
+  assert.ok(csv.includes('1160000'), 'còn lại đúng');
 });
 
 test('whitelist KHÔNG chứa tài nguyên nhạy cảm (users/payouts/…)', () => {

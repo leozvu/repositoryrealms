@@ -5,22 +5,26 @@ import { useMemo, useState } from 'react';
 import { useResource, useModules, Icon, useToast } from '@/components/ui';
 import { money, todayISO } from '@/lib/format';
 import { modOn } from '@/lib/modules';
-import { IMPORTABLE, validateRow, splitRows, toCSV } from '@/lib/importable';
+import { IMPORTABLE, EXPORT_ONLY, validateRow, splitRows, toCSV } from '@/lib/importable';
 
 const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
 export default function ImportPage() {
   const modules = useModules();
   const toast = useToast();
-  const options = Object.entries(IMPORTABLE).filter(([, s]) => modOn(s.mod, modules));
-  const [resource, setResource] = useState(options[0]?.[0] || 'clients');
-  const spec = IMPORTABLE[resource];
-  const res = useResource(resource); // để refresh sau khi nhập + đếm hiện có
+  const [mode, setMode] = useState('import'); // import | export
+  // Xuất hỗ trợ nhiều nguồn hơn nhập (thêm hóa đơn, lô hàng…). Nhập chỉ các danh sách round-trip.
+  const EXPORT_SPECS = { ...IMPORTABLE, ...EXPORT_ONLY };
+  const specMap = mode === 'import' ? IMPORTABLE : EXPORT_SPECS;
+  const options = Object.entries(specMap).filter(([, s]) => modOn(s.mod, modules));
+  const [resource, setResource] = useState('clients');
+  const spec = specMap[resource] || IMPORTABLE.clients;
+  const res = useResource(specMap[resource] ? resource : 'clients'); // để refresh sau khi nhập + đếm hiện có
   const [text, setText] = useState('');
   const [mapping, setMapping] = useState({});
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
-  const [mode, setMode] = useState('import'); // import | export
+  const switchMode = m => { setMode(m); setResult(null); const opts = Object.entries(m === 'import' ? IMPORTABLE : EXPORT_SPECS).filter(([, s]) => modOn(s.mod, modules)); if (!opts.some(([k]) => k === resource)) setResource(opts[0]?.[0] || 'clients'); };
 
   const exportCSV = () => {
     if (!res.rows.length) return toast('Chưa có dữ liệu để xuất.', 'error');
@@ -81,8 +85,8 @@ export default function ImportPage() {
     <>
       <div className="toolbar">
         <div className="seg" style={{ display: 'inline-flex', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
-          <button className={mode === 'import' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'} style={{ borderRadius: 0 }} onClick={() => { setMode('import'); setResult(null); }}>Nhập vào</button>
-          <button className={mode === 'export' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'} style={{ borderRadius: 0 }} onClick={() => { setMode('export'); setResult(null); }}>Xuất ra</button>
+          <button className={mode === 'import' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'} style={{ borderRadius: 0 }} onClick={() => switchMode('import')}>Nhập vào</button>
+          <button className={mode === 'export' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'} style={{ borderRadius: 0 }} onClick={() => switchMode('export')}>Xuất ra</button>
         </div>
         <label style={{ fontSize: '.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>{mode === 'import' ? 'Loại dữ liệu:' : 'Xuất từ:'}
           <select className="filter" value={resource} onChange={e => changeResource(e.target.value)}>
