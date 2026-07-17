@@ -31,6 +31,7 @@ export async function GET(req) {
     prisma.shipment.findMany(),      // v3.21: cho công ty XNK
     prisma.liveSession.findMany(),   // v3.21: cho công ty livestream
   ]);
+  const stockLots = await prisma.stockLot.findMany().catch(() => []); // v3.34: cho công ty có kho
   const settings = settingRow ? JSON.parse(settingRow.json) : {};
   const tm = mk(0), lm = mk(-1);
   const sum = (arr, f) => arr.reduce((s, x) => s + f(x), 0);
@@ -67,6 +68,10 @@ export async function GET(req) {
       liveGmvMonth: sum(liveSessions.filter(s => (s.date || '').startsWith(tm)), s => s.gmv || 0),
       liveNetMonth: sum(liveSessions.filter(s => (s.date || '').startsWith(tm) && s.status === 'reconciled'), s => s.netReceived || 0),
       livePendingRecon: liveSessions.filter(s => s.status === 'done').length,
+      // v3.34: chỉ số mới đêm nay
+      livePendingSettle: sum(liveSessions.filter(s => s.status === 'reconciled' && !s.settledDate), s => s.netReceived || 0), // tiền sàn chưa về ví
+      inventoryValue: sum(stockLots, l => Math.max(0, (l.qtyIn || 0) - (l.qtyOut || 0)) * (l.unitCost || 0)), // giá trị tồn kho theo giá vốn
+      cashBalance: sum(txs, t => t.type === 'income' ? t.amount : -t.amount), // số dư quỹ lũy kế (cơ sở tiền)
     },
     insights: insights.filter(i => ['bad', 'warn'].includes(i.level)).slice(0, 6).map(i => ({ level: i.level, text: i.text })),
   });
