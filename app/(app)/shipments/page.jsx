@@ -4,7 +4,7 @@
 // chứng từ theo thị trường, tính hạn xuất trình L/C, cảnh báo điều kiện đặc thù.
 import { useState } from 'react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
-import { moneyC, fmtDate, todayISO } from '@/lib/format';
+import { moneyC, money, fmtDate, todayISO } from '@/lib/format';
 import {
   MARKETS, CROPS, SHIPMENT_STATUS, INCOTERMS_SEA, INCOTERMS_AIR,
   marketBlocked, marketNotes, incotermValid, requiredDocs, presentationDeadline, CROP_TEMP,
@@ -80,6 +80,13 @@ export default function ShipmentsPage() {
     return { txt: `Hạn xuất trình L/C: ${fmtDate(s.presentDeadline)}`, danger: false };
   };
 
+  // v3.22: KPI đầu trang — bức tranh nhanh cho DN xuất khẩu
+  const inTransit = ships.rows.filter(s => ['booked', 'packing', 'customs', 'shipped'].includes(s.status));
+  const unpaid = ships.rows.filter(s => !['draft', 'paid'].includes(s.status));
+  const unpaidVnd = unpaid.reduce((a, s) => a + (s.amount || 0) * (s.fxRate || 1), 0);
+  const lcRisk = ships.rows.filter(s => lcWarn(s)?.danger).length;
+  const docsIncomplete = ships.rows.filter(s => { const ds = docsOf(s.id); return ds.length && ds.filter(d => d.status === 'done').length < ds.length && s.status !== 'paid'; }).length;
+
   const fields = (row) => [
     { key: 'crop', label: 'Mặt hàng', type: 'select', required: true, options: CROPS.map(c => ({ value: c, label: c })) },
     { key: 'market', label: 'Thị trường đích', type: 'select', required: true, options: Object.entries(MARKETS).map(([k, v]) => ({ value: k, label: v })) },
@@ -107,6 +114,21 @@ export default function ShipmentsPage() {
 
   return (
     <>
+      <div className="grid kpi-grid" style={{ marginBottom: 16 }}>
+        <div className="card kpi"><span className="kpi-label">Lô đang đi</span>
+          <div className="kpi-value">{inTransit.length}</div>
+          <div className="kpi-sub">{ships.rows.length} lô trong hệ thống</div></div>
+        <div className="card kpi"><span className="kpi-label">Tiền hàng chưa thu</span>
+          <div className="kpi-value" style={{ fontSize: '1.15rem' }}>{money(unpaidVnd)}</div>
+          <div className="kpi-sub">{unpaid.length} lô chờ thanh toán (quy VNĐ)</div></div>
+        <div className="card kpi"><span className="kpi-label">Chứng từ chưa đủ</span>
+          <div className="kpi-value" style={{ color: docsIncomplete ? 'var(--warn)' : 'var(--accent)' }}>{docsIncomplete}</div>
+          <div className="kpi-sub">lô thiếu chứng từ để thông quan / thanh toán</div></div>
+        <div className="card kpi"><span className="kpi-label">L/C sắp / quá hạn</span>
+          <div className="kpi-value" style={{ color: lcRisk ? 'var(--danger)' : 'var(--accent)' }}>{lcRisk}</div>
+          <div className="kpi-sub">còn ≤5 ngày xuất trình chứng từ — trễ là mất tiền</div></div>
+      </div>
+
       <div className="toolbar">
         <span style={{ fontSize: '.85rem', color: 'var(--muted)' }}>{ships.rows.length} lô hàng · chặn cứng thị trường cấm, checklist chứng từ tự sinh theo thị trường</span>
         <div className="spacer"></div>

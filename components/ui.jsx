@@ -9,6 +9,12 @@ export const RoleLabelsCtx = createContext(null);
 // Trả map {DIRECTOR: 'Giám đốc', ...} — công ty đổi tên trong Cài đặt thì mọi nơi đổi theo
 export const useRoleLabels = () => useContext(RoleLabelsCtx) || ROLE_LABEL;
 
+/* ---------- v3.22: phân hệ bật/tắt theo công ty (Setting.modules) ---------- */
+// Shell nạp modules 1 lần rồi cung cấp qua context — trang con đọc để hiện KPI đúng loại hình
+// mà không phải fetch lại. Giá trị: mảng mod đang bật | null (công ty cũ = coi như bật hết agency).
+export const ModulesCtx = createContext(null);
+export const useModules = () => useContext(ModulesCtx);
+
 /* ---------- Icons (Lucide-style, giữ nguyên từ v1) ---------- */
 const RAW = {
   dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',

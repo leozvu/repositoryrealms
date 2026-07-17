@@ -216,7 +216,7 @@ const NAV = [
   { key: 'leads', label: 'Khách tiềm năng', icon: 'leads', roles: ['AM'], mod: 'sales' },
   { key: 'clients', label: 'Khách hàng', icon: 'clients', roles: ALL },
   { key: 'quotes', label: 'Báo giá', icon: 'quotes', roles: ['AM', 'PM', 'ACCOUNTANT'], mod: 'sales' },
-  { key: 'services', label: 'Bảng giá dịch vụ', icon: 'tag', roles: ALL, mod: 'sales' },
+  { key: 'services', label: 'Bảng giá dịch vụ', icon: 'tag', roles: ALL, mod: 'services' },
   { key: 'tickets', label: 'Ticket hỗ trợ', icon: 'check', roles: ALL, mod: 'support' },
   { section: 'Vận hành' },
   { key: 'portfolio', label: 'Sở chỉ huy DA', icon: 'reports', roles: ['PM', 'LEAD', 'ACCOUNTANT'], mod: 'delivery' },
@@ -324,6 +324,7 @@ export default function Shell({ user, company, children }) {
     <SessionProvider>
     <ToastProvider>
     <RoleLabelsCtx.Provider value={roleLabels}>
+    <ModulesCtx.Provider value={modules}>
       <div id="app">
         <aside id="sidebar" className={open ? 'open' : ''}>
           <div className="brand">
@@ -393,6 +394,7 @@ export default function Shell({ user, company, children }) {
             : children}</main>
         </div>
       </div>
+    </ModulesCtx.Provider>
     </RoleLabelsCtx.Provider>
     </ToastProvider>
     </SessionProvider>
