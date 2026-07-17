@@ -250,7 +250,7 @@ const NAV = [
   { key: 'violations', label: 'Điểm vi phạm', icon: 'alert', roles: ['LEAD', 'ACCOUNTANT', 'PM'], mod: 'livestream' },
   { section: 'Công ty' },
   { key: 'assets', label: 'Tài sản', icon: 'projects', roles: ALL },
-  { key: 'import', label: 'Nhập liệu Excel', icon: 'upload', roles: ['ACCOUNTANT', 'AM', 'PM', 'HR', 'LEAD'] },
+  { key: 'import', label: 'Nhập / Xuất Excel', icon: 'upload', roles: ['ACCOUNTANT', 'AM', 'PM', 'HR', 'LEAD'] },
   { key: 'reports', label: 'Báo cáo', icon: 'reports', roles: ['ACCOUNTANT', 'PM'] },
   { key: 'financials', label: 'Báo cáo tài chính', icon: 'wallet', roles: ['ACCOUNTANT'], mod: 'export' },
   { key: 'analytics', label: 'Analytics (MRR/LTV)', icon: 'trendUp', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'analytics' },

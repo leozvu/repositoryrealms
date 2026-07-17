@@ -1,7 +1,7 @@
 // v3.28: test nhập liệu hàng loạt. Ép kiểu + kiểm lỗi sai là ghi rác vào DB.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { IMPORTABLE, validateRow, parseIntVnd, splitRows } from '../lib/importable.js';
+import { IMPORTABLE, validateRow, parseIntVnd, splitRows, toCSV } from '../lib/importable.js';
 
 test('parseIntVnd: bỏ dấu phân tách nghìn + ký hiệu tiền', () => {
   assert.equal(parseIntVnd('1.000.000'), 1000000);
@@ -53,6 +53,16 @@ test('splitRows: ưu tiên TAB (dán Excel), fallback dấu phẩy; bỏ dòng t
   assert.equal(r.length, 3);
   const csv = 'a,b\n1,2';
   assert.deepEqual(splitRows(csv)[1], ['1', '2']);
+});
+
+test('toCSV: có BOM, escape dấu phẩy/ngoặc kép/xuống dòng', () => {
+  const fields = [{ key: 'name', label: 'Tên' }, { key: 'note', label: 'Ghi chú' }];
+  const csv = toCSV([{ name: 'Cty A, B', note: 'có "trích"' }, { name: 'Cty C', note: 'dòng\nhai' }], fields);
+  assert.ok(csv.startsWith('﻿'), 'có BOM để Excel đọc UTF-8');
+  const lines = csv.slice(1).split('\n');
+  assert.equal(lines[0], 'Tên,Ghi chú');
+  assert.equal(lines[1], '"Cty A, B","có ""trích"""', 'phẩy + ngoặc kép được bọc/nhân đôi');
+  assert.ok(csv.includes('"dòng\nhai"'), 'xuống dòng trong ô được bọc ngoặc kép');
 });
 
 test('whitelist KHÔNG chứa tài nguyên nhạy cảm (users/payouts/…)', () => {

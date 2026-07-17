@@ -3,9 +3,9 @@
 // (bắt lỗi từng dòng) → nhập. Giảm rào cản đưa dữ liệu thật vào (khách, lead, thu/chi…).
 import { useMemo, useState } from 'react';
 import { useResource, useModules, Icon, useToast } from '@/components/ui';
-import { money } from '@/lib/format';
+import { money, todayISO } from '@/lib/format';
 import { modOn } from '@/lib/modules';
-import { IMPORTABLE, validateRow, splitRows } from '@/lib/importable';
+import { IMPORTABLE, validateRow, splitRows, toCSV } from '@/lib/importable';
 
 const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
@@ -20,6 +20,19 @@ export default function ImportPage() {
   const [mapping, setMapping] = useState({});
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [mode, setMode] = useState('import'); // import | export
+
+  const exportCSV = () => {
+    if (!res.rows.length) return toast('Chưa có dữ liệu để xuất.', 'error');
+    const csv = toCSV(res.rows, spec.fields);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${resource}-${todayISO()}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast(`Đã tải ${res.rows.length} dòng ${spec.label}`);
+  };
 
   const parsed = useMemo(() => splitRows(text), [text]);
   const header = parsed[0] || [];
@@ -67,13 +80,31 @@ export default function ImportPage() {
   return (
     <>
       <div className="toolbar">
-        <label style={{ fontSize: '.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>Nhập vào:
+        <div className="seg" style={{ display: 'inline-flex', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+          <button className={mode === 'import' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'} style={{ borderRadius: 0 }} onClick={() => { setMode('import'); setResult(null); }}>Nhập vào</button>
+          <button className={mode === 'export' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'} style={{ borderRadius: 0 }} onClick={() => { setMode('export'); setResult(null); }}>Xuất ra</button>
+        </div>
+        <label style={{ fontSize: '.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>{mode === 'import' ? 'Loại dữ liệu:' : 'Xuất từ:'}
           <select className="filter" value={resource} onChange={e => changeResource(e.target.value)}>
             {options.map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}
           </select>
         </label>
         <span style={{ fontSize: '.8rem', color: 'var(--muted)' }}>đang có {res.rows.length} bản ghi</span>
       </div>
+
+      {mode === 'export' && (
+        <div className="card">
+          <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 240 }}>
+              <b>Xuất {spec.label} ra file CSV</b>
+              <p style={{ fontSize: '.83rem', color: 'var(--muted)', margin: '4px 0 0' }}>Tải {res.rows.length} bản ghi ({spec.fields.map(f => f.label).join(', ')}). Mở bằng Excel/Google Sheets — có sẵn dấu tiếng Việt.</p>
+            </div>
+            <button className="btn btn-primary" onClick={exportCSV} disabled={!res.rows.length}><Icon name="download" size={16} /><span>Tải CSV ({res.rows.length})</span></button>
+          </div>
+        </div>
+      )}
+
+      {mode === 'import' && (<>
 
       <div className="card" style={{ marginBottom: 14 }}>
         <div className="card-body">
@@ -147,6 +178,8 @@ export default function ImportPage() {
           </div>
         </div>
       )}
+
+      </>)}
     </>
   );
 }
