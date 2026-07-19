@@ -33,13 +33,13 @@ route.resources.action.gan,app/(app)/resources/page.jsx,174,Gán,data-action,asy
 route.reviews.action.gui-tu-anh-gia,app/(app)/reviews/page.jsx,39,Gửi tự đánh giá,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.reviews.action.chot-anh-gia,app/(app)/reviews/page.jsx,43,Chốt đánh giá,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.reviews.action.mo-ot-anh-gia-q,app/(app)/reviews/page.jsx,107,Mở đợt đánh giá / {q},data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
-route.settings.action.khoa-mo,app/(app)/settings/page.jsx,67,Khóa / Mở,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.settings.action.delkey-k,app/(app)/settings/page.jsx,68,,data-action,async-button-guard,toast-or-state,handled-candidate,confirmed,verified
-route.settings.action.tao-key,app/(app)/settings/page.jsx,76,Tạo key,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.settings.action.tat-bat,app/(app)/settings/page.jsx,87,Tắt / Bật,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
-route.settings.action.them,app/(app)/settings/page.jsx,96,Thêm,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
-route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay,app/(app)/settings/page.jsx,244,Lưu & gửi email thử tới chính hộp thư này,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.settings.action.luu-cai-at,app/(app)/settings/page.jsx,258,Lưu cài đặt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.khoa-mo,app/(app)/settings/page.jsx,68,Khóa / Mở,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.delkey-k,app/(app)/settings/page.jsx,69,,data-action,async-button-guard,toast-or-state,handled-candidate,confirmed,verified
+route.settings.action.tao-key,app/(app)/settings/page.jsx,77,Tạo key,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.tat-bat,app/(app)/settings/page.jsx,88,Tắt / Bật,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
+route.settings.action.them,app/(app)/settings/page.jsx,97,Thêm,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
+route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay,app/(app)/settings/page.jsx,245,Lưu & gửi email thử tới chính hộp thư này,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.luu-cai-at,app/(app)/settings/page.jsx,259,Lưu cài đặt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.staff.action.luu,app/(app)/staff/page.jsx,22,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.ang-luu-luu,app/(app)/tasks/page.jsx,71,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.ghi-gio,app/(app)/tasks/page.jsx,141,Ghi giờ,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
@@ -64,11 +64,15 @@ component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-real
 component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so,components/realm/RealmOffice.jsx,1865,Đang đồng bộ… / Lưu hồ sơ,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmoffice.action.nhan-gold,components/realm/RealmOffice.jsx,1901,Nhận / Gold,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold,components/realm/RealmOffice.jsx,2472,Đang ghi… / Ghi nhận Gold,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-realmpilotcontrol.action.duyet-ap-dung,components/realm/RealmPilotControl.jsx,71,Duyệt & áp dụng,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-realmpilotcontrol.action.tu-choi,components/realm/RealmPilotControl.jsx,72,Từ chối,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-realmpilotcontrol.action.chay-dry-run-phat-hanh,components/realm/RealmPilotControl.jsx,536,Chạy dry-run phát hành,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-realmpilotcontrol.action.gui-director-khac-duyet,components/realm/RealmPilotControl.jsx,539,Gửi Director khác duyệt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-realmpilotcontrol.action.kich-hoat-kill-switch-luu-chinh-sach-pilot,components/realm/RealmPilotControl.jsx,546,Kích hoạt kill switch / Lưu chính sách pilot,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-realmpilotcontrol.action.duyet-ap-dung,components/realm/RealmPilotControl.jsx,73,Duyệt & áp dụng,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-realmpilotcontrol.action.tu-choi,components/realm/RealmPilotControl.jsx,74,Từ chối,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-realmpilotcontrol.action.chay-dry-run-phat-hanh,components/realm/RealmPilotControl.jsx,541,Chạy dry-run phát hành,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-realmpilotcontrol.action.gui-director-khac-duyet,components/realm/RealmPilotControl.jsx,544,Gửi Director khác duyệt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-realmpilotcontrol.action.kich-hoat-kill-switch-luu-chinh-sach-pilot,components/realm/RealmPilotControl.jsx,551,Kích hoạt kill switch / Lưu chính sách pilot,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-realmpilotoperations.action.gui-director-duyet,components/realm/RealmPilotOperations.jsx,177,Gửi Director duyệt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-realmpilotoperations.action.duyet-moi-cohort,components/realm/RealmPilotOperations.jsx,178,Duyệt & mời cohort,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-realmpilotoperations.action.tra-ve-nhap,components/realm/RealmPilotOperations.jsx,178,Trả về nháp,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-realmpilotoperations.action.tao-ban-nhap,components/realm/RealmPilotOperations.jsx,190,Tạo bản nháp,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-rewardcontrolcenter.action.ang-gui-gui-duyet,components/realm/RewardControlCenter.jsx,253,Đang gửi… / Gửi duyệt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-rewardcontrolcenter.action.ang-duyet-phe-duyet-budget,components/realm/RewardControlCenter.jsx,254,Đang duyệt… / Phê duyệt budget,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-rewardcontrolcenter.form-submit.checker-review-cau-hinh-han-muc-truoc-khi-reward-uoc-phe-duyet-t,components/realm/RewardControlCenter.jsx,271,Checker review / Cấu hình hạn mức trước khi reward được phê duyệt / Trần Gold toàn công ty / Trần Gold mỗi nhân sự / Lý do và phạm vi budget / Trần mỗi nhân sự không được lớn hơn t,data-action,local-state,toast-or-state,handled-candidate,not-required,verified

@@ -2095,6 +2095,76 @@
       }
     },
     {
+      "route": "/api/realm-demo/pilot/operations",
+      "source": "app/api/realm-demo/pilot/operations/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "Approval",
+            "CollaborationPresenceSession",
+            "Setting",
+            "Ticket",
+            "User"
+          ],
+          "roles": [
+            "ACCOUNTANT",
+            "AM",
+            "PM",
+            "STAFF"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector",
+            "isFreelancer"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            500
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "POST": {
+          "models": [
+            "Approval",
+            "AuditLog",
+            "CollaborationPresenceSession",
+            "Notification",
+            "RealmChangeEvent",
+            "Setting",
+            "Ticket",
+            "User"
+          ],
+          "roles": [
+            "ACCOUNTANT",
+            "AM",
+            "DIRECTOR",
+            "PM",
+            "STAFF"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector",
+            "isFreelancer"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            409,
+            500
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/realm-demo/readiness",
       "source": "app/api/realm-demo/readiness/route.js",
       "methods": {
@@ -23257,7 +23327,7 @@
     {
       "elementId": "route.settings.action.khoa-mo",
       "source": "app/(app)/settings/page.jsx",
-      "line": 67,
+      "line": 68,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -23332,7 +23402,7 @@
     {
       "elementId": "route.settings.action.delkey-k",
       "source": "app/(app)/settings/page.jsx",
-      "line": 68,
+      "line": 69,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -23407,7 +23477,7 @@
     {
       "elementId": "route.settings.form-control.ten-key-vd-n8n-zapier",
       "source": "app/(app)/settings/page.jsx",
-      "line": 72,
+      "line": 73,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -23473,7 +23543,7 @@
     {
       "elementId": "route.settings.form-control.ctrl-click-chon-nhieu-vai-tro",
       "source": "app/(app)/settings/page.jsx",
-      "line": 73,
+      "line": 74,
       "column": 13,
       "surface": "route.settings",
       "tag": "select",
@@ -23539,7 +23609,7 @@
     {
       "elementId": "route.settings.action.tao-key",
       "source": "app/(app)/settings/page.jsx",
-      "line": 76,
+      "line": 77,
       "column": 13,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -23616,7 +23686,7 @@
     {
       "elementId": "route.settings.action.tat-bat",
       "source": "app/(app)/settings/page.jsx",
-      "line": 87,
+      "line": 88,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -23716,7 +23786,7 @@
     {
       "elementId": "route.settings.action.setdeletewebhook-h",
       "source": "app/(app)/settings/page.jsx",
-      "line": 88,
+      "line": 89,
       "column": 15,
       "surface": "route.settings",
       "tag": "button",
@@ -23780,7 +23850,7 @@
     {
       "elementId": "route.settings.form-control.https-url-nhan-webhook",
       "source": "app/(app)/settings/page.jsx",
-      "line": 92,
+      "line": 93,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -23846,7 +23916,7 @@
     {
       "elementId": "route.settings.form-control.su-kien-mac-inh",
       "source": "app/(app)/settings/page.jsx",
-      "line": 94,
+      "line": 95,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -23912,7 +23982,7 @@
     {
       "elementId": "route.settings.form-control.secret-tuy-chon",
       "source": "app/(app)/settings/page.jsx",
-      "line": 95,
+      "line": 96,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -23978,7 +24048,7 @@
     {
       "elementId": "route.settings.action.them",
       "source": "app/(app)/settings/page.jsx",
-      "line": 96,
+      "line": 97,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -24080,7 +24150,7 @@
     {
       "elementId": "route.settings.action.copy-ong",
       "source": "app/(app)/settings/page.jsx",
-      "line": 103,
+      "line": 104,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -24146,7 +24216,7 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 146,
+      "line": 147,
       "column": 7,
       "surface": "route.settings",
       "tag": "input",
@@ -24212,7 +24282,7 @@
     {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 178,
+      "line": 179,
       "column": 17,
       "surface": "route.settings",
       "tag": "input",
@@ -24278,7 +24348,7 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 187,
+      "line": 188,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -24344,7 +24414,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 203,
+      "line": 204,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -24408,7 +24478,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 206,
+      "line": 207,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -24472,7 +24542,7 @@
     {
       "elementId": "route.settings.form-control.input.4",
       "source": "app/(app)/settings/page.jsx",
-      "line": 216,
+      "line": 217,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -24538,7 +24608,7 @@
     {
       "elementId": "route.settings.form-control.input.5",
       "source": "app/(app)/settings/page.jsx",
-      "line": 240,
+      "line": 241,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -24604,7 +24674,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 244,
+      "line": 245,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -24681,7 +24751,7 @@
     {
       "elementId": "route.settings.form-control.sk-ant-tao-tai-console-anthropic-com",
       "source": "app/(app)/settings/page.jsx",
-      "line": 254,
+      "line": 255,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -24747,7 +24817,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 258,
+      "line": 259,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -24820,7 +24890,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 271,
+      "line": 273,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -24886,7 +24956,7 @@
     {
       "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 274,
+      "line": 276,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -45607,7 +45677,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.duyet-ap-dung",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 71,
+      "line": 73,
       "column": 13,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "AsyncButton",
@@ -45649,7 +45719,7 @@
         {
           "callback": "onDecide",
           "source": "components/realm/RealmPilotControl.jsx",
-          "line": 497,
+          "line": 502,
           "surface": "component:realm/RealmPilotControl",
           "apiCalls": [
             "GET /api/realm-demo/launch/approvals",
@@ -45719,7 +45789,8 @@
       "rowPolicy": false,
       "scopedRead": false,
       "browserActions": [
-        "window.confirm"
+        "window.confirm",
+        "window.dispatchEvent"
       ],
       "helperCalls": [],
       "localMutations": [],
@@ -45732,7 +45803,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.tu-choi",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 72,
+      "line": 74,
       "column": 13,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "AsyncButton",
@@ -45774,7 +45845,7 @@
         {
           "callback": "onDecide",
           "source": "components/realm/RealmPilotControl.jsx",
-          "line": 497,
+          "line": 502,
           "surface": "component:realm/RealmPilotControl",
           "apiCalls": [
             "GET /api/realm-demo/launch/approvals",
@@ -45844,7 +45915,8 @@
       "rowPolicy": false,
       "scopedRead": false,
       "browserActions": [
-        "window.confirm"
+        "window.confirm",
+        "window.dispatchEvent"
       ],
       "helperCalls": [],
       "localMutations": [],
@@ -45857,7 +45929,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.thu-lai",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 315,
+      "line": 320,
       "column": 13,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -45933,7 +46005,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-pilot-mode",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 324,
+      "line": 329,
       "column": 21,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -45990,7 +46062,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-cohort-strategy",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 343,
+      "line": 348,
       "column": 23,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -46047,7 +46119,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.input",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 358,
+      "line": 363,
       "column": 25,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -46108,7 +46180,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.tim-theo-ten-chuc-danh-hoac-vai-tro",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 369,
+      "line": 374,
       "column": 25,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -46167,7 +46239,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.bo-chon",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 373,
+      "line": 378,
       "column": 25,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -46224,7 +46296,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.input.2",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 382,
+      "line": 387,
       "column": 29,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -46285,7 +46357,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 401,
+      "line": 406,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -46342,7 +46414,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface.2",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 405,
+      "line": 410,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -46399,7 +46471,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.input.3",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 417,
+      "line": 422,
       "column": 21,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -46460,7 +46532,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.tao-tour-v",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 429,
+      "line": 434,
       "column": 17,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -46517,7 +46589,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.mo-tour-cua-toi",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 430,
+      "line": 435,
       "column": 17,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -46576,7 +46648,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.chay-dry-run-phat-hanh",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 536,
+      "line": 541,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "AsyncButton",
@@ -46655,7 +46727,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.gui-director-khac-duyet",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 539,
+      "line": 544,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "AsyncButton",
@@ -46726,7 +46798,9 @@
       ],
       "rowPolicy": false,
       "scopedRead": false,
-      "browserActions": [],
+      "browserActions": [
+        "window.dispatchEvent"
+      ],
       "helperCalls": [],
       "localMutations": [],
       "loadingState": "async-button-guard",
@@ -46738,7 +46812,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.kich-hoat-kill-switch-luu-chinh-sach-pilot",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 546,
+      "line": 551,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "AsyncButton",
@@ -46806,7 +46880,9 @@
       ],
       "rowPolicy": false,
       "scopedRead": false,
-      "browserActions": [],
+      "browserActions": [
+        "window.dispatchEvent"
+      ],
       "helperCalls": [],
       "localMutations": [],
       "loadingState": "async-button-guard",
@@ -47012,6 +47088,705 @@
       "loadingState": "not-required",
       "successState": "not-required",
       "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.tai-lai-pilot-operations",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 126,
+      "column": 9,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "Tải lại Pilot Operations",
+      "handlerEvent": "onClick",
+      "handler": "() => load()",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "state.loading",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/realm-demo/pilot/operations"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "Approval",
+        "CollaborationPresenceSession",
+        "Setting",
+        "Ticket",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "ACCOUNTANT",
+        "AM",
+        "PM",
+        "STAFF"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.thu-lai",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 133,
+      "column": 80,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "Thử lại",
+      "handlerEvent": "onClick",
+      "handler": "() => load()",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/realm-demo/pilot/operations"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "Approval",
+        "CollaborationPresenceSession",
+        "Setting",
+        "Ticket",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "ACCOUNTANT",
+        "AM",
+        "PM",
+        "STAFF"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.gui-director-duyet",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 177,
+      "column": 49,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Gửi Director duyệt",
+      "handlerEvent": "onClick",
+      "handler": "() => mutate('submit')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!readiness.ready || wave.policyVersion !== dashboard.policy.version",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load",
+        "mutate"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/realm-demo/pilot/operations",
+        "POST /api/realm-demo/pilot/operations"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "Approval",
+        "AuditLog",
+        "CollaborationPresenceSession",
+        "Notification",
+        "RealmChangeEvent",
+        "Setting",
+        "Ticket",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "ACCOUNTANT",
+        "AM",
+        "DIRECTOR",
+        "PM",
+        "STAFF"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.dispatchEvent"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.duyet-moi-cohort",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 178,
+      "column": 209,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Duyệt & mời cohort",
+      "handlerEvent": "onClick",
+      "handler": "() => mutate('approve')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!readiness.ready",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load",
+        "mutate"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/realm-demo/pilot/operations",
+        "POST /api/realm-demo/pilot/operations"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "Approval",
+        "AuditLog",
+        "CollaborationPresenceSession",
+        "Notification",
+        "RealmChangeEvent",
+        "Setting",
+        "Ticket",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "ACCOUNTANT",
+        "AM",
+        "DIRECTOR",
+        "PM",
+        "STAFF"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.dispatchEvent"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.tra-ve-nhap",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 178,
+      "column": 82,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Trả về nháp",
+      "handlerEvent": "onClick",
+      "handler": "() => mutate('reject')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load",
+        "mutate"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/realm-demo/pilot/operations",
+        "POST /api/realm-demo/pilot/operations"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "Approval",
+        "AuditLog",
+        "CollaborationPresenceSession",
+        "Notification",
+        "RealmChangeEvent",
+        "Setting",
+        "Ticket",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "ACCOUNTANT",
+        "AM",
+        "DIRECTOR",
+        "PM",
+        "STAFF"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.dispatchEvent"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.hoan-tat-wave",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 179,
+      "column": 155,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "Hoàn tất wave",
+      "handlerEvent": "onClick",
+      "handler": "() => setConfirm('complete')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.tam-dung",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 179,
+      "column": 52,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "Tạm dừng",
+      "handlerEvent": "onClick",
+      "handler": "() => setConfirm('pause')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.ong-wave",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 180,
+      "column": 88,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đóng wave",
+      "handlerEvent": "onClick",
+      "handler": "() => setConfirm('complete')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.form-control.input",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 188,
+      "column": 47,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.form-control.7-ngay-10-ngay-14-ngay",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 189,
+      "column": 49,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "7 ngày / 10 ngày / 14 ngày",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.tao-ban-nhap",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 190,
+      "column": 19,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Tạo bản nháp",
+      "handlerEvent": "onClick",
+      "handler": "() => mutate('create', { name: name.trim(), durationDays })",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "dashboard.policy.mode !== 'pilot' || name.trim().length < 3",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOperations",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load",
+        "mutate"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/realm-demo/pilot/operations",
+        "POST /api/realm-demo/pilot/operations"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "Approval",
+        "AuditLog",
+        "CollaborationPresenceSession",
+        "Notification",
+        "RealmChangeEvent",
+        "Setting",
+        "Ticket",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "ACCOUNTANT",
+        "AM",
+        "DIRECTOR",
+        "PM",
+        "STAFF"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.dispatchEvent"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
       "confirmationState": "not-required",
       "uxStateCandidates": []
     },
@@ -53963,6 +54738,7 @@
         "loadKeys",
         "markDone",
         "markPaid",
+        "mutate",
         "nextPeriod",
         "nowHM",
         "openEditor",
@@ -54331,7 +55107,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 67,
+          "line": 68,
           "surface": "route:/settings",
           "apiCalls": [
             "GET /api/apikeys",
@@ -54345,7 +55121,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 68,
+          "line": 69,
           "surface": "route:/settings",
           "apiCalls": [
             "DELETE /api/apikeys",
@@ -54359,7 +55135,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 76,
+          "line": 77,
           "surface": "route:/settings",
           "apiCalls": [
             "GET /api/apikeys",
@@ -54376,7 +55152,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 87,
+          "line": 88,
           "surface": "route:/settings",
           "apiCalls": [
             "PUT /api/data/webhooks/[id]"
@@ -54391,7 +55167,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 96,
+          "line": 97,
           "surface": "route:/settings",
           "apiCalls": [
             "POST /api/data/webhooks"
@@ -54410,7 +55186,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 244,
+          "line": 245,
           "surface": "route:/settings",
           "apiCalls": [
             "POST /api/email/send",
@@ -54424,7 +55200,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 258,
+          "line": 259,
           "surface": "route:/settings",
           "apiCalls": [
             "PUT /api/settings"
@@ -54643,7 +55419,7 @@
         {
           "callback": "onClick",
           "source": "components/realm/RealmPilotControl.jsx",
-          "line": 71,
+          "line": 73,
           "surface": "component:realm/RealmPilotControl",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54654,7 +55430,7 @@
         {
           "callback": "onClick",
           "source": "components/realm/RealmPilotControl.jsx",
-          "line": 72,
+          "line": 74,
           "surface": "component:realm/RealmPilotControl",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54665,7 +55441,7 @@
         {
           "callback": "onClick",
           "source": "components/realm/RealmPilotControl.jsx",
-          "line": 536,
+          "line": 541,
           "surface": "component:realm/RealmPilotControl",
           "apiCalls": [
             "GET /api/realm-demo/launch/approvals",
@@ -54685,7 +55461,7 @@
         {
           "callback": "onClick",
           "source": "components/realm/RealmPilotControl.jsx",
-          "line": 539,
+          "line": 544,
           "surface": "component:realm/RealmPilotControl",
           "apiCalls": [
             "GET /api/realm-demo/launch/approvals",
@@ -54705,7 +55481,7 @@
         {
           "callback": "onClick",
           "source": "components/realm/RealmPilotControl.jsx",
-          "line": 546,
+          "line": 551,
           "surface": "component:realm/RealmPilotControl",
           "apiCalls": [
             "GET /api/realm-demo/launch/approvals",
@@ -54719,6 +55495,70 @@
           "localState": [
             "setDraft",
             "setLaunch",
+            "setState"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "components/realm/RealmPilotOperations.jsx",
+          "line": 177,
+          "surface": "component:realm/RealmPilotOperations",
+          "apiCalls": [
+            "GET /api/realm-demo/pilot/operations",
+            "POST /api/realm-demo/pilot/operations"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setState"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "components/realm/RealmPilotOperations.jsx",
+          "line": 178,
+          "surface": "component:realm/RealmPilotOperations",
+          "apiCalls": [
+            "GET /api/realm-demo/pilot/operations",
+            "POST /api/realm-demo/pilot/operations"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setState"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "components/realm/RealmPilotOperations.jsx",
+          "line": 178,
+          "surface": "component:realm/RealmPilotOperations",
+          "apiCalls": [
+            "GET /api/realm-demo/pilot/operations",
+            "POST /api/realm-demo/pilot/operations"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setState"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "components/realm/RealmPilotOperations.jsx",
+          "line": 190,
+          "surface": "component:realm/RealmPilotOperations",
+          "apiCalls": [
+            "GET /api/realm-demo/pilot/operations",
+            "POST /api/realm-demo/pilot/operations"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
             "setState"
           ]
         },
@@ -54775,6 +55615,7 @@
         "component:realm/RealmCreateActionDialog",
         "component:realm/RealmFeedbackOperations",
         "component:realm/RealmPilotControl",
+        "component:realm/RealmPilotOperations",
         "route:/attendance",
         "route:/automation",
         "route:/commissions",
@@ -54806,6 +55647,7 @@
         "GET /api/realm-demo/feedback",
         "GET /api/realm-demo/launch/approvals",
         "GET /api/realm-demo/pilot",
+        "GET /api/realm-demo/pilot/operations",
         "GET /api/realm-demo/readiness",
         "PATCH /api/realm-demo/feedback",
         "PATCH /api/realm-demo/pilot",
@@ -54829,6 +55671,7 @@
         "POST /api/realm-demo/actions",
         "POST /api/realm-demo/launch",
         "POST /api/realm-demo/launch/approvals",
+        "POST /api/realm-demo/pilot/operations",
         "PUT /api/apikeys",
         "PUT /api/data/activities/[id]",
         "PUT /api/data/attendance/[id]",
@@ -55136,7 +55979,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/settings/page.jsx",
-          "line": 102,
+          "line": 103,
           "surface": "route:/settings",
           "apiCalls": [],
           "resourceOperations": [],
@@ -55631,7 +56474,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/settings/page.jsx",
-          "line": 102,
+          "line": 103,
           "surface": "route:/settings",
           "apiCalls": [],
           "resourceOperations": [],
@@ -56405,7 +57248,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/settings/page.jsx",
-          "line": 108,
+          "line": 109,
           "surface": "route:/settings",
           "apiCalls": [],
           "resourceOperations": [],
@@ -56609,11 +57452,25 @@
           "localState": [
             "setLinkToDelete"
           ]
+        },
+        {
+          "callback": "onClose",
+          "source": "components/realm/RealmPilotOperations.jsx",
+          "line": 215,
+          "surface": "component:realm/RealmPilotOperations",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setConfirm"
+          ]
         }
       ],
       "usedBySurfaces": [
         "component:Activities",
         "component:DocLinks",
+        "component:realm/RealmPilotOperations",
         "route:/analytics",
         "route:/assets",
         "route:/attendance",
@@ -56703,6 +57560,7 @@
         "docsOf",
         "finalize",
         "load",
+        "mutate",
         "payBill",
         "payShipment",
         "projName",
@@ -57672,7 +58530,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/settings/page.jsx",
-          "line": 108,
+          "line": 109,
           "surface": "route:/settings",
           "apiCalls": [],
           "resourceOperations": [],
@@ -57685,7 +58543,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/settings/page.jsx",
-          "line": 108,
+          "line": 109,
           "surface": "route:/settings",
           "apiCalls": [
             "DELETE /api/data/webhooks/[id]"
@@ -58123,11 +58981,41 @@
           "routeTargets": [],
           "helperCalls": [],
           "localState": []
+        },
+        {
+          "callback": "onClose",
+          "source": "components/realm/RealmPilotOperations.jsx",
+          "line": 215,
+          "surface": "component:realm/RealmPilotOperations",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setConfirm"
+          ]
+        },
+        {
+          "callback": "onYes",
+          "source": "components/realm/RealmPilotOperations.jsx",
+          "line": 215,
+          "surface": "component:realm/RealmPilotOperations",
+          "apiCalls": [
+            "GET /api/realm-demo/pilot/operations",
+            "POST /api/realm-demo/pilot/operations"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setState"
+          ]
         }
       ],
       "usedBySurfaces": [
         "component:Activities",
         "component:DocLinks",
+        "component:realm/RealmPilotOperations",
         "route:/analytics",
         "route:/assets",
         "route:/attendance",
@@ -58218,9 +59106,11 @@
         "GET /api/data/users",
         "GET /api/data/vendorbills",
         "GET /api/payroll",
+        "GET /api/realm-demo/pilot/operations",
         "POST /api/livesessions/*/settle",
         "POST /api/payroll/*/finalize",
         "POST /api/quotes/*/convert",
+        "POST /api/realm-demo/pilot/operations",
         "POST /api/shipments/*/pay",
         "POST /api/vendorbills/*/pay",
         "PUT /api/data/tasks/[id]"
@@ -58290,6 +59180,7 @@
         "Budget",
         "Candidate",
         "Client",
+        "CollaborationPresenceSession",
         "Commission",
         "Contact",
         "Contract",
@@ -58354,7 +59245,9 @@
       ],
       "rowPolicy": true,
       "scopedRead": false,
-      "browserActions": [],
+      "browserActions": [
+        "window.dispatchEvent"
+      ],
       "helperCalls": [
         "import:money",
         "import:todayISO"
@@ -68700,31 +69593,31 @@
     }
   ],
   "summary": {
-    "elements": 698,
-    "apiContracts": 60,
+    "elements": 709,
+    "apiContracts": 61,
     "registryResources": 50,
     "byActionType": {
-      "local-state": 223,
-      "data-action": 99,
-      "form-control": 223,
+      "local-state": 226,
+      "data-action": 105,
+      "form-control": 225,
       "delegated-action": 70,
       "navigation": 57,
       "browser-action": 18,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 509,
+      "classified-local": 514,
       "delegated-resolved": 33,
-      "handler-resolved": 86,
+      "handler-resolved": 92,
       "delegated": 70
     },
     "byConfidence": {
-      "high": 665,
+      "high": 676,
       "medium": 33
     },
     "uxStateCandidates": {},
-    "dataActions": 99,
-    "delegatedBindings": 1053,
+    "dataActions": 105,
+    "delegatedBindings": 1060,
     "actionableUnresolved": 0
   }
 }

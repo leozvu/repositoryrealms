@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 22,
+    "verifiedContracts": 22,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "additiveMigrations": 0,
+    "parallelBusinessTables": 0,
+    "minimumObservationDays": 7,
+    "maximumObservationDays": 14,
+    "aggregateOnly": true,
+    "rosterIncluded": false,
+    "selfApprovalAllowed": false,
+    "pausePreservesData": true
+  },
+  "contracts": [
+    {
+      "id": "reuse-erp-setting",
+      "layer": "data",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "realmPilotOperations:",
+        "tx.setting.upsert",
+        "entity: 'realm_pilot_operations'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "bounded-wave-lifecycle",
+      "layer": "domain",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "'draft'",
+        "'awaiting_approval'",
+        "'active'",
+        "'paused'",
+        "'completed'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-only-operations",
+      "layer": "rbac",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "requireDirector(sessionUser)",
+        "realm_pilot_operations_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "operations-cas-version",
+      "layer": "concurrency",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "validateExpectedVersion(operations, input.expectedVersion)",
+        "realm_pilot_operations_version_conflict",
+        "isolationLevel: 'Serializable'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "single-open-wave",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "OPEN_STATUSES.has(wave.status)",
+        "realm_pilot_wave_open_exists"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "policy-version-binding",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "wave.policyVersion !== policy.version",
+        "realm_pilot_wave_policy_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "submit-live-readiness",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "action === 'submit'",
+        "loadRealmLaunchReadiness(tx, policy, now)",
+        "realm_pilot_wave_readiness_blocked"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "maker-checker-activation",
+      "layer": "rbac",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "action === 'approve'",
+        "wave.submittedById === sessionUser.id",
+        "self_approval_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "activation-rechecks-readiness",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "Readiness vừa xuất hiện blocker mới",
+        "status: 'active'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "post-approval-invitations",
+      "layer": "integration",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "eligibleMemberIds(tx, policy)",
+        "Pilot wave “${wave.name}” đã mở",
+        "'/realm'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "pause-uses-existing-kill-switch",
+      "layer": "rollback",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "applyRealmPilotConfigInTransaction(tx",
+        "mode: 'off'",
+        "status: 'paused'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "complete-persists-aggregate-report",
+      "layer": "operations",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "status: 'completed'",
+        "finalReport:",
+        "blockedFeedback:"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "seven-fourteen-day-gate",
+      "layer": "decision",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "REALM_PILOT_WAVE_MIN_DAYS = 7",
+        "REALM_PILOT_WAVE_MAX_DAYS = 14",
+        "buildRealmPilotGoNoGoReport"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-only-privacy",
+      "layer": "privacy",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "aggregateOnly: true",
+        "rosterIncluded: false",
+        "performanceTracking: false",
+        "durationTracking: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-traced-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/operations/route.js",
+      "signals": [
+        "authenticatedUser()",
+        "startRealmApiRequest",
+        "realmJsonResponse",
+        "realmErrorResponse"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "cross-surface-change-signal",
+      "layer": "integration",
+      "source": "app/api/realm-demo/pilot/operations/route.js",
+      "signals": [
+        "safelyPublishRealmChange",
+        "resource: 'settings'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "stale-settings-write-protection",
+      "layer": "data",
+      "source": "app/api/settings/route.js",
+      "signals": [
+        "current.realmPilotOperations",
+        "delete data.realmPilotOperations"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "operations-dashboard-ui",
+      "layer": "client",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "signals": [
+        "Pilot Operations · Rollout Waves",
+        "Duyệt &amp; mời cohort",
+        "Báo cáo Go / No-go",
+        "ERP fallback"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-ui",
+      "layer": "style",
+      "source": "components/realm/realm-pilot-operations.module.css",
+      "signals": [
+        "button { min-height: 44px;",
+        "@media (max-width: 680px)",
+        ".metrics, .waveFacts, .criteria { grid-template-columns: 1fr;",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "mobile-erp-toolbar-containment",
+      "layer": "style",
+      "source": "app/globals.css",
+      "signals": [
+        "Phase 16: toolbar ERP co giãn",
+        ".topbar-right>.btn{width:44px",
+        "#page-title{min-width:0;flex:1;overflow:hidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase16-test-suite",
+      "layer": "test",
+      "source": "tests/realm-pilot-operations.test.mjs",
+      "signals": [
+        "requires a different Director",
+        "pause atomically activates the existing kill switch",
+        "Go/No-go report respects the 7–14 day window"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase16-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-16-PILOT-OPERATIONS.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "codex/realms-demo",
+        "7–14 ngày",
+        "mode = off",
+        "không có migration"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "maker-cannot-activate-own-wave",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "activation-needs-live-readiness",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "pause-closes-realm-not-data",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "settings-form-cannot-clobber-operations",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "go-no-go-visible-without-ranking",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "wave-actions-have-erp-fallback-copy",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    }
+  ]
+}

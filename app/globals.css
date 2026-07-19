@@ -371,13 +371,22 @@ a.link:hover{text-decoration:underline}
   #sidebar.open{transform:translateX(0)}
   #backdrop.show{display:block}
   #main{margin-left:0}
-  #menu-btn{display:inline-flex}
+  #menu-btn{display:inline-flex;flex:0 0 44px;min-width:44px;min-height:44px;align-items:center;justify-content:center}
   #view{padding:18px 14px 60px}
   #topbar{padding:12px 14px}
   #today-label{display:none}
   .search-box input{width:150px}
   .form-grid{grid-template-columns:1fr}
   #quick-add-btn span{display:none}
+}
+/* Phase 16: toolbar ERP co giãn thay vì ép viewport rộng hơn màn hình. Ba hành động
+   cốt lõi vẫn là target 44px; nhãn dài được thu gọn thành icon có aria-label sẵn. */
+@media(max-width:680px){
+  #topbar{min-width:0;gap:8px;padding:8px}
+  #page-title{min-width:0;flex:1;overflow:hidden;font-size:1rem;text-overflow:ellipsis;white-space:nowrap}
+  .topbar-right{min-width:0;flex:0 0 auto;gap:8px}
+  .topbar-right>.btn{width:44px;min-width:44px;min-height:44px;justify-content:center;padding:0}
+  .topbar-right>.btn>span:not(.count),.topbar-right>.role-chip{display:none}
 }
 /* v3.14: BẢNG TRÊN ĐIỆN THOẠI — mỗi dòng thành một tấm thẻ.
    Trước đây table{min-width:640px} ép mọi bảng cuộn ngang trên máy 375px; ERP có 19 trang

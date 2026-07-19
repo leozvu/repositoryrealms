@@ -7,6 +7,8 @@ import { REALM_PILOT_MEMBER_LIMIT } from '@/lib/realm-pilot';
 import { REALM_ONBOARDING_RESET_EVENT } from './RealmPilotOnboarding';
 import styles from './realm-pilot-control.module.css';
 
+const PILOT_OPERATIONS_EVENT = 'crmegoric:pilot-operations-changed';
+
 const MODE_OPTIONS = [
   { value: 'off', label: 'Tạm đóng', description: 'Kill switch: toàn bộ nhân sự tiếp tục dùng ERP cổ điển.' },
   { value: 'pilot', label: 'Pilot theo cohort', description: 'Chỉ danh sách nhân sự hoặc vai trò được chọn có thể mở Realm.' },
@@ -229,6 +231,7 @@ export default function RealmPilotControl() {
     setState((current) => ({ ...current, loading: false, error: '', policy: payload.policy, metrics: payload.metrics, readiness, directory: payload.directory || current.directory }));
     setDraft(payload.policy);
     setLaunch({ error: '', token: '', preview: null, draftKey: '' });
+    window.dispatchEvent(new CustomEvent(PILOT_OPERATIONS_EVENT));
     toast('Đã cập nhật Realm pilot. ERP cổ điển vẫn luôn khả dụng.');
     return true;
   };
@@ -252,6 +255,7 @@ export default function RealmPilotControl() {
     }
     toast('Đã gửi Director thứ hai duyệt. Policy hiện tại chưa thay đổi.');
     await load();
+    window.dispatchEvent(new CustomEvent(PILOT_OPERATIONS_EVENT));
     return true;
   };
 
@@ -275,6 +279,7 @@ export default function RealmPilotControl() {
         ? 'Đã duyệt và áp dụng policy Realm. ERP vẫn là source of truth.'
         : 'Đã từ chối yêu cầu. Policy hiện tại được giữ nguyên.');
       await load();
+      window.dispatchEvent(new CustomEvent(PILOT_OPERATIONS_EVENT));
       return true;
     } catch {
       toast('Không thể kết nối máy chủ phê duyệt. Policy chưa bị thay đổi.', 'error');

@@ -1,0 +1,23 @@
+id,layer,source,signals,missingSignals,status
+reuse-erp-setting,data,lib/realm-pilot-operations.js,realmPilotOperations: | tx.setting.upsert | entity: 'realm_pilot_operations',,verified
+bounded-wave-lifecycle,domain,lib/realm-pilot-operations.js,'draft' | 'awaiting_approval' | 'active' | 'paused' | 'completed',,verified
+director-only-operations,rbac,lib/realm-pilot-operations.js,requireDirector(sessionUser) | realm_pilot_operations_forbidden,,verified
+operations-cas-version,concurrency,lib/realm-pilot-operations.js,"validateExpectedVersion(operations, input.expectedVersion) | realm_pilot_operations_version_conflict | isolationLevel: 'Serializable'",,verified
+single-open-wave,safety,lib/realm-pilot-operations.js,OPEN_STATUSES.has(wave.status) | realm_pilot_wave_open_exists,,verified
+policy-version-binding,safety,lib/realm-pilot-operations.js,wave.policyVersion !== policy.version | realm_pilot_wave_policy_stale,,verified
+submit-live-readiness,safety,lib/realm-pilot-operations.js,"action === 'submit' | loadRealmLaunchReadiness(tx, policy, now) | realm_pilot_wave_readiness_blocked",,verified
+maker-checker-activation,rbac,lib/realm-pilot-operations.js,action === 'approve' | wave.submittedById === sessionUser.id | self_approval_forbidden,,verified
+activation-rechecks-readiness,safety,lib/realm-pilot-operations.js,Readiness vừa xuất hiện blocker mới | status: 'active',,verified
+post-approval-invitations,integration,lib/realm-pilot-operations.js,"eligibleMemberIds(tx, policy) | Pilot wave “${wave.name}” đã mở | '/realm'",,verified
+pause-uses-existing-kill-switch,rollback,lib/realm-pilot-operations.js,applyRealmPilotConfigInTransaction(tx | mode: 'off' | status: 'paused',,verified
+complete-persists-aggregate-report,operations,lib/realm-pilot-operations.js,status: 'completed' | finalReport: | blockedFeedback:,,verified
+seven-fourteen-day-gate,decision,lib/realm-pilot-operations.js,REALM_PILOT_WAVE_MIN_DAYS = 7 | REALM_PILOT_WAVE_MAX_DAYS = 14 | buildRealmPilotGoNoGoReport,,verified
+aggregate-only-privacy,privacy,lib/realm-pilot-operations.js,aggregateOnly: true | rosterIncluded: false | performanceTracking: false | durationTracking: false,,verified
+authenticated-traced-api,api,app/api/realm-demo/pilot/operations/route.js,authenticatedUser() | startRealmApiRequest | realmJsonResponse | realmErrorResponse,,verified
+cross-surface-change-signal,integration,app/api/realm-demo/pilot/operations/route.js,safelyPublishRealmChange | resource: 'settings',,verified
+stale-settings-write-protection,data,app/api/settings/route.js,current.realmPilotOperations | delete data.realmPilotOperations,,verified
+operations-dashboard-ui,client,components/realm/RealmPilotOperations.jsx,Pilot Operations · Rollout Waves | Duyệt &amp; mời cohort | Báo cáo Go / No-go | ERP fallback,,verified
+accessible-responsive-ui,style,components/realm/realm-pilot-operations.module.css,"button { min-height: 44px; | @media (max-width: 680px) | .metrics, .waveFacts, .criteria { grid-template-columns: 1fr; | @media (prefers-reduced-motion: reduce)",,verified
+mobile-erp-toolbar-containment,style,app/globals.css,Phase 16: toolbar ERP co giãn | .topbar-right>.btn{width:44px | #page-title{min-width:0;flex:1;overflow:hidden,,verified
+phase16-test-suite,test,tests/realm-pilot-operations.test.mjs,requires a different Director | pause atomically activates the existing kill switch | Go/No-go report respects the 7–14 day window,,verified
+phase16-runbook,operations,docs/realms/PHASE-16-PILOT-OPERATIONS.md,crmegoric-realms-demo | codex/realms-demo | 7–14 ngày | mode = off | không có migration,,verified
