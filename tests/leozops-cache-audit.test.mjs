@@ -18,28 +18,30 @@ const req = (extra = {}) => {
 };
 const base = over => ({ env: ON, loadLeads, now: () => 0, uuid: () => 'gen-uuid-1', ...over });
 
-test('200 sets ETag=snapshot_id and Cache-Control: private, no-cache', async () => {
+test('200 sets ETag to QUOTED snapshot_id and Cache-Control: private, no-cache', async () => {
   _resetRateLimit();
   const r = await handleSnapshot(req(), base());
   assert.equal(r.status, 200);
-  assert.equal(r.headers.ETag, r.body.snapshot_id);
+  assert.equal(r.headers.ETag, `"${r.body.snapshot_id}"`); // RFC 9110 quoted validator
+  assert.ok(r.body.snapshot_id.startsWith('sha256:'), 'body snapshot_id stays unquoted');
   assert.equal(r.headers['Cache-Control'], 'private, no-cache');
 });
 
-test('If-None-Match match -> 304 with empty body but ETag present', async () => {
+test('If-None-Match (quoted, as served) -> 304 with empty body but ETag present', async () => {
   _resetRateLimit();
   const first = await handleSnapshot(req(), base());
-  const etag = first.body.snapshot_id;
+  const etag = first.headers.ETag; // quoted, exactly as a compliant client echoes it
   const r = await handleSnapshot(req({ 'if-none-match': etag }), base());
   assert.equal(r.status, 304);
   assert.equal(r.body, null);
   assert.equal(r.headers.ETag, etag);
 });
 
-test('X-Correlation-ID: echoed when present', async () => {
+test('X-Correlation-ID: echoed when present and a strict UUID', async () => {
   _resetRateLimit();
-  const r = await handleSnapshot(req({ 'x-correlation-id': 'abc-123' }), base());
-  assert.equal(r.headers['X-Correlation-ID'], 'abc-123');
+  const CALLER_UUID = '3f2b8c1a-9d4e-4f6a-8b2c-1d3e5f7a9b0c';
+  const r = await handleSnapshot(req({ 'x-correlation-id': CALLER_UUID }), base());
+  assert.equal(r.headers['X-Correlation-ID'], CALLER_UUID);
 });
 
 test('X-Correlation-ID: generated when absent', async () => {
@@ -61,15 +63,16 @@ test('rate limit: 60 pass, 61st -> 429 with Retry-After', async () => {
 
 test('audit log line carries required fields and ZERO PII', async () => {
   _resetRateLimit();
+  const CALLER_UUID = '7a1c2d3e-4f5a-4b6c-8d7e-9f0a1b2c3d4e';
   const lines = [];
-  await handleSnapshot(req({ 'x-correlation-id': 'corr-9' }), base({ log: m => lines.push(m) }));
+  await handleSnapshot(req({ 'x-correlation-id': CALLER_UUID }), base({ log: m => lines.push(m) }));
   assert.equal(lines.length, 1);
   const entry = JSON.parse(lines[0]);
   // required audit fields present
   for (const k of ['correlation_id', 'key_fingerprint', 'path', 'status', 'latency_ms', 'record_count', 'snapshot_id']) {
     assert.ok(k in entry, `missing ${k}`);
   }
-  assert.equal(entry.correlation_id, 'corr-9');
+  assert.equal(entry.correlation_id, CALLER_UUID);
   assert.equal(entry.key_fingerprint, HASH.slice(0, 8));
   assert.equal(entry.status, 200);
   assert.equal(entry.record_count, 1);
