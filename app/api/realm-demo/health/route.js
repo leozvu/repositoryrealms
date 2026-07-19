@@ -30,6 +30,12 @@ export async function GET(request) {
         to_regclass('"CollaborationContactRequest"') IS NOT NULL AS "collaborationTable",
         to_regclass('"RealmChangeEvent"') IS NOT NULL AS "changeFeedTable",
         to_regclass('"RealmActionReceipt"') IS NOT NULL AS "actionReceiptTable",
+        EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = current_schema()
+            AND table_name = 'User'
+            AND column_name = 'workspacePreference'
+        ) AS "pilotPreferenceColumn",
         to_regclass('"_prisma_migrations"') IS NOT NULL AS "migrationTable"
     `;
     let latestMigrationApplied = false;

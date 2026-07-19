@@ -18,7 +18,19 @@ export default function LoginPage() {
     const res = await signIn('credentials', { email, password, otp, redirect: false });
     setBusy(false);
     if (res?.error) setErr('Email, mật khẩu hoặc mã 2FA không đúng');
-    else { router.push(preferredWorkspaceSurface() === 'realm' ? '/realm' : '/dashboard'); router.refresh(); }
+    else {
+      let destination = '/dashboard';
+      try {
+        const pilotResponse = await fetch('/api/realm-demo/pilot', { cache: 'no-store' });
+        const pilot = await pilotResponse.json();
+        const resolvedSurface = pilot.user?.preference === 'auto'
+          ? preferredWorkspaceSurface()
+          : pilot.user?.resolvedSurface;
+        if (pilotResponse.ok && pilot.user?.allowed && resolvedSurface === 'realm') destination = '/realm';
+      } catch {}
+      router.push(destination);
+      router.refresh();
+    }
   };
 
   return (

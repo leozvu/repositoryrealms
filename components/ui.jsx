@@ -273,10 +273,11 @@ function useAnyLoading() {
   return n > 0;
 }
 
-// v3.13: useResource(name, filter) — filter lọc Ở SERVER, VD useResource('timelogs', { taskId }).
+// v3.13: useResource(name, filter, options) — filter lọc Ở SERVER, VD useResource('timelogs', { taskId }).
 // Chỉ các cột có trong danh sách trắng FILTERABLE (lib/registry) mới có tác dụng.
-// Không truyền filter thì hành xử y như cũ (lấy tất cả trong phạm vi quyền của mình).
-export function useResource(name, filter) {
+// options.enabled=false giữ nguyên thứ tự hook nhưng không phát request cho phân hệ đang tắt.
+export function useResource(name, filter, options = {}) {
+  const enabled = options.enabled !== false;
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mutating, setMutating] = useState(false);
@@ -288,6 +289,13 @@ export function useResource(name, filter) {
     ? new URLSearchParams(Object.entries(filter).filter(([, v]) => v !== undefined && v !== null && v !== '')).toString()
     : '';
   const refresh = useCallback(async () => {
+    if (!enabled) {
+      setRows([]);
+      setLoading(false);
+      setForbidden(false);
+      return;
+    }
+    setLoading(true);
     bumpInflight(1); // v3.14: báo cho EmptyState biết đang tải
     try {
       const res = await fetch(`/api/data/${name}${qs ? '?' + qs : ''}`);
@@ -297,10 +305,11 @@ export function useResource(name, filter) {
       setLoading(false);
       bumpInflight(-1); // luôn trừ lại kể cả khi lỗi, nếu không skeleton treo vĩnh viễn
     }
-  }, [name, qs]);
+  }, [enabled, name, qs]);
   useEffect(() => { refresh(); }, [refresh]);
 
   const call = async (method, url, body) => {
+    if (!enabled) return null;
     if (mutationRef.current) return mutationRef.current;
     const request = (async () => {
       setMutating(true);

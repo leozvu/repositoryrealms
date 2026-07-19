@@ -37,8 +37,18 @@ export async function PUT(req) {
   if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!isDirector(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const data = await req.json();
-  const json = JSON.stringify({ ...DEFAULTS, ...data });
-  await prisma.setting.upsert({ where: { id: 1 }, create: { id: 1, json }, update: { json } });
-  await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'settings', detail: 'Cập nhật cài đặt công ty' } });
+  await prisma.$transaction(async (tx) => {
+    const row = await tx.setting.findUnique({ where: { id: 1 }, select: { json: true } });
+    let current = {};
+    try { current = JSON.parse(row?.json || '{}'); } catch { current = {}; }
+    // Realm pilot có endpoint PATCH riêng để validate cohort/kill switch. Form cài đặt
+    // công ty dùng snapshot cũ nên không được phép ghi đè hoặc bypass policy đó.
+    const next = { ...DEFAULTS, ...data };
+    if (current.realmPilot) next.realmPilot = current.realmPilot;
+    else delete next.realmPilot;
+    const json = JSON.stringify(next);
+    await tx.setting.upsert({ where: { id: 1 }, create: { id: 1, json }, update: { json } });
+    await tx.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'settings', detail: 'Cập nhật cài đặt công ty' } });
+  }, { isolationLevel: 'Serializable' });
   return NextResponse.json({ ok: true });
 }

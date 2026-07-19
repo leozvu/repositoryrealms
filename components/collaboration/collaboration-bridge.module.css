@@ -71,6 +71,11 @@
   gap: 7px;
 }
 
+.unavailableSwitch {
+  cursor: not-allowed;
+  opacity: .62;
+}
+
 @media (max-width: 680px) {
   .contactBanner {
     grid-template-columns: 44px minmax(0, 1fr);

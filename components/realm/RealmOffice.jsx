@@ -60,8 +60,8 @@ import RealmNotificationBell from './RealmNotificationBell';
 import { useCollaborationDirectory } from '@/components/collaboration/useCollaborationDirectory';
 import {
   preferredCollaborationAvailability,
+  persistWorkspaceSurface,
   rememberCollaborationAvailability,
-  rememberWorkspaceSurface,
 } from '@/lib/collaboration';
 import styles from './realm-office.module.css';
 
@@ -2049,7 +2049,7 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
           <button type="button" className={mode === 'world' ? styles.activeMode : ''} onClick={() => setMode('world')} aria-pressed={mode === 'world'}><Icon name="dashboard" size={16} />Realm</button>
           {erpHref ? (
             <>
-              <Link className={styles.erpGateway} href={erpHref} onClick={() => rememberWorkspaceSurface('erp')}><Icon name="reports" size={16} />ERP · CRM</Link>
+              <Link className={styles.erpGateway} href={erpHref} onClick={() => persistWorkspaceSurface('erp')} aria-label="Chuyển sang giao diện ERP CRM"><Icon name="reports" size={16} />ERP · CRM</Link>
               <button type="button" className={mode === 'ledger' ? styles.activeMode : ''} onClick={() => setMode('ledger')} aria-pressed={mode === 'ledger'}><Icon name="wallet" size={16} />Sổ Realm</button>
             </>
           ) : (
@@ -2109,7 +2109,7 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
             })}
             <span className={styles.navLabel}>Hệ thống</span>
             <button type="button" className={activePanel === 'profile' && mode === 'world' ? styles.navActive : ''} onClick={() => { setMode('world'); setActivePanel('profile'); }}><Icon name="staff" size={18} /><span>Hồ sơ nhân vật</span></button>
-            {erpHref && <Link href={erpHref} onClick={() => rememberWorkspaceSurface('erp')}><Icon name="reports" size={18} /><span>Mở ERP · CRM</span></Link>}
+            {erpHref && <Link href={erpHref} onClick={() => persistWorkspaceSurface('erp')}><Icon name="reports" size={18} /><span>Mở ERP · CRM</span></Link>}
             <button type="button" className={mode === 'ledger' ? styles.navActive : ''} onClick={() => setMode('ledger')}><Icon name="wallet" size={18} /><span>{erpHref ? 'Sổ Realm & Tavern' : 'Điều hành ERP · CRM'}</span></button>
           </nav>
           <div className={styles.onlineSummary}><span><i />{onlineCount} online</span><small>{TRANSPORT[transportState]?.short || 'Solo mode'}</small></div>

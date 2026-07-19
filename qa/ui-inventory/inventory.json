@@ -766,9 +766,11 @@
       "roles": [],
       "module": "",
       "resourceCandidates": [],
-      "apiCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'"
+      ],
       "routeCandidates": [
-        "preferredWorkspaceSurface() === 'realm' ? '/realm' : '/dashboard'"
+        "destination"
       ],
       "mappingStatus": "unreviewed"
     },
@@ -1859,6 +1861,17 @@
       "methods": [
         "GET",
         "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/realm-demo/pilot",
+      "source": "app/api/realm-demo/pilot/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "PUT",
+        "PATCH"
       ],
       "mappingStatus": "unreviewed"
     },
@@ -9851,7 +9864,7 @@
     {
       "elementId": "route.settings.action.khoa-mo",
       "source": "app/(app)/settings/page.jsx",
-      "line": 65,
+      "line": 66,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -9885,7 +9898,7 @@
     {
       "elementId": "route.settings.action.delkey-k",
       "source": "app/(app)/settings/page.jsx",
-      "line": 66,
+      "line": 67,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -9919,7 +9932,7 @@
     {
       "elementId": "route.settings.form-control.ten-key-vd-n8n-zapier",
       "source": "app/(app)/settings/page.jsx",
-      "line": 70,
+      "line": 71,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -9955,7 +9968,7 @@
     {
       "elementId": "route.settings.form-control.ctrl-click-chon-nhieu-vai-tro",
       "source": "app/(app)/settings/page.jsx",
-      "line": 71,
+      "line": 72,
       "column": 13,
       "surface": "route.settings",
       "tag": "select",
@@ -9991,7 +10004,7 @@
     {
       "elementId": "route.settings.action.tao-key",
       "source": "app/(app)/settings/page.jsx",
-      "line": 74,
+      "line": 75,
       "column": 13,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10025,7 +10038,7 @@
     {
       "elementId": "route.settings.action.tat-bat",
       "source": "app/(app)/settings/page.jsx",
-      "line": 85,
+      "line": 86,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10059,7 +10072,7 @@
     {
       "elementId": "route.settings.action.setdeletewebhook-h",
       "source": "app/(app)/settings/page.jsx",
-      "line": 86,
+      "line": 87,
       "column": 15,
       "surface": "route.settings",
       "tag": "button",
@@ -10093,7 +10106,7 @@
     {
       "elementId": "route.settings.form-control.https-url-nhan-webhook",
       "source": "app/(app)/settings/page.jsx",
-      "line": 90,
+      "line": 91,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -10129,7 +10142,7 @@
     {
       "elementId": "route.settings.form-control.su-kien-mac-inh",
       "source": "app/(app)/settings/page.jsx",
-      "line": 92,
+      "line": 93,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -10165,7 +10178,7 @@
     {
       "elementId": "route.settings.form-control.secret-tuy-chon",
       "source": "app/(app)/settings/page.jsx",
-      "line": 93,
+      "line": 94,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -10201,7 +10214,7 @@
     {
       "elementId": "route.settings.action.them",
       "source": "app/(app)/settings/page.jsx",
-      "line": 94,
+      "line": 95,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10235,7 +10248,7 @@
     {
       "elementId": "route.settings.action.copy-ong",
       "source": "app/(app)/settings/page.jsx",
-      "line": 101,
+      "line": 102,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -10269,7 +10282,7 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 144,
+      "line": 145,
       "column": 7,
       "surface": "route.settings",
       "tag": "input",
@@ -10305,7 +10318,7 @@
     {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 176,
+      "line": 177,
       "column": 17,
       "surface": "route.settings",
       "tag": "input",
@@ -10341,7 +10354,7 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 185,
+      "line": 186,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -10377,7 +10390,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 201,
+      "line": 202,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -10411,7 +10424,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 204,
+      "line": 205,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -10445,7 +10458,7 @@
     {
       "elementId": "route.settings.form-control.input.4",
       "source": "app/(app)/settings/page.jsx",
-      "line": 214,
+      "line": 215,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -10481,7 +10494,7 @@
     {
       "elementId": "route.settings.form-control.input.5",
       "source": "app/(app)/settings/page.jsx",
-      "line": 238,
+      "line": 239,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -10517,7 +10530,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 242,
+      "line": 243,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10551,7 +10564,7 @@
     {
       "elementId": "route.settings.form-control.sk-ant-tao-tai-console-anthropic-com",
       "source": "app/(app)/settings/page.jsx",
-      "line": 252,
+      "line": 253,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -10587,7 +10600,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 256,
+      "line": 257,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10621,7 +10634,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 267,
+      "line": 269,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -10655,7 +10668,7 @@
     {
       "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 270,
+      "line": 272,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -14478,7 +14491,7 @@
     {
       "elementId": "route.login.form-submit.email-mat-khau-ma-2fa-bo-trong-neu-chua-bat-ang-ang-nhap-ang-nha",
       "source": "app/login/page.jsx",
-      "line": 31,
+      "line": 43,
       "column": 9,
       "surface": "route.login",
       "tag": "form",
@@ -14493,16 +14506,18 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [],
-      "apiCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'"
+      ],
       "routeCandidates": [
-        "preferredWorkspaceSurface() === 'realm' ? '/realm' : '/dashboard'"
+        "destination"
       ],
       "uxRiskCandidates": []
     },
     {
       "elementId": "route.login.form-control.ban-congty-vn",
       "source": "app/login/page.jsx",
-      "line": 34,
+      "line": 46,
       "column": 13,
       "surface": "route.login",
       "tag": "input",
@@ -14517,16 +14532,18 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [],
-      "apiCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'"
+      ],
       "routeCandidates": [
-        "preferredWorkspaceSurface() === 'realm' ? '/realm' : '/dashboard'"
+        "destination"
       ],
       "uxRiskCandidates": []
     },
     {
       "elementId": "route.login.form-control.input",
       "source": "app/login/page.jsx",
-      "line": 38,
+      "line": 50,
       "column": 13,
       "surface": "route.login",
       "tag": "input",
@@ -14541,16 +14558,18 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [],
-      "apiCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'"
+      ],
       "routeCandidates": [
-        "preferredWorkspaceSurface() === 'realm' ? '/realm' : '/dashboard'"
+        "destination"
       ],
       "uxRiskCandidates": []
     },
     {
       "elementId": "route.login.form-control.000000",
       "source": "app/login/page.jsx",
-      "line": 42,
+      "line": 54,
       "column": 13,
       "surface": "route.login",
       "tag": "input",
@@ -14565,16 +14584,18 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [],
-      "apiCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'"
+      ],
       "routeCandidates": [
-        "preferredWorkspaceSurface() === 'realm' ? '/realm' : '/dashboard'"
+        "destination"
       ],
       "uxRiskCandidates": []
     },
     {
       "elementId": "route.login.action.ang-ang-nhap-ang-nhap",
       "source": "app/login/page.jsx",
-      "line": 44,
+      "line": 56,
       "column": 11,
       "surface": "route.login",
       "tag": "button",
@@ -14589,9 +14610,11 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [],
-      "apiCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'"
+      ],
       "routeCandidates": [
-        "preferredWorkspaceSurface() === 'realm' ? '/realm' : '/dashboard'"
+        "destination"
       ],
       "uxRiskCandidates": []
     },
@@ -14792,16 +14815,16 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "component.components-collaboration-collaborationbridge.navigation.erp-crm-realm",
+      "elementId": "component.components-collaboration-collaborationbridge.navigation.label",
       "source": "components/collaboration/CollaborationBridge.jsx",
-      "line": 45,
+      "line": 66,
       "column": 5,
       "surface": "component.components-collaboration-collaborationbridge",
       "tag": "Link",
       "kind": "navigation",
-      "label": "ERP · CRM / Realm",
+      "label": "{label}",
       "handlerEvent": "onClick",
-      "handler": "() => rememberWorkspaceSurface(surface)",
+      "handler": "rememberPreference",
       "target": "href",
       "insideForm": false,
       "disabledBinding": "",
@@ -14823,7 +14846,7 @@
     {
       "elementId": "component.components-collaboration-collaborationbridge.action.tu-choi",
       "source": "components/collaboration/CollaborationBridge.jsx",
-      "line": 180,
+      "line": 201,
       "column": 9,
       "surface": "component.components-collaboration-collaborationbridge",
       "tag": "button",
@@ -14852,7 +14875,7 @@
     {
       "elementId": "component.components-collaboration-collaborationbridge.action.ang-mo-mo-chat",
       "source": "components/collaboration/CollaborationBridge.jsx",
-      "line": 181,
+      "line": 202,
       "column": 9,
       "surface": "component.components-collaboration-collaborationbridge",
       "tag": "button",
@@ -17754,16 +17777,16 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "component.components-realm-realmoffice.navigation.erp-crm",
+      "elementId": "component.components-realm-realmoffice.navigation.chuyen-sang-giao-dien-erp-crm",
       "source": "components/realm/RealmOffice.jsx",
       "line": 2052,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
       "kind": "navigation",
-      "label": "ERP · CRM",
+      "label": "Chuyển sang giao diện ERP CRM",
       "handlerEvent": "onClick",
-      "handler": "() => rememberWorkspaceSurface('erp')",
+      "handler": "() => persistWorkspaceSurface('erp')",
       "target": "erpHref",
       "insideForm": false,
       "disabledBinding": "",
@@ -18078,7 +18101,7 @@
       "kind": "navigation",
       "label": "Mở ERP · CRM",
       "handlerEvent": "onClick",
-      "handler": "() => rememberWorkspaceSurface('erp')",
+      "handler": "() => persistWorkspaceSurface('erp')",
       "target": "erpHref",
       "insideForm": false,
       "disabledBinding": "",
@@ -18521,6 +18544,158 @@
         "realmRecordHref('staff', member.id)",
         "realmRecordHref('task', task.id)"
       ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.thu-lai",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 96,
+      "column": 13,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "button",
+      "kind": "action",
+      "label": "Thử lại",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "PATCH '/api/realm-demo/pilot'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-pilot-mode",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 105,
+      "column": 21,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "realm-pilot-mode",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "PATCH '/api/realm-demo/pilot'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.form-control.input",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 124,
+      "column": 23,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "PATCH '/api/realm-demo/pilot'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 136,
+      "column": 19,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "realm-default-surface",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "PATCH '/api/realm-demo/pilot'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface.2",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 140,
+      "column": 19,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "realm-default-surface",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "PATCH '/api/realm-demo/pilot'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.luu-chinh-sach-pilot",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 162,
+      "column": 15,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Lưu chính sách pilot",
+      "handlerEvent": "onClick",
+      "handler": "save",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!changed",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "PATCH '/api/realm-demo/pilot'"
+      ],
+      "routeCandidates": [],
       "uxRiskCandidates": []
     },
     {
@@ -20655,7 +20830,7 @@
     {
       "elementId": "component.components-shell.navigation.item-key",
       "source": "components/Shell.jsx",
-      "line": 333,
+      "line": 335,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -20694,7 +20869,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 347,
+      "line": 349,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20733,7 +20908,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 350,
+      "line": 352,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20772,7 +20947,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 359,
+      "line": 361,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -20814,7 +20989,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 362,
+      "line": 364,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20853,7 +21028,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 366,
+      "line": 368,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20892,7 +21067,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 369,
+      "line": 371,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -21236,7 +21411,7 @@
     {
       "elementId": "component.components-ui.action.csv",
       "source": "components/ui.jsx",
-      "line": 349,
+      "line": 358,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "button",
@@ -21261,20 +21436,20 @@
   ],
   "summary": {
     "uiRoutes": 56,
-    "apiRoutes": 55,
-    "interactiveElements": 655,
-    "sourceFilesWithInteractions": 73,
+    "apiRoutes": 56,
+    "interactiveElements": 661,
+    "sourceFilesWithInteractions": 74,
     "routesInPrimaryNavigation": 52,
     "routesWithResourceCandidates": 43,
     "byKind": {
-      "action": 399,
-      "form-control": 205,
+      "action": 401,
+      "form-control": 209,
       "form-submit": 9,
       "navigation": 42
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 196,
+      "control_binding_unverified": 197,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 22
     },

@@ -6,12 +6,13 @@ import {
   evaluateRealmSchemaReadiness,
 } from '../lib/realm-health.js';
 
-test('Realm readiness requires ERP core, collaboration bridge, change feed, action receipts and latest migration', () => {
+test('Realm readiness requires ERP core, collaboration bridge, change feed, action receipts, pilot preference and latest migration', () => {
   const ready = evaluateRealmSchemaReadiness({
     userTable: true,
     collaborationTable: true,
     changeFeedTable: true,
     actionReceiptTable: true,
+    pilotPreferenceColumn: true,
     migrationTable: true,
     latestMigrationApplied: true,
   });
@@ -22,5 +23,5 @@ test('Realm readiness requires ERP core, collaboration bridge, change feed, acti
 test('Realm readiness reports safe component names instead of database details', () => {
   const state = evaluateRealmSchemaReadiness({ migrationTable: true });
   assert.equal(state.ready, false);
-  assert.deepEqual(state.missing, ['erp_core', 'collaboration_bridge', 'change_feed', 'action_receipts', 'latest_migration']);
+  assert.deepEqual(state.missing, ['erp_core', 'collaboration_bridge', 'change_feed', 'action_receipts', 'pilot_preference', 'latest_migration']);
 });

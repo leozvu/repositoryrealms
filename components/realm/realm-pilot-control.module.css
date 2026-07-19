@@ -1,0 +1,128 @@
+.card { overflow: hidden; }
+
+.header {
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.header p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: .75rem;
+  line-height: 1.45;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  color: #fff;
+  background: #315b43;
+}
+
+.status {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.status_off { color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, var(--card)); }
+.status_pilot { color: #8a5a08; background: #fff7df; }
+.status_open { color: #21613d; background: #eaf6ef; }
+
+.body { display: grid; gap: 16px; }
+.loading { min-height: 110px; display: grid; place-items: center; color: var(--muted); }
+.error { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--danger); }
+
+.fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.fieldset legend { margin-bottom: 8px; color: var(--fg); font-size: .8rem; font-weight: 750; }
+
+.optionGrid, .surfaceChoice { display: grid; gap: 8px; }
+.option, .surfaceChoice label {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--card);
+  cursor: pointer;
+}
+
+.option:hover, .surfaceChoice label:hover { border-color: #7e9b89; }
+.selected { border-color: #315b43 !important; background: #f0f7f2 !important; box-shadow: 0 0 0 1px rgba(49, 91, 67, .1); }
+.option input, .surfaceChoice input, .roles input { width: 18px; height: 18px; accent-color: #315b43; }
+.option strong, .surfaceChoice strong { display: block; font-size: .8rem; }
+.option small, .surfaceChoice small { display: block; margin-top: 2px; color: var(--muted); font-size: .7rem; line-height: 1.4; }
+
+.roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.roles label {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: .76rem;
+  cursor: pointer;
+}
+.roleSelected { border-color: #315b43 !important; background: #f0f7f2; }
+
+.assurance, .privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 8px 0 0;
+  color: #315b43;
+  font-size: .72rem;
+  line-height: 1.45;
+}
+
+.metricsHeader { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; padding-top: 3px; border-top: 1px solid var(--border); }
+.metricsHeader strong, .metricsHeader span { display: block; }
+.metricsHeader strong { font-size: .8rem; }
+.metricsHeader div span, .metricsHeader > span { margin-top: 2px; color: var(--muted); font-size: .68rem; }
+.metricsHeader > span { padding: 4px 7px; border-radius: 999px; background: var(--bg); white-space: nowrap; }
+
+.metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.metric { min-height: 72px; padding: 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+.metric strong { display: block; font-size: 1.08rem; font-variant-numeric: tabular-nums; }
+.metric span, .metric small { display: block; margin-top: 2px; color: var(--muted); font-size: .68rem; line-height: 1.35; }
+
+.privacy { margin: -7px 0 0; color: var(--muted); }
+.actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border); }
+.actions span { color: var(--muted); font-size: .7rem; }
+.actions button { min-height: 44px; }
+
+.option:focus-within, .surfaceChoice label:focus-within, .roles label:focus-within {
+  outline: 3px solid color-mix(in srgb, #315b43 32%, transparent);
+  outline-offset: 2px;
+}
+
+@media (min-width: 1100px) {
+  .optionGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  .header { grid-template-columns: 38px minmax(0, 1fr); }
+  .status { grid-column: 2; justify-self: start; }
+  .roles, .metrics { grid-template-columns: 1fr; }
+  .metricsHeader, .actions { align-items: stretch; flex-direction: column; }
+  .actions button { width: 100%; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option, .surfaceChoice label, .roles label { transition: none; }
+}

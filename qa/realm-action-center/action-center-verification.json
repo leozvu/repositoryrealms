@@ -201,12 +201,12 @@
       "status": "verified"
     },
     {
-      "id": "schema-readiness-v6",
+      "id": "schema-readiness-v7",
       "layer": "health",
       "source": "lib/realm-health.js",
       "signals": [
-        "REALM_SCHEMA_VERSION = 6",
-        "20260718230000_extend_realm_action_receipts"
+        "REALM_SCHEMA_VERSION = 7",
+        "20260719110000_add_realm_pilot_preference"
       ],
       "missingSignals": [],
       "status": "verified"

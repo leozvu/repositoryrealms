@@ -33,7 +33,7 @@ Phase 8 cho phép nhân sự dùng ERP thuần và Realm song song trên cùng d
 | realm-to-erp-contact | components/realm/RealmOffice.jsx | verified |
 | server-signed-realm-identity | scripts/realm-signal-server.mjs | verified |
 | message-deep-link | app/(app)/messages/page.jsx | verified |
-| remembered-surface-login | app/login/page.jsx | verified |
+| policy-aware-surface-login | app/login/page.jsx | verified |
 | fail-soft-directory | components/collaboration/useCollaborationDirectory.js | verified |
 | private-no-store-response | lib/collaboration-response.js | verified |
 

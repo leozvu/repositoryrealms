@@ -1,0 +1,18 @@
+id,layer,source,signals,forbiddenSignals,missingSignals,status
+additive-user-preference,database,prisma/schema.prisma,"workspacePreference | String | @default(""auto"") | @@index([status, userType, workspacePreference])",,,verified
+preference-only-migration,database,prisma/migrations/20260719110000_add_realm_pilot_preference/migration.sql,"ALTER TABLE ""User"" | ADD COLUMN ""workspacePreference"" | User_status_userType_workspacePreference_idx",,,verified
+single-setting-policy,server,lib/realm-pilot.js,"parseRealmPilotConfig | JSON.stringify({ ...current, realmPilot: config }) | setting.upsert",,,verified
+generic-settings-preserve-policy,server,app/api/settings/route.js,if (current.realmPilot) next.realmPilot = current.realmPilot | delete next.realmPilot | isolationLevel: 'Serializable',,,verified
+kill-switch-and-role-cohort,contract,lib/realm-pilot.js,config.mode === 'off' | config.mode === 'pilot' | config.roles.includes(role) | resolvedSurface: 'erp',,,verified
+explicit-user-opt-out,contract,lib/realm-pilot.js,"REALM_WORKSPACE_PREFERENCES | ['auto', 'erp', 'realm'] | saveRealmWorkspacePreference",,,verified
+server-route-enforcement,server,app/(app)/realm/page.jsx,loadRealmPilotDecision | if (!pilot.allowed) | redirect(`/dashboard?realm=,,,verified
+authenticated-policy-api,api,app/api/realm-demo/pilot/route.js,authenticatedUser() | export async function GET | export async function PUT | export async function PATCH,,,verified
+director-policy-write,server,lib/realm-pilot.js,if (!isDirector(sessionUser)) | realm_pilot_admin_forbidden | realm_pilot_roles_required,,,verified
+aggregate-private-metrics,server,lib/realm-pilot.js,eligibleUsers | aggregateOnly: true | performanceTracking: false | durationTracking: false | lastSeen: { gte: activeAfter },,,verified
+policy-aware-login,client,app/login/page.jsx,fetch('/api/realm-demo/pilot' | pilot.user?.allowed | destination = '/realm',,,verified
+cross-surface-preference,client,lib/collaboration.js,persistWorkspaceSurface | window.fetch('/api/realm-demo/pilot' | preference: normalized | keepalive: true,,,verified
+both-surfaces-persist-choice,client,components/realm/RealmOffice.jsx,persistWorkspaceSurface('erp') | Chuyển sang giao diện ERP CRM | Mở ERP · CRM,,,verified
+pilot-admin-control,client,components/realm/RealmPilotControl.jsx,Realm Pilot Control | Pilot theo vai trò | Lưu chính sách pilot | không thay thế ERP,,,verified
+accessible-responsive-control,style,components/realm/realm-pilot-control.module.css,min-height: 44px | :focus-within | @media (max-width: 680px) | @media (prefers-reduced-motion: reduce),,,verified
+classic-erp-always-reachable,client,components/collaboration/CollaborationBridge.jsx,realm ? '/dashboard' | surface = realm ? 'erp' | ERP · CRM,,,verified
+schema-readiness-v7,health,lib/realm-health.js,REALM_SCHEMA_VERSION = 7 | 20260719110000_add_realm_pilot_preference | missing.push('pilot_preference'),,,verified

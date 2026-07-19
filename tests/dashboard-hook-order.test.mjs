@@ -18,3 +18,10 @@ test('dashboard declares onboarding state before the unauthenticated early retur
     'all dashboard hooks must run before the session hydration early return',
   );
 });
+
+test('dashboard does not request disabled vertical resources', () => {
+  assert.match(dashboardSource, /useResource\('shipments', null, \{ enabled: on\('export'\) \}\)/);
+  assert.match(dashboardSource, /useResource\('areacodes', null, \{ enabled: on\('export'\) \}\)/);
+  assert.match(dashboardSource, /useResource\('livesessions', null, \{ enabled: on\('livestream'\) \}\)/);
+  assert.match(dashboardSource, /useResource\('violations', null, \{ enabled: on\('livestream'\) \}\)/);
+});

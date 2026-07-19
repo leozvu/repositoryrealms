@@ -7,7 +7,10 @@ test.beforeEach(async ({ page }) => {
   runtimeIssues.set(page, issues);
   page.on('pageerror', (error) => issues.push(`pageerror: ${error.message}`));
   page.on('console', (message) => {
-    if (message.type() === 'error') issues.push(`console.error: ${message.text()}`);
+    if (message.type() === 'error') {
+      const location = message.location();
+      issues.push(`console.error${location.url ? ` (${location.url})` : ''}: ${message.text()}`);
+    }
   });
 });
 
@@ -38,7 +41,7 @@ test('the product Realm uses the original ERP authentication boundary', async ({
 });
 
 test('cross-surface collaboration APIs preserve the ERP authentication boundary', async ({ request }) => {
-  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle']) {
+  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle', '/api/realm-demo/pilot']) {
     const response = await request.get(route);
     expect([401, 503]).toContain(response.status());
     expect(response.headers()['cache-control']).toContain('no-store');
@@ -93,6 +96,43 @@ test('anonymous ERP navigation lands on an accessible login form', async ({ page
   await expect(password).toHaveAttribute('autocomplete', 'current-password');
   await expect(otp).toHaveAttribute('autocomplete', 'one-time-code');
   await expect(page.getByRole('button', { name: 'Đăng nhập', exact: true })).toBeEnabled();
+});
+
+test('director can inspect the pilot policy and switch between the same ERP data surfaces', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Authenticated pilot control is covered once on desktop; mobile controls are covered by CSS and inventory gates.');
+  test.skip(!process.env.REALM_PILOT_E2E_EMAIL || !process.env.REALM_PILOT_E2E_PASSWORD, 'Requires an ephemeral staging Director account.');
+
+  await page.goto('/login');
+  await page.getByLabel('Email', { exact: true }).fill(process.env.REALM_PILOT_E2E_EMAIL);
+  await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.REALM_PILOT_E2E_PASSWORD);
+  await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+
+  await page.goto('/settings');
+  const pilot = page.getByRole('region', { name: 'Realm Pilot Control' });
+  await expect(pilot).toBeVisible();
+  await expect(pilot.getByRole('radio', { name: /Tạm đóng/ })).toBeVisible();
+  await expect(pilot.getByRole('radio', { name: /Pilot theo vai trò/ })).toBeVisible();
+  await expect(pilot.getByRole('radio', { name: /Mở cho nội bộ/ })).toBeVisible();
+  await expect(pilot).toContainText('Không ghi thời lượng làm việc');
+
+  const policyResponse = await page.evaluate(async () => {
+    const current = await fetch('/api/realm-demo/pilot', { cache: 'no-store' }).then((response) => response.json());
+    const response = await fetch('/api/realm-demo/pilot', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ policy: current.policy }),
+    });
+    return { status: response.status, payload: await response.json() };
+  });
+  expect(policyResponse.status).toBe(200);
+  expect(policyResponse.payload.ok).toBe(true);
+
+  await page.goto('/dashboard');
+  await page.getByRole('link', { name: 'Chuyển sang văn phòng Realm' }).click();
+  await expect(page).toHaveURL(/\/realm$/);
+  await page.getByRole('link', { name: 'Chuyển sang giao diện ERP CRM' }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
 });
 
 test('Realm and ERP views expose the same live character status', async ({ page }) => {

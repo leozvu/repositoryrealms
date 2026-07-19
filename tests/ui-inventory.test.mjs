@@ -36,18 +36,16 @@ test('critical API contracts and generic resource bindings are discoverable', ()
   assert.ok(api.get('/api/data/[resource]')?.methods.includes('POST'));
   assert.ok(api.get('/api/realm-demo/operations')?.methods.includes('GET'));
   assert.ok(api.get('/api/realm-demo/operations')?.methods.includes('POST'));
+  assert.deepEqual([...(api.get('/api/realm-demo/pilot')?.methods || [])].sort(), ['GET', 'PATCH', 'PUT']);
   assert.deepEqual([...(api.get('/api/collaboration/presence')?.methods || [])].sort(), ['DELETE', 'GET', 'POST']);
   assert.deepEqual([...(api.get('/api/collaboration/contact')?.methods || [])].sort(), ['GET', 'PATCH', 'POST']);
 
   const dashboard = inventory.uiRoutes.find((route) => route.route === '/dashboard');
   assert.ok(dashboard.resourceCandidates.includes('tasks'));
   assert.ok(dashboard.resourceCandidates.includes('projects'));
-  const routeTargets = new Set(inventory.uiRoutes.flatMap((route) => route.routeCandidates));
-  assert.equal(routeTargets.size, 1);
-  const loginTarget = [...routeTargets][0];
-  assert.match(loginTarget, /preferredWorkspaceSurface/);
-  assert.match(loginTarget, /'\/realm'/);
-  assert.match(loginTarget, /'\/dashboard'/);
+  const login = inventory.uiRoutes.find((route) => route.route === '/login');
+  assert.ok(login.apiCandidates.includes("GET '/api/realm-demo/pilot'"));
+  assert.deepEqual(login.routeCandidates, ['destination']);
 });
 
 test('rendered artifacts are deterministic', () => {

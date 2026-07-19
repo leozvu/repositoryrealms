@@ -29,6 +29,7 @@ model User {
   totpSecret                    String? // v3.2: 2FA TOTP — null = chưa bật
   birthday                      String? // v3.8: YYYY-MM-DD — AI Summary nhắc sinh nhật
   userType                      String                         @default("employee") // v3.11: employee | freelancer
+  workspacePreference           String                         @default("auto") // auto | erp | realm — lựa chọn giao diện, không phải dữ liệu hiệu suất
   accessUntil                   String? // v3.11: YYYY-MM-DD — freelancer hết hạn thì chặn đăng nhập
   hourlyRate                    Int                            @default(0) // v3.11: đơn giá giờ freelancer (nhân viên dùng lương÷176)
   skills                        String? // v3.11: kỹ năng freelancer
@@ -48,6 +49,8 @@ model User {
   collaborationPresence         CollaborationPresenceSession[]
   collaborationRequestsSent     CollaborationContactRequest[]  @relation("CollaborationRequester")
   collaborationRequestsReceived CollaborationContactRequest[]  @relation("CollaborationTarget")
+
+  @@index([status, userType, workspacePreference])
 }
 
 // Invalidation log giữa ERP và Realm. Chỉ lưu metadata kỹ thuật đã allowlist,

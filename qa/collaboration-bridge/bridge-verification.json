@@ -132,7 +132,7 @@
       "source": "components/Shell.jsx",
       "signals": [
         "<CollaborationBridge />",
-        "<WorkspaceSurfaceSwitch />"
+        "<WorkspaceSurfaceSwitch pilot={realmPilot} />"
       ],
       "missingSignals": [],
       "status": "verified"
@@ -171,11 +171,12 @@
       "status": "verified"
     },
     {
-      "id": "remembered-surface-login",
+      "id": "policy-aware-surface-login",
       "source": "app/login/page.jsx",
       "signals": [
-        "preferredWorkspaceSurface",
-        "=== 'realm' ? '/realm' : '/dashboard'"
+        "fetch('/api/realm-demo/pilot'",
+        "pilot.user?.allowed",
+        "destination = '/realm'"
       ],
       "missingSignals": [],
       "status": "verified"

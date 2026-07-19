@@ -218,7 +218,7 @@ function TwoFAModal({ onClose }) {
 
 const NAV = ERP_NAV;
 
-export default function Shell({ user, company, children }) {
+export default function Shell({ user, company, realmPilot, children }) {
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadChat, setUnreadChat] = useState(0);
@@ -266,7 +266,9 @@ export default function Shell({ user, company, children }) {
   const myRoles = rolesOf(user);
   // v3.17: mục menu hiện khi (đúng vai trò) VÀ (phân hệ của nó đang bật). Mục lõi (không mod)
   // luôn qua modOn. Freelancer đi lối riêng.
-  const visible = item => isFL ? true : (hasAny(user, item.roles) && modOn(item.mod, modules));
+  const visible = item => isFL
+    ? true
+    : (item.key !== 'realm' || realmPilot?.allowed) && hasAny(user, item.roles) && modOn(item.mod, modules);
 
   const loadShellCounters = useCallback(() => {
     fetch('/api/approvals').then(r => r.ok ? r.json() : null)
@@ -362,7 +364,7 @@ export default function Shell({ user, company, children }) {
             <button id="menu-btn" onClick={() => setOpen(true)} aria-label="Mở menu"><Icon name="menu" /></button>
             <h1 id="page-title">{current?.label || 'Agency ERP'}</h1>
             <div className="topbar-right">
-              <WorkspaceSurfaceSwitch />
+              <WorkspaceSurfaceSwitch pilot={realmPilot} />
               <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
                 <Icon name="search" size={14} /><span> Ctrl+K</span>
               </button>

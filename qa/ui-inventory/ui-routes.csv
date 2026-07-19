@@ -28,7 +28,7 @@
 "/invoices","app/(app)/invoices/page.jsx","false","authenticated","true","Hóa đơn","Tài chính","DIRECTOR | ACCOUNTANT | AM","","clients | invoices | projects | services","POST `/api/invoices/${inv.id}/pay` | GET `/api/invoices/from-hours?projectId=${projectId}` | POST '/api/invoices/from-hours'","","unreviewed"
 "/leads","app/(app)/leads/page.jsx","false","authenticated","true","Khách tiềm năng","CRM — Bán hàng","DIRECTOR | AM","sales","clients | leads | users","GET '/api/settings'","","unreviewed"
 "/live","app/(app)/live/page.jsx","false","authenticated","true","Ca live","Livestream","DIRECTOR | LEAD | ACCOUNTANT | AM | PM","livestream","clients | livesessions | users","POST `/api/livesessions/${s.id}/settle` | POST `/api/livesessions/${recon.id}/reconcile`","","unreviewed"
-"/login","app/login/page.jsx","false","public","false","","","","","","","preferredWorkspaceSurface() === 'realm' ? '/realm' : '/dashboard'","unreviewed"
+"/login","app/login/page.jsx","false","public","false","","","","","","GET '/api/realm-demo/pilot'","destination","unreviewed"
 "/markets","app/(app)/markets/page.jsx","false","authenticated","true","Tra cứu thị trường","Xuất nhập khẩu","DIRECTOR | PM | ACCOUNTANT | AM","export","shipments","","","unreviewed"
 "/messages","app/(app)/messages/page.jsx","false","authenticated","true","Tin nhắn","Tổng quan","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","","POST '/api/chat' | GET '/api/chat' | GET `/api/chat/${id}` | GET url | POST `/api/chat/${sel}`","","unreviewed"
 "/myday","app/(app)/myday/page.jsx","false","authenticated","true","Việc của tôi","Tổng quan","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","activities | tasks | timelogs","GET '/api/approvals'","","unreviewed"

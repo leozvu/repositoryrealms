@@ -7,6 +7,7 @@ import { Icon, useToast } from '@/components/ui';
 import {
   COLLABORATION_AVAILABILITY_EVENT,
   collaborationContactLabel,
+  persistWorkspaceSurface,
   preferredCollaborationAvailability,
   rememberWorkspaceSurface,
 } from '@/lib/collaboration';
@@ -38,18 +39,38 @@ async function contactAction(id, action) {
   return payload.contact;
 }
 
-export function WorkspaceSurfaceSwitch({ realm = false }) {
+export function WorkspaceSurfaceSwitch({ realm = false, pilot = null }) {
   const href = realm ? '/dashboard' : '/realm';
   const surface = realm ? 'erp' : 'realm';
+  const unavailable = !realm && pilot && !pilot.allowed;
+  const label = realm ? 'ERP · CRM' : 'Realm';
+  if (unavailable) {
+    return (
+      <span
+        className={`btn btn-outline btn-sm ${styles.unavailableSwitch}`}
+        role="status"
+        aria-disabled="true"
+        title={pilot.reason}
+        aria-label={`Realm chưa khả dụng: ${pilot.reason}`}
+      >
+        <Icon name="shield" size={15} />
+        <span>Realm chưa mở</span>
+      </span>
+    );
+  }
+
+  const rememberPreference = () => {
+    rememberWorkspaceSurface(surface);
+  };
   return (
     <Link
       className={realm ? styles.realmToErp : 'btn btn-outline btn-sm'}
       href={href}
-      onClick={() => rememberWorkspaceSurface(surface)}
+      onClick={rememberPreference}
       aria-label={realm ? 'Chuyển sang giao diện ERP CRM' : 'Chuyển sang văn phòng Realm'}
     >
       <Icon name={realm ? 'reports' : 'shield'} size={15} />
-      <span>{realm ? 'ERP · CRM' : 'Realm'}</span>
+      <span>{label}</span>
     </Link>
   );
 }
@@ -98,7 +119,7 @@ export default function CollaborationBridge() {
   }, [toast]);
 
   useEffect(() => {
-    rememberWorkspaceSurface(surface);
+    persistWorkspaceSurface(surface);
     heartbeat();
     loadContacts();
     const heartbeatTimer = window.setInterval(heartbeat, 25_000);
