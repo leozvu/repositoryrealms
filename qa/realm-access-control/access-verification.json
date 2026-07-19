@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "surfacePolicies": 8,
+    "failedPolicies": 0,
+    "roleScenarios": 8,
+    "verifiedRoleScenarios": 8,
+    "moduleScenarios": 5,
+    "verifiedModuleScenarios": 5,
+    "enforcementContracts": 11,
+    "verifiedEnforcementContracts": 11
+  },
+  "policies": [
+    {
+      "key": "personal",
+      "label": "Sổ nhân vật",
+      "roles": [
+        "PM",
+        "AM",
+        "ACCOUNTANT",
+        "HR",
+        "LEAD",
+        "STAFF"
+      ],
+      "module": null
+    },
+    {
+      "key": "quests",
+      "label": "Quest Board",
+      "roles": [
+        "PM",
+        "AM",
+        "ACCOUNTANT",
+        "HR",
+        "LEAD",
+        "STAFF"
+      ],
+      "module": "tasks"
+    },
+    {
+      "key": "guild",
+      "label": "Guild Hall",
+      "roles": [
+        "PM",
+        "AM",
+        "ACCOUNTANT",
+        "HR",
+        "LEAD",
+        "STAFF"
+      ],
+      "module": "tasks"
+    },
+    {
+      "key": "campaigns",
+      "label": "War Room",
+      "roles": [
+        "PM",
+        "AM",
+        "ACCOUNTANT",
+        "HR",
+        "LEAD",
+        "STAFF"
+      ],
+      "module": "delivery"
+    },
+    {
+      "key": "embassy",
+      "label": "Royal Embassy",
+      "roles": [
+        "AM"
+      ],
+      "module": "sales"
+    },
+    {
+      "key": "rewards",
+      "label": "Hội đồng Gold",
+      "roles": [
+        "PM",
+        "LEAD",
+        "HR"
+      ],
+      "module": "tasks"
+    },
+    {
+      "key": "economy",
+      "label": "Đài quan sát Gold",
+      "roles": [
+        "PM",
+        "LEAD",
+        "HR"
+      ],
+      "module": "tasks",
+      "teamRequiredForLead": true
+    },
+    {
+      "key": "treasury",
+      "label": "Tavern",
+      "roles": [
+        "PM",
+        "AM",
+        "ACCOUNTANT",
+        "HR",
+        "LEAD",
+        "STAFF"
+      ],
+      "module": null
+    }
+  ],
+  "failedPolicies": [],
+  "roleScenarios": [
+    {
+      "type": "role",
+      "id": "DIRECTOR",
+      "modules": "legacy-defaults",
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "embassy",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "embassy",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "role",
+      "id": "PM",
+      "modules": "legacy-defaults",
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "role",
+      "id": "AM",
+      "modules": "legacy-defaults",
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "embassy",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "embassy",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "role",
+      "id": "ACCOUNTANT",
+      "modules": "legacy-defaults",
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "role",
+      "id": "HR",
+      "modules": "legacy-defaults",
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "role",
+      "id": "LEAD",
+      "modules": "legacy-defaults",
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "role",
+      "id": "STAFF",
+      "modules": "legacy-defaults",
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "campaigns",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "role",
+      "id": "FREELANCER",
+      "modules": "legacy-defaults",
+      "expected": [],
+      "actual": [],
+      "status": "verified"
+    }
+  ],
+  "moduleScenarios": [
+    {
+      "type": "module",
+      "id": "staff-none",
+      "modules": [],
+      "expected": [
+        "personal",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "module",
+      "id": "staff-tasks",
+      "modules": [
+        "tasks"
+      ],
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "module",
+      "id": "am-sales-tasks",
+      "modules": [
+        "sales",
+        "tasks"
+      ],
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "embassy",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "embassy",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "module",
+      "id": "pm-delivery",
+      "modules": [
+        "delivery"
+      ],
+      "expected": [
+        "personal",
+        "campaigns",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "campaigns",
+        "treasury"
+      ],
+      "status": "verified"
+    },
+    {
+      "type": "module",
+      "id": "lead-team-tasks",
+      "modules": [
+        "tasks"
+      ],
+      "expected": [
+        "personal",
+        "quests",
+        "guild",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "actual": [
+        "personal",
+        "quests",
+        "guild",
+        "rewards",
+        "economy",
+        "treasury"
+      ],
+      "status": "verified"
+    }
+  ],
+  "enforcementContracts": [
+    {
+      "id": "authenticated-bootstrap",
+      "source": "app/(app)/realm/page.jsx",
+      "signals": [
+        "if (!user) return null",
+        "loadRealmCompanyModules(prisma)",
+        "initialBridge={initialBridge}"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "snapshot-modules",
+      "source": "lib/realm-erp-adapter.js",
+      "signals": [
+        "const tasksEnabled = modOn('tasks', modules)",
+        "createRealmErpBridge({ user, tasks, modules })"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "claim-module-guard",
+      "source": "lib/realm-erp-adapter.js",
+      "signals": [
+        "'realm_tasks_module_disabled'",
+        "if (!modOn('tasks', modules))"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "guild-api",
+      "source": "app/api/realm-demo/guild/route.js",
+      "signals": [
+        "realmSurfaceDecision(user, 'guild'",
+        "if (!access.allowed)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "rewards-api",
+      "source": "app/api/realm-demo/rewards/route.js",
+      "signals": [
+        "realmSurfaceDecision(user, 'rewards'",
+        "if (!access.allowed)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "economy-api",
+      "source": "app/api/realm-demo/economy/route.js",
+      "signals": [
+        "realmSurfaceDecision(user, 'economy'",
+        "if (!access.allowed)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "embassy-api",
+      "source": "app/api/realm-demo/embassy/route.js",
+      "signals": [
+        "realmSurfaceDecision(user, 'embassy'",
+        "if (!access.allowed)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "war-room-api",
+      "source": "app/api/realm-demo/war-room/route.js",
+      "signals": [
+        "realmSurfaceDecision(user, 'campaigns'",
+        "if (!access.allowed)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "world-navigation",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "realmAccessForPanel(businessBridge?.access, item.id)",
+        "disabled={!access.allowed}"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "ledger-navigation",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "realmAccessForSurface(accessManifest, tab.key)",
+        "title={!access.allowed ? access.reason"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "locked-portals",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "businessBridge?.unavailablePortals",
+        "aria-disabled=\"true\""
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ]
+}

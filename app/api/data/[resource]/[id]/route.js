@@ -36,7 +36,7 @@ export async function PUT(req, { params }) {
     if (icp?.data) data = icp.data;
     const updated = await prisma[cfg.model].update({ where: { id: params.id }, data });
     await audit(user, 'update', params.resource, params.id, updated.name || updated.title || updated.code || null);
-    emitEvent(params.resource, 'update', updated, row, user); // v3.3: webhook + rule tự động
+    await emitEvent(params.resource, 'update', updated, row, user); // v3.3 + Realm change feed
     const notice = icp?.after ? await icp.after(updated) : null;
     const out = cfg.sanitize ? cfg.sanitize(updated, user) : updated;
     return NextResponse.json(notice ? { ...out, _notice: notice } : out);
@@ -61,7 +61,7 @@ export async function DELETE(req, { params }) {
   try {
     await prisma[cfg.model].delete({ where: { id: params.id } });
     await audit(user, 'delete', params.resource, params.id, row.name || row.title || row.code || null);
-    emitEvent(params.resource, 'delete', row, null, user); // v3.3: webhook
+    await emitEvent(params.resource, 'delete', row, null, user); // v3.3 + Realm change feed
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json({ error: 'Không xóa được — còn dữ liệu liên quan (dự án, hóa đơn…)' }, { status: 400 });

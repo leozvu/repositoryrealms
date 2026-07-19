@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Badge, EmptyState, useToast } from '@/components/ui';
+import { useResource, Icon, Badge, EmptyState, AsyncButton, useToast } from '@/components/ui';
 import { fmtDate, todayISO, daysFromNow, localISO, parseItems } from '@/lib/format';
 
 export default function MyDayPage() {
@@ -39,8 +39,8 @@ export default function MyDayPage() {
     const cl = parseItems(t.checklist);
     return (
       <div className="act-item" style={{ alignItems: 'center' }}>
-        <button className="icon-btn" title="Đánh dấu hoàn thành" style={{ color: 'var(--accent)', flex: 'none' }} onClick={() => markDone(t)}>
-          <Icon name="check" size={17} /></button>
+        <AsyncButton className="icon-btn" pendingLabel="…" disabled={tasks.mutating} title="Đánh dấu hoàn thành" style={{ color: 'var(--accent)', flex: 'none' }} onClick={() => markDone(t)}>
+          <Icon name="check" size={17} /></AsyncButton>
         <div style={{ flex: 1 }}>
           <div className="act-title">{t.recur && '🔁 '}{t.title}</div>
           <div className="act-sub">{cl.length > 0 && <>☑ {cl.filter(x => x.done).length}/{cl.length} · </>}

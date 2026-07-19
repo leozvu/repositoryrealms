@@ -61,7 +61,7 @@ export async function POST(req, { params }) {
     if (icp?.data) data = icp.data;
     const row = await prisma[cfg.model].create({ data });
     await audit(user, 'create', params.resource, row.id, row.name || row.title || row.code || null);
-    emitEvent(params.resource, 'create', row, null, user); // v3.3: webhook + rule tự động
+    await emitEvent(params.resource, 'create', row, null, user); // v3.3 + Realm change feed
     const notice = icp?.after ? await icp.after(row) : null;
     const out = cfg.sanitize ? cfg.sanitize(row, user) : row;
     return NextResponse.json(notice ? { ...out, _notice: notice } : out);

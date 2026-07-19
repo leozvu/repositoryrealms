@@ -1,7 +1,8 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { Icon, Modal, useToast } from '@/components/ui';
+import { useSearchParams } from 'next/navigation';
+import { Icon, Modal, AsyncButton, useToast } from '@/components/ui';
 import { initials } from '@/lib/format';
 
 const fmtTime = at => {
@@ -28,7 +29,7 @@ function NewChatModal({ directory, onCreated, onClose }) {
   return (
     <Modal title="Cuộc trò chuyện mới" onClose={onClose}
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={create}>Bắt đầu</button></>}>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang tạo…" onClick={create}>Bắt đầu</AsyncButton></>}>
       <div className="tabs">
         <button className={`tab ${tab === 'dm' ? 'active' : ''}`} onClick={() => { setTab('dm'); setSel([]); }}>Nhắn riêng</button>
         <button className={`tab ${tab === 'group' ? 'active' : ''}`} onClick={() => { setTab('group'); setSel([]); }}>Tạo nhóm</button>
@@ -52,12 +53,14 @@ function NewChatModal({ directory, onCreated, onClose }) {
 
 export default function MessagesPage() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const me = session?.user;
   const [convs, setConvs] = useState([]);
   const [directory, setDirectory] = useState([]);
   const [sel, setSel] = useState(null);       // conv id đang mở
   const [thread, setThread] = useState(null); // {conv, messages}
   const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const endRef = useRef(null);
   const lastAtRef = useRef(null);
@@ -73,6 +76,10 @@ export default function MessagesPage() {
   }, []);
 
   useEffect(() => { loadList(); const t = setInterval(loadList, 12000); return () => clearInterval(t); }, [loadList]);
+  useEffect(() => {
+    const requested = searchParams.get('conversation');
+    if (requested && convs.some((conversation) => conversation.id === requested)) setSel(requested);
+  }, [convs, searchParams]);
   useEffect(() => { if (sel) loadThread(sel); }, [sel, loadThread]);
   // Poll tin mới của hội thoại đang mở mỗi 4 giây
   useEffect(() => {
@@ -93,14 +100,21 @@ export default function MessagesPage() {
   const send = async e => {
     e?.preventDefault();
     const content = input.trim();
-    if (!content || !sel) return;
+    if (!content || !sel || sending) return;
+    setSending(true);
     setInput('');
-    const res = await fetch(`/api/chat/${sel}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
-    const msg = await res.json();
-    if (!res.ok) return toast(msg.error || 'Gửi lỗi', 'error');
-    setThread(prev => ({ ...prev, messages: [...prev.messages, msg] }));
-    lastAtRef.current = msg.at;
-    loadList();
+    try {
+      const res = await fetch(`/api/chat/${sel}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
+      const msg = await res.json();
+      if (!res.ok) { setInput(content); return toast(msg.error || 'Gửi lỗi', 'error'); }
+      setThread(prev => ({ ...prev, messages: [...prev.messages, msg] }));
+      lastAtRef.current = msg.at;
+      loadList();
+    } catch {
+      setInput(content); toast('Không thể gửi tin nhắn', 'error');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -166,9 +180,9 @@ export default function MessagesPage() {
                 {!thread.messages.length && <div className="chat-empty" style={{ padding: 30 }}>Hãy gửi tin nhắn đầu tiên 👋</div>}
                 <div ref={endRef}></div>
               </div>
-              <form className="chat-input" onSubmit={send}>
+              <form className="chat-input" aria-busy={sending || undefined} onSubmit={send}>
                 <input value={input} onChange={e => setInput(e.target.value)} placeholder={`Nhắn ${thread.conv.name}…`} autoFocus />
-                <button className="btn btn-primary" disabled={!input.trim()}>Gửi</button>
+                <button className="btn btn-primary" disabled={sending || !input.trim()}>{sending ? 'Đang gửi…' : 'Gửi'}</button>
               </form>
             </>
           )}

@@ -1,0 +1,12 @@
+id,source,missingSignals,status
+operations,app/api/realm-demo/operations/route.js,,verified
+rewards,app/api/realm-demo/rewards/route.js,,verified
+tavern,app/api/realm-demo/treasury/route.js,,verified
+guild,app/api/realm-demo/guild/route.js,,verified
+war-room,app/api/realm-demo/war-room/route.js,,verified
+economy,app/api/realm-demo/economy/route.js,,verified
+embassy,app/api/realm-demo/embassy/route.js,,verified
+token,app/api/realm-demo/token/route.js,,verified
+health,app/api/realm-demo/health/route.js,,verified
+changes,app/api/realm-demo/changes/route.js,,verified
+actions,app/api/realm-demo/actions/route.js,,verified

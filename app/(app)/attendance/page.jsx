@@ -3,7 +3,7 @@
 // bảng công tháng nối vào bảng lương.
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Modal, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, ConfirmDialog, EmptyState, AsyncButton, useToast } from '@/components/ui';
 import { fmtDate, todayISO, thisMonth, monthKey, initials } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
@@ -15,7 +15,7 @@ export default function AttendancePage() {
   const { data: session } = useSession();
   const user = session?.user;
   const isHR = hasAny(user, ['HR']);
-  const { rows, create, update, remove } = useResource('attendance');
+  const { rows, create, update, remove, mutating } = useResource('attendance');
   const holidays = useResource('holidays');
   const users = useResource('users');
   const [m, setM] = useState(thisMonth());
@@ -59,9 +59,9 @@ export default function AttendancePage() {
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
           <b style={{ fontSize: '.88rem' }}>Hôm nay ({fmtDate(todayISO())}):</b>
           {Object.entries(ST).map(([k, [label]]) => (
-            <button key={k} className={myToday?.status === k ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'} onClick={() => clockIn(k)}>{label}</button>
+            <AsyncButton key={k} className={myToday?.status === k ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'} disabled={mutating} onClick={() => clockIn(k)}>{label}</AsyncButton>
           ))}
-          {myToday && !myToday.checkOut && myToday.status !== 'off' && <button className="btn btn-outline btn-sm" onClick={clockOut}>🚪 Tan ca</button>}
+          {myToday && !myToday.checkOut && myToday.status !== 'off' && <AsyncButton className="btn btn-outline btn-sm" disabled={mutating} onClick={clockOut}>🚪 Tan ca</AsyncButton>}
           {myToday && <span style={{ fontSize: '.8rem', color: 'var(--accent)', fontWeight: 600 }}>
             ✓ {ST[myToday.status][0]}{myToday.checkIn ? ` · vào ${myToday.checkIn}` : ''}{myToday.checkOut ? ` · ra ${myToday.checkOut} (${workedHours(myToday.checkIn, myToday.checkOut)}h)` : ''}
             {isLate(myToday) ? ' · ⚠ muộn' : ''}</span>}
@@ -138,21 +138,24 @@ export default function AttendancePage() {
 function HolidayModal({ holidays, onClose }) {
   const [date, setDate] = useState(todayISO());
   const [name, setName] = useState('');
+  const [deleting, setDeleting] = useState(null);
   const toast = useToast();
   return (
     <Modal title="Ngày lễ công ty" onClose={onClose} footer={<button className="btn btn-outline" onClick={onClose}>Đóng</button>}>
       <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
         <input type="date" value={date} onChange={e => setDate(e.target.value)} />
         <input style={{ flex: 1 }} placeholder="Tên ngày lễ (VD: Quốc khánh)" value={name} onChange={e => setName(e.target.value)} />
-        <button className="btn btn-primary btn-sm" onClick={async () => { if (!name.trim()) return; const r = await holidays.create({ date, name: name.trim() }); if (r) { toast('Đã thêm'); setName(''); } }}>Thêm</button>
+        <AsyncButton className="btn btn-primary btn-sm" disabled={holidays.mutating} onClick={async () => { if (!name.trim()) return; const r = await holidays.create({ date, name: name.trim() }); if (r) { toast('Đã thêm'); setName(''); } }}>Thêm</AsyncButton>
       </div>
       {holidays.rows.map(h => (
         <div key={h.id} className="act-item" style={{ alignItems: 'center' }}>
           <span style={{ flex: 1 }}>{fmtDate(h.date)} — {h.name}</span>
-          <button className="icon-btn danger" onClick={() => holidays.remove(h.id)}><Icon name="trash" size={14} /></button>
+          <button className="icon-btn danger" onClick={() => setDeleting(h)} aria-label={`Xóa ngày lễ ${h.name}`}><Icon name="trash" size={14} /></button>
         </div>
       ))}
       {!holidays.rows.length && <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Chưa có ngày lễ nào. Ngày lễ không tính là vắng.</p>}
+      {deleting && <ConfirmDialog msg={`Xóa ngày lễ "${deleting.name}"?`} onClose={() => setDeleting(null)}
+        onYes={async () => { const r = await holidays.remove(deleting.id); if (!r) return false; toast('Đã xóa ngày lễ'); }} />}
     </Modal>
   );
 }
@@ -164,7 +167,7 @@ function OtModal({ users, onSave, onClose }) {
   return (
     <Modal title="Ghi giờ làm thêm (OT)" onClose={onClose}
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={() => { if (!uid || !(+ot > 0)) return; onSave(uid, date, ot); onClose(); }}>Lưu OT</button></>}>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={async () => { if (!uid || !(+ot > 0)) return; const r = await onSave(uid, date, ot); if (r !== false && r !== null) onClose(); }}>Lưu OT</AsyncButton></>}>
       <div className="form-grid">
         <div className="field full"><label>Nhân sự</label>
           <select value={uid} onChange={e => setUid(e.target.value)}>

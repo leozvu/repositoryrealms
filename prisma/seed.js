@@ -552,8 +552,12 @@ async function main() {
   /* ---------- Tổng kết ---------- */
   console.log('✔ Seed hoàn tất. Đăng nhập (http://localhost:3300):');
   console.log('');
-  console.log('  MẬT KHẨU CHUNG CHO MỌI TÀI KHOẢN DEMO: ' + DEMO_PW);
-  console.log('  (sinh ngẫu nhiên mỗi lần seed — đặt SEED_PASSWORD nếu muốn cố định)');
+  if (process.env.SEED_SHOW_PASSWORD === '0') {
+    console.log('  MẬT KHẨU DEMO: đã được cấp qua secret staging (không hiển thị trong log)');
+  } else {
+    console.log('  MẬT KHẨU CHUNG CHO MỌI TÀI KHOẢN DEMO: ' + DEMO_PW);
+    console.log('  (sinh ngẫu nhiên mỗi lần seed — đặt SEED_PASSWORD nếu muốn cố định)');
+  }
   console.log('');
   console.log('  Giám đốc   : giamdoc@agency.vn');
   console.log('  Kế toán    : ketoan@agency.vn');

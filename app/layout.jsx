@@ -1,6 +1,9 @@
 import './globals.css';
 
-export const metadata = { title: 'Agency ERP', description: 'Hệ thống quản trị agency đa người dùng' };
+export const metadata = {
+  title: 'CRMegoric ERP · CRM — Medieval Realms',
+  description: 'Hệ thống ERP và CRM đầy đủ với lớp trải nghiệm medieval, Realm, Quest, Gold và Tavern.',
+};
 
 export default function RootLayout({ children }) {
   return (

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Badge, Forbidden, ExportCsv, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Badge, Forbidden, ExportCsv, AsyncButton, useToast } from '@/components/ui';
 import DocEditor, { printDoc, nextCode } from '@/components/DocEditor';
 import { SendEmailModal } from '@/components/SendEmail';
 import { money, fmtDate, todayISO, docGrand, paidOf, remainOf } from '@/lib/format';
@@ -192,8 +192,8 @@ export default function InvoicesPage() {
                   {v.status !== 'paid' && <button className="icon-btn" style={{ color: 'var(--accent)' }} title="Ghi nhận thanh toán"
                     onClick={() => setModal({ mode: 'pay', row: v })}><Icon name="wallet" size={16} /></button>}
                   {/* v3.13: nhân bản retainer sang kỳ tới, cùng recGroup để MRR không cộng dồn */}
-                  {v.recurring && <button className="icon-btn" style={{ color: 'var(--primary)' }} title="Sinh hóa đơn kỳ tới (tháng sau)"
-                    onClick={() => nextPeriod(v)}><Icon name="repeat" size={16} /></button>}
+                  {v.recurring && <AsyncButton className="icon-btn" pendingLabel="…" style={{ color: 'var(--primary)' }} title="Sinh hóa đơn kỳ tới (tháng sau)"
+                    onClick={() => nextPeriod(v)}><Icon name="repeat" size={16} /></AsyncButton>}
                   <button className="icon-btn" title="Gửi email cho khách" aria-label={`Gửi email hóa đơn ${v.code}`}
                     onClick={() => setModal({ mode: 'email', row: v })}><Icon name="mail" size={16} /></button>
                   <button className="icon-btn" title="In / xuất PDF" onClick={() => printDoc(v, 'invoice', client(v.clientId)?.name || '', client(v.clientId) || {})}><Icon name="print" size={16} /></button>

@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 10,
+    "verifiedContracts": 10,
+    "scenarios": 5,
+    "verifiedScenarios": 5
+  },
+  "contracts": [
+    {
+      "id": "append-only-model",
+      "layer": "database",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model RealmChangeEvent",
+        "domains        String",
+        "@@index([createdAt, id])"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "additive-migration",
+      "layer": "database",
+      "source": "prisma/migrations/20260718170000_add_realm_change_feed/migration.sql",
+      "signals": [
+        "CREATE TABLE \"RealmChangeEvent\"",
+        "CREATE INDEX \"RealmChangeEvent_createdAt_id_idx\""
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-event-publisher",
+      "layer": "server",
+      "source": "lib/events.js",
+      "signals": [
+        "await step('Realm change feed'",
+        "publishRealmChange(prisma"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "awaited-resource-events",
+      "layer": "api",
+      "source": "app/api/data/[resource]/route.js",
+      "signals": [
+        "await emitEvent(params.resource, 'create'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-cursor-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/changes/route.js",
+      "signals": [
+        "const user = await currentUser()",
+        "loadRealmChangeFeed(prisma, user, { cursor })",
+        "realmJsonResponse(trace, feed"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "payload-free-response",
+      "layer": "server",
+      "source": "lib/realm-change-feed.js",
+      "signals": [
+        "select: { id: true, createdAt: true, domains: true }",
+        "domains: [...domainSet].sort()",
+        "eventCount: rows.length"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "fail-soft-publisher",
+      "layer": "server",
+      "source": "lib/realm-change-feed.js",
+      "signals": [
+        "safelyPublishRealmChange",
+        "return null"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "resilient-client-poll",
+      "layer": "client",
+      "source": "components/realm/useRealmChangeFeed.js",
+      "signals": [
+        "MAX_RETRY_MS",
+        "window.addEventListener('online'",
+        "document.addEventListener('visibilitychange'",
+        "setState((current) => current === 'ready' ? 'stale' : 'unavailable')"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "targeted-panel-invalidation",
+      "layer": "client",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "useRealmChangeFeed({",
+        "setRealmDataRevision((current) => current + 1)",
+        "dataRevision={realmDataRevision}"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "schema-readiness",
+      "layer": "health",
+      "source": "app/api/realm-demo/health/route.js",
+      "signals": [
+        "to_regclass('\"RealmChangeEvent\"')",
+        "evaluateRealmSchemaReadiness"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "task-domain-fanout",
+      "expected": "operations,guild,campaigns,rewards",
+      "actual": "operations,guild,campaigns,rewards",
+      "status": "verified"
+    },
+    {
+      "id": "lead-domain-isolation",
+      "expected": "embassy",
+      "actual": "embassy",
+      "status": "verified"
+    },
+    {
+      "id": "unmapped-domain-suppressed",
+      "expected": "",
+      "actual": "",
+      "status": "verified"
+    },
+    {
+      "id": "cursor-time-roundtrip",
+      "expected": "2026-07-18T12:00:00.000Z",
+      "actual": "2026-07-18T12:00:00.000Z",
+      "status": "verified"
+    },
+    {
+      "id": "cursor-id-roundtrip",
+      "expected": "event-1",
+      "actual": "event-1",
+      "status": "verified"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { isFreelancer } from '@/lib/perm';
+import { safelyPublishRealmChange } from '@/lib/realm-change-feed';
 
 // Đảm bảo kênh #Chung tồn tại và người gọi là thành viên
 async function ensureGeneral(userId) {
@@ -65,6 +66,9 @@ export async function POST(req) {
     }
     const conv = await prisma.conversation.create({ data: { type: 'dm' } });
     await prisma.convMember.createMany({ data: [{ convId: conv.id, userId: user.id }, { convId: conv.id, userId }] });
+    await Promise.all([user.id, userId].map(audienceUserId => safelyPublishRealmChange(prisma, {
+      resource: 'messages', action: 'conversation_create', actorId: user.id, audienceUserId,
+    })));
     return NextResponse.json(conv);
   }
   if (type === 'group') {
@@ -72,6 +76,9 @@ export async function POST(req) {
     if (!name?.trim() || ids.length < 2) return NextResponse.json({ error: 'Cần tên nhóm và ít nhất 1 thành viên khác' }, { status: 400 });
     const conv = await prisma.conversation.create({ data: { type: 'group', name: name.trim() } });
     await prisma.convMember.createMany({ data: ids.map(uid => ({ convId: conv.id, userId: uid })) });
+    await Promise.all(ids.map(audienceUserId => safelyPublishRealmChange(prisma, {
+      resource: 'messages', action: 'conversation_create', actorId: user.id, audienceUserId,
+    })));
     return NextResponse.json(conv);
   }
   return NextResponse.json({ error: 'type không hợp lệ' }, { status: 400 });

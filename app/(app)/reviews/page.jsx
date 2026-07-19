@@ -3,7 +3,7 @@
 // quản lý (HR/PM/Trưởng nhóm/GĐ) chấm lại + chốt. Điểm chốt = TB điểm quản lý.
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Modal, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, ConfirmDialog, EmptyState, AsyncButton, useToast } from '@/components/ui';
 import { initials } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
@@ -36,14 +36,14 @@ function ReviewModal({ review, userName, isMgr, isSelf, onSave, onClose }) {
     <Modal title={`Đánh giá ${review.quarter} — ${userName}`} onClose={onClose} large
       footer={<>
         <button className="btn btn-outline" onClick={onClose}>Đóng</button>
-        {canSelf && <button className="btn btn-primary" onClick={() => {
+        {canSelf && <AsyncButton className="btn btn-primary" pendingLabel="Đang gửi…" onClick={async () => {
           if (scores.some(s => !s.self)) return alert('Hãy tự chấm đủ 5 tiêu chí');
-          onSave({ scores: JSON.stringify(scores), selfNote, status: 'self_done' }); onClose();
-        }}>Gửi tự đánh giá</button>}
-        {canMgr && <button className="btn btn-primary" onClick={() => {
+          const r = await onSave({ scores: JSON.stringify(scores), selfNote, status: 'self_done' }); if (r !== false && r !== null) onClose();
+        }}>Gửi tự đánh giá</AsyncButton>}
+        {canMgr && <AsyncButton className="btn btn-primary" pendingLabel="Đang chốt…" onClick={async () => {
           if (scores.some(s => !s.mgr)) return alert('Hãy chấm đủ 5 tiêu chí phần quản lý');
-          onSave({ scores: JSON.stringify(scores), mgrNote, status: 'final' }); onClose();
-        }}>Chốt đánh giá</button>}
+          const r = await onSave({ scores: JSON.stringify(scores), mgrNote, status: 'final' }); if (r !== false && r !== null) onClose();
+        }}>Chốt đánh giá</AsyncButton>}
       </>}>
       <table style={{ fontSize: '.85rem', width: '100%' }}>
         <thead><tr><th>Tiêu chí</th><th style={{ textAlign: 'center' }}>Tự chấm</th><th style={{ textAlign: 'center' }}>Quản lý</th></tr></thead>
@@ -104,7 +104,7 @@ export default function ReviewsPage() {
           Quý <b style={{ color: 'var(--fg)' }}>{q}</b> · {thisQ.filter(r => r.status === 'final').length}/{thisQ.length} đã chốt
         </span>
         <div className="spacer"></div>
-        {isHR && <button className="btn btn-primary" onClick={openRound}><Icon name="plus" size={16} /><span>Mở đợt đánh giá {q}</span></button>}
+        {isHR && <AsyncButton className="btn btn-primary" pendingLabel="Đang mở đợt…" disabled={reviews.mutating} onClick={openRound}><Icon name="plus" size={16} /><span>Mở đợt đánh giá {q}</span></AsyncButton>}
       </div>
 
       {mine && (
@@ -154,7 +154,7 @@ export default function ReviewsPage() {
       {modal?.row && <ReviewModal review={modal.row} userName={uName(modal.row.userId)}
         isMgr={isMgr} isSelf={modal.row.userId === me?.id}
         onClose={() => setModal(null)}
-        onSave={async d => { await reviews.update(modal.row.id, d); toast(d.status === 'final' ? 'Đã chốt đánh giá' : 'Đã gửi tự đánh giá'); }} />}
+        onSave={async d => { const r = await reviews.update(modal.row.id, d); if (!r) return false; toast(d.status === 'final' ? 'Đã chốt đánh giá' : 'Đã gửi tự đánh giá'); return true; }} />}
       {modal?.del && <ConfirmDialog msg={`Xóa phiếu đánh giá của ${uName(modal.del.userId)}?`}
         onClose={() => setModal(null)} onYes={async () => { await reviews.remove(modal.del.id); toast('Đã xóa'); }} />}
     </>

@@ -1,17 +1,19 @@
 /* ============ Agency CRM/ERP — Data-Dense Dashboard ============ */
 :root{
-  --primary:#2563EB; --primary-dark:#1D4ED8; --on-primary:#FFFFFF;
-  --secondary:#3B82F6; --accent:#059669; --accent-soft:#D1FAE5;
-  --bg:#F8FAFC; --fg:#0F172A; --muted:#64748B; --muted-bg:#F1F5F9;
-  --border:#E2E8F0; --card:#FFFFFF;
+  --primary:#315B43; --primary-dark:#244735; --on-primary:#FFFFFF;
+  --secondary:#55745F; --accent:#26734D; --accent-soft:#DCEDE2;
+  --bg:#F4F1E9; --fg:#202720; --muted:#5F695F; --muted-bg:#ECE6D9;
+  --border:#D8CFBC; --card:#FFFCF5;
   --danger:#DC2626; --danger-soft:#FEE2E2;
-  --warn:#D97706; --warn-soft:#FEF3C7;
-  --info-soft:#DBEAFE; --violet:#7C3AED; --violet-soft:#EDE9FE;
-  --sidebar-bg:#0F172A; --sidebar-fg:#CBD5E1; --sidebar-active:#1E293B;
-  --radius:10px; --radius-sm:7px;
-  --shadow:0 1px 2px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.08);
-  --shadow-lg:0 10px 30px rgba(15,23,42,.16);
+  --warn:#9A651D; --warn-soft:#F7E7C3;
+  --info-soft:#E2ECE5; --violet:#755B87; --violet-soft:#EEE6F1;
+  --sidebar-bg:#102219; --sidebar-fg:#D7DDD3; --sidebar-active:#1D3528;
+  --realm-gold:#B88936;
+  --radius:9px; --radius-sm:7px;
+  --shadow:0 1px 2px rgba(57,45,25,.07),0 3px 9px rgba(57,45,25,.06);
+  --shadow-lg:0 14px 36px rgba(40,32,18,.18);
   --font:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-display:Georgia,'Times New Roman',serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px}
@@ -25,25 +27,25 @@ svg{width:20px;height:20px;flex:none}
 @media(max-width:900px),(pointer:coarse){
   input,select,textarea{font-size:16px}
 }
-::selection{background:#BFDBFE}
+::selection{background:#E8D6A8}
 
 #app{display:flex;min-height:100dvh}
 
 /* ============ Sidebar ============ */
-#sidebar{width:248px;background:var(--sidebar-bg);color:var(--sidebar-fg);display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:50;transition:transform .25s ease}
+#sidebar{width:248px;background:linear-gradient(180deg,#14281E 0%,var(--sidebar-bg) 52%,#0C1A13 100%);color:var(--sidebar-fg);display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:50;transition:transform .25s ease;border-right:1px solid rgba(184,137,54,.3)}
 .brand{display:flex;align-items:center;gap:12px;padding:18px 18px 14px}
-.brand-logo{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--primary),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem}
+.brand-logo{width:40px;height:40px;border:1px solid #E0BD6E;border-radius:10px;background:linear-gradient(145deg,#426F54,#213D2D);box-shadow:inset 0 0 0 3px rgba(255,247,218,.08),0 6px 16px rgba(0,0,0,.24);color:#F6E7B7;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:1.2rem}
 .brand-text{display:flex;flex-direction:column;line-height:1.2}
 .brand-name{color:#fff;font-weight:700;font-size:.95rem}
 /* v3.14: #64748B trên nền sidebar #0F172A chỉ đạt 3.75:1 — chữ nhỏ cần 4.5:1. Lên slate-400 (6.96:1). */
-.brand-sub{font-size:.7rem;color:#94A3B8}
+.brand-sub{font-size:.7rem;color:#B5BBAF}
 #nav{flex:1;overflow-y:auto;padding:6px 10px 10px}
 /* v3.14: #475569 trên #0F172A chỉ 2.36:1 — gần như chìm vào nền, đây là lỗi tương phản
    nặng nhất toàn app. Lên slate-400 (6.96:1) + 0.7rem cho dễ đọc. */
-.nav-section{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#94A3B8;padding:14px 10px 6px;font-weight:600}
+.nav-section{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:#B8BCAF;padding:14px 10px 6px;font-weight:700}
 .nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:9px 10px;border-radius:8px;color:var(--sidebar-fg);font-size:.875rem;font-weight:500;margin-bottom:2px;transition:background .15s,color .15s;text-align:left}
-.nav-item:hover{background:var(--sidebar-active);color:#fff}
-.nav-item.active{background:var(--primary);color:#fff}
+.nav-item:hover{background:var(--sidebar-active);color:#FFF8E8}
+.nav-item.active{background:linear-gradient(90deg,#315B43,#294D3A);box-shadow:inset 3px 0 0 var(--realm-gold);color:#FFF8E8}
 .nav-item svg{width:18px;height:18px}
 .nav-item .count{margin-left:auto;background:rgba(255,255,255,.12);font-size:.7rem;padding:1px 7px;border-radius:99px;font-weight:600}
 .sidebar-footer{padding:12px 18px;font-size:.7rem;color:#94A3B8;border-top:1px solid #1E293B}
@@ -51,13 +53,21 @@ svg{width:20px;height:20px;flex:none}
 
 /* ============ Main ============ */
 #main{flex:1;margin-left:248px;display:flex;flex-direction:column;min-width:0}
-#topbar{display:flex;align-items:center;gap:14px;padding:14px 26px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30}
+#topbar{display:flex;align-items:center;gap:14px;padding:14px 26px;background:rgba(255,252,245,.96);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(67,52,25,.05);position:sticky;top:0;z-index:30;backdrop-filter:blur(12px)}
 #menu-btn{display:none;padding:6px;border-radius:8px;color:var(--muted)}
 #menu-btn:hover{background:var(--muted-bg)}
-#page-title{font-size:1.15rem;font-weight:700}
+#page-title{font-family:var(--font-display);font-size:1.22rem;font-weight:700;color:#26382D}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px}
 #today-label{font-size:.8rem;color:var(--muted)}
 #view{padding:24px 26px 60px;max-width:1440px;width:100%}
+
+/* Realm là một phân hệ immersive của ERP, không phải một ứng dụng thay thế. Auth, session,
+   phân quyền và API vẫn đi qua app layout gốc; chỉ ẩn chrome ERP khi người dùng bước vào map. */
+#app.realm-immersive #sidebar,
+#app.realm-immersive #topbar,
+#app.realm-immersive #backdrop{display:none!important}
+#app.realm-immersive #main{margin-left:0}
+#app.realm-immersive #view{max-width:none;padding:0}
 
 /* ============ Buttons ============ */
 .btn{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:8px;font-size:.85rem;font-weight:600;transition:background .15s,box-shadow .15s,transform .1s;border:1px solid transparent;white-space:nowrap}
@@ -106,7 +116,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .kpi-sub .up{color:var(--accent);font-weight:600}
 .kpi-sub .down{color:var(--danger);font-weight:600}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 18px;border-bottom:1px solid var(--border)}
-.card-title{font-size:.92rem;font-weight:700}
+.card-title{font-family:var(--font-display);font-size:.96rem;font-weight:700}
 .card-body{padding:16px 18px}
 .two-col{grid-template-columns:1fr 1fr}
 .dash-cols{grid-template-columns:2fr 1fr}
@@ -278,6 +288,7 @@ a.link:hover{text-decoration:underline}
 .palette{max-width:520px!important}
 .palette-input{width:100%;padding:13px 16px;border:none;border-bottom:1px solid var(--border);font-size:1rem;background:transparent;color:var(--fg)}
 .palette-input:focus{outline:none}
+.palette-input:focus-visible{outline:2px solid var(--primary);outline-offset:-3px}
 .palette-results{max-height:330px;overflow-y:auto;padding:6px}
 .palette-item{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border-radius:8px;cursor:pointer;text-align:left;transition:background .1s}
 .palette-item:hover,.palette-item.sel{background:var(--muted-bg)}
@@ -324,17 +335,19 @@ a.link:hover{text-decoration:underline}
 
 /* ============ Dark theme ============ */
 :root[data-theme="dark"]{
-  --bg:#0B1220; --fg:#E2E8F0; --muted:#94A3B8; --muted-bg:#182238;
-  --border:#233049; --card:#111A2E;
-  --accent-soft:#0B3A2C; --danger-soft:#3F1518; --warn-soft:#3A2A0C;
-  --info-soft:#16294D; --violet-soft:#2A1D4D;
-  --sidebar-bg:#0A0F1C; --sidebar-active:#182238;
+  --bg:#0C1510; --fg:#E9E5D8; --muted:#A8B0A5; --muted-bg:#18271E;
+  --border:#304237; --card:#132019;
+  --accent-soft:#123525; --danger-soft:#3F1518; --warn-soft:#3A2A0C;
+  --info-soft:#1B3024; --violet-soft:#2A1D35;
+  --sidebar-bg:#09130E; --sidebar-active:#1B3024;
   --shadow:0 1px 2px rgba(0,0,0,.4); --shadow-lg:0 10px 34px rgba(0,0,0,.55);
 }
-:root[data-theme="dark"] th{background:#0E1626}
-:root[data-theme="dark"] tbody tr:hover{background:#162138}
+:root[data-theme="dark"] #topbar{background:rgba(19,32,25,.96)}
+:root[data-theme="dark"] #page-title{color:#F0E4C2}
+:root[data-theme="dark"] th{background:#102019}
+:root[data-theme="dark"] tbody tr:hover{background:#1A2B21}
 :root[data-theme="dark"] .field input,:root[data-theme="dark"] .field select,:root[data-theme="dark"] .field textarea,
-:root[data-theme="dark"] .items-table input{background:#0E1626;color:var(--fg)}
+:root[data-theme="dark"] .items-table input{background:#102019;color:var(--fg)}
 :root[data-theme="dark"] .search-box input,:root[data-theme="dark"] select.filter{background:var(--card);color:var(--fg)}
 :root[data-theme="dark"] .btn-outline{background:var(--card);color:var(--fg)}
 :root[data-theme="dark"] .b-gray{background:#2A3650;color:#CBD5E1}
@@ -346,7 +359,7 @@ a.link:hover{text-decoration:underline}
 :root[data-theme="dark"] .avatar{background:#16294D;color:#93C5FD}
 :root[data-theme="dark"] .toast{background:#1E293B}
 :root[data-theme="dark"] .field label{color:#CBD5E1}
-:root[data-theme="dark"] ::selection{background:#1E3A8A}
+:root[data-theme="dark"] ::selection{background:#5B4824}
 
 /* ============ Responsive ============ */
 @media(max-width:1080px){
@@ -427,10 +440,10 @@ a.link:hover{text-decoration:underline}
 }
 
 /* ============ v2.0 additions: login + auth ============ */
-.login-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0F172A 0%,#1E3A8A 100%);padding:20px}
+.login-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 8%,rgba(184,137,54,.2),transparent 28rem),linear-gradient(145deg,#0B1710 0%,#173222 58%,#0D1B14 100%);padding:20px}
 .login-card{background:var(--card);border-radius:16px;box-shadow:var(--shadow-lg);width:100%;max-width:400px;padding:34px 32px}
-.login-logo{width:52px;height:52px;border-radius:13px;background:linear-gradient(135deg,var(--primary),#7C3AED);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.5rem;margin:0 auto 14px}
-.login-title{text-align:center;font-size:1.2rem;font-weight:800;margin-bottom:4px}
+.login-logo{width:54px;height:54px;border:1px solid #E0BD6E;border-radius:14px;background:linear-gradient(145deg,#426F54,#213D2D);box-shadow:inset 0 0 0 4px rgba(255,247,218,.08),0 8px 20px rgba(0,0,0,.24);color:#F6E7B7;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:1.55rem;margin:0 auto 14px}
+.login-title{text-align:center;font-family:var(--font-display);font-size:1.28rem;font-weight:800;margin-bottom:4px}
 .login-sub{text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:22px}
 .login-err{background:var(--danger-soft);color:var(--danger);font-size:.8rem;padding:9px 13px;border-radius:8px;margin-bottom:14px;font-weight:600}
 .login-card .field{margin-bottom:14px}
@@ -441,12 +454,12 @@ a.link:hover{text-decoration:underline}
 :root[data-theme="dark"] .role-DIRECTOR{background:#2A1D4D;color:#C4B5FD}
 :root[data-theme="dark"] .role-MANAGER{background:#16294D;color:#93C5FD}
 :root[data-theme="dark"] .role-STAFF{background:#2A3650;color:#CBD5E1}
-.user-chip{display:flex;align-items:center;gap:10px;padding:10px 18px;border-top:1px solid #1E293B}
-.user-chip .avatar{background:#1E3A8A;color:#93C5FD}
-.user-chip .uc-name{font-size:.8rem;color:#E2E8F0;font-weight:600;line-height:1.2}
-.user-chip .uc-role{font-size:.7rem;color:#64748B}
-.user-chip button{margin-left:auto;color:#64748B;padding:5px;border-radius:6px}
-.user-chip button:hover{background:#1E293B;color:#fff}
+.user-chip{display:flex;align-items:center;gap:10px;padding:10px 18px;border-top:1px solid rgba(184,137,54,.22)}
+.user-chip .avatar{background:#294D3A;color:#F2DB9D}
+.user-chip .uc-name{font-size:.8rem;color:#E8EBDD;font-weight:600;line-height:1.2}
+.user-chip .uc-role{font-size:.7rem;color:#A7B0A4}
+.user-chip button{margin-left:auto;color:#A7B0A4;padding:5px;border-radius:6px}
+.user-chip button:hover{background:#1D3528;color:#fff}
 
 /* v2.1: role chips cho 7 vai trò */
 .role-PM{background:#DBEAFE;color:#1D4ED8}
@@ -497,7 +510,7 @@ a.link:hover{text-decoration:underline}
 .msg-row.mine .msg-meta{text-align:right}
 .chat-input{display:flex;gap:9px;padding:12px 14px;border-top:1px solid var(--border)}
 .chat-input input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--fg);font-size:.88rem}
-.chat-input input:focus{outline:none;border-color:var(--primary)}
+.chat-input input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.14)}
 .chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-size:.86rem;gap:8px}
 @media(max-width:900px){
   .chat-list{width:100%;border-right:none}

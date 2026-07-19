@@ -15,30 +15,75 @@ generator client {
 // Một người giữ được nhiều vai trò (roles = JSON array, cộng quyền).
 // Cột `role` cũ giữ lại để tương thích, không dùng nữa.
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  name         String
-  passwordHash String
-  role         String    @default("STAFF")
-  roles        String    @default("[\"STAFF\"]")
-  teamId       String?
-  title        String? // chức danh: Designer, Account Manager…
-  phone        String?
-  salary       Int       @default(0) // chỉ DIRECTOR và chính chủ được xem
-  status       String    @default("active") // active | inactive
-  totpSecret   String? // v3.2: 2FA TOTP — null = chưa bật
-  birthday     String? // v3.8: YYYY-MM-DD — AI Summary nhắc sinh nhật
-  userType     String    @default("employee") // v3.11: employee | freelancer
-  accessUntil  String? // v3.11: YYYY-MM-DD — freelancer hết hạn thì chặn đăng nhập
-  hourlyRate   Int       @default(0) // v3.11: đơn giá giờ freelancer (nhân viên dùng lương÷176)
-  skills       String? // v3.11: kỹ năng freelancer
-  portfolio    String? // v3.11: link portfolio freelancer
-  loginFails   Int       @default(0) // v3.13: số lần nhập sai liên tiếp — chống dò mật khẩu
-  lockedUntil  DateTime? // v3.13: khóa đăng nhập tạm đến thời điểm này
-  createdAt    DateTime  @default(now())
-  tasks        Task[]
-  timeLogs     TimeLog[]
-  leaves       Leave[]
+  id                            String                         @id @default(cuid())
+  email                         String                         @unique
+  name                          String
+  passwordHash                  String
+  role                          String                         @default("STAFF")
+  roles                         String                         @default("[\"STAFF\"]")
+  teamId                        String?
+  title                         String? // chức danh: Designer, Account Manager…
+  phone                         String?
+  salary                        Int                            @default(0) // chỉ DIRECTOR và chính chủ được xem
+  status                        String                         @default("active") // active | inactive
+  totpSecret                    String? // v3.2: 2FA TOTP — null = chưa bật
+  birthday                      String? // v3.8: YYYY-MM-DD — AI Summary nhắc sinh nhật
+  userType                      String                         @default("employee") // v3.11: employee | freelancer
+  accessUntil                   String? // v3.11: YYYY-MM-DD — freelancer hết hạn thì chặn đăng nhập
+  hourlyRate                    Int                            @default(0) // v3.11: đơn giá giờ freelancer (nhân viên dùng lương÷176)
+  skills                        String? // v3.11: kỹ năng freelancer
+  portfolio                     String? // v3.11: link portfolio freelancer
+  loginFails                    Int                            @default(0) // v3.13: số lần nhập sai liên tiếp — chống dò mật khẩu
+  lockedUntil                   DateTime? // v3.13: khóa đăng nhập tạm đến thời điểm này
+  createdAt                     DateTime                       @default(now())
+  tasks                         Task[]
+  timeLogs                      TimeLog[]
+  leaves                        Leave[]
+  realmProfile                  RealmProfile?
+  realmQuestApprovals           RealmQuestConfig[]             @relation("RealmQuestApprover")
+  realmQuestConfigs             RealmQuestConfig[]             @relation("RealmQuestConfigurator")
+  realmGoldEntries              RealmGoldEntry[]
+  realmBudgetConfigs            RealmRewardBudget[]            @relation("RealmBudgetConfigurator")
+  realmBudgetApprovals          RealmRewardBudget[]            @relation("RealmBudgetApprover")
+  collaborationPresence         CollaborationPresenceSession[]
+  collaborationRequestsSent     CollaborationContactRequest[]  @relation("CollaborationRequester")
+  collaborationRequestsReceived CollaborationContactRequest[]  @relation("CollaborationTarget")
+}
+
+// Invalidation log giữa ERP và Realm. Chỉ lưu metadata kỹ thuật đã allowlist,
+// không sao chép payload nghiệp vụ; API change-feed chỉ trả domain tổng hợp.
+model RealmChangeEvent {
+  id             String   @id @default(cuid())
+  resource       String
+  action         String
+  entityId       String?
+  actorId        String?
+  audienceUserId String? // null = company-wide; set = chỉ session của người nhận được thấy
+  domains        String   @default("[]")
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt, id])
+  @@index([resource, createdAt])
+  @@index([audienceUserId, createdAt, id])
+}
+
+// Receipt kỹ thuật cho command Realm -> ERP. Không chứa payload nghiệp vụ;
+// idempotencyKey bảo đảm retry/double-click không ghi Task/Lead hai lần.
+model RealmActionReceipt {
+  id             String   @id @default(cuid())
+  idempotencyKey String   @unique
+  userId         String
+  action         String
+  resource       String
+  entityId       String
+  fromState      String
+  toState        String
+  resultId       String?
+  payloadHash    String?
+  createdAt      DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([resource, entityId, createdAt])
 }
 
 // ===== v3.11: Thành viên dự án — gắn freelancer (và nhân sự) vào dự án cụ thể =====
@@ -138,6 +183,7 @@ model Phase {
   name      String
   order     Int     @default(0)
   color     String?
+
   @@index([projectId])
 }
 
@@ -149,6 +195,7 @@ model TaskEvent {
   userName String
   text     String
   at       DateTime @default(now())
+
   @@index([taskId])
 }
 
@@ -166,26 +213,110 @@ model ProjectTemplate {
 }
 
 model Task {
-  id         String   @id @default(cuid())
-  title      String
-  projectId  String?
-  project    Project? @relation(fields: [projectId], references: [id])
-  assigneeId String?
-  assignee   User?    @relation(fields: [assigneeId], references: [id])
-  priority   String   @default("medium")
-  status     String   @default("todo")
-  dueDate    String?
-  note       String?
-  dependsOn  String   @default("[]") // v3.2: JSON [taskId] — việc phải xong trước mới được hoàn thành
-  checklist  String   @default("[]") // v3.7: JSON [{text, done}] — các bước con trong việc
-  recur      String? // v3.7: weekly | monthly — xong tự tạo kỳ sau
-  estHours   Float    @default(0) // v3.10: giờ ước lượng — so với giờ đã log
-  phaseId    String? // v3.10: thuộc giai đoạn nào của dự án
-  labels     String   @default("[]") // v3.10: JSON nhãn phân loại
+  id          String            @id @default(cuid())
+  title       String
+  projectId   String?
+  project     Project?          @relation(fields: [projectId], references: [id])
+  assigneeId  String?
+  assignee    User?             @relation(fields: [assigneeId], references: [id])
+  priority    String            @default("medium")
+  status      String            @default("todo")
+  dueDate     String?
+  note        String?
+  dependsOn   String            @default("[]") // v3.2: JSON [taskId] — việc phải xong trước mới được hoàn thành
+  checklist   String            @default("[]") // v3.7: JSON [{text, done}] — các bước con trong việc
+  recur       String? // v3.7: weekly | monthly — xong tự tạo kỳ sau
+  estHours    Float             @default(0) // v3.10: giờ ước lượng — so với giờ đã log
+  phaseId     String? // v3.10: thuộc giai đoạn nào của dự án
+  labels      String            @default("[]") // v3.10: JSON nhãn phân loại
   statusSince String? // v3.12: YYYY-MM-DD vào cột hiện tại từ khi nào — tính tuổi việc
+  realmQuest  RealmQuestConfig?
+
   @@index([assigneeId])
   @@index([projectId])
   @@index([status])
+}
+
+// ===== CRMegoric Realms: hồ sơ nhân vật gắn 1-1 với nhân sự ERP =====
+// Wallet và Renown KHÔNG lưu ở đây; luôn cộng từ RealmGoldEntry append-only.
+model RealmProfile {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  realmClass String   @default("Realm Builder")
+  color      String   @default("#3b8061")
+  streakDays Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Reward được quản lý duyệt riêng; nhân viên không tự gán Gold cho Task.
+model RealmQuestConfig {
+  id             String    @id @default(cuid())
+  taskId         String    @unique
+  task           Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  gold           Int       @default(0)
+  renown         Int       @default(0)
+  active         Boolean   @default(true)
+  status         String    @default("draft") // draft | pending | approved | rejected
+  note           String?
+  version        Int       @default(1)
+  configuredById String?
+  configuredBy   User?     @relation("RealmQuestConfigurator", fields: [configuredById], references: [id], onDelete: SetNull)
+  configuredAt   DateTime?
+  approvedById   String?
+  approvedBy     User?     @relation("RealmQuestApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt     DateTime?
+  reviewNote     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([configuredById])
+  @@index([approvedById])
+}
+
+// Hạn mức Gold theo tháng. Budget cũng có maker/checker để tránh một người tự nâng trần rồi duyệt.
+model RealmRewardBudget {
+  id             String    @id @default(cuid())
+  period         String    @unique // YYYY-MM
+  goldCap        Int       @default(140)
+  perUserGoldCap Int       @default(45)
+  status         String    @default("draft") // draft | pending | approved | rejected
+  note           String?
+  version        Int       @default(1)
+  configuredById String?
+  configuredBy   User?     @relation("RealmBudgetConfigurator", fields: [configuredById], references: [id], onDelete: SetNull)
+  configuredAt   DateTime?
+  approvedById   String?
+  approvedBy     User?     @relation("RealmBudgetApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt     DateTime?
+  reviewNote     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([configuredById])
+  @@index([approvedById])
+}
+
+// Sổ Gold append-only. idempotencyKey unique bảo vệ double-click/retry/webhook lặp.
+model RealmGoldEntry {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type           String // quest_reward | shop_spend | adjustment
+  amount         Int
+  renown         Int      @default(0)
+  label          String
+  sourceType     String?
+  sourceId       String?
+  idempotencyKey String   @unique
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, type, sourceType, sourceId])
+  @@index([userId, createdAt])
+  @@index([sourceType, sourceId])
 }
 
 // ===== v3.8: Đánh giá hiệu suất theo quý =====
@@ -210,6 +341,7 @@ model TaskComment {
   userId    String
   content   String
   createdAt DateTime @default(now())
+
   @@index([taskId])
 }
 
@@ -222,6 +354,7 @@ model Milestone {
   date      String // YYYY-MM-DD
   done      Boolean @default(false)
   note      String?
+
   @@index([projectId])
 }
 
@@ -237,6 +370,7 @@ model TimeLog {
   hours     Float   @default(0)
   billable  Boolean @default(true)
   note      String?
+
   @@index([userId])
   @@index([projectId])
   @@index([date])
@@ -256,6 +390,7 @@ model Payout {
   note      String?
   createdAt DateTime @default(now())
   paidDate  String?
+
   @@index([userId])
   @@index([status])
 }
@@ -292,6 +427,7 @@ model Invoice {
   recGroup  String?
   currency  String  @default("VND") // v3.18: đa tiền tệ
   fxRate    Float   @default(1)
+
   @@index([clientId])
   @@index([projectId])
   @@index([status])
@@ -308,6 +444,7 @@ model Transaction {
   desc        String?
   projectId   String?
   createdById String?
+
   @@index([date])
   @@index([projectId])
 }
@@ -332,6 +469,7 @@ model Leave {
   type   String  @default("annual")
   status String  @default("pending")
   note   String?
+
   @@index([userId])
 }
 
@@ -487,6 +625,7 @@ model Ticket {
   createdAt  DateTime  @default(now())
   dueAt      DateTime? // hạn SLA
   resolvedAt DateTime?
+
   @@index([assigneeId])
   @@index([status])
 }
@@ -538,6 +677,7 @@ model Message {
   senderId  String
   content   String
   createdAt DateTime     @default(now())
+
   @@index([convId, createdAt])
 }
 
@@ -553,6 +693,7 @@ model Commission {
   status    String  @default("pending") // pending | paid
   note      String?
   createdAt String?
+
   @@index([userId])
   @@index([invoiceId])
 }
@@ -620,6 +761,48 @@ model Notification {
   @@index([userId, readAt])
 }
 
+// ===== Shared Collaboration Bridge =====
+// Presence là dữ liệu phiên ngắn hạn theo tab/device. ERP và Realm cùng ghi vào bảng này,
+// sau đó directory hợp nhất theo userId để một người không bị đếm online nhiều lần.
+model CollaborationPresenceSession {
+  sessionId    String   @id
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  surface      String   @default("erp") // erp | realm
+  availability String   @default("available") // available | busy | focus | dnd | away
+  capabilities String   @default("[\"chat\"]") // JSON string: chat | voice | video
+  lastSeen     DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([userId, lastSeen])
+  @@index([lastSeen])
+}
+
+// Lời mời "ghé bàn" dùng chung cho Realm và ERP. Notification/Message vẫn là các kênh
+// nghiệp vụ chuẩn; bảng này chỉ giữ lifecycle, idempotency và trạng thái delivery.
+model CollaborationContactRequest {
+  id             String    @id @default(cuid())
+  requesterId    String
+  requester      User      @relation("CollaborationRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  targetId       String
+  target         User      @relation("CollaborationTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  conversationId String?
+  kind           String    @default("chat") // knock | chat | voice
+  sourceSurface  String    @default("realm") // realm | erp
+  status         String    @default("pending") // pending | accepted | declined | expired
+  message        String?
+  idempotencyKey String    @unique
+  seenAt         DateTime?
+  actionAt       DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([targetId, status, createdAt])
+  @@index([requesterId, createdAt])
+  @@index([expiresAt])
+}
+
 // ===== v3.5: Gắn link tài liệu ngoài (Drive/Notion/Figma…) =====
 model DocLink {
   id        String   @id @default(cuid())
@@ -669,21 +852,22 @@ model AuditLog {
   refId    String?
   detail   String?
   at       DateTime @default(now())
+
   @@index([at])
 }
 
 // ===== v3.19: XUẤT NHẬP KHẨU NÔNG SẢN (phân hệ 'export' — Fretas) =====
 // Vùng trồng (PUC) + cơ sở đóng gói (PHC). Gộp một model, phân biệt bằng type.
 model GrowingArea {
-  id        String   @id @default(cuid())
-  type      String   @default("PUC") // PUC (vùng trồng) | PHC (cơ sở đóng gói)
+  id        String     @id @default(cuid())
+  type      String     @default("PUC") // PUC (vùng trồng) | PHC (cơ sở đóng gói)
   name      String
   crop      String? // chanh dây | chôm chôm | ...
   province  String?
-  areaHa    Float    @default(0) // diện tích (ha) — với PUC
+  areaHa    Float      @default(0) // diện tích (ha) — với PUC
   owner     String? // chủ vườn / đơn vị
   note      String?
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
   codes     AreaCode[]
 }
 
@@ -700,38 +884,40 @@ model AreaCode {
   validFrom  String?
   validTo    String?
   note       String?
+
   @@index([areaId])
 }
 
 // Lô hàng xuất khẩu.
 model Shipment {
-  id             String   @id @default(cuid())
-  code           String   @unique
-  clientId       String? // người mua (buyer nước ngoài)
-  crop           String? // mặt hàng
-  market         String // thị trường đích: CN | EU | US
-  incoterm       String   @default("FOB") // FOB | CIF | CFR | EXW | DAP | FCA | CPT | CIP
-  transportMode  String   @default("SEA") // SEA | AIR
-  currency       String   @default("USD")
-  fxRate         Float    @default(1)
-  amount         Int      @default(0) // giá trị lô (theo currency)
-  paymentMethod  String   @default("TT") // TT | LC | DP | DA
-  containerType  String? // 20RF | 40HC-RF
-  containerNo    String?
-  sealNo         String?
-  weightKg       Float    @default(0)
-  etd            String? // ngày tàu chạy dự kiến (YYYY-MM-DD)
-  eta            String?
-  blNo           String? // số vận đơn
-  lcNo           String? // số L/C (nếu thanh toán L/C)
-  lcExpiry       String? // ngày hết hạn L/C
+  id              String        @id @default(cuid())
+  code            String        @unique
+  clientId        String? // người mua (buyer nước ngoài)
+  crop            String? // mặt hàng
+  market          String // thị trường đích: CN | EU | US
+  incoterm        String        @default("FOB") // FOB | CIF | CFR | EXW | DAP | FCA | CPT | CIP
+  transportMode   String        @default("SEA") // SEA | AIR
+  currency        String        @default("USD")
+  fxRate          Float         @default(1)
+  amount          Int           @default(0) // giá trị lô (theo currency)
+  paymentMethod   String        @default("TT") // TT | LC | DP | DA
+  containerType   String? // 20RF | 40HC-RF
+  containerNo     String?
+  sealNo          String?
+  weightKg        Float         @default(0)
+  etd             String? // ngày tàu chạy dự kiến (YYYY-MM-DD)
+  eta             String?
+  blNo            String? // số vận đơn
+  lcNo            String? // số L/C (nếu thanh toán L/C)
+  lcExpiry        String? // ngày hết hạn L/C
   presentDeadline String? // hạn xuất trình chứng từ (min(etd+21, lcExpiry))
-  growingAreaId  String? // vùng trồng nguồn (truy xuất)
-  packingHouseId String? // cơ sở đóng gói
-  status         String   @default("draft") // draft | booked | packing | customs | shipped | delivered | paid
-  note           String?
-  createdAt      DateTime @default(now())
-  docs           ShipmentDoc[]
+  growingAreaId   String? // vùng trồng nguồn (truy xuất)
+  packingHouseId  String? // cơ sở đóng gói
+  status          String        @default("draft") // draft | booked | packing | customs | shipped | delivered | paid
+  note            String?
+  createdAt       DateTime      @default(now())
+  docs            ShipmentDoc[]
+
   @@index([status])
   @@index([market])
 }
@@ -747,6 +933,7 @@ model ShipmentDoc {
   issuedBy   String? // đơn vị cấp
   issuedAt   String?
   note       String?
+
   @@index([shipmentId])
 }
 
@@ -754,8 +941,8 @@ model ShipmentDoc {
 // Mua nông sản từ nông dân → nhập kho theo LÔ (gắn vùng trồng + ngày thu hoạch + hạn dùng)
 // → xuất kho vào lô hàng xuất. Giá vốn theo lô (đích danh — phù hợp nông sản truy xuất từng lô).
 model StockLot {
-  id            String   @id @default(cuid())
-  code          String   @unique // LOT-2026-001
+  id            String      @id @default(cuid())
+  code          String      @unique // LOT-2026-001
   crop          String // Chanh dây | Chôm chôm | ...
   vendorId      String? // nhà cung cấp / nông dân (Vendor)
   growingAreaId String? // vùng trồng nguồn — TRUY XUẤT NGUỒN GỐC (GrowingArea PUC)
@@ -763,14 +950,15 @@ model StockLot {
   harvestDate   String? // ngày thu hoạch (YYYY-MM-DD)
   expiryDate    String? // hạn sử dụng / nên xuất trước
   receivedDate  String? // ngày nhập kho
-  qtyIn         Float    @default(0) // kg nhập
-  qtyOut        Float    @default(0) // kg đã xuất (tổng các phiếu xuất)
-  unitCost      Float    @default(0) // giá vốn / kg (theo currency)
-  currency      String   @default("VND")
-  status        String   @default("in_stock") // in_stock | depleted | expired
+  qtyIn         Float       @default(0) // kg nhập
+  qtyOut        Float       @default(0) // kg đã xuất (tổng các phiếu xuất)
+  unitCost      Float       @default(0) // giá vốn / kg (theo currency)
+  currency      String      @default("VND")
+  status        String      @default("in_stock") // in_stock | depleted | expired
   note          String?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime    @default(now())
   moves         StockMove[]
+
   @@index([crop])
   @@index([status])
 }
@@ -788,6 +976,7 @@ model StockMove {
   refId     String? // shipmentId khi xuất cho lô hàng
   note      String?
   createdAt DateTime @default(now())
+
   @@index([lotId])
   @@index([refId])
 }
@@ -827,6 +1016,7 @@ model LiveSession {
   settledDate   String? // v3.33: ngày tiền sàn THỰC VỀ ví (Shopee ~ngày 4, có hoàn tới ngày 15) — ghi phiếu thu
   note          String?
   createdAt     DateTime @default(now())
+
   @@index([date])
   @@index([status])
   @@index([hostId])
@@ -834,17 +1024,18 @@ model LiveSession {
 
 // Điểm vi phạm nền tảng — tích lũy rolling 180 ngày, 36đ = hạn chế live, 48đ = đóng shop.
 model Violation {
-  id            String   @id @default(cuid())
-  platform      String   @default("tiktok")
-  shop          String?
-  points        Int      @default(0)
-  reason        String
-  category      String? // vận hành | nội dung | sản phẩm
-  occurredAt    String // YYYY-MM-DD
-  expiresAt     String? // occurredAt + 180 ngày
+  id             String   @id @default(cuid())
+  platform       String   @default("tiktok")
+  shop           String?
+  points         Int      @default(0)
+  reason         String
+  category       String? // vận hành | nội dung | sản phẩm
+  occurredAt     String // YYYY-MM-DD
+  expiresAt      String? // occurredAt + 180 ngày
   appealDeadline String?
-  status        String   @default("active") // active | appealing | cleared | expired
-  note          String?
-  createdAt     DateTime @default(now())
+  status         String   @default("active") // active | appealing | cleared | expired
+  note           String?
+  createdAt      DateTime @default(now())
+
   @@index([occurredAt])
 }

@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 14,
+    "verifiedContracts": 14,
+    "scenarios": 5,
+    "verifiedScenarios": 5
+  },
+  "contracts": [
+    {
+      "id": "receipt-schema",
+      "layer": "database",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model RealmActionReceipt",
+        "idempotencyKey String   @unique",
+        "@@index([resource, entityId, createdAt])"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "additive-receipt-migration",
+      "layer": "database",
+      "source": "prisma/migrations/20260718210000_add_realm_action_receipts/migration.sql",
+      "signals": [
+        "CREATE TABLE \"RealmActionReceipt\"",
+        "RealmActionReceipt_idempotencyKey_key"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "explicit-transition-allowlist",
+      "layer": "contract",
+      "source": "lib/realm-action-contract.js",
+      "signals": [
+        "REALM_TASK_TRANSITIONS",
+        "REALM_LEAD_TRANSITIONS",
+        "done: Object.freeze([])",
+        "won: Object.freeze([])"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-rbac-row-scope",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "canWrite('tasks', user)",
+        "RESOURCES.tasks.canWriteRow",
+        "realmGuildScope(user)",
+        "realmEmbassyScope(user)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "optimistic-concurrency",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "updateMany({",
+        "status: command.expectedState",
+        "stage: command.expectedState",
+        "'realm_action_stale'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "idempotent-command-receipt",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "normalizeRealmIdempotencyKey",
+        "existingReceipt",
+        "error?.code !== 'P2002'",
+        "realm_action_idempotency_conflict"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "atomic-audit-receipt",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "db.$transaction",
+        "realmActionReceipt.create",
+        "auditLog.create",
+        "action: 'realm_action'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "event-bus-feedback-loop",
+      "layer": "api",
+      "source": "app/api/realm-demo/actions/route.js",
+      "signals": [
+        "await emitEvent(result.resource, result.event || 'update'",
+        "!result.idempotent",
+        "route: 'realm.actions'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "surface-and-session-gate",
+      "layer": "api",
+      "source": "app/api/realm-demo/actions/route.js",
+      "signals": [
+        "authorizedUser()",
+        "realmSurfaceDecision",
+        "isFreelancer(user)",
+        "loadRealmCompanyModules"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "safe-response-shape",
+      "layer": "api",
+      "source": "app/api/realm-demo/actions/route.js",
+      "signals": [
+        "source: 'erp'",
+        "idempotent: result.idempotent",
+        "action: result.action",
+        "generatedAt: new Date().toISOString()"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "explicit-user-confirmation",
+      "layer": "client",
+      "source": "components/realm/RealmActionDialog.jsx",
+      "signals": [
+        "ConfirmDialog",
+        "Idempotency-Key",
+        "ERP vẫn là nguồn dữ liệu chính",
+        "nhật ký kiểm toán"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "war-room-command-ui",
+      "layer": "client",
+      "source": "components/realm/WarRoom.jsx",
+      "signals": [
+        "realmTaskTransitions",
+        "action: 'task.transition'",
+        "RealmActionDialog",
+        "command bridge"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "embassy-command-ui",
+      "layer": "client",
+      "source": "components/realm/RoyalEmbassy.jsx",
+      "signals": [
+        "realmLeadTransitions",
+        "action: 'lead.transition'",
+        "RealmActionDialog",
+        "command bridge"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "schema-readiness-current",
+      "layer": "health",
+      "source": "lib/realm-health.js",
+      "signals": [
+        "REALM_SCHEMA_VERSION = 6",
+        "20260718230000_extend_realm_action_receipts",
+        "missing.push('action_receipts')"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "task-forward",
+      "expected": "in_progress,blocked",
+      "actual": "in_progress,blocked",
+      "status": "verified"
+    },
+    {
+      "id": "task-terminal",
+      "expected": "",
+      "actual": "",
+      "status": "verified"
+    },
+    {
+      "id": "lead-forward",
+      "expected": "won,lost",
+      "actual": "won,lost",
+      "status": "verified"
+    },
+    {
+      "id": "lead-terminal",
+      "expected": "",
+      "actual": "",
+      "status": "verified"
+    },
+    {
+      "id": "unknown-state-deny",
+      "expected": "",
+      "actual": "",
+      "status": "verified"
+    }
+  ]
+}

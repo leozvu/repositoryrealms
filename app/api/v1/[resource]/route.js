@@ -38,7 +38,7 @@ export async function POST(req, { params }) {
     const row = await prisma[cfg.model].create({ data });
     await audit(user, 'create', params.resource, row.id, row.name || row.title || row.code || null);
     if (icp?.after) await icp.after(row);
-    emitEvent(params.resource, 'create', row, null, user);
+    await emitEvent(params.resource, 'create', row, null, user);
     const out = cfg.sanitize ? cfg.sanitize(row, user) : row;
     return NextResponse.json(out);
   } catch (e) {

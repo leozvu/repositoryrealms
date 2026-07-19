@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Modal, FormModal, ConfirmDialog, EmptyState, Badge, useToast, useRoleLabels } from '@/components/ui';
+import { useResource, Icon, Modal, FormModal, ConfirmDialog, EmptyState, Badge, AsyncButton, useToast, useRoleLabels } from '@/components/ui';
 import { money, fmtDate, todayISO, initials } from '@/lib/format';
 import { ROLES, ROLE_LABEL, rolesOf, hasAny, isDirector } from '@/lib/perm';
 
@@ -19,7 +19,7 @@ function UserModal({ row, teams, canRoles, canPickRoles, roleOptions, onSave, on
   return (
     <Modal title={row ? `Sửa: ${row.name}` : 'Tạo tài khoản nhân sự'} onClose={onClose} large
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={() => onSave(f)}>Lưu</button></>}>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={() => onSave(f)}>Lưu</AsyncButton></>}>
       <div className="form-grid">
         <div className="field"><label>Họ tên <span className="req">*</span></label><input value={f.name} onChange={e => set('name', e.target.value)} /></div>
         {!row && <div className="field"><label>Email đăng nhập <span className="req">*</span></label><input type="email" value={f.email} onChange={e => set('email', e.target.value)} /></div>}
@@ -108,7 +108,8 @@ export default function StaffPage() {
       if (!f.email || !f.password) return toast('Cần email và mật khẩu', 'error');
       r = await callUsers('POST', { ...body, email: f.email, password: f.password });
     }
-    if (r) { toast(modal.row ? 'Đã cập nhật' : 'Đã tạo tài khoản'); setModal(null); }
+    if (!r) return false;
+    toast(modal.row ? 'Đã cập nhật' : 'Đã tạo tài khoản'); setModal(null); return true;
   };
 
   const LEAVE_FIELDS = [

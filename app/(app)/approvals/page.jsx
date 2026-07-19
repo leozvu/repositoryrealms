@@ -22,7 +22,7 @@ function Steps({ ap }) {
   );
 }
 
-function ApCard({ ap, mine, onDecide }) {
+function ApCard({ ap, mine, onDecide, busy }) {
   const [t, icon] = TYPE_META[ap.type] || [ap.type, 'alert'];
   return (
     <div className="ap-card">
@@ -37,8 +37,8 @@ function ApCard({ ap, mine, onDecide }) {
       </div>
       {!mine && ap.status === 'pending' && (
         <div className="ap-actions">
-          <button className="btn btn-primary btn-sm" onClick={() => onDecide(ap, 'approve')}><Icon name="check" size={14} /> Duyệt</button>
-          <button className="btn btn-outline btn-sm" style={{ color: 'var(--danger)' }} onClick={() => onDecide(ap, 'reject')}><Icon name="x" size={14} /> Từ chối</button>
+          <button className="btn btn-primary btn-sm" disabled={busy} aria-busy={busy || undefined} onClick={() => onDecide(ap, 'approve')}><Icon name="check" size={14} /> {busy ? 'Đang xử lý…' : 'Duyệt'}</button>
+          <button className="btn btn-outline btn-sm" disabled={busy} style={{ color: 'var(--danger)' }} onClick={() => onDecide(ap, 'reject')}><Icon name="x" size={14} /> Từ chối</button>
         </div>
       )}
     </div>
@@ -47,22 +47,31 @@ function ApCard({ ap, mine, onDecide }) {
 
 export default function ApprovalsPage() {
   const [data, setData] = useState(null);
+  const [decidingId, setDecidingId] = useState(null);
   const toast = useToast();
   const load = useCallback(() => fetch('/api/approvals').then(r => r.json()).then(setData), []);
   useEffect(() => { load(); }, [load]);
 
   const decide = async (ap, decision) => {
+    if (decidingId) return;
     if (decision === 'reject' && !confirm(`Từ chối yêu cầu "${ap.title}"?`)) return;
-    const res = await fetch(`/api/approvals/${ap.id}/decide`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ decision }),
-    });
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok) return toast(json.error || 'Có lỗi', 'error');
-    toast(decision === 'approve'
-      ? (json.status === 'approved' ? 'Đã duyệt xong — yêu cầu được thực thi' : 'Đã duyệt — chuyển sang cấp tiếp theo')
-      : 'Đã từ chối yêu cầu');
-    load();
+    setDecidingId(ap.id);
+    try {
+      const res = await fetch(`/api/approvals/${ap.id}/decide`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) return toast(json.error || 'Có lỗi', 'error');
+      toast(decision === 'approve'
+        ? (json.status === 'approved' ? 'Đã duyệt xong — yêu cầu được thực thi' : 'Đã duyệt — chuyển sang cấp tiếp theo')
+        : 'Đã từ chối yêu cầu');
+      await load();
+    } catch {
+      toast('Không thể kết nối máy chủ', 'error');
+    } finally {
+      setDecidingId(null);
+    }
   };
 
   if (!data) return null;
@@ -71,7 +80,7 @@ export default function ApprovalsPage() {
       <div className="card">
         <div className="card-head"><span className="card-title">Chờ tôi duyệt ({data.toApprove.length})</span></div>
         {data.toApprove.length
-          ? data.toApprove.map(ap => <ApCard key={ap.id} ap={ap} onDecide={decide} />)
+          ? data.toApprove.map(ap => <ApCard key={ap.id} ap={ap} busy={decidingId === ap.id} onDecide={decide} />)
           : <div className="card-body"><EmptyState title="Không có gì chờ bạn duyệt" sub="Báo giá lớn, khoản chi lớn và đơn nghỉ phép sẽ xuất hiện ở đây" /></div>}
       </div>
       <div className="card" style={{ marginTop: 16 }}>

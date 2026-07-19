@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { Icon, Forbidden, useToast, useResource, Modal, useRoleLabels } from '@/components/ui';
+import { Icon, Forbidden, useToast, useResource, Modal, ConfirmDialog, AsyncButton, useRoleLabels } from '@/components/ui';
 import { ROLES, ROLE_LABEL } from '@/lib/perm';
 import { MODULE_GROUPS, MODULE_PRESETS } from '@/lib/modules';
 
@@ -16,6 +16,7 @@ function ApiSection() {
   const [wUrl, setWUrl] = useState('');
   const [wEvents, setWEvents] = useState('*');
   const [wSecret, setWSecret] = useState('');
+  const [deleteWebhook, setDeleteWebhook] = useState(null);
   const toast = useToast();
 
   const loadKeys = () => fetch('/api/apikeys').then(r => r.ok ? r.json() : []).then(setKeys);
@@ -28,14 +29,25 @@ function ApiSection() {
     if (!r.ok) return toast(j.error || 'Lỗi', 'error');
     setNewKey({ name: kName.trim(), key: j.key }); setKName(''); loadKeys();
   };
-  const toggleKey = async k => { await fetch('/api/apikeys', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id, active: !k.active }) }); loadKeys(); };
-  const delKey = async k => { if (!confirm(`Xóa key "${k.name}"? Ứng dụng đang dùng key này sẽ mất truy cập.`)) return; await fetch('/api/apikeys', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id }) }); loadKeys(); toast('Đã xóa key'); };
+  const toggleKey = async k => {
+    const r = await fetch('/api/apikeys', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id, active: !k.active }) });
+    if (!r.ok) return toast('Không thể cập nhật API key', 'error');
+    await loadKeys(); toast(k.active ? 'Đã khóa API key' : 'Đã mở API key');
+  };
+  const delKey = async k => {
+    if (!confirm(`Xóa key "${k.name}"? Ứng dụng đang dùng key này sẽ mất truy cập.`)) return;
+    const r = await fetch('/api/apikeys', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id }) });
+    if (!r.ok) return toast('Không thể xóa API key', 'error');
+    await loadKeys(); toast('Đã xóa key');
+  };
 
   const addWebhook = async () => {
     if (!wUrl.trim().startsWith('http')) return toast('URL webhook không hợp lệ', 'error');
     const events = wEvents.split(',').map(x => x.trim()).filter(Boolean);
-    await webhooks.create({ url: wUrl.trim(), events: JSON.stringify(events.length ? events : ['*']), secret: wSecret.trim() || null });
+    const result = await webhooks.create({ url: wUrl.trim(), events: JSON.stringify(events.length ? events : ['*']), secret: wSecret.trim() || null });
+    if (!result) return false;
     setWUrl(''); setWEvents('*'); setWSecret(''); toast('Đã thêm webhook');
+    return true;
   };
 
   return (
@@ -50,8 +62,8 @@ function ApiSection() {
                 <div className="act-title">{k.name} <code style={{ fontSize: '.72rem' }}>{k.prefix}…</code>{!k.active && <span className="badge b-gray" style={{ marginLeft: 6 }}><span className="dot"></span>Đã khóa</span>}</div>
                 <div className="act-sub">{JSON.parse(k.roles || '[]').map(r => RL[r] || r).join(', ')} · dùng lần cuối: {k.lastUsed ? new Date(k.lastUsed).toLocaleString('vi-VN') : 'chưa'}</div>
               </div>
-              <button className="btn btn-outline btn-sm" onClick={() => toggleKey(k)}>{k.active ? 'Khóa' : 'Mở'}</button>
-              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={() => delKey(k)}><Icon name="trash" size={14} /></button>
+              <AsyncButton className="btn btn-outline btn-sm" onClick={() => toggleKey(k)}>{k.active ? 'Khóa' : 'Mở'}</AsyncButton>
+              <AsyncButton className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={() => delKey(k)} aria-label={`Xóa API key ${k.name}`}><Icon name="trash" size={14} /></AsyncButton>
             </div>
           ))}
           <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
@@ -59,7 +71,7 @@ function ApiSection() {
             <select multiple size={3} value={kRoles} onChange={e => setKRoles([...e.target.selectedOptions].map(o => o.value))} title="Ctrl+click chọn nhiều vai trò">
               {ROLES.map(r => <option key={r} value={r}>{RL[r] || ROLE_LABEL[r]}</option>)}
             </select>
-            <button className="btn btn-primary btn-sm" onClick={createKey}><Icon name="plus" size={14} /> Tạo key</button>
+            <AsyncButton className="btn btn-primary btn-sm" pendingLabel="Đang tạo…" onClick={createKey}><Icon name="plus" size={14} /> Tạo key</AsyncButton>
           </div>
         </div>
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
@@ -70,8 +82,8 @@ function ApiSection() {
                 <div className="act-title" style={{ wordBreak: 'break-all' }}>{h.url}{!h.active && <span className="badge b-gray" style={{ marginLeft: 6 }}><span className="dot"></span>Tắt</span>}</div>
                 <div className="act-sub">{JSON.parse(h.events || '[]').join(', ')} · lần gọi cuối: {h.lastStatus || 'chưa'}</div>
               </div>
-              <button className="btn btn-outline btn-sm" onClick={() => webhooks.update(h.id, { active: !h.active })}>{h.active ? 'Tắt' : 'Bật'}</button>
-              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={async () => { await webhooks.remove(h.id); toast('Đã xóa webhook'); }}><Icon name="trash" size={14} /></button>
+              <AsyncButton className="btn btn-outline btn-sm" disabled={webhooks.mutating} onClick={async () => { const r = await webhooks.update(h.id, { active: !h.active }); if (r) toast(h.active ? 'Đã tắt webhook' : 'Đã bật webhook'); }}>{h.active ? 'Tắt' : 'Bật'}</AsyncButton>
+              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={() => setDeleteWebhook(h)} aria-label={`Xóa webhook ${h.url}`}><Icon name="trash" size={14} /></button>
             </div>
           ))}
           <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
@@ -79,7 +91,7 @@ function ApiSection() {
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <input style={{ flex: 1, minWidth: 120 }} placeholder="Sự kiện (mặc định *)" value={wEvents} onChange={e => setWEvents(e.target.value)} />
               <input style={{ flex: 1, minWidth: 120 }} placeholder="Secret (tùy chọn)" value={wSecret} onChange={e => setWSecret(e.target.value)} />
-              <button className="btn btn-primary btn-sm" onClick={addWebhook}><Icon name="plus" size={14} /> Thêm</button>
+              <AsyncButton className="btn btn-primary btn-sm" disabled={webhooks.mutating} pendingLabel="Đang thêm…" onClick={addWebhook}><Icon name="plus" size={14} /> Thêm</AsyncButton>
             </div>
           </div>
         </div>
@@ -91,6 +103,8 @@ function ApiSection() {
           <code style={{ display: 'block', padding: '10px 12px', background: 'var(--bg, #f1f5f9)', borderRadius: 8, wordBreak: 'break-all', fontWeight: 700 }}>{newKey.key}</code>
         </Modal>
       )}
+      {deleteWebhook && <ConfirmDialog msg={`Xóa webhook "${deleteWebhook.url}"? Hệ thống tích hợp sẽ ngừng nhận sự kiện.`}
+        onClose={() => setDeleteWebhook(null)} onYes={async () => { const r = await webhooks.remove(deleteWebhook.id); if (!r) return false; toast('Đã xóa webhook'); }} />}
     </div>
   );
 }
@@ -225,13 +239,13 @@ export default function SettingsPage() {
             </div>
             <F k="smtpFrom" label="Địa chỉ gửi (để trống = tài khoản)" full />
             <div className="field full">
-              <button className="btn btn-outline btn-sm" onClick={async () => {
+              <AsyncButton className="btn btn-outline btn-sm" pendingLabel="Đang gửi thử…" onClick={async () => {
                 const save = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(s) });
                 if (!save.ok) return toast('Lưu cài đặt thất bại', 'error');
                 const r = await fetch('/api/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'test', to: s.smtpUser }) });
                 const j = await r.json().catch(() => ({}));
                 toast(r.ok ? `Đã gửi email thử tới ${s.smtpUser} — kiểm tra hộp thư` : j.error || 'Gửi thất bại', r.ok ? 'success' : 'error');
-              }}>Lưu &amp; gửi email thử tới chính hộp thư này</button>
+              }}>Lưu &amp; gửi email thử tới chính hộp thư này</AsyncButton>
             </div>
             <div className="field full">
               <label>Claude API key (bật AI Copilot)</label>
@@ -239,7 +253,7 @@ export default function SettingsPage() {
               <div className="hint">Dùng cho menu AI Copilot — chat với dữ liệu công ty, viết email/proposal. Không có key thì các tính năng AI rule-based (AI Summary, Lead Score) vẫn chạy bình thường.</div>
             </div>
           </div>
-          <div style={{ marginTop: 16 }}><button className="btn btn-primary" onClick={save}>Lưu cài đặt</button></div>
+          <div style={{ marginTop: 16 }}><AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={save}>Lưu cài đặt</AsyncButton></div>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

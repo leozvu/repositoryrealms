@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 12,
+    "verifiedContracts": 12,
+    "scenarios": 4,
+    "verifiedScenarios": 4
+  },
+  "contracts": [
+    {
+      "id": "audience-schema",
+      "layer": "database",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "audienceUserId String?",
+        "@@index([audienceUserId, createdAt, id])"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "additive-audience-migration",
+      "layer": "database",
+      "source": "prisma/migrations/20260718193000_add_realm_change_audience/migration.sql",
+      "signals": [
+        "ADD COLUMN \"audienceUserId\" TEXT",
+        "RealmChangeEvent_audienceUserId_createdAt_id_idx"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "session-audience-filter",
+      "layer": "server",
+      "source": "lib/realm-change-feed.js",
+      "signals": [
+        "{ audienceUserId: user.id }",
+        "where: { AND: [audience, afterCursor] }"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "payload-free-audience-feed",
+      "layer": "server",
+      "source": "lib/realm-change-feed.js",
+      "signals": [
+        "select: { id: true, createdAt: true, domains: true }",
+        "domains: [...domainSet].sort()"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "notification-create-wakeup",
+      "layer": "server",
+      "source": "lib/events.js",
+      "signals": [
+        "resource: 'notifications', action: 'create', audienceUserId"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "notification-read-wakeup",
+      "layer": "api",
+      "source": "app/api/notifications/route.js",
+      "signals": [
+        "resource: 'notifications'",
+        "audienceUserId: user.id",
+        "'Cache-Control': 'private, no-cache, no-store, max-age=0'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "collaboration-target-wakeup",
+      "layer": "server",
+      "source": "lib/collaboration-admin.js",
+      "signals": [
+        "resource: 'collaboration', action: 'request'",
+        "audienceUserId: targetId"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "message-recipient-wakeup",
+      "layer": "api",
+      "source": "app/api/chat/[id]/route.js",
+      "signals": [
+        "resource: 'messages', action: 'create'",
+        "audienceUserId"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-live-counters",
+      "layer": "client",
+      "source": "components/Shell.jsx",
+      "signals": [
+        "handleShellChanges",
+        "loadShellCounters",
+        "domains.has(domain)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realm-raven-inbox",
+      "layer": "client",
+      "source": "components/realm/RealmNotificationBell.jsx",
+      "signals": [
+        "Raven Inbox",
+        "fetch('/api/notifications'",
+        "dataRevision"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "single-browser-event",
+      "layer": "client",
+      "source": "components/realm/useRealmChangeFeed.js",
+      "signals": [
+        "REALM_CHANGE_BROWSER_EVENT",
+        "window.dispatchEvent(new CustomEvent"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "instant-contact-refresh",
+      "layer": "client",
+      "source": "components/collaboration/CollaborationBridge.jsx",
+      "signals": [
+        "REALM_CHANGE_BROWSER_EVENT",
+        "includes('collaboration')",
+        "loadContacts()"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "notification-domain",
+      "expected": "notifications",
+      "actual": "notifications",
+      "status": "verified"
+    },
+    {
+      "id": "message-domain",
+      "expected": "communications",
+      "actual": "communications",
+      "status": "verified"
+    },
+    {
+      "id": "collaboration-fanout",
+      "expected": "collaboration,notifications,communications",
+      "actual": "collaboration,notifications,communications",
+      "status": "verified"
+    },
+    {
+      "id": "sensitive-resource-suppressed",
+      "expected": "",
+      "actual": "",
+      "status": "verified"
+    }
+  ]
+}

@@ -47,7 +47,7 @@ export default function CopilotPage() {
 
   return (
     <div style={{ maxWidth: 780, margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: 'calc(100dvh - 140px)' }}>
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1 }} aria-live="polite" aria-busy={busy || undefined}>
         {!messages.length && (
           <div style={{ textAlign: 'center', padding: '36px 0 22px' }}>
             <div style={{ width: 54, height: 54, borderRadius: 14, background: 'linear-gradient(135deg,#2563EB,#7C3AED)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', margin: '0 auto 14px' }}>AI</div>
@@ -72,7 +72,7 @@ export default function CopilotPage() {
           <span style={{ color: 'var(--muted)', fontSize: '.86rem', paddingTop: 7 }}>Đang phân tích dữ liệu công ty…</span></div>}
         <div ref={endRef}></div>
       </div>
-      <form onSubmit={e => { e.preventDefault(); send(); }}
+      <form aria-busy={busy || undefined} onSubmit={e => { e.preventDefault(); send(); }}
         style={{ position: 'sticky', bottom: 14, display: 'flex', gap: 9, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 13, padding: 9, boxShadow: 'var(--shadow-lg)', marginTop: 14 }}>
         <input value={input} onChange={e => setInput(e.target.value)} placeholder="Hỏi về doanh thu, khách hàng, dự án… hoặc nhờ viết email/proposal"
           style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '.9rem', padding: '6px 8px', color: 'var(--fg)' }} />

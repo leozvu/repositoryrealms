@@ -1,0 +1,16 @@
+id,source,missingSignals,status
+additive-collaboration-schema,prisma/schema.prisma,,verified
+canonical-erp-chat-notification,lib/collaboration-admin.js,,verified
+authenticated-actor-boundary,lib/collaboration-admin.js,,verified
+presence-session-ownership,lib/collaboration-admin.js,,verified
+multi-session-user-merge,lib/collaboration.js,,verified
+contact-idempotency,lib/collaboration-admin.js,,verified
+dnd-and-rate-guard,lib/collaboration-admin.js,,verified
+contact-lifecycle-expiry,lib/collaboration-admin.js,,verified
+erp-global-bridge,components/Shell.jsx,,verified
+realm-to-erp-contact,components/realm/RealmOffice.jsx,,verified
+server-signed-realm-identity,scripts/realm-signal-server.mjs,,verified
+message-deep-link,app/(app)/messages/page.jsx,,verified
+remembered-surface-login,app/login/page.jsx,,verified
+fail-soft-directory,components/collaboration/useCollaborationDirectory.js,,verified
+private-no-store-response,lib/collaboration-response.js,,verified

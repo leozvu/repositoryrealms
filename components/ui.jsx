@@ -56,6 +56,9 @@ const RAW = {
   // v3.14: bổ sung cho các chỗ đang dùng emoji làm icon. Cùng bộ Feather (nét 2px, bo tròn)
   // để không lệch phong cách với 36 icon sẵn có.
   bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  camera: '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>',
+  mic: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>',
+  screen: '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
   cake: '<path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s1-1 2.5-1 2.5 2 5 2 3.5-2 5-2 2.5 1 2.5 1"/><path d="M2 21h20"/><path d="M12 4v3"/><path d="M8 5v2"/><path d="M16 5v2"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="m17.7 17.7 1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.3 17.7-1.4 1.4"/><path d="m19.1 4.9-1.4 1.4"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
@@ -98,6 +101,36 @@ export function ToastProvider({ children }) {
 }
 export const useToast = () => useContext(ToastCtx);
 
+/* ---------- Nút async dùng chung: khóa double-submit + phản hồi tiến trình ---------- */
+export function AsyncButton({ onClick, pendingLabel = 'Đang xử lý…', disabled, children, ...props }) {
+  const [pending, setPending] = useState(false);
+  const pendingRef = useRef(false);
+  const toast = useToast();
+
+  const run = async e => {
+    if (pendingRef.current) return;
+    try {
+      const result = onClick?.(e);
+      if (!result || typeof result.then !== 'function') return result;
+      pendingRef.current = true;
+      setPending(true);
+      return await result;
+    } catch {
+      toast?.('Không thể hoàn tất thao tác. Vui lòng thử lại.', 'error');
+      return false;
+    } finally {
+      pendingRef.current = false;
+      setPending(false);
+    }
+  };
+
+  return (
+    <button {...props} onClick={run} disabled={disabled || pending} aria-busy={pending || undefined}>
+      {pending ? pendingLabel : children}
+    </button>
+  );
+}
+
 /* ---------- Modal ---------- */
 export function Modal({ title, children, footer, large, onClose }) {
   useEffect(() => {
@@ -120,11 +153,31 @@ export function Modal({ title, children, footer, large, onClose }) {
 }
 
 export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa' }) {
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
+  const toast = useToast();
+  const close = () => { if (!submittingRef.current) onClose(); };
+  const confirm = async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
+    try {
+      const result = await onYes();
+      if (result !== false && result !== null) onClose();
+    } catch {
+      toast?.('Không thể hoàn tất thao tác. Vui lòng thử lại.', 'error');
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
+  };
   return (
-    <Modal title="Xác nhận" onClose={onClose}
+    <Modal title="Xác nhận" onClose={close}
       footer={<>
-        <button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-danger" onClick={() => { onClose(); onYes(); }}>{yesLabel}</button>
+        <button className="btn btn-outline" onClick={close} disabled={submitting}>Hủy</button>
+        <button className="btn btn-danger" onClick={confirm} disabled={submitting} aria-busy={submitting || undefined}>
+          {submitting ? 'Đang xử lý…' : yesLabel}
+        </button>
       </>}>
       <p style={{ fontSize: '.9rem' }}>{msg}</p>
     </Modal>
@@ -134,10 +187,14 @@ export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa' }) {
 /* ---------- Form động (port fieldHTML/formModal từ v1) ---------- */
 export function FormModal({ title, fields, data = {}, onSave, onClose, large, extraFooter }) {
   const formRef = useRef(null);
+  const submittingRef = useRef(false);
+  const [submitting, setSubmitting] = useState(false);
+  const toast = useToast();
   // v3.20: onSave có thể async và trả về false để GIỮ modal mở (validate thất bại).
   // Trước đây luôn onClose() sau onSave → validate lỗi vẫn đóng modal, người dùng thấy toast
   // lỗi nhưng mất hết dữ liệu vừa nhập. Ảnh hưởng mọi FormModal toàn app.
   const submit = async () => {
+    if (submittingRef.current) return;
     const form = formRef.current;
     if (!form.reportValidity()) return;
     const out = {};
@@ -147,17 +204,29 @@ export function FormModal({ title, fields, data = {}, onSave, onClose, large, ex
       if (f.type === 'multiselect') v = [...(form.elements[f.key]?.selectedOptions || [])].map(o => o.value);
       out[f.key] = v;
     });
-    const res = await onSave(out);
-    if (res !== false) onClose();
+    submittingRef.current = true;
+    setSubmitting(true);
+    try {
+      const res = await onSave(out);
+      if (res !== false && res !== null) onClose();
+    } catch {
+      toast?.('Không thể lưu dữ liệu. Vui lòng thử lại.', 'error');
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
   };
+  const close = () => { if (!submittingRef.current) onClose(); };
   return (
-    <Modal title={title} onClose={onClose} large={large}
+    <Modal title={title} onClose={close} large={large}
       footer={<>
         {extraFooter}
-        <button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={submit}>Lưu</button>
+        <button className="btn btn-outline" onClick={close} disabled={submitting}>Hủy</button>
+        <button className="btn btn-primary" onClick={submit} disabled={submitting} aria-busy={submitting || undefined}>
+          {submitting ? 'Đang lưu…' : 'Lưu'}
+        </button>
       </>}>
-      <form ref={formRef} className="form-grid" onSubmit={e => { e.preventDefault(); submit(); }}>
+      <form ref={formRef} className="form-grid" aria-busy={submitting || undefined} onSubmit={e => { e.preventDefault(); submit(); }}>
         {fields.map(f => {
           const v = data[f.key] ?? f.default ?? '';
           return (
@@ -210,6 +279,8 @@ function useAnyLoading() {
 export function useResource(name, filter) {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mutating, setMutating] = useState(false);
+  const mutationRef = useRef(null);
   const [forbidden, setForbidden] = useState(false);
   const toast = useToast();
   // Chuỗi hóa filter để useCallback không chạy lại mỗi lần render (object literal luôn khác nhau)
@@ -230,17 +301,31 @@ export function useResource(name, filter) {
   useEffect(() => { refresh(); }, [refresh]);
 
   const call = async (method, url, body) => {
-    const res = await fetch(url, {
-      method, headers: { 'Content-Type': 'application/json' },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok) { toast(json.error || 'Có lỗi xảy ra', 'error'); return null; }
-    await refresh();
-    return json;
+    if (mutationRef.current) return mutationRef.current;
+    const request = (async () => {
+      setMutating(true);
+      try {
+        const res = await fetch(url, {
+          method, headers: { 'Content-Type': 'application/json' },
+          body: body ? JSON.stringify(body) : undefined,
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) { toast(json.error || 'Có lỗi xảy ra', 'error'); return null; }
+        await refresh();
+        return json;
+      } catch {
+        toast('Không thể kết nối máy chủ. Vui lòng thử lại.', 'error');
+        return null;
+      } finally {
+        mutationRef.current = null;
+        setMutating(false);
+      }
+    })();
+    mutationRef.current = request;
+    return request;
   };
   return {
-    rows, loading, forbidden, refresh,
+    rows, loading, mutating, forbidden, refresh,
     create: data => call('POST', `/api/data/${name}`, data),
     update: (id, data) => call('PUT', `/api/data/${name}/${id}`, data),
     remove: id => call('DELETE', `/api/data/${name}/${id}`),

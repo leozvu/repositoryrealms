@@ -29,6 +29,6 @@ export async function PUT(req, { params }) {
   }
   const updated = await prisma.task.update({ where: { id: params.id }, data });
   await prisma.auditLog.create({ data: { userId: user.id, userName: user.name + ' (FL)', action: 'update', entity: 'tasks', refId: params.id, detail: updated.title } }).catch(() => {});
-  emitEvent('tasks', 'update', updated, task, { id: user.id, name: user.name });
+  await emitEvent('tasks', 'update', updated, task, { id: user.id, name: user.name });
   return NextResponse.json({ ok: true });
 }

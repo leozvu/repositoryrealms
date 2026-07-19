@@ -1,12 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useResource, Icon, FormModal, ConfirmDialog, Forbidden, ExportCsv, useToast } from '@/components/ui';
+import { useEffect, useRef, useState } from 'react';
+import { useResource, Icon, FormModal, ConfirmDialog, Forbidden, ExportCsv, AsyncButton, useToast } from '@/components/ui';
 import { ActivitiesModal } from '@/components/Activities';
 import { BarChart } from '@/components/charts';
 import { money, moneyShort, initials, todayISO, localISO, LEAD_STAGES, leadScore, scoreColor } from '@/lib/format';
 
 export default function LeadsPage() {
-  const { rows, forbidden, create, update, remove } = useResource('leads');
+  const { rows, loading, forbidden, create, update, remove } = useResource('leads');
   const users = useResource('users');
   const clients = useResource('clients');
   const [modal, setModal] = useState(null);
@@ -14,7 +14,20 @@ export default function LeadsPage() {
   const [overCol, setOverCol] = useState(null);
   const [settings, setSettings] = useState(null);
   const toast = useToast();
+  const focusedRecordRef = useRef(null);
   useEffect(() => { fetch('/api/settings').then(r => r.ok ? r.json() : null).then(setSettings).catch(() => {}); }, []);
+  useEffect(() => {
+    if (loading || typeof window === 'undefined') return;
+    const focusId = new URLSearchParams(window.location.search).get('focus');
+    if (!focusId || focusedRecordRef.current === focusId) return;
+    focusedRecordRef.current = focusId;
+    const lead = rows.find((row) => row.id === focusId);
+    if (!lead) {
+      toast('Không tìm thấy Lead hoặc bạn không còn quyền xem bản ghi này.', 'error');
+      return;
+    }
+    setModal({ mode: 'edit', row: lead });
+  }, [loading, rows, toast]);
   if (forbidden) return <Forbidden />;
 
   /* ---------- v3.4: forecast doanh thu weighted theo xác suất giai đoạn ---------- */
@@ -56,8 +69,9 @@ export default function LeadsPage() {
       name: lead.company || lead.name, contact: lead.name, email: lead.email, phone: lead.phone,
       note: 'Chuyển từ pipeline (' + (lead.source || '') + ')', createdAt: todayISO(),
     });
-    if (res) toast('Đã tạo khách hàng mới từ deal thắng');
-    setModal(null);
+    if (!res) return false;
+    toast('Đã tạo khách hàng mới từ deal thắng');
+    setModal(null); return true;
   };
 
   return (
@@ -134,7 +148,7 @@ export default function LeadsPage() {
           <button className="btn btn-ghost" style={{ marginRight: 'auto', color: 'var(--danger)' }}
             onClick={() => setModal({ mode: 'del', row: modal.row })}><Icon name="trash" size={16} /> Xóa</button>
           <button className="btn btn-outline" onClick={() => setModal({ mode: 'acts', row: modal.row })}><Icon name="clock" size={16} /> Nhật ký &amp; hẹn</button>
-          {modal.row.stage === 'won' && <button className="btn btn-outline" onClick={() => convertToClient(modal.row)}>Chuyển thành khách hàng</button>}
+          {modal.row.stage === 'won' && <AsyncButton className="btn btn-outline" pendingLabel="Đang chuyển…" onClick={() => convertToClient(modal.row)}>Chuyển thành khách hàng</AsyncButton>}
         </>} />}
       {modal?.mode === 'acts' && <ActivitiesModal refType="lead" refId={modal.row.id} name={modal.row.company || modal.row.name} onClose={() => setModal(null)} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa khách tiềm năng "${modal.row.company || modal.row.name}"?`}

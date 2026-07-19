@@ -1,0 +1,50 @@
+key,group,realmLabel,realmSurface,erpLabel,href,roles,module,routeFile,status
+realm,Trải nghiệm,Cổng Realm,Vương quốc,Văn phòng Realm,/realm,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/realm/page.jsx,verified
+dashboard,Tổng quan,Royal Briefing,Đại sảnh,Bảng điều khiển,/dashboard,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/dashboard/page.jsx,verified
+myday,Tổng quan,Nhật trình,Bàn phiêu lưu,Việc của tôi,/myday,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/myday/page.jsx,verified
+guide,Tổng quan,Codex,Thư viện,Cẩm nang sử dụng,/guide,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/guide/page.jsx,verified
+install,Tổng quan,Travel Rune,Cổng di động,Cài lên điện thoại,/install,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/install/page.jsx,verified
+calendar,Tổng quan,Royal Calendar,Phòng lịch,Lịch làm việc,/calendar,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/calendar/page.jsx,verified
+messages,Tổng quan,Lantern Mail,Tavern,Tin nhắn,/messages,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/messages/page.jsx,verified
+approvals,Tổng quan,Council Chamber,Phòng hội đồng,Phê duyệt,/approvals,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/approvals/page.jsx,verified
+copilot,Tổng quan,Oracle,Tháp tiên tri,AI Copilot,/copilot,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/copilot/page.jsx,verified
+leads,CRM,Royal Embassy,Đại sứ quán,Khách tiềm năng,/leads,AM,sales,app/(app)/leads/page.jsx,verified
+clients,CRM,Alliance Registry,Đại sứ quán,Khách hàng,/clients,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/clients/page.jsx,verified
+quotes,CRM,Royal Proposals,Văn phòng hiệp ước,Báo giá,/quotes,AM | PM | ACCOUNTANT,sales,app/(app)/quotes/page.jsx,verified
+services,CRM,Merchant Codex,Khu chợ,Bảng giá dịch vụ,/services,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,services,app/(app)/services/page.jsx,verified
+tickets,CRM,Petition Board,Trạm hỗ trợ,Ticket hỗ trợ,/tickets,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,support,app/(app)/tickets/page.jsx,verified
+portfolio,Vận hành,Campaign Command,War Room,Sở chỉ huy DA,/portfolio,PM | LEAD | ACCOUNTANT,delivery,app/(app)/portfolio/page.jsx,verified
+projects,Vận hành,War Room,Phòng chiến dịch,Dự án,/projects,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,delivery,app/(app)/projects/page.jsx,verified
+tasks,Vận hành,Quest Board,Đại sảnh,Công việc,/tasks,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,tasks,app/(app)/tasks/page.jsx,verified
+timesheet,Vận hành,Chronicle,Đài thời gian,Chấm công giờ,/timesheet,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,delivery,app/(app)/timesheet/page.jsx,verified
+gantt,Vận hành,Campaign Map,War Room,Gantt tiến độ,/gantt,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,delivery,app/(app)/gantt/page.jsx,verified
+templates,Vận hành,Campaign Blueprints,Xưởng kế hoạch,Mẫu dự án,/templates,PM | LEAD,delivery,app/(app)/templates/page.jsx,verified
+resources,Vận hành,Guild Capacity,Guild Hall,Nguồn lực,/resources,PM | HR | LEAD,delivery,app/(app)/resources/page.jsx,verified
+invoices,Tài chính,Royal Invoices,Kho bạc,Hóa đơn,/invoices,ACCOUNTANT | AM,,app/(app)/invoices/page.jsx,verified
+commissions,Tài chính,Bounty Ledger,Kho bạc,Hoa hồng Sales,/commissions,ACCOUNTANT | AM | PM,commissions,app/(app)/commissions/page.jsx,verified
+finance,Tài chính,Royal Ledger,Kho bạc,Thu / Chi,/finance,ACCOUNTANT,,app/(app)/finance/page.jsx,verified
+finplan,Tài chính,Treasury Forecast,Đài quan sát,Công nợ & Dự báo,/finplan,ACCOUNTANT,,app/(app)/finplan/page.jsx,verified
+fxreval,Tài chính,Currency Alchemy,Sàn đổi tiền,Đánh giá lại tỷ giá,/fxreval,ACCOUNTANT,export,app/(app)/fxreval/page.jsx,verified
+vendors,Tài chính,Merchant Guild,Khu chợ,Mua hàng / NCC,/vendors,ACCOUNTANT | PM,procurement,app/(app)/vendors/page.jsx,verified
+contracts,Tài chính,Treaty Vault,Kho hiệp ước,Hợp đồng,/contracts,ACCOUNTANT | AM | PM,procurement,app/(app)/contracts/page.jsx,verified
+staff,Nhân sự,Guild Roster,Guild Hall,Hồ sơ & nhóm,/staff,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/staff/page.jsx,verified
+attendance,Nhân sự,Royal Muster,Cổng thành,Chấm công ngày,/attendance,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/attendance/page.jsx,verified
+payroll,Nhân sự,Payroll Chest,Kho bạc,Bảng lương,/payroll,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/payroll/page.jsx,verified
+recruitment,Nhân sự,Recruitment Hall,Guild Hall,Tuyển dụng,/recruitment,HR,recruitment,app/(app)/recruitment/page.jsx,verified
+reviews,Nhân sự,Growth Chronicle,Phòng cố vấn,Đánh giá hiệu suất,/reviews,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,reviews,app/(app)/reviews/page.jsx,verified
+freelancers,Nhân sự,Mercenary Guild,Guild Hall,Freelancer,/freelancers,HR | PM | LEAD,freelancers,app/(app)/freelancers/page.jsx,verified
+growing,Xuất nhập khẩu,Royal Provinces,Bản đồ lãnh địa,Vùng trồng / Đóng gói,/growing,PM | ACCOUNTANT | AM,export,app/(app)/growing/page.jsx,verified
+inventory,Xuất nhập khẩu,Warehouse Vault,Kho hàng,Kho hàng / Lô,/inventory,PM | ACCOUNTANT | AM,inventory,app/(app)/inventory/page.jsx,verified
+shipments,Xuất nhập khẩu,Caravan Registry,Bến vận tải,Lô hàng xuất,/shipments,PM | ACCOUNTANT | AM,export,app/(app)/shipments/page.jsx,verified
+markets,Xuất nhập khẩu,Foreign Market Atlas,Đại sứ quán,Tra cứu thị trường,/markets,PM | ACCOUNTANT | AM,export,app/(app)/markets/page.jsx,verified
+live,Livestream,Broadcast Stage,Đấu trường,Ca live,/live,LEAD | ACCOUNTANT | AM | PM,livestream,app/(app)/live/page.jsx,verified
+violations,Livestream,Discipline Ledger,Phòng giám sát,Điểm vi phạm,/violations,LEAD | ACCOUNTANT | PM,livestream,app/(app)/violations/page.jsx,verified
+assets,Công ty,Royal Armory,Kho tài sản,Tài sản,/assets,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/assets/page.jsx,verified
+import,Công ty,Data Portal,Cổng dữ liệu,Nhập / Xuất Excel,/import,ACCOUNTANT | AM | PM | HR | LEAD,,app/(app)/import/page.jsx,verified
+reports,Công ty,Royal Reports,Đài quan sát,Báo cáo,/reports,ACCOUNTANT | PM,,app/(app)/reports/page.jsx,verified
+financials,Công ty,Treasury Statements,Kho bạc,Báo cáo tài chính,/financials,ACCOUNTANT,export,app/(app)/financials/page.jsx,verified
+analytics,Công ty,Scrying Observatory,Đài quan sát,Analytics (MRR/LTV),/analytics,ACCOUNTANT | AM | PM,analytics,app/(app)/analytics/page.jsx,verified
+okr,Công ty,Guild Objectives,Bảng mục tiêu,KPI / OKR,/okr,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/okr/page.jsx,verified
+automation,Công ty,Arcane Automation,Tháp cơ khí,Tự động hóa,/automation,DIRECTOR only,,app/(app)/automation/page.jsx,verified
+audit,Công ty,Royal Chronicle,Kho lưu trữ,Nhật ký hệ thống,/audit,DIRECTOR only,,app/(app)/audit/page.jsx,verified
+settings,Công ty,Realm Governance,Phòng quản trị,Cài đặt,/settings,DIRECTOR only,,app/(app)/settings/page.jsx,verified

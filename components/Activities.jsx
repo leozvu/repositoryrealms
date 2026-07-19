@@ -1,16 +1,17 @@
 'use client';
 // Nhật ký hoạt động & lịch hẹn CRM — gắn với khách hàng hoặc lead
 import { useState } from 'react';
-import { Modal, Icon, useToast, useResource } from './ui';
+import { Modal, Icon, ConfirmDialog, AsyncButton, useToast, useResource } from './ui';
 import { fmtDate, todayISO } from '@/lib/format';
 
 const KINDS = { call: ['Cuộc gọi', 'phone'], meeting: ['Cuộc họp', 'meeting'], email: ['Email', 'mail'], note: ['Ghi chú', 'note'] };
 
 export function ActivitiesPanel({ refType, refId }) {
-  const { rows, create, update, remove } = useResource('activities');
+  const { rows, create, update, remove, mutating } = useResource('activities');
   const [kind, setKind] = useState('call');
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(todayISO());
+  const [activityToDelete, setActivityToDelete] = useState(null);
   const toast = useToast();
 
   const acts = rows.filter(a => a.refType === refType && a.refId === refId)
@@ -18,8 +19,8 @@ export function ActivitiesPanel({ refType, refId }) {
 
   const add = async () => {
     if (!title.trim()) return toast('Nhập nội dung hoạt động', 'error');
-    await create({ kind, refType, refId, title: title.trim(), date, done: false });
-    setTitle('');
+    const result = await create({ kind, refType, refId, title: title.trim(), date, done: false });
+    if (result) setTitle('');
   };
 
   return (
@@ -32,7 +33,7 @@ export function ActivitiesPanel({ refType, refId }) {
           <input value={title} onChange={e => setTitle(e.target.value)} placeholder="VD: Gọi follow-up báo giá…"
             onKeyDown={e => e.key === 'Enter' && add()} /></div>
         <div className="field"><label>Ngày hẹn</label><input type="date" value={date} onChange={e => setDate(e.target.value)} /></div>
-        <button className="btn btn-primary" style={{ height: 38 }} onClick={add}><Icon name="plus" size={16} /></button>
+        <AsyncButton className="btn btn-primary" style={{ height: 38 }} disabled={mutating} pendingLabel="…" onClick={add} aria-label="Thêm hoạt động"><Icon name="plus" size={16} /></AsyncButton>
       </div>
       {acts.length ? acts.map(a => (
         <div key={a.id} className={`act-item ${a.done ? 'done' : ''}`}>
@@ -42,12 +43,14 @@ export function ActivitiesPanel({ refType, refId }) {
             <div className="act-sub">{KINDS[a.kind]?.[0]} · {a.done ? 'Đã xong'
               : <>hẹn <span className={a.date < todayISO() ? 'act-late' : ''}>{fmtDate(a.date)}</span></>}</div>
           </div>
-          <button className="icon-btn" style={{ color: 'var(--accent)' }} title={a.done ? 'Đánh dấu chưa xong' : 'Đánh dấu đã xong'}
-            onClick={() => update(a.id, { done: !a.done })}><Icon name="check" size={16} /></button>
-          <button className="icon-btn danger" onClick={() => remove(a.id)} aria-label="Xóa"><Icon name="trash" size={16} /></button>
+          <AsyncButton className="icon-btn" disabled={mutating} pendingLabel="…" style={{ color: 'var(--accent)' }} title={a.done ? 'Đánh dấu chưa xong' : 'Đánh dấu đã xong'}
+            onClick={() => update(a.id, { done: !a.done })}><Icon name="check" size={16} /></AsyncButton>
+          <button className="icon-btn danger" onClick={() => setActivityToDelete(a)} aria-label={`Xóa hoạt động ${a.title}`}><Icon name="trash" size={16} /></button>
         </div>
       )) : <p style={{ fontSize: '.83rem', color: 'var(--muted)', padding: '18px 0', textAlign: 'center' }}>
         Chưa có hoạt động — ghi lại các cuộc gọi, cuộc họp, lịch hẹn follow-up.</p>}
+      {activityToDelete && <ConfirmDialog msg={`Xóa hoạt động "${activityToDelete.title}"?`} onClose={() => setActivityToDelete(null)}
+        onYes={async () => { const r = await remove(activityToDelete.id); if (!r) return false; toast('Đã xóa hoạt động'); }} />}
     </>
   );
 }
