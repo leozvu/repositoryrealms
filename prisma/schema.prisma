@@ -616,21 +616,31 @@ model Budget {
 
 // ===== v2.4 Customer Success: ticket hỗ trợ + SLA =====
 model Ticket {
-  id         String    @id @default(cuid())
-  code       String
-  clientId   String?
-  title      String
-  desc       String?
-  priority   String    @default("normal") // urgent | high | normal | low
-  status     String    @default("open") // open | in_progress | waiting | resolved | closed
-  assigneeId String?
-  channel    String? // email | phone | zalo | messenger | meeting
-  createdAt  DateTime  @default(now())
-  dueAt      DateTime? // hạn SLA
-  resolvedAt DateTime?
+  id               String    @id @default(cuid())
+  code             String
+  clientId         String?
+  title            String
+  desc             String?
+  priority         String    @default("normal") // urgent | high | normal | low
+  status           String    @default("open") // open | in_progress | waiting | resolved | closed
+  assigneeId       String?
+  channel          String? // email | phone | zalo | messenger | meeting | Realm Pilot
+  reporterId       String?   // nhân sự gửi phản hồi; null với ticket CRM cũ
+  source           String?   // realm_pilot với phản hồi Phase 11
+  feedbackType     String?   // bug | friction | idea | support
+  feedbackSurface  String?   // realm | erp
+  feedbackContext  String?   // JSON context đã lọc, không chứa dữ liệu form/record
+  feedbackResponse String?   // phản hồi xử lý hiển thị lại cho người gửi
+  requestKey       String?   @unique // idempotency key cho feedback API
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
+  dueAt            DateTime? // hạn SLA
+  resolvedAt       DateTime?
 
   @@index([assigneeId])
   @@index([status])
+  @@index([source, status])
+  @@index([reporterId, createdAt])
 }
 
 // ===== v2.5: KPI/OKR theo quý + khảo sát NPS =====

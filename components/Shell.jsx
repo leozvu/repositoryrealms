@@ -13,6 +13,7 @@ import { realmRecordHref } from '@/lib/realm-business-bridge';
 import CollaborationBridge, { WorkspaceSurfaceSwitch } from './collaboration/CollaborationBridge';
 import { useRealmChangeFeed } from './realm/useRealmChangeFeed';
 import { NOTIFICATION_SYNC_EVENT } from '@/lib/notification-inbox';
+import RealmFeedbackLauncher from './realm/RealmFeedbackLauncher';
 
 /* v3.14: TỰ GẮN NHÃN CỘT CHO BẢNG.
    Toàn app có 19 trang bảng, mỗi bảng viết tay riêng. Trên điện thoại, bảng 8 cột buộc phải
@@ -313,6 +314,7 @@ export default function Shell({ user, company, realmPilot, children }) {
     <RoleLabelsCtx.Provider value={roleLabels}>
     <ModulesCtx.Provider value={modules}>
       <CollaborationBridge />
+      {!isFL && <RealmFeedbackLauncher />}
       <div id="app" className={isRealmRoute ? 'realm-immersive' : ''}>
         <aside id="sidebar" className={open ? 'open' : ''}>
           <div className="brand">

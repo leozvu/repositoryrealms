@@ -23,7 +23,7 @@ const CONTRACTS = [
   { id: 'action-composer', layer: 'client', source: 'components/realm/RealmCreateActionDialog.jsx', signals: ['War Council note', 'Diplomatic follow-up', 'Idempotency-Key', 'Gửi tới Task ERP', 'Lưu vào CRM ERP'] },
   { id: 'war-room-entrypoint', layer: 'client', source: 'components/realm/WarRoom.jsx', signals: ["action: 'task.comment.create'", 'Ghi chú War Council', 'RealmCreateActionDialog'] },
   { id: 'embassy-entrypoint', layer: 'client', source: 'components/realm/RoyalEmbassy.jsx', signals: ["action: 'lead.followup.create'", 'Lên lịch follow-up', 'RealmCreateActionDialog'] },
-  { id: 'schema-readiness-v7', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 7', '20260719110000_add_realm_pilot_preference'] },
+  { id: 'schema-readiness-v8', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 8', '20260719133000_add_realm_pilot_feedback'] },
 ];
 
 function csvCell(value) {

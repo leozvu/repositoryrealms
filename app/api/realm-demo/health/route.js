@@ -36,6 +36,15 @@ export async function GET(request) {
             AND table_name = 'User'
             AND column_name = 'workspacePreference'
         ) AS "pilotPreferenceColumn",
+        (
+          SELECT COUNT(*) = 8 FROM information_schema.columns
+          WHERE table_schema = current_schema()
+            AND table_name = 'Ticket'
+            AND column_name IN (
+              'reporterId', 'source', 'feedbackType', 'feedbackSurface',
+              'feedbackContext', 'feedbackResponse', 'requestKey', 'updatedAt'
+            )
+        ) AS "pilotFeedbackColumns",
         to_regclass('"_prisma_migrations"') IS NOT NULL AS "migrationTable"
     `;
     let latestMigrationApplied = false;

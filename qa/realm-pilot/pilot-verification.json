@@ -227,12 +227,12 @@
       "status": "verified"
     },
     {
-      "id": "schema-readiness-v7",
+      "id": "schema-readiness-v8",
       "layer": "health",
       "source": "lib/realm-health.js",
       "signals": [
-        "REALM_SCHEMA_VERSION = 7",
-        "20260719110000_add_realm_pilot_preference",
+        "REALM_SCHEMA_VERSION = 8",
+        "20260719133000_add_realm_pilot_feedback",
         "missing.push('pilot_preference')"
       ],
       "missingSignals": [],

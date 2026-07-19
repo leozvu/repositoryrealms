@@ -5,6 +5,7 @@ import { Icon, Forbidden, useToast, useResource, Modal, ConfirmDialog, AsyncButt
 import { ROLES, ROLE_LABEL } from '@/lib/perm';
 import { MODULE_GROUPS, MODULE_PRESETS } from '@/lib/modules';
 import RealmPilotControl from '@/components/realm/RealmPilotControl';
+import RealmFeedbackOperations from '@/components/realm/RealmFeedbackOperations';
 
 /* ---------- v3.3: API key + Webhook (chỉ Giám đốc) ---------- */
 function ApiSection() {
@@ -259,6 +260,7 @@ export default function SettingsPage() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <RealmPilotControl />
+        <RealmFeedbackOperations />
         <div className="card">
           <div className="card-head"><span className="card-title">Import dữ liệu từ bản offline (v1)</span></div>
           <div className="card-body">

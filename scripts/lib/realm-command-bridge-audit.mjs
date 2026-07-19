@@ -16,7 +16,7 @@ const CONTRACTS = [
   { id: 'explicit-user-confirmation', layer: 'client', source: 'components/realm/RealmActionDialog.jsx', signals: ['ConfirmDialog', 'Idempotency-Key', 'ERP vẫn là nguồn dữ liệu chính', 'nhật ký kiểm toán'] },
   { id: 'war-room-command-ui', layer: 'client', source: 'components/realm/WarRoom.jsx', signals: ['realmTaskTransitions', "action: 'task.transition'", 'RealmActionDialog', 'command bridge'] },
   { id: 'embassy-command-ui', layer: 'client', source: 'components/realm/RoyalEmbassy.jsx', signals: ['realmLeadTransitions', "action: 'lead.transition'", 'RealmActionDialog', 'command bridge'] },
-  { id: 'schema-readiness-current', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 7', '20260719110000_add_realm_pilot_preference', "missing.push('action_receipts')"] },
+  { id: 'schema-readiness-current', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 8', '20260719133000_add_realm_pilot_feedback', "missing.push('action_receipts')"] },
 ];
 
 function csvCell(value) {

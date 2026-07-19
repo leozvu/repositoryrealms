@@ -9,9 +9,9 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 85,
-    "asyncButtonGuards": 46,
-    "disabledBindings": 36,
+    "guardedActions": 88,
+    "asyncButtonGuards": 47,
+    "disabledBindings": 38,
     "localPendingStates": 3,
     "destructiveFlows": 6,
     "destructiveFlowsVerified": 6,
@@ -429,7 +429,7 @@
     {
       "elementId": "route.settings.action.khoa-mo",
       "source": "app/(app)/settings/page.jsx",
-      "line": 66,
+      "line": 67,
       "label": "Khóa / Mở",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -441,7 +441,7 @@
     {
       "elementId": "route.settings.action.delkey-k",
       "source": "app/(app)/settings/page.jsx",
-      "line": 67,
+      "line": 68,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -453,7 +453,7 @@
     {
       "elementId": "route.settings.action.tao-key",
       "source": "app/(app)/settings/page.jsx",
-      "line": 75,
+      "line": 76,
       "label": "Tạo key",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -465,7 +465,7 @@
     {
       "elementId": "route.settings.action.tat-bat",
       "source": "app/(app)/settings/page.jsx",
-      "line": 86,
+      "line": 87,
       "label": "Tắt / Bật",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -477,7 +477,7 @@
     {
       "elementId": "route.settings.action.them",
       "source": "app/(app)/settings/page.jsx",
-      "line": 95,
+      "line": 96,
       "label": "Thêm",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -489,7 +489,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 243,
+      "line": 244,
       "label": "Lưu & gửi email thử tới chính hộp thư này",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -501,7 +501,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 257,
+      "line": 258,
       "label": "Lưu cài đặt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -671,6 +671,42 @@
       "source": "components/realm/RealmCreateActionDialog.jsx",
       "line": 91,
       "label": "Lưu vào CRM ERP",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.form-submit.cho-oi-pilot-biet-ieu-gi-ang-can-tro-cong-viec-khong-can-roi-rea",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 146,
+      "label": "Cho đội pilot biết điều gì đang cản trở công việc. Không cần rời Realm và không tạo một hệ thống dữ liệu thứ hai. / Loại phản hồi / Mức ảnh hưởng / Mô tả ngắn / * / /120 ký tự / Đi",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.action.ang-gui-gui-vao-guild-support",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 192,
+      "label": "Đang gửi… / Gửi vào Guild Support",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.action.luu-thong-bao",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 138,
+      "label": "Lưu & thông báo",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
       "successState": "toast-or-state",
@@ -957,7 +993,7 @@
     {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 150,
+      "line": 151,
       "label": "Đọc tất cả",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -969,7 +1005,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 194,
+      "line": 195,
       "label": "Tắt 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -981,7 +1017,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 195,
+      "line": 196,
       "label": "Bật 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",

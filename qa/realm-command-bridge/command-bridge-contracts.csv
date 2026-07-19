@@ -12,4 +12,4 @@ safe-response-shape,api,app/api/realm-demo/actions/route.js,source: 'erp' | idem
 explicit-user-confirmation,client,components/realm/RealmActionDialog.jsx,ConfirmDialog | Idempotency-Key | ERP vẫn là nguồn dữ liệu chính | nhật ký kiểm toán,,verified
 war-room-command-ui,client,components/realm/WarRoom.jsx,realmTaskTransitions | action: 'task.transition' | RealmActionDialog | command bridge,,verified
 embassy-command-ui,client,components/realm/RoyalEmbassy.jsx,realmLeadTransitions | action: 'lead.transition' | RealmActionDialog | command bridge,,verified
-schema-readiness-current,health,lib/realm-health.js,REALM_SCHEMA_VERSION = 7 | 20260719110000_add_realm_pilot_preference | missing.push('action_receipts'),,verified
+schema-readiness-current,health,lib/realm-health.js,REALM_SCHEMA_VERSION = 8 | 20260719133000_add_realm_pilot_feedback | missing.push('action_receipts'),,verified

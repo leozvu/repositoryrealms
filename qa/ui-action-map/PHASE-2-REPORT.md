@@ -4,11 +4,11 @@ Báo cáo này được sinh tự động bằng `npm run audit:ui:actions`. Map
 
 ## Phạm vi
 
-- Element definitions: **661**
-- API route contracts: **56**
+- Element definitions: **683**
+- API route contracts: **57**
 - Registry resources: **50**
-- Data-bound actions: **90**
-- Delegated callback bindings: **1040**
+- Data-bound actions: **95**
+- Delegated callback bindings: **1045**
 - Actionable unresolved: **0**
 - Parse errors: **0**
 
@@ -16,28 +16,28 @@ Báo cáo này được sinh tự động bằng `npm run audit:ui:actions`. Map
 
 | Loại | Số lượng |
 | --- | --- |
-| local-state | 216 |
-| data-action | 90 |
-| form-control | 209 |
+| local-state | 219 |
+| data-action | 95 |
+| form-control | 219 |
 | delegated-action | 70 |
-| navigation | 55 |
-| browser-action | 13 |
+| navigation | 57 |
+| browser-action | 15 |
 | helper-action | 8 |
 
 ## Trạng thái mapping
 
 | Trạng thái | Số lượng |
 | --- | --- |
-| classified-local | 481 |
+| classified-local | 498 |
 | delegated-resolved | 31 |
-| handler-resolved | 79 |
+| handler-resolved | 84 |
 | delegated | 70 |
 
 ## Mức độ tin cậy
 
 | Confidence | Số lượng |
 | --- | --- |
-| high | 630 |
+| high | 652 |
 | medium | 31 |
 
 ## UX async/feedback candidates

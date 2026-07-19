@@ -23,7 +23,7 @@ const CONTRACTS = [
   { id: 'pilot-admin-control', layer: 'client', source: 'components/realm/RealmPilotControl.jsx', signals: ['Realm Pilot Control', 'Pilot theo vai trò', 'Lưu chính sách pilot', 'không thay thế ERP'] },
   { id: 'accessible-responsive-control', layer: 'style', source: 'components/realm/realm-pilot-control.module.css', signals: ['min-height: 44px', ':focus-within', '@media (max-width: 680px)', '@media (prefers-reduced-motion: reduce)'] },
   { id: 'classic-erp-always-reachable', layer: 'client', source: 'components/collaboration/CollaborationBridge.jsx', signals: ["realm ? '/dashboard'", "surface = realm ? 'erp'", 'ERP · CRM'] },
-  { id: 'schema-readiness-v7', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 7', '20260719110000_add_realm_pilot_preference', "missing.push('pilot_preference')"] },
+  { id: 'schema-readiness-v8', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 8', '20260719133000_add_realm_pilot_feedback', "missing.push('pilot_preference')"] },
 ];
 
 function csvCell(value) {

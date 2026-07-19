@@ -28,7 +28,7 @@ Phase 6 nối cộng tác hằng ngày giữa giao diện Realms và ERP nguyên
 | action-composer | client | components/realm/RealmCreateActionDialog.jsx | verified |
 | war-room-entrypoint | client | components/realm/WarRoom.jsx | verified |
 | embassy-entrypoint | client | components/realm/RoyalEmbassy.jsx | verified |
-| schema-readiness-v7 | health | lib/realm-health.js | verified |
+| schema-readiness-v8 | health | lib/realm-health.js | verified |
 
 ## Safety model
 

@@ -30,7 +30,7 @@ Phase 10 đưa Realm vào rollout có kiểm soát mà không thay thế ERP/CRM
 | pilot-admin-control | client | components/realm/RealmPilotControl.jsx | verified |
 | accessible-responsive-control | style | components/realm/realm-pilot-control.module.css | verified |
 | classic-erp-always-reachable | client | components/collaboration/CollaborationBridge.jsx | verified |
-| schema-readiness-v7 | health | lib/realm-health.js | verified |
+| schema-readiness-v8 | health | lib/realm-health.js | verified |
 
 ## Rollout và quyền riêng tư
 

@@ -37,6 +37,7 @@
 "/api/realm-demo/command-center","app/api/realm-demo/command-center/route.js","false","GET | POST","unreviewed"
 "/api/realm-demo/economy","app/api/realm-demo/economy/route.js","false","GET","unreviewed"
 "/api/realm-demo/embassy","app/api/realm-demo/embassy/route.js","false","GET","unreviewed"
+"/api/realm-demo/feedback","app/api/realm-demo/feedback/route.js","false","GET | POST | PATCH","unreviewed"
 "/api/realm-demo/guild","app/api/realm-demo/guild/route.js","false","GET","unreviewed"
 "/api/realm-demo/health","app/api/realm-demo/health/route.js","false","GET","unreviewed"
 "/api/realm-demo/operations","app/api/realm-demo/operations/route.js","false","GET | POST","unreviewed"

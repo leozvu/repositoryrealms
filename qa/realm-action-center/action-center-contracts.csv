@@ -15,4 +15,4 @@ embassy-permission,server,lib/realm-embassy-admin.js,"canWrite('activities', use
 action-composer,client,components/realm/RealmCreateActionDialog.jsx,War Council note | Diplomatic follow-up | Idempotency-Key | Gửi tới Task ERP | Lưu vào CRM ERP,,verified
 war-room-entrypoint,client,components/realm/WarRoom.jsx,action: 'task.comment.create' | Ghi chú War Council | RealmCreateActionDialog,,verified
 embassy-entrypoint,client,components/realm/RoyalEmbassy.jsx,action: 'lead.followup.create' | Lên lịch follow-up | RealmCreateActionDialog,,verified
-schema-readiness-v7,health,lib/realm-health.js,REALM_SCHEMA_VERSION = 7 | 20260719110000_add_realm_pilot_preference,,verified
+schema-readiness-v8,health,lib/realm-health.js,REALM_SCHEMA_VERSION = 8 | 20260719133000_add_realm_pilot_feedback,,verified

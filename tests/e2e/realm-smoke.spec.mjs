@@ -41,7 +41,7 @@ test('the product Realm uses the original ERP authentication boundary', async ({
 });
 
 test('cross-surface collaboration APIs preserve the ERP authentication boundary', async ({ request }) => {
-  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle', '/api/realm-demo/pilot']) {
+  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle', '/api/realm-demo/pilot', '/api/realm-demo/feedback']) {
     const response = await request.get(route);
     expect([401, 503]).toContain(response.status());
     expect(response.headers()['cache-control']).toContain('no-store');
@@ -115,6 +115,9 @@ test('director can inspect the pilot policy and switch between the same ERP data
   await expect(pilot.getByRole('radio', { name: /Pilot theo vai trò/ })).toBeVisible();
   await expect(pilot.getByRole('radio', { name: /Mở cho nội bộ/ })).toBeVisible();
   await expect(pilot).toContainText('Không ghi thời lượng làm việc');
+  const feedbackOperations = page.getByRole('region', { name: 'Guild Support · Pilot Operations' });
+  await expect(feedbackOperations).toBeVisible();
+  await expect(feedbackOperations).toContainText('Không dùng số phản hồi để đánh giá cá nhân');
 
   const policyResponse = await page.evaluate(async () => {
     const current = await fetch('/api/realm-demo/pilot', { cache: 'no-store' }).then((response) => response.json());
@@ -129,6 +132,12 @@ test('director can inspect the pilot policy and switch between the same ERP data
   expect(policyResponse.payload.ok).toBe(true);
 
   await page.goto('/dashboard');
+  await page.getByRole('button', { name: 'Gửi phản hồi về Realm pilot' }).click();
+  const feedbackDialog = page.getByRole('dialog', { name: 'Guild Support · Phản hồi pilot' });
+  await expect(feedbackDialog.getByLabel('Mô tả ngắn *')).toBeVisible();
+  await expect(feedbackDialog.getByLabel('Điều gì đã xảy ra và bạn mong đợi gì? *')).toBeVisible();
+  await expect(feedbackDialog).toContainText('Không ghi phím bấm, lịch sử duyệt, nội dung record hay thời lượng làm việc');
+  await feedbackDialog.getByRole('button', { name: 'Đóng' }).click();
   await page.getByRole('link', { name: 'Chuyển sang văn phòng Realm' }).click();
   await expect(page).toHaveURL(/\/realm$/);
   await page.getByRole('link', { name: 'Chuyển sang giao diện ERP CRM' }).click();

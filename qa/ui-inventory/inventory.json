@@ -1837,6 +1837,17 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/api/realm-demo/feedback",
+      "source": "app/api/realm-demo/feedback/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "POST",
+        "PATCH"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/api/realm-demo/guild",
       "source": "app/api/realm-demo/guild/route.js",
       "dynamic": false,
@@ -9864,7 +9875,7 @@
     {
       "elementId": "route.settings.action.khoa-mo",
       "source": "app/(app)/settings/page.jsx",
-      "line": 66,
+      "line": 67,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -9898,7 +9909,7 @@
     {
       "elementId": "route.settings.action.delkey-k",
       "source": "app/(app)/settings/page.jsx",
-      "line": 67,
+      "line": 68,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -9932,7 +9943,7 @@
     {
       "elementId": "route.settings.form-control.ten-key-vd-n8n-zapier",
       "source": "app/(app)/settings/page.jsx",
-      "line": 71,
+      "line": 72,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -9968,7 +9979,7 @@
     {
       "elementId": "route.settings.form-control.ctrl-click-chon-nhieu-vai-tro",
       "source": "app/(app)/settings/page.jsx",
-      "line": 72,
+      "line": 73,
       "column": 13,
       "surface": "route.settings",
       "tag": "select",
@@ -10004,7 +10015,7 @@
     {
       "elementId": "route.settings.action.tao-key",
       "source": "app/(app)/settings/page.jsx",
-      "line": 75,
+      "line": 76,
       "column": 13,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10038,7 +10049,7 @@
     {
       "elementId": "route.settings.action.tat-bat",
       "source": "app/(app)/settings/page.jsx",
-      "line": 86,
+      "line": 87,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10072,7 +10083,7 @@
     {
       "elementId": "route.settings.action.setdeletewebhook-h",
       "source": "app/(app)/settings/page.jsx",
-      "line": 87,
+      "line": 88,
       "column": 15,
       "surface": "route.settings",
       "tag": "button",
@@ -10106,7 +10117,7 @@
     {
       "elementId": "route.settings.form-control.https-url-nhan-webhook",
       "source": "app/(app)/settings/page.jsx",
-      "line": 91,
+      "line": 92,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -10142,7 +10153,7 @@
     {
       "elementId": "route.settings.form-control.su-kien-mac-inh",
       "source": "app/(app)/settings/page.jsx",
-      "line": 93,
+      "line": 94,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -10178,7 +10189,7 @@
     {
       "elementId": "route.settings.form-control.secret-tuy-chon",
       "source": "app/(app)/settings/page.jsx",
-      "line": 94,
+      "line": 95,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -10214,7 +10225,7 @@
     {
       "elementId": "route.settings.action.them",
       "source": "app/(app)/settings/page.jsx",
-      "line": 95,
+      "line": 96,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10248,7 +10259,7 @@
     {
       "elementId": "route.settings.action.copy-ong",
       "source": "app/(app)/settings/page.jsx",
-      "line": 102,
+      "line": 103,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -10282,7 +10293,7 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 145,
+      "line": 146,
       "column": 7,
       "surface": "route.settings",
       "tag": "input",
@@ -10318,7 +10329,7 @@
     {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 177,
+      "line": 178,
       "column": 17,
       "surface": "route.settings",
       "tag": "input",
@@ -10354,7 +10365,7 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 186,
+      "line": 187,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -10390,7 +10401,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 202,
+      "line": 203,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -10424,7 +10435,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 205,
+      "line": 206,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -10458,7 +10469,7 @@
     {
       "elementId": "route.settings.form-control.input.4",
       "source": "app/(app)/settings/page.jsx",
-      "line": 215,
+      "line": 216,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -10494,7 +10505,7 @@
     {
       "elementId": "route.settings.form-control.input.5",
       "source": "app/(app)/settings/page.jsx",
-      "line": 239,
+      "line": 240,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -10530,7 +10541,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 243,
+      "line": 244,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10564,7 +10575,7 @@
     {
       "elementId": "route.settings.form-control.sk-ant-tao-tai-console-anthropic-com",
       "source": "app/(app)/settings/page.jsx",
-      "line": 253,
+      "line": 254,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -10600,7 +10611,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 257,
+      "line": 258,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -10634,7 +10645,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 269,
+      "line": 271,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -10668,7 +10679,7 @@
     {
       "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 272,
+      "line": 274,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -16148,6 +16159,574 @@
       ]
     },
     {
+      "elementId": "component.components-realm-realmfeedbacklauncher.action.gui-phan-hoi-ve-realm-pilot",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 118,
+      "column": 7,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "button",
+      "kind": "action",
+      "label": "Gửi phản hồi về Realm pilot",
+      "handlerEvent": "onClick",
+      "handler": "() => setOpen(true)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.action.tiep-tuc-lam-viec",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 139,
+      "column": 17,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "button",
+      "kind": "action",
+      "label": "Tiếp tục làm việc",
+      "handlerEvent": "onClick",
+      "handler": "close",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.navigation.ve-erp-an-toan",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 141,
+      "column": 19,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "Về ERP an toàn",
+      "handlerEvent": "onClick",
+      "handler": "() => persistWorkspaceSurface('erp')",
+      "target": "/dashboard",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.form-submit.cho-oi-pilot-biet-ieu-gi-ang-can-tro-cong-viec-khong-can-roi-rea",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 146,
+      "column": 13,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "form",
+      "kind": "form-submit",
+      "label": "Cho đội pilot biết điều gì đang cản trở công việc. Không cần rời Realm và không tạo một hệ thống dữ liệu thứ hai. / Loại phản hồi / Mức ảnh hưởng / Mô tả ngắn / * / /120 ký tự / Đi",
+      "handlerEvent": "onSubmit",
+      "handler": "(event) => { event.preventDefault(); submit(); }",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "submitting || undefined",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.form-control.feedback-category",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 154,
+      "column": 23,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "feedback-category",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.form-control.select",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 163,
+      "column": 17,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.form-control.input",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 170,
+      "column": 17,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.form-control.textarea",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 176,
+      "column": 17,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.form-control.input.2",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 182,
+      "column": 17,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.action.huy",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 191,
+      "column": 17,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "button",
+      "kind": "action",
+      "label": "Hủy",
+      "handlerEvent": "onClick",
+      "handler": "close",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "submitting",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.action.ang-gui-gui-vao-guild-support",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 192,
+      "column": 17,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đang gửi… / Gửi vào Guild Support",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "submitting",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbacklauncher.navigation.tickets-focus-encodeuricomponent-row-id-from-realm-feedback",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "line": 201,
+      "column": 17,
+      "surface": "component.components-realm-realmfeedbacklauncher",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "`/tickets?focus=${encodeURIComponent(row.id)}&from=realm-feedback`",
+      "handlerEvent": "onClick",
+      "handler": "() => setOpen(false)",
+      "target": "`/tickets?focus=${encodeURIComponent(row.id)}&from=realm-feedback`",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback?scope=mine'",
+        "POST '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.action.tai-lai",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 86,
+      "column": 9,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "Tải lại",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "state.loading",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.action.thu-lai",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 93,
+      "column": 80,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "Thử lại",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.form-control.chua-hoan-tat-a-hoan-tat-tat-ca",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 105,
+      "column": 43,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Chưa hoàn tất / Đã hoàn tất / Tất cả",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.action.gui-boi-statuslabel",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 112,
+      "column": 19,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "· / · gửi bởi / {statusLabel}",
+      "handlerEvent": "onClick",
+      "handler": "() => openEditor(row)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.form-control.select",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 133,
+      "column": 45,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.form-control.select.2",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 134,
+      "column": 42,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.form-control.chua-gan",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 135,
+      "column": 70,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Chưa gán",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.form-control.textarea",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 136,
+      "column": 81,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.action.huy",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 138,
+      "column": 50,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "Hủy",
+      "handlerEvent": "onClick",
+      "handler": "() => { setSelected(null); setDraft(null); }",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmfeedbackoperations.action.luu-thong-bao",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "line": 138,
+      "column": 167,
+      "surface": "component.components-realm-realmfeedbackoperations",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Lưu & thông báo",
+      "handlerEvent": "onClick",
+      "handler": "save",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/feedback'",
+        "PATCH '/api/realm-demo/feedback'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "component.components-realm-realmnotificationbell.action.raven",
       "source": "components/realm/RealmNotificationBell.jsx",
       "line": 110,
@@ -20431,7 +21010,7 @@
     {
       "elementId": "component.components-shell.form-control.go-ten-khach-deal-du-an-viec-hoa-on-ticket-2-ky-tu",
       "source": "components/Shell.jsx",
-      "line": 94,
+      "line": 95,
       "column": 7,
       "surface": "component.components-shell",
       "tag": "input",
@@ -20472,7 +21051,7 @@
     {
       "elementId": "component.components-shell.action.go-g-r",
       "source": "components/Shell.jsx",
-      "line": 103,
+      "line": 104,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "div",
@@ -20514,7 +21093,7 @@
     {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 150,
+      "line": 151,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -20553,7 +21132,7 @@
     {
       "elementId": "component.components-shell.action.ong",
       "source": "components/Shell.jsx",
-      "line": 151,
+      "line": 152,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20592,7 +21171,7 @@
     {
       "elementId": "component.components-shell.action.truoc-mo",
       "source": "components/Shell.jsx",
-      "line": 154,
+      "line": 155,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20631,7 +21210,7 @@
     {
       "elementId": "component.components-shell.action.ong.2",
       "source": "components/Shell.jsx",
-      "line": 192,
+      "line": 193,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20670,7 +21249,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 194,
+      "line": 195,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -20709,7 +21288,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 195,
+      "line": 196,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -20748,7 +21327,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so",
       "source": "components/Shell.jsx",
-      "line": 200,
+      "line": 201,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -20789,7 +21368,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so.2",
       "source": "components/Shell.jsx",
-      "line": 210,
+      "line": 211,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -20830,7 +21409,7 @@
     {
       "elementId": "component.components-shell.navigation.item-key",
       "source": "components/Shell.jsx",
-      "line": 335,
+      "line": 337,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -20869,7 +21448,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 349,
+      "line": 351,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20908,7 +21487,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 352,
+      "line": 354,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20947,7 +21526,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 361,
+      "line": 363,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -20989,7 +21568,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 364,
+      "line": 366,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -21028,7 +21607,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 368,
+      "line": 370,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -21067,7 +21646,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 371,
+      "line": 373,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -21436,20 +22015,20 @@
   ],
   "summary": {
     "uiRoutes": 56,
-    "apiRoutes": 56,
-    "interactiveElements": 661,
-    "sourceFilesWithInteractions": 74,
+    "apiRoutes": 57,
+    "interactiveElements": 683,
+    "sourceFilesWithInteractions": 76,
     "routesInPrimaryNavigation": 52,
     "routesWithResourceCandidates": 43,
     "byKind": {
-      "action": 401,
-      "form-control": 209,
-      "form-submit": 9,
-      "navigation": 42
+      "action": 410,
+      "form-control": 219,
+      "form-submit": 10,
+      "navigation": 44
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 197,
+      "control_binding_unverified": 206,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 22
     },
