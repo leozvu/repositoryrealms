@@ -8,7 +8,7 @@ function taskDb(overrides = {}) {
   const calls = { update: null, receipt: null, audit: null, taskReads: 0 };
   const before = overrides.before || {
     id: 'task-1', title: 'Build bridge', assigneeId: 'staff-1', status: 'todo',
-    dependsOn: '[]', assignee: { id: 'staff-1', teamId: 'delivery' },
+    dueDate: '2026-07-22', priority: 'medium', dependsOn: '[]', assignee: { id: 'staff-1', teamId: 'delivery' },
   };
   const updated = { ...before, status: overrides.nextState || 'in_progress' };
   const tx = {
@@ -25,6 +25,7 @@ function taskDb(overrides = {}) {
       findUnique: async () => { calls.taskReads += 1; return before; },
       findMany: async () => [],
     },
+    user: { findUnique: async () => overrides.target || { id: 'staff-2', teamId: 'delivery', status: 'active', userType: 'employee' } },
     $transaction: async (fn) => fn(tx),
   };
   return { db, calls };
@@ -72,6 +73,38 @@ test('Task command từ snapshot cũ bị từ chối trước transaction', asy
     action: 'task.transition', entityId: 'task-1', expectedState: 'todo', nextState: 'in_progress', idempotencyKey: KEY,
   }), (error) => error.status === 409 && error.code === 'realm_action_stale');
   assert.equal(calls.update, null);
+});
+
+test('PM phân công Task bằng compare-and-swap và giữ Task ERP làm nguồn duy nhất', async () => {
+  const { db, calls } = taskDb();
+  const result = await executeRealmRecordAction(db, { id: 'pm-1', name: 'PM', roles: ['PM'] }, {
+    action: 'task.assign',
+    entityId: 'task-1',
+    expectedAssigneeId: 'staff-1',
+    assigneeId: 'staff-2',
+    expectedDueDate: '2026-07-22',
+    dueDate: '2026-07-24',
+    expectedPriority: 'medium',
+    priority: 'high',
+    idempotencyKey: `${KEY}:assign`,
+  });
+  assert.equal(result.resource, 'tasks');
+  assert.deepEqual(calls.update.where, {
+    id: 'task-1', assigneeId: 'staff-1', dueDate: '2026-07-22', priority: 'medium',
+  });
+  assert.deepEqual(calls.update.data, { assigneeId: 'staff-2', dueDate: '2026-07-24', priority: 'high' });
+  assert.equal(calls.receipt.action, 'task.assign');
+  assert.equal(calls.audit.entity, 'tasks');
+});
+
+test('Trưởng Guild không thể phân công ra ngoài team', async () => {
+  const scoped = taskDb({ target: { id: 'staff-2', teamId: 'other', status: 'active', userType: 'employee' } });
+  await assert.rejects(executeRealmRecordAction(scoped.db, { id: 'lead-1', name: 'Lead', roles: ['LEAD'], teamId: 'delivery' }, {
+    action: 'task.assign', entityId: 'task-1', expectedAssigneeId: 'staff-1', assigneeId: 'staff-2',
+    expectedDueDate: '2026-07-22', dueDate: '2026-07-24', expectedPriority: 'medium', priority: 'high',
+    idempotencyKey: `${KEY}:outside-team`,
+  }), (error) => error.code === 'realm_assignment_target_outside_scope');
+  assert.equal(scoped.calls.update, null);
 });
 
 test('Realm không cho mở lại Quest done hoặc sửa Task ngoài scope', async () => {

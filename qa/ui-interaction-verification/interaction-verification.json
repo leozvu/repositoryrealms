@@ -9,9 +9,9 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 82,
+    "guardedActions": 84,
     "asyncButtonGuards": 45,
-    "disabledBindings": 34,
+    "disabledBindings": 36,
     "localPendingStates": 3,
     "destructiveFlows": 6,
     "destructiveFlowsVerified": 6,
@@ -21,7 +21,7 @@
     {
       "elementId": "route.approvals.action.ang-xu-ly-duyet",
       "source": "app/(app)/approvals/page.jsx",
-      "line": 40,
+      "line": 41,
       "label": "Đang xử lý… / Duyệt",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -33,7 +33,7 @@
     {
       "elementId": "route.approvals.action.tu-choi",
       "source": "app/(app)/approvals/page.jsx",
-      "line": 41,
+      "line": 42,
       "label": "Từ chối",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -693,7 +693,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.go-cua-erp-nguoi-nhan-ang-offline-loi-nhan-van-uoc-luu-trong-not",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1774,
+      "line": 1781,
       "label": "Gõ cửa ERP / Người nhận đang offline; lời nhắn vẫn được lưu trong Notification và Lantern Mail.",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -705,7 +705,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1787,
+      "line": 1794,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -717,7 +717,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1818,
+      "line": 1825,
       "label": "Tên hiển thị / Class trong Realm / Màu huy hiệu / Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -729,7 +729,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1835,
+      "line": 1842,
       "label": "Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -741,7 +741,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1862,
+      "line": 1878,
       "label": "Nhận / Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -753,7 +753,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2420,
+      "line": 2441,
       "label": "Đang ghi… / Ghi nhận Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -851,6 +851,30 @@
       "source": "components/realm/RewardControlCenter.jsx",
       "line": 338,
       "label": "Đang duyệt… / Phê duyệt",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.ang-ghi-erp-xac-nhan-phan-cong",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 74,
+      "label": "Đang ghi ERP… / Xác nhận phân công",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.ang-gui-gui-yeu-cau-duyet",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 114,
+      "label": "Đang gửi… / Gửi yêu cầu duyệt",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
       "successState": "toast-or-state",

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "surfacePolicies": 8,
+    "surfacePolicies": 9,
     "failedPolicies": 0,
     "roleScenarios": 8,
     "verifiedRoleScenarios": 8,
     "moduleScenarios": 5,
     "verifiedModuleScenarios": 5,
-    "enforcementContracts": 11,
-    "verifiedEnforcementContracts": 11
+    "enforcementContracts": 12,
+    "verifiedEnforcementContracts": 12
   },
   "policies": [
     {
@@ -27,6 +27,19 @@
     {
       "key": "quests",
       "label": "Quest Board",
+      "roles": [
+        "PM",
+        "AM",
+        "ACCOUNTANT",
+        "HR",
+        "LEAD",
+        "STAFF"
+      ],
+      "module": "tasks"
+    },
+    {
+      "key": "command",
+      "label": "Royal Command Center",
       "roles": [
         "PM",
         "AM",
@@ -115,6 +128,7 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "embassy",
@@ -125,6 +139,7 @@
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "embassy",
@@ -141,6 +156,7 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "rewards",
@@ -150,6 +166,7 @@
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "rewards",
@@ -165,6 +182,7 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "embassy",
@@ -173,6 +191,7 @@
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "embassy",
@@ -187,6 +206,7 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "treasury"
@@ -194,6 +214,7 @@
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "treasury"
@@ -207,6 +228,7 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "rewards",
@@ -216,6 +238,7 @@
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "rewards",
@@ -231,6 +254,7 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "rewards",
@@ -240,6 +264,7 @@
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "rewards",
@@ -255,6 +280,7 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "treasury"
@@ -262,6 +288,7 @@
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "campaigns",
         "treasury"
@@ -301,12 +328,14 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "treasury"
       ],
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "treasury"
       ],
@@ -322,6 +351,7 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "embassy",
         "treasury"
@@ -329,6 +359,7 @@
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "embassy",
         "treasury"
@@ -362,6 +393,7 @@
       "expected": [
         "personal",
         "quests",
+        "command",
         "guild",
         "rewards",
         "economy",
@@ -370,6 +402,7 @@
       "actual": [
         "personal",
         "quests",
+        "command",
         "guild",
         "rewards",
         "economy",
@@ -416,6 +449,16 @@
       "signals": [
         "realmSurfaceDecision(user, 'guild'",
         "if (!access.allowed)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "command-center-api",
+      "source": "app/api/realm-demo/command-center/route.js",
+      "signals": [
+        "realmSurfaceDecision(user, 'command'",
+        "loadRealmCommandCenter(prisma, user)"
       ],
       "missingSignals": [],
       "status": "verified"

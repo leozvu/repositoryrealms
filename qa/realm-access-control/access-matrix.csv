@@ -1,14 +1,14 @@
 type,id,modules,expected,actual,status
-role,DIRECTOR,legacy-defaults,personal | quests | guild | campaigns | embassy | rewards | economy | treasury,personal | quests | guild | campaigns | embassy | rewards | economy | treasury,verified
-role,PM,legacy-defaults,personal | quests | guild | campaigns | rewards | economy | treasury,personal | quests | guild | campaigns | rewards | economy | treasury,verified
-role,AM,legacy-defaults,personal | quests | guild | campaigns | embassy | treasury,personal | quests | guild | campaigns | embassy | treasury,verified
-role,ACCOUNTANT,legacy-defaults,personal | quests | guild | campaigns | treasury,personal | quests | guild | campaigns | treasury,verified
-role,HR,legacy-defaults,personal | quests | guild | campaigns | rewards | economy | treasury,personal | quests | guild | campaigns | rewards | economy | treasury,verified
-role,LEAD,legacy-defaults,personal | quests | guild | campaigns | rewards | economy | treasury,personal | quests | guild | campaigns | rewards | economy | treasury,verified
-role,STAFF,legacy-defaults,personal | quests | guild | campaigns | treasury,personal | quests | guild | campaigns | treasury,verified
+role,DIRECTOR,legacy-defaults,personal | quests | command | guild | campaigns | embassy | rewards | economy | treasury,personal | quests | command | guild | campaigns | embassy | rewards | economy | treasury,verified
+role,PM,legacy-defaults,personal | quests | command | guild | campaigns | rewards | economy | treasury,personal | quests | command | guild | campaigns | rewards | economy | treasury,verified
+role,AM,legacy-defaults,personal | quests | command | guild | campaigns | embassy | treasury,personal | quests | command | guild | campaigns | embassy | treasury,verified
+role,ACCOUNTANT,legacy-defaults,personal | quests | command | guild | campaigns | treasury,personal | quests | command | guild | campaigns | treasury,verified
+role,HR,legacy-defaults,personal | quests | command | guild | campaigns | rewards | economy | treasury,personal | quests | command | guild | campaigns | rewards | economy | treasury,verified
+role,LEAD,legacy-defaults,personal | quests | command | guild | campaigns | rewards | economy | treasury,personal | quests | command | guild | campaigns | rewards | economy | treasury,verified
+role,STAFF,legacy-defaults,personal | quests | command | guild | campaigns | treasury,personal | quests | command | guild | campaigns | treasury,verified
 role,FREELANCER,legacy-defaults,,,verified
 module,staff-none,,personal | treasury,personal | treasury,verified
-module,staff-tasks,tasks,personal | quests | guild | treasury,personal | quests | guild | treasury,verified
-module,am-sales-tasks,sales | tasks,personal | quests | guild | embassy | treasury,personal | quests | guild | embassy | treasury,verified
+module,staff-tasks,tasks,personal | quests | command | guild | treasury,personal | quests | command | guild | treasury,verified
+module,am-sales-tasks,sales | tasks,personal | quests | command | guild | embassy | treasury,personal | quests | command | guild | embassy | treasury,verified
 module,pm-delivery,delivery,personal | campaigns | treasury,personal | campaigns | treasury,verified
-module,lead-team-tasks,tasks,personal | quests | guild | rewards | economy | treasury,personal | quests | guild | rewards | economy | treasury,verified
+module,lead-team-tasks,tasks,personal | quests | command | guild | rewards | economy | treasury,personal | quests | command | guild | rewards | economy | treasury,verified

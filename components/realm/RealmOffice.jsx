@@ -37,6 +37,7 @@ import {
 import { createRealmGuildDemoDashboard } from '@/lib/realm-guild';
 import { createRealmWarRoomDemoDashboard } from '@/lib/realm-war-room';
 import { createRealmEmbassyDemoDashboard } from '@/lib/realm-embassy';
+import { createRealmCommandCenterDemoDashboard } from '@/lib/realm-command-center';
 import { normalizeRealmText, realmEmote, REALM_EMOTES } from '@/lib/realm-social';
 import { REALM_CORE_PORTALS, createRealmErpBridge, realmRecordHref } from '@/lib/realm-business-bridge';
 import { realmAccessForPanel, realmAccessForSurface } from '@/lib/realm-access';
@@ -47,6 +48,7 @@ import RoyalTreasuryExchange from './RoyalTreasuryExchange';
 import GuildHall from './GuildHall';
 import WarRoom from './WarRoom';
 import RoyalEmbassy from './RoyalEmbassy';
+import RoyalCommandCenter from './RoyalCommandCenter';
 import { useProximityMedia } from './useProximityMedia';
 import { usePartySfuMedia } from './usePartySfuMedia';
 import { useRealmParty } from './useRealmParty';
@@ -106,6 +108,7 @@ const STATUS = {
 const NAV = [
   { id: 'briefing', label: 'Đại sảnh', icon: 'dashboard' },
   { id: 'quests', label: 'Quest Board', icon: 'tasks' },
+  { id: 'command', label: 'Royal Command', icon: 'shield' },
   { id: 'campaigns', label: 'Chiến dịch', icon: 'projects' },
   { id: 'guild', label: 'Guild', icon: 'staff' },
   { id: 'treasury', label: 'Royal Treasury', icon: 'wallet' },
@@ -1492,6 +1495,10 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
     () => realmLocalFixture(dataSource, createRealmGuildDemoDashboard({ members: realmPeople, quests, campaigns: CAMPAIGNS })),
     [dataSource, quests, realmPeople],
   );
+  const commandDashboard = useMemo(
+    () => realmLocalFixture(dataSource, createRealmCommandCenterDemoDashboard({ members: realmPeople, quests })),
+    [dataSource, quests, realmPeople],
+  );
   const embassyDashboard = useMemo(() => realmLocalFixture(dataSource, createRealmEmbassyDemoDashboard()), [dataSource]);
   const localWarRoom = useMemo(
     () => realmLocalFixture(dataSource, createRealmWarRoomDemoDashboard({ campaign: selectedCampaign || CAMPAIGNS[0], quests })),
@@ -1844,6 +1851,15 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
       </>
     );
 
+    if (activePanel === 'command') return (
+      <RoyalCommandCenter
+        compact
+        operationsSource={operationsSource}
+        localDashboard={commandDashboard}
+        dataRevision={realmDataRevision}
+      />
+    );
+
     if (activePanel === 'quests') return (
       <>
         <PanelHeading eyebrow="Quest Board" title="Nhiệm vụ hôm nay" text="Gold chỉ được ghi khi nhiệm vụ đủ tiêu chí và qua bước duyệt." />
@@ -2003,7 +2019,7 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
         </div>
       </>
     );
-  }, [activePanel, businessBridge, cancelInvite, career.level, career.renown, chatText, confirmPartyAction, contactReceipt, contactSending, currentRoom?.name, dataSource.isErp, embassyDashboard, guildDashboard, handleLocalTreasuryChange, incomingInvite, inviteToParty, ledger, localWarRoom, mediaTopology, messages, moveToSelectedPerson, nearby.length, networkInfo, onlineCount, openAuthorizedPanel, operationsSource, operationsSyncState, outgoingInvite, party, partyConfirm, position, profile.color, profile.name, profileDraft, quests, realmDataRevision, realmPeople, refreshRealmOperations, remotePlayers, selectPerson, selectedCampaign, selectedPerson, sendContactToSelected, sendWhisperToSelected, sessionId, sfuMedia.status, transportState, treasuryDashboard, triggerEmote, wallet, whisperText]);
+  }, [activePanel, businessBridge, cancelInvite, career.level, career.renown, chatText, commandDashboard, confirmPartyAction, contactReceipt, contactSending, currentRoom?.name, dataSource.isErp, embassyDashboard, guildDashboard, handleLocalTreasuryChange, incomingInvite, inviteToParty, ledger, localWarRoom, mediaTopology, messages, moveToSelectedPerson, nearby.length, networkInfo, onlineCount, openAuthorizedPanel, operationsSource, operationsSyncState, outgoingInvite, party, partyConfirm, position, profile.color, profile.name, profileDraft, quests, realmDataRevision, realmPeople, refreshRealmOperations, remotePlayers, selectPerson, selectedCampaign, selectedPerson, sendContactToSelected, sendWhisperToSelected, sessionId, sfuMedia.status, transportState, treasuryDashboard, triggerEmote, wallet, whisperText]);
 
   return (
     <main className={`${styles.realmShell} ${mode === 'ledger' ? styles.ledgerShell : ''}`}>
@@ -2148,6 +2164,7 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
               onOperationsRefresh={refreshRealmOperations}
               onCopySupportId={copyRealmSupportId}
               guildDashboard={guildDashboard}
+              commandDashboard={commandDashboard}
               guildPresence={realmPeople}
               embassyDashboard={embassyDashboard}
               businessBridge={businessBridge}
@@ -2252,6 +2269,7 @@ function LedgerMode({
   onOperationsRefresh,
   onCopySupportId,
   guildDashboard,
+  commandDashboard,
   guildPresence,
   embassyDashboard,
   businessBridge,
@@ -2265,6 +2283,7 @@ function LedgerMode({
   const accessManifest = businessBridge?.access;
   const ledgerTabs = [
     { key: 'personal', label: 'Sổ nhân vật', icon: 'staff' },
+    { key: 'command', label: 'Royal Command', icon: 'shield' },
     { key: 'guild', label: 'Guild Hall', icon: 'projects' },
     { key: 'rewards', label: 'Hội đồng Gold', icon: 'shield' },
     { key: 'economy', label: 'Đài quan sát Gold', icon: 'reports' },
@@ -2314,7 +2333,9 @@ function LedgerMode({
         </section>
       )}
 
-      {ledgerView === 'guild' ? (
+      {ledgerView === 'command' ? (
+        <RoyalCommandCenter operationsSource={operationsSource} localDashboard={commandDashboard} dataRevision={dataRevision} />
+      ) : ledgerView === 'guild' ? (
         warRoomCampaign ? (
           <WarRoom
             operationsSource={operationsSource}

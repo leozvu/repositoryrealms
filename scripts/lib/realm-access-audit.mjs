@@ -6,22 +6,22 @@ const employee = (role, extra = {}) => ({ id: `${role.toLowerCase()}-audit`, nam
 const keys = (manifest) => Object.entries(manifest.surfaces).filter(([, access]) => access.allowed).map(([key]) => key);
 
 const ROLE_SCENARIOS = [
-  ['DIRECTOR', employee('DIRECTOR'), ['personal', 'quests', 'guild', 'campaigns', 'embassy', 'rewards', 'economy', 'treasury']],
-  ['PM', employee('PM'), ['personal', 'quests', 'guild', 'campaigns', 'rewards', 'economy', 'treasury']],
-  ['AM', employee('AM'), ['personal', 'quests', 'guild', 'campaigns', 'embassy', 'treasury']],
-  ['ACCOUNTANT', employee('ACCOUNTANT'), ['personal', 'quests', 'guild', 'campaigns', 'treasury']],
-  ['HR', employee('HR'), ['personal', 'quests', 'guild', 'campaigns', 'rewards', 'economy', 'treasury']],
-  ['LEAD', employee('LEAD', { teamId: 'team-audit' }), ['personal', 'quests', 'guild', 'campaigns', 'rewards', 'economy', 'treasury']],
-  ['STAFF', employee('STAFF'), ['personal', 'quests', 'guild', 'campaigns', 'treasury']],
+  ['DIRECTOR', employee('DIRECTOR'), ['personal', 'quests', 'command', 'guild', 'campaigns', 'embassy', 'rewards', 'economy', 'treasury']],
+  ['PM', employee('PM'), ['personal', 'quests', 'command', 'guild', 'campaigns', 'rewards', 'economy', 'treasury']],
+  ['AM', employee('AM'), ['personal', 'quests', 'command', 'guild', 'campaigns', 'embassy', 'treasury']],
+  ['ACCOUNTANT', employee('ACCOUNTANT'), ['personal', 'quests', 'command', 'guild', 'campaigns', 'treasury']],
+  ['HR', employee('HR'), ['personal', 'quests', 'command', 'guild', 'campaigns', 'rewards', 'economy', 'treasury']],
+  ['LEAD', employee('LEAD', { teamId: 'team-audit' }), ['personal', 'quests', 'command', 'guild', 'campaigns', 'rewards', 'economy', 'treasury']],
+  ['STAFF', employee('STAFF'), ['personal', 'quests', 'command', 'guild', 'campaigns', 'treasury']],
   ['FREELANCER', { ...employee('FREELANCER'), userType: 'freelancer' }, []],
 ];
 
 const MODULE_SCENARIOS = [
   ['staff-none', employee('STAFF'), [], ['personal', 'treasury']],
-  ['staff-tasks', employee('STAFF'), ['tasks'], ['personal', 'quests', 'guild', 'treasury']],
-  ['am-sales-tasks', employee('AM'), ['sales', 'tasks'], ['personal', 'quests', 'guild', 'embassy', 'treasury']],
+  ['staff-tasks', employee('STAFF'), ['tasks'], ['personal', 'quests', 'command', 'guild', 'treasury']],
+  ['am-sales-tasks', employee('AM'), ['sales', 'tasks'], ['personal', 'quests', 'command', 'guild', 'embassy', 'treasury']],
   ['pm-delivery', employee('PM'), ['delivery'], ['personal', 'campaigns', 'treasury']],
-  ['lead-team-tasks', employee('LEAD', { teamId: 'team-audit' }), ['tasks'], ['personal', 'quests', 'guild', 'rewards', 'economy', 'treasury']],
+  ['lead-team-tasks', employee('LEAD', { teamId: 'team-audit' }), ['tasks'], ['personal', 'quests', 'command', 'guild', 'rewards', 'economy', 'treasury']],
 ];
 
 const ENFORCEMENT_CONTRACTS = [
@@ -29,6 +29,7 @@ const ENFORCEMENT_CONTRACTS = [
   { id: 'snapshot-modules', source: 'lib/realm-erp-adapter.js', signals: ['const tasksEnabled = modOn(\'tasks\', modules)', 'createRealmErpBridge({ user, tasks, modules })'] },
   { id: 'claim-module-guard', source: 'lib/realm-erp-adapter.js', signals: ["'realm_tasks_module_disabled'", "if (!modOn('tasks', modules))"] },
   { id: 'guild-api', source: 'app/api/realm-demo/guild/route.js', signals: ["realmSurfaceDecision(user, 'guild'", 'if (!access.allowed)'] },
+  { id: 'command-center-api', source: 'app/api/realm-demo/command-center/route.js', signals: ["realmSurfaceDecision(user, 'command'", 'loadRealmCommandCenter(prisma, user)'] },
   { id: 'rewards-api', source: 'app/api/realm-demo/rewards/route.js', signals: ["realmSurfaceDecision(user, 'rewards'", 'if (!access.allowed)'] },
   { id: 'economy-api', source: 'app/api/realm-demo/economy/route.js', signals: ["realmSurfaceDecision(user, 'economy'", 'if (!access.allowed)'] },
   { id: 'embassy-api', source: 'app/api/realm-demo/embassy/route.js', signals: ["realmSurfaceDecision(user, 'embassy'", 'if (!access.allowed)'] },

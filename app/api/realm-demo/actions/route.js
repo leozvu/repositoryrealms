@@ -27,6 +27,7 @@ async function authorizedUser() {
 
 function surfaceFor(action) {
   if (action === 'task.transition' || action === 'task.comment.create') return 'campaigns';
+  if (action === 'task.assign') return 'command';
   if (action === 'lead.transition' || action === 'lead.followup.create') return 'embassy';
   throw new RealmOperationError('Realm action chưa được cho phép.', 400, 'realm_action_unsupported');
 }

@@ -5,7 +5,7 @@ Phase 3 thêm kênh invalidation gần thời gian thực dùng chung database s
 ## Kết quả
 
 - Change-feed contracts: **10/10**
-- Deterministic scenarios: **5/5**
+- Deterministic scenarios: **6/6**
 - Additive database migration: **1**
 
 ## Contract matrix

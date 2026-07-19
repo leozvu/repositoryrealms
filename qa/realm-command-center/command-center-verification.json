@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 17,
+    "verifiedContracts": 17,
+    "scenarios": 7,
+    "verifiedScenarios": 7,
+    "databaseMigrations": 0,
+    "parallelBusinessTables": 0
+  },
+  "contracts": [
+    {
+      "id": "erp-task-source-of-truth",
+      "layer": "database",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model Task {",
+        "model TaskEvent {",
+        "model Approval {",
+        "model RealmActionReceipt {"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "command-surface-task-module",
+      "layer": "access",
+      "source": "lib/realm-access.js",
+      "signals": [
+        "key: 'command'",
+        "module: 'tasks'",
+        "command: 'command'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-feature-gated-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/command-center/route.js",
+      "signals": [
+        "process.env.REALM_ERP_SYNC_ENABLED !== '1'",
+        "realmSurfaceDecision(user, 'command'",
+        "isFreelancer(user)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "scope-and-privacy-allowlist",
+      "layer": "server",
+      "source": "lib/realm-command-center-admin.js",
+      "signals": [
+        "realmGuildScope(user)",
+        "assigneeId: true",
+        "estHours: true",
+        "select: { userId: true, hours: true }"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "workload-planning-not-ranking",
+      "layer": "contract",
+      "source": "lib/realm-command-center.js",
+      "signals": [
+        "capacityBasis: '40 giờ kế hoạch/người; chỉ dùng để phát hiện xung đột phân bổ'",
+        "performanceRanking: false",
+        "sourceOfTruth: 'erp-task'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "assignment-rbac-and-team-scope",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "hasAny(user, ['PM', 'LEAD'])",
+        "realm_assignment_target_outside_scope",
+        "action === 'task.assign'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "assignment-optimistic-concurrency",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "assigneeId: command.expectedAssigneeId",
+        "dueDate: command.expectedDueDate",
+        "priority: command.expectedPriority",
+        "'realm_action_stale'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "assignment-idempotency-and-audit",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "tx.realmActionReceipt.create",
+        "payloadHash: command.payloadHash",
+        "tx.auditLog.create({ data: auditData(user, command, 'tasks')"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "assignment-event-raven-bridge",
+      "layer": "api",
+      "source": "app/api/realm-demo/actions/route.js",
+      "signals": [
+        "if (action === 'task.assign') return 'command'",
+        "await emitEvent(result.resource",
+        "if (!result.idempotent)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "handoff-owner-team-and-dedup",
+      "layer": "server",
+      "source": "lib/realm-command-center-admin.js",
+      "signals": [
+        "task.assigneeId !== user.id",
+        "realm_handoff_target_outside_team",
+        "type: 'task_handoff', refId: task.id, requesterId: user.id, status: 'pending'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "handoff-maker-checker",
+      "layer": "api",
+      "source": "app/api/approvals/[id]/decide/route.js",
+      "signals": [
+        "['realm_redemption', 'task_handoff'].includes(ap.type)",
+        "ap.requesterId === user.id",
+        "'self_approval_forbidden'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "handoff-approval-claim-transaction",
+      "layer": "api",
+      "source": "app/api/approvals/[id]/decide/route.js",
+      "signals": [
+        "prisma.$transaction(async (tx)",
+        "where: { id: ap.id, status: 'pending', steps: ap.steps }",
+        "'approval_decision_stale'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "handoff-cas-team-and-event",
+      "layer": "server",
+      "source": "lib/approvals.js",
+      "signals": [
+        "executeTaskHandoff",
+        "where: { id: taskId, assigneeId: expectedAssigneeId",
+        "'task_handoff_target_outside_team'",
+        "await emitEvent('tasks', 'update'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realtime-task-and-approval-domains",
+      "layer": "sync",
+      "source": "lib/realm-change-feed.js",
+      "signals": [
+        "tasks: ['operations', 'guild', 'campaigns', 'command', 'rewards']",
+        "approvals: ['command', 'notifications']"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-command-ui",
+      "layer": "client",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "signals": [
+        "role=\"progressbar\"",
+        "aria-busy={saving || undefined}",
+        "Mở Task ERP",
+        "Điều phối nguồn lực, không xếp hạng con người"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-command-ui",
+      "layer": "style",
+      "source": "components/realm/royal-command-center.module.css",
+      "signals": [
+        "min-height: 44px",
+        ":focus-visible",
+        "@media (max-width: 420px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "classic-erp-task-surface-preserved",
+      "layer": "client",
+      "source": "app/(app)/tasks/page.jsx",
+      "signals": [
+        "useResource('taskcomments'",
+        "useResource('timelogs'",
+        "useResource('taskevents'",
+        "Chi tiết công việc"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "erp-source-contract",
+      "expected": "erp:erp-task",
+      "actual": "erp:erp-task",
+      "status": "verified"
+    },
+    {
+      "id": "seven-day-capacity",
+      "expected": "7:40:110:overloaded",
+      "actual": "7:40:110:overloaded",
+      "status": "verified"
+    },
+    {
+      "id": "handoff-locks-duplicate",
+      "expected": "approval-1:false",
+      "actual": "approval-1:false",
+      "status": "verified"
+    },
+    {
+      "id": "serializer-hides-private-fields",
+      "expected": "false:false",
+      "actual": "false:false",
+      "status": "verified"
+    },
+    {
+      "id": "no-gold-or-presence-scoring",
+      "expected": "false:false:false",
+      "actual": "false:false:false",
+      "status": "verified"
+    },
+    {
+      "id": "task-change-refreshes-command",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "approval-change-refreshes-command",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    }
+  ]
+}

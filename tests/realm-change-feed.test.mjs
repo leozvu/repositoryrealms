@@ -10,7 +10,8 @@ import {
 } from '../lib/realm-change-feed.js';
 
 test('mapping chỉ phát domain Realm cần invalidation', () => {
-  assert.deepEqual(realmChangeDomains('tasks'), ['operations', 'guild', 'campaigns', 'rewards']);
+  assert.deepEqual(realmChangeDomains('tasks'), ['operations', 'guild', 'campaigns', 'command', 'rewards']);
+  assert.deepEqual(realmChangeDomains('approvals'), ['command', 'notifications']);
   assert.deepEqual(realmChangeDomains('leads'), ['embassy']);
   assert.deepEqual(realmChangeDomains('collaboration'), ['collaboration', 'notifications', 'communications']);
   assert.deepEqual(realmChangeDomains('payroll'), []);
@@ -38,7 +39,7 @@ test('publisher ghi metadata allowlist, không sao chép business payload và d�
     payload: { title: 'must never persist' },
   });
   assert.equal(row.resource, 'tasks');
-  assert.deepEqual(JSON.parse(calls.create.data.domains), ['operations', 'guild', 'campaigns', 'rewards']);
+  assert.deepEqual(JSON.parse(calls.create.data.domains), ['operations', 'guild', 'campaigns', 'command', 'rewards']);
   assert.equal(calls.create.data.audienceUserId, 'user-2');
   assert.equal('payload' in calls.create.data, false);
   assert.equal(calls.prune.where.createdAt.lt.toISOString(), '2026-07-04T12:00:00.000Z');

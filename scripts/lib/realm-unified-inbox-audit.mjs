@@ -108,6 +108,6 @@ export function renderRealmUnifiedInboxArtifacts(result) {
   return {
     'unified-inbox-verification.json': `${JSON.stringify(result, null, 2)}\n`,
     'unified-inbox-contracts.csv': `${columns.map(csvCell).join(',')}\n${result.contracts.map((row) => columns.map((column) => csvCell(row[column])).join(',')).join('\n')}\n`,
-    'PHASE-7-REPORT.md': `${report(result)}\n`,
+    'PHASE-7-REPORT.md': report(result),
   };
 }

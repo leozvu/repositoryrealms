@@ -3,8 +3,8 @@
   "summary": {
     "contracts": 10,
     "verifiedContracts": 10,
-    "scenarios": 5,
-    "verifiedScenarios": 5
+    "scenarios": 6,
+    "verifiedScenarios": 6
   },
   "contracts": [
     {
@@ -126,8 +126,14 @@
   "scenarios": [
     {
       "id": "task-domain-fanout",
-      "expected": "operations,guild,campaigns,rewards",
-      "actual": "operations,guild,campaigns,rewards",
+      "expected": "operations,guild,campaigns,command,rewards",
+      "actual": "operations,guild,campaigns,command,rewards",
+      "status": "verified"
+    },
+    {
+      "id": "approval-command-fanout",
+      "expected": "command,notifications",
+      "actual": "command,notifications",
       "status": "verified"
     },
     {

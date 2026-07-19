@@ -4,10 +4,10 @@ Phase 5 chiếu quyền của session ERP và cấu hình module vào Realm trư
 
 ## Kết quả
 
-- Surface policies: **8**
+- Surface policies: **9**
 - Role scenarios: **8/8**
 - Module scenarios: **5/5**
-- Server/UI enforcement contracts: **11/11**
+- Server/UI enforcement contracts: **12/12**
 - Failed policies: **0**
 
 ## Surface policy
@@ -16,6 +16,7 @@ Phase 5 chiếu quyền của session ERP và cấu hình module vào Realm trư
 | --- | --- | --- | --- |
 | Sổ nhân vật | personal | PM, AM, ACCOUNTANT, HR, LEAD, STAFF |  |
 | Quest Board | quests | PM, AM, ACCOUNTANT, HR, LEAD, STAFF | tasks |
+| Royal Command Center | command | PM, AM, ACCOUNTANT, HR, LEAD, STAFF | tasks |
 | Guild Hall | guild | PM, AM, ACCOUNTANT, HR, LEAD, STAFF | tasks |
 | War Room | campaigns | PM, AM, ACCOUNTANT, HR, LEAD, STAFF | delivery |
 | Royal Embassy | embassy | AM | sales |
@@ -27,13 +28,13 @@ Phase 5 chiếu quyền của session ERP và cấu hình module vào Realm trư
 
 | Scenario | Expected | Actual | Status |
 | --- | --- | --- | --- |
-| DIRECTOR | personal, quests, guild, campaigns, embassy, rewards, economy, treasury | personal, quests, guild, campaigns, embassy, rewards, economy, treasury | verified |
-| PM | personal, quests, guild, campaigns, rewards, economy, treasury | personal, quests, guild, campaigns, rewards, economy, treasury | verified |
-| AM | personal, quests, guild, campaigns, embassy, treasury | personal, quests, guild, campaigns, embassy, treasury | verified |
-| ACCOUNTANT | personal, quests, guild, campaigns, treasury | personal, quests, guild, campaigns, treasury | verified |
-| HR | personal, quests, guild, campaigns, rewards, economy, treasury | personal, quests, guild, campaigns, rewards, economy, treasury | verified |
-| LEAD | personal, quests, guild, campaigns, rewards, economy, treasury | personal, quests, guild, campaigns, rewards, economy, treasury | verified |
-| STAFF | personal, quests, guild, campaigns, treasury | personal, quests, guild, campaigns, treasury | verified |
+| DIRECTOR | personal, quests, command, guild, campaigns, embassy, rewards, economy, treasury | personal, quests, command, guild, campaigns, embassy, rewards, economy, treasury | verified |
+| PM | personal, quests, command, guild, campaigns, rewards, economy, treasury | personal, quests, command, guild, campaigns, rewards, economy, treasury | verified |
+| AM | personal, quests, command, guild, campaigns, embassy, treasury | personal, quests, command, guild, campaigns, embassy, treasury | verified |
+| ACCOUNTANT | personal, quests, command, guild, campaigns, treasury | personal, quests, command, guild, campaigns, treasury | verified |
+| HR | personal, quests, command, guild, campaigns, rewards, economy, treasury | personal, quests, command, guild, campaigns, rewards, economy, treasury | verified |
+| LEAD | personal, quests, command, guild, campaigns, rewards, economy, treasury | personal, quests, command, guild, campaigns, rewards, economy, treasury | verified |
+| STAFF | personal, quests, command, guild, campaigns, treasury | personal, quests, command, guild, campaigns, treasury | verified |
 | FREELANCER |  |  | verified |
 
 ## Ma trận module
@@ -41,10 +42,10 @@ Phase 5 chiếu quyền của session ERP và cấu hình module vào Realm trư
 | Scenario | Modules | Expected | Actual | Status |
 | --- | --- | --- | --- | --- |
 | staff-none |  | personal, treasury | personal, treasury | verified |
-| staff-tasks | tasks | personal, quests, guild, treasury | personal, quests, guild, treasury | verified |
-| am-sales-tasks | sales, tasks | personal, quests, guild, embassy, treasury | personal, quests, guild, embassy, treasury | verified |
+| staff-tasks | tasks | personal, quests, command, guild, treasury | personal, quests, command, guild, treasury | verified |
+| am-sales-tasks | sales, tasks | personal, quests, command, guild, embassy, treasury | personal, quests, command, guild, embassy, treasury | verified |
 | pm-delivery | delivery | personal, campaigns, treasury | personal, campaigns, treasury | verified |
-| lead-team-tasks | tasks | personal, quests, guild, rewards, economy, treasury | personal, quests, guild, rewards, economy, treasury | verified |
+| lead-team-tasks | tasks | personal, quests, command, guild, rewards, economy, treasury | personal, quests, command, guild, rewards, economy, treasury | verified |
 
 ## Enforcement
 

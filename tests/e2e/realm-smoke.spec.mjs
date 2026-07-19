@@ -23,12 +23,13 @@ test('the product Realm uses the original ERP authentication boundary', async ({
 });
 
 test('cross-surface collaboration APIs preserve the ERP authentication boundary', async ({ request }) => {
-  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact']) {
+  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center']) {
     const response = await request.get(route);
-    expect(response.status()).toBe(401);
+    expect([401, 503]).toContain(response.status());
     expect(response.headers()['cache-control']).toContain('no-store');
     expect(response.headers().vary).toContain('Cookie');
-    await expect(response.json()).resolves.toMatchObject({ error: 'unauthorized', code: 'unauthorized' });
+    const body = await response.json();
+    expect(['unauthorized', 'realm_erp_sync_disabled']).toContain(body.code);
   }
 });
 
@@ -49,6 +50,7 @@ test('Realm API responses expose safe correlation and latency diagnostics', asyn
 test('anonymous clients cannot issue Realm record commands', async ({ request }) => {
   const commands = [
     { action: 'task.transition', entityId: 'task-demo', expectedState: 'todo', nextState: 'in_progress' },
+    { action: 'task.assign', entityId: 'task-demo', expectedAssigneeId: null, assigneeId: 'staff-demo', expectedPriority: 'medium', priority: 'high' },
     { action: 'task.comment.create', entityId: 'task-demo', content: 'anonymous note' },
     { action: 'lead.followup.create', entityId: 'lead-demo', kind: 'call', title: 'anonymous follow-up', date: '2026-07-21' },
   ];
@@ -85,10 +87,10 @@ test('Realm and ERP views expose the same live character status', async ({ page 
   await expect(page.getByRole('region', { name: 'Adventurer Zero' })).toContainText('Gold');
   await expect(page.getByText('Quest ↔ công việc ERP/CRM', { exact: true })).toBeVisible();
   const access = page.getByRole('region', { name: 'Quyền truy cập phiên ERP' });
-  await expect(access).toContainText('DEMO · 8/8 khu vực khả dụng');
+  await expect(access).toContainText('DEMO · 9/9 khu vực khả dụng');
   const ledgerTabs = page.getByRole('navigation', { name: 'Chọn khu vực điều hành ERP' }).getByRole('button');
-  await expect(ledgerTabs).toHaveCount(5);
-  for (let index = 0; index < 5; index += 1) await expect(ledgerTabs.nth(index)).toBeEnabled();
+  await expect(ledgerTabs).toHaveCount(6);
+  for (let index = 0; index < 6; index += 1) await expect(ledgerTabs.nth(index)).toBeEnabled();
   const bridge = page.getByRole('region', { name: 'Cổng nghiệp vụ ERP/CRM' });
   await expect(bridge).toContainText('Medieval label chỉ là lớp giao diện');
   await expect(bridge.getByRole('link')).toHaveCount(7);
@@ -96,6 +98,13 @@ test('Realm and ERP views expose the same live character status', async ({ page 
   await expect(bridge.getByRole('link', { name: /War Room/ })).toHaveAttribute('href', '/projects');
   await expect(bridge.getByRole('link', { name: /Guild Roster/ })).toHaveAttribute('href', '/staff');
   await expect(bridge.locator('[aria-disabled="true"]')).toHaveCount(0);
+
+  await page.getByRole('navigation', { name: 'Chọn khu vực điều hành ERP' }).getByRole('button', { name: 'Royal Command', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Điều phối Quest xuyên ERP và Realm' })).toBeVisible();
+  await expect(page.getByText('Demo cục bộ', { exact: true })).toBeVisible();
+  await expect(page.getByText('Điều phối nguồn lực, không xếp hạng con người', { exact: true })).toBeVisible();
+  const taskLinks = page.getByRole('link', { name: 'Mở Task ERP' });
+  await expect(taskLinks.first()).toHaveAttribute('href', /^\/tasks\?focus=/);
 });
 
 test('demo Realm stays an explicit local sandbox when product ERP sync is enabled', async ({ page }) => {

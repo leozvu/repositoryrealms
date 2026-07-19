@@ -1798,6 +1798,16 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/api/realm-demo/command-center",
+      "source": "app/api/realm-demo/command-center/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/api/realm-demo/economy",
       "source": "app/api/realm-demo/economy/route.js",
       "dynamic": false,
@@ -2043,7 +2053,7 @@
     {
       "elementId": "route.approvals.action.ang-xu-ly-duyet",
       "source": "app/(app)/approvals/page.jsx",
-      "line": 40,
+      "line": 41,
       "column": 11,
       "surface": "route.approvals",
       "tag": "button",
@@ -2068,7 +2078,7 @@
     {
       "elementId": "route.approvals.action.tu-choi",
       "source": "app/(app)/approvals/page.jsx",
-      "line": 41,
+      "line": 42,
       "column": 11,
       "surface": "route.approvals",
       "tag": "button",
@@ -16006,7 +16016,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ban-o-van-phong-ao-crmegoric-realms-dung-wasd-hoac-phim-mui-ten-",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 615,
+      "line": 618,
       "column": 7,
       "surface": "component.components-realm-realmoffice",
       "tag": "canvas",
@@ -16044,7 +16054,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.onemote-emote-id",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 629,
+      "line": 632,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16079,7 +16089,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-len",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 635,
+      "line": 638,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16114,7 +16124,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-sang-trai",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 636,
+      "line": 639,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16149,7 +16159,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-xuong",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 637,
+      "line": 640,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16184,7 +16194,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-sang-phai",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 638,
+      "line": 641,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16219,7 +16229,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.onselect-person",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 656,
+      "line": 659,
       "column": 5,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16254,7 +16264,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tat-mic-bat-mic",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 728,
+      "line": 731,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16289,7 +16299,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tat-camera-camera",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 729,
+      "line": 732,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16324,7 +16334,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.dung-chia-se-chia-se",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 730,
+      "line": 733,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16359,7 +16369,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.loai",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1624,
+      "line": 1631,
       "column": 25,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16394,7 +16404,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.thu-hoi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1639,
+      "line": 1646,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16429,7 +16439,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.invitetoparty-person",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1649,
+      "line": 1656,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16466,7 +16476,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.huy",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1672,
+      "line": 1679,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16501,7 +16511,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.xac-nhan",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1673,
+      "line": 1680,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16536,7 +16546,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ket-thuc-party-roi-party",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1677,
+      "line": 1684,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16571,7 +16581,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.thu-hoi-loi-moi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1684,
+      "line": 1691,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16606,7 +16616,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.invitetoparty-person.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1694,
+      "line": 1701,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16643,7 +16653,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-toi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1749,
+      "line": 1756,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16678,7 +16688,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.hi-vay-chao",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1750,
+      "line": 1757,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16713,7 +16723,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.partyactionlabel",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1753,
+      "line": 1760,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16748,7 +16758,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.thi-tham-rieng-chi-nhan-uoc-tin-nhan-nay",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1764,
+      "line": 1771,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -16783,7 +16793,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.viet-loi-nhan-rieng",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1768,
+      "line": 1775,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -16820,7 +16830,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1769,
+      "line": 1776,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16855,7 +16865,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.go-cua-erp-nguoi-nhan-ang-offline-loi-nhan-van-uoc-luu-trong-not",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1774,
+      "line": 1781,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -16890,7 +16900,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.ban-muon-trao-oi-viec-gi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1780,
+      "line": 1787,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -16927,7 +16937,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1787,
+      "line": 1794,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -16962,7 +16972,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-lantern-mail",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1798,
+      "line": 1805,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -16997,7 +17007,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1818,
+      "line": 1825,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -17032,7 +17042,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.input",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1824,
+      "line": 1831,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -17069,7 +17079,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.select",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1827,
+      "line": 1834,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "select",
@@ -17106,7 +17116,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.input.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1832,
+      "line": 1839,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -17143,7 +17153,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1835,
+      "line": 1842,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17178,7 +17188,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1862,
+      "line": 1878,
       "column": 44,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17213,7 +17223,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-task-erp",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1864,
+      "line": 1880,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -17248,7 +17258,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.cap-nhat-tien-o-demo",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1865,
+      "line": 1881,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17283,7 +17293,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.buyitem-item",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1948,
+      "line": 1964,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17318,7 +17328,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.nhan-vao-tavern",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1975,
+      "line": 1991,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -17353,7 +17363,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.gui-tin-nhan",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1977,
+      "line": 1993,
       "column": 143,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17388,7 +17398,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.viet-tin-nhan",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1977,
+      "line": 1993,
       "column": 16,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -17425,7 +17435,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-toi.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1998,
+      "line": 2014,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17460,7 +17470,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2016,
+      "line": 2032,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17495,7 +17505,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.erp-crm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2019,
+      "line": 2035,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -17530,7 +17540,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.so-realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2020,
+      "line": 2036,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17565,7 +17575,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.erp-crm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2023,
+      "line": 2039,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17600,7 +17610,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.trang-thai-hien-dien",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2031,
+      "line": 2047,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "select",
@@ -17635,7 +17645,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tu-choi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2050,
+      "line": 2066,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17670,7 +17680,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tham-gia",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2051,
+      "line": 2067,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17705,7 +17715,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.level",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2058,
+      "line": 2074,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17740,7 +17750,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.movetoobject-item-id",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2068,
+      "line": 2084,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17775,7 +17785,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ho-so-nhan-vat",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2078,
+      "line": 2094,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17810,7 +17820,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-erp-crm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2079,
+      "line": 2095,
       "column": 25,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -17845,7 +17855,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.so-realm-tavern-ieu-hanh-erp-crm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2080,
+      "line": 2096,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17880,7 +17890,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.e",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2105,
+      "line": 2121,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17915,7 +17925,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-kiem-tra-thu-ong-bo",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2227,
+      "line": 2244,
       "column": 37,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17950,7 +17960,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.copy-ma",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2228,
+      "line": 2245,
       "column": 48,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -17985,7 +17995,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.setledgerview-tab-key-if-tab-key-guild-setwarroomcampaign-null-s",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2300,
+      "line": 2319,
       "column": 18,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -18020,7 +18030,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-ho-so-erp",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2381,
+      "line": 2402,
       "column": 40,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -18055,7 +18065,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.link",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2388,
+      "line": 2409,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -18090,7 +18100,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-task-erp.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2418,
+      "line": 2439,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -18125,7 +18135,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.cap-nhat-1",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2419,
+      "line": 2440,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -18160,7 +18170,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2420,
+      "line": 2441,
       "column": 48,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -18195,7 +18205,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-ho-so-nhan-su-goc",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2478,
+      "line": 2499,
       "column": 38,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -18230,7 +18240,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.mo-goc-nhin-realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2479,
+      "line": 2500,
       "column": 7,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -18800,6 +18810,436 @@
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.thu-lai",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 38,
+      "column": 15,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "button",
+      "kind": "action",
+      "label": "Thử lại",
+      "handlerEvent": "onClick",
+      "handler": "onRetry",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.huy",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 73,
+      "column": 5,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "button",
+      "kind": "action",
+      "label": "Hủy",
+      "handlerEvent": "onClick",
+      "handler": "onClose",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "saving",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.ang-ghi-erp-xac-nhan-phan-cong",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 74,
+      "column": 5,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đang ghi ERP… / Xác nhận phân công",
+      "handlerEvent": "onClick",
+      "handler": "submit",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "saving",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.form-control.chon-thanh-vien",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 77,
+      "column": 70,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "— Chọn thành viên —",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "saving",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.form-control.input",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 81,
+      "column": 66,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "saving",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.form-control.select",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 82,
+      "column": 59,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "saving",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.huy.2",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 113,
+      "column": 5,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "button",
+      "kind": "action",
+      "label": "Hủy",
+      "handlerEvent": "onClick",
+      "handler": "onClose",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "saving",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.ang-gui-gui-yeu-cau-duyet",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 114,
+      "column": 5,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đang gửi… / Gửi yêu cầu duyệt",
+      "handlerEvent": "onClick",
+      "handler": "submit",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "saving",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.form-control.chon-thanh-vien.2",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 117,
+      "column": 72,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "— Chọn thành viên —",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "saving",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.form-control.textarea",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 121,
+      "column": 79,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "saving",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.phan-cong",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 153,
+      "column": 26,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "button",
+      "kind": "action",
+      "label": "Phân công",
+      "handlerEvent": "onClick",
+      "handler": "() => onAssign(task)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.xin-ban-giao",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 154,
+      "column": 34,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "button",
+      "kind": "action",
+      "label": "Xin bàn giao",
+      "handlerEvent": "onClick",
+      "handler": "() => onHandoff(task)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.navigation.mo-task-erp",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 155,
+      "column": 7,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "a",
+      "kind": "navigation",
+      "label": "Mở Task ERP",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "realmRecordHref('task', task.id)",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.action.thu-lai.2",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 222,
+      "column": 147,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "button",
+      "kind": "action",
+      "label": "Thử lại",
+      "handlerEvent": "onClick",
+      "handler": "reload",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.form-control.nhap-tu-khoa",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 240,
+      "column": 103,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "Nhập từ khóa…",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-royalcommandcenter.form-control.input.2",
+      "source": "components/realm/RoyalCommandCenter.jsx",
+      "line": 241,
+      "column": 47,
+      "surface": "component.components-realm-royalcommandcenter",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/realm-demo/actions'",
+        "POST '/api/realm-demo/command-center'",
+        "GET '/api/realm-demo/command-center'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
     },
     {
       "elementId": "component.components-realm-royalembassy.action.ve-guild-hall",
@@ -19964,7 +20404,7 @@
     {
       "elementId": "component.components-shell.navigation.item-key",
       "source": "components/Shell.jsx",
-      "line": 325,
+      "line": 333,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -20003,7 +20443,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 339,
+      "line": 347,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20042,7 +20482,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 342,
+      "line": 350,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20081,7 +20521,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 351,
+      "line": 359,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -20123,7 +20563,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 354,
+      "line": 362,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20162,7 +20602,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 358,
+      "line": 366,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20201,7 +20641,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 361,
+      "line": 369,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20570,20 +21010,20 @@
   ],
   "summary": {
     "uiRoutes": 56,
-    "apiRoutes": 53,
-    "interactiveElements": 629,
-    "sourceFilesWithInteractions": 71,
+    "apiRoutes": 54,
+    "interactiveElements": 645,
+    "sourceFilesWithInteractions": 72,
     "routesInPrimaryNavigation": 52,
     "routesWithResourceCandidates": 43,
     "byKind": {
-      "action": 389,
-      "form-control": 197,
+      "action": 397,
+      "form-control": 204,
       "form-submit": 9,
-      "navigation": 34
+      "navigation": 35
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 188,
+      "control_binding_unverified": 195,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 22
     },
@@ -20641,11 +21081,11 @@
         "count": 16
       },
       {
-        "source": "app/(app)/messages/page.jsx",
-        "count": 13
+        "source": "components/realm/RoyalCommandCenter.jsx",
+        "count": 16
       },
       {
-        "source": "components/ui.jsx",
+        "source": "app/(app)/messages/page.jsx",
         "count": 13
       }
     ]

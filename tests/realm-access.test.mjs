@@ -19,6 +19,7 @@ test('manifest áp đúng policy cho từng vai trò ERP', () => {
   const staff = createRealmAccessManifest({ user: user('STAFF'), modules: null });
   assert.equal(staff.surfaces.personal.allowed, true);
   assert.equal(staff.surfaces.quests.allowed, true);
+  assert.equal(staff.surfaces.command.allowed, true);
   assert.equal(staff.surfaces.rewards.allowed, false);
   assert.equal(staff.surfaces.economy.allowed, false);
   assert.equal(staff.surfaces.embassy.allowed, false);
@@ -65,7 +66,7 @@ test('parser module tương thích setting cũ và payload lỗi', () => {
   assert.deepEqual(parseRealmCompanyModules('{"modules":["tasks","sales"]}'), ['tasks', 'sales']);
   assert.equal(parseRealmCompanyModules('{}'), null);
   assert.equal(parseRealmCompanyModules('{broken'), null);
-  assert.equal(REALM_SURFACE_POLICIES.length, 8);
+  assert.equal(REALM_SURFACE_POLICIES.length, 9);
 });
 
 test('Phase 5 audit xác minh role/module scenarios và server/UI enforcement', () => {
