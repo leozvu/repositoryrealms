@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Modal, AsyncButton, useToast } from '@/components/ui';
 import { initials, todayISO } from '@/lib/format';
 
@@ -35,7 +35,7 @@ const slaLeft = t => {
 };
 
 export default function TicketsPage() {
-  const { rows, create, update, remove, mutating } = useResource('tickets');
+  const { rows, loading, create, update, remove, mutating } = useResource('tickets');
   const clients = useResource('clients');
   const users = useResource('users');
   const csat = useResource('csat');
@@ -45,6 +45,18 @@ export default function TicketsPage() {
   const [f, setF] = useState('openish');
   const [modal, setModal] = useState(null);
   const toast = useToast();
+  const focusedRecordRef = useRef(null);
+
+  useEffect(() => {
+    if (loading || typeof window === 'undefined') return;
+    const focusId = new URLSearchParams(window.location.search).get('focus');
+    if (!focusId || focusedRecordRef.current === focusId) return;
+    focusedRecordRef.current = focusId;
+    const ticket = rows.find((row) => row.id === focusId);
+    if (!ticket) return toast('Không tìm thấy Ticket hoặc bạn không còn quyền xem bản ghi này.', 'error');
+    setF('all');
+    setModal({ mode: 'edit', row: ticket });
+  }, [loading, rows, toast]);
 
   const cName = id => clients.rows.find(c => c.id === id)?.name || '—';
   const uName = id => users.rows.find(u => u.id === id)?.name || '—';

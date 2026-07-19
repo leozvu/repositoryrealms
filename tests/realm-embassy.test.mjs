@@ -22,7 +22,7 @@ test('Lead quá ngày, chưa gán và forecast được suy ra từ stage chuẩ
   const dashboard = createRealmEmbassyDashboard({
     source: 'erp',
     leads: [
-      { id: 'lead-1', name: 'Lan', company: 'Lumen', value: 100_000_000, stage: 'proposal', ownerId: 'am-1', expectedClose: '2026-07-16', email: 'must-not-leak@example.com' },
+      { id: 'lead-1', name: 'Lan', company: 'Lumen', value: 100_000_000, stage: 'proposal', ownerId: 'am-1', expectedClose: '2026-07-16', email: 'must-not-leak@example.com', activities: [{ id: 'activity-1', kind: 'call', title: 'Gọi xác nhận', date: '2026-07-18', done: false, author: { name: 'Quang Võ' }, note: 'must-not-leak' }] },
       { id: 'lead-2', name: 'Minh', company: 'North', value: 50_000_000, stage: 'contacted', ownerId: null, expectedClose: null },
     ],
     owners: new Map([['am-1', { id: 'am-1', name: 'Quang Võ' }]]),
@@ -36,6 +36,7 @@ test('Lead quá ngày, chưa gán và forecast được suy ra từ stage chuẩ
   assert.equal(proposal.owner.name, 'Quang Võ');
   assert.equal(proposal.overdue, true);
   assert.equal('email' in proposal, false);
+  assert.deepEqual(proposal.activities[0], { id: 'activity-1', kind: 'call', title: 'Gọi xác nhận', date: '2026-07-18', done: false, author: 'Quang Võ' });
 });
 
 test('Client registry chỉ trả nhịp Project, không trả contact details', () => {

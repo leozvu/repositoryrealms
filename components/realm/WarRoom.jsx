@@ -35,6 +35,13 @@ function dateLabel(value) {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+function dateTimeLabel(value) {
+  const parsed = new Date(value || '');
+  return Number.isNaN(parsed.getTime()) ? 'Không rõ thời điểm' : parsed.toLocaleString('vi-VN', {
+    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+}
+
 function EmptyState({ loading = false, error = '', selection = false, onRetry, onBack }) {
   return (
     <section className={styles.stateCard} role={error ? 'alert' : 'status'} aria-live="polite">
@@ -76,6 +83,15 @@ function TaskCard({ task, onOpen, onTransition, onComment }) {
       </div>
       {task.blockers.length > 0 && <div className={styles.taskBlocker}><Icon name="alert" size={14} /><span>Chờ: {task.blockers.join(', ')}</span></div>}
       {REWARD[task.rewardGate] && <div className={`${styles.rewardGate} ${styles[`reward_${task.rewardGate}`]}`}><Icon name={task.rewardGate === 'claimed' ? 'check' : 'shield'} size={14} />{REWARD[task.rewardGate]}</div>}
+      {task.comments?.length > 0 && <details className={styles.timeline}>
+        <summary><Icon name="messages" size={14} /><span>War Council gần đây</span><b>{task.comments.length}</b></summary>
+        <ol>
+          {task.comments.map((comment) => <li key={comment.id}>
+            <div><strong>{comment.author}</strong><time dateTime={comment.createdAt || undefined}>{dateTimeLabel(comment.createdAt)}</time></div>
+            <p>{comment.content}</p>
+          </li>)}
+        </ol>
+      </details>}
       {transitions.length > 0 && <div className={styles.taskActions} aria-label={`Cập nhật ${task.title}`}>
         {transitions.map((nextState) => <button type="button" key={nextState} onClick={() => onTransition(task, nextState)}>{realmStateLabel(nextState)}</button>)}
       </div>}

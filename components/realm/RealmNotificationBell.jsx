@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Icon, useToast } from '@/components/ui';
+import { NOTIFICATION_SYNC_EVENT } from '@/lib/notification-inbox';
 import styles from './realm-notification-bell.module.css';
 
 function relativeTime(value) {
@@ -19,6 +20,10 @@ export default function RealmNotificationBell({ dataRevision = 0 }) {
   const [data, setData] = useState({ rows: [], unread: 0 });
   const [state, setState] = useState('loading');
   const [working, setWorking] = useState(false);
+  const triggerRef = useRef(null);
+  const panelRef = useRef(null);
+  const headingRef = useRef(null);
+  const panelId = useId();
 
   const load = useCallback(async () => {
     try {
@@ -32,13 +37,36 @@ export default function RealmNotificationBell({ dataRevision = 0 }) {
     }
   }, []);
 
+  const announceChange = useCallback(() => window.dispatchEvent(new CustomEvent(NOTIFICATION_SYNC_EVENT)), []);
+  const closePanel = useCallback((restoreFocus = true) => {
+    setOpen(false);
+    if (restoreFocus) window.requestAnimationFrame(() => triggerRef.current?.focus());
+  }, []);
+
   useEffect(() => { load(); }, [dataRevision, load]);
   useEffect(() => {
+    const refresh = () => load();
+    window.addEventListener(NOTIFICATION_SYNC_EVENT, refresh);
+    const timer = window.setInterval(refresh, 15_000);
+    return () => {
+      window.removeEventListener(NOTIFICATION_SYNC_EVENT, refresh);
+      window.clearInterval(timer);
+    };
+  }, [load]);
+  useEffect(() => {
     if (!open) return undefined;
-    const close = (event) => { if (event.key === 'Escape') setOpen(false); };
+    headingRef.current?.focus();
+    const close = (event) => {
+      if (event.key === 'Escape') closePanel();
+      if (event.type === 'pointerdown' && !panelRef.current?.contains(event.target) && !triggerRef.current?.contains(event.target)) closePanel(false);
+    };
     window.addEventListener('keydown', close);
-    return () => window.removeEventListener('keydown', close);
-  }, [open]);
+    window.addEventListener('pointerdown', close);
+    return () => {
+      window.removeEventListener('keydown', close);
+      window.removeEventListener('pointerdown', close);
+    };
+  }, [closePanel, open]);
 
   const markRead = async (notification) => {
     if (working) return;
@@ -48,8 +76,9 @@ export default function RealmNotificationBell({ dataRevision = 0 }) {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: notification.id }),
       });
       if (!response.ok) throw new Error('Không thể đánh dấu thông báo.');
-      setOpen(false);
+      closePanel(false);
       await load();
+      announceChange();
       router.push(String(notification.route || '/messages').startsWith('/') ? notification.route || '/messages' : '/messages');
     } catch (error) {
       toast(error.message, 'error');
@@ -67,6 +96,7 @@ export default function RealmNotificationBell({ dataRevision = 0 }) {
       });
       if (!response.ok) throw new Error('Không thể cập nhật Raven Inbox.');
       await load();
+      announceChange();
       toast('Đã đánh dấu tất cả Raven là đã đọc.', 'success');
     } catch (error) {
       toast(error.message, 'error');
@@ -78,11 +108,13 @@ export default function RealmNotificationBell({ dataRevision = 0 }) {
   return (
     <div className={styles.root}>
       <button
+        ref={triggerRef}
         type="button"
         className={styles.trigger}
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
         aria-haspopup="dialog"
+        aria-controls={panelId}
         aria-label={`Raven Inbox${data.unread ? `, ${data.unread} chưa đọc` : ''}`}
         title="Raven Inbox · thông báo ERP dùng chung"
       >
@@ -91,15 +123,25 @@ export default function RealmNotificationBell({ dataRevision = 0 }) {
         {data.unread > 0 && <b>{Math.min(data.unread, 99)}</b>}
       </button>
       {open && (
-        <section className={styles.panel} role="dialog" aria-label="Raven Inbox">
-          <header><span><strong>Raven Inbox</strong><small>Thông báo ERP dùng chung</small></span>{data.unread > 0 && <button type="button" disabled={working} aria-busy={working || undefined} onClick={markAllRead}>{working ? 'Đang xử lý…' : 'Đọc tất cả'}</button>}</header>
+        <section ref={panelRef} id={panelId} className={styles.panel} role="dialog" aria-labelledby={`${panelId}-title`} aria-modal="false">
+          <header>
+            <span><strong ref={headingRef} id={`${panelId}-title`} tabIndex={-1}>Raven Inbox</strong><small>Thông báo ERP · CRM dùng chung</small></span>
+            <div className={styles.headerActions}>
+              {data.unread > 0 && <button type="button" disabled={working} aria-busy={working || undefined} onClick={markAllRead}>{working ? 'Đang xử lý…' : 'Đọc tất cả'}</button>}
+              <button type="button" className={styles.close} onClick={() => closePanel()} aria-label="Đóng Raven Inbox"><Icon name="x" size={16} /></button>
+            </div>
+          </header>
           <div className={styles.list} aria-live="polite">
             {state === 'loading' && <p className={styles.empty}>Đang gọi đàn quạ…</p>}
-            {state === 'unavailable' && <p className={styles.empty}>Raven Inbox tạm mất kết nối. Hệ thống sẽ tự thử lại.</p>}
+            {state === 'unavailable' && <div className={styles.empty} role="alert"><p>Raven Inbox tạm mất kết nối. Hệ thống sẽ tự thử lại.</p><button type="button" onClick={load}>Thử lại</button></div>}
             {state === 'ready' && data.rows.slice(0, 12).map((notification) => (
               <button type="button" key={notification.id} className={styles.item} disabled={working} data-unread={!notification.readAt || undefined} onClick={() => markRead(notification)}>
-                <i />
-                <span><strong>{notification.text}</strong><small>{relativeTime(notification.createdAt)}</small></span>
+                <span className={styles.kindIcon}><Icon name={notification.icon || 'bell'} size={16} /></span>
+                <span className={styles.itemBody}>
+                  <span className={styles.itemMeta}><b>{notification.kindLabel || 'Realm Dispatch'}</b><small>{relativeTime(notification.createdAt)}</small></span>
+                  <strong>{notification.text}</strong>
+                  <em>Mở {notification.targetLabel || 'ERP · CRM'}</em>
+                </span>
               </button>
             ))}
             {state === 'ready' && !data.rows.length && <p className={styles.empty}>Chưa có thư mới. Thông báo từ ERP và Realm sẽ cùng xuất hiện tại đây.</p>}

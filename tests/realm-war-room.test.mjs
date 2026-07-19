@@ -22,7 +22,7 @@ test('War Room suy ra dependency blocker, quá hạn và cổng thưởng từ T
     project: { id: 'project-1', name: 'Rồng Xanh', status: 'active', progress: 50, deadline: '2026-07-20' },
     phases: [{ id: 'phase-1', name: 'Build', order: 0, color: '#336655' }],
     tasks: [
-      { id: 'task-a', title: 'Foundation', status: 'doing', priority: 'high', dueDate: '2026-07-16', phaseId: 'phase-1', assignee: { id: 'staff-1', name: 'Mai Anh' } },
+      { id: 'task-a', title: 'Foundation', status: 'doing', priority: 'high', dueDate: '2026-07-16', phaseId: 'phase-1', assignee: { id: 'staff-1', name: 'Mai Anh' }, comments: [{ id: 'comment-1', content: '  Chốt\nphương án  ', createdAt: '2026-07-17T10:00:00.000Z', author: { name: 'Sơn Vũ' }, secret: 'hidden' }] },
       { id: 'task-b', title: 'Release', status: 'todo', dependsOn: '["task-a"]', phaseId: 'phase-1', assignee: { id: 'lead-1', name: 'Minh Quân' } },
       { id: 'task-c', title: 'QA approved', status: 'done', checklist: '[{"text":"QA","done":true}]', phaseId: 'phase-1', assignee: { id: 'staff-1', name: 'Mai Anh' }, realmQuest: { active: true, approvedAt: new Date('2026-07-16') } },
     ],
@@ -37,6 +37,8 @@ test('War Room suy ra dependency blocker, quá hạn và cổng thưởng từ T
   assert.equal(dashboard.metrics.readyRewards, 1);
   assert.equal(dashboard.phases[0].tasks.find((task) => task.id === 'task-b').lane, 'blocked');
   assert.deepEqual(dashboard.blockers[0].reasons, ['Foundation']);
+  const comment = dashboard.phases[0].tasks.find((task) => task.id === 'task-a').comments[0];
+  assert.deepEqual(comment, { id: 'comment-1', content: 'Chốt phương án', createdAt: '2026-07-17T10:00:00.000Z', author: 'Sơn Vũ' });
 });
 
 test('Task ngoài Phase đã biết được gom vào Backlog an toàn', () => {

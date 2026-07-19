@@ -13518,7 +13518,7 @@
     {
       "elementId": "route.tickets.form-control.ang-mo-mac-inh-tat-ca",
       "source": "app/(app)/tickets/page.jsx",
-      "line": 94,
+      "line": 106,
       "column": 9,
       "surface": "route.tickets",
       "tag": "select",
@@ -13547,7 +13547,7 @@
     {
       "elementId": "route.tickets.action.tao-ticket",
       "source": "app/(app)/tickets/page.jsx",
-      "line": 100,
+      "line": 112,
       "column": 9,
       "surface": "route.tickets",
       "tag": "button",
@@ -13574,7 +13574,7 @@
     {
       "elementId": "route.tickets.action.anh-dau-a-xu-ly",
       "source": "app/(app)/tickets/page.jsx",
-      "line": 122,
+      "line": 134,
       "column": 23,
       "surface": "route.tickets",
       "tag": "AsyncButton",
@@ -13601,7 +13601,7 @@
     {
       "elementId": "route.tickets.action.button.2",
       "source": "app/(app)/tickets/page.jsx",
-      "line": 126,
+      "line": 138,
       "column": 25,
       "surface": "route.tickets",
       "tag": "button",
@@ -13628,7 +13628,7 @@
     {
       "elementId": "route.tickets.action.sua",
       "source": "app/(app)/tickets/page.jsx",
-      "line": 128,
+      "line": 140,
       "column": 21,
       "surface": "route.tickets",
       "tag": "button",
@@ -13655,7 +13655,7 @@
     {
       "elementId": "route.tickets.action.xoa",
       "source": "app/(app)/tickets/page.jsx",
-      "line": 129,
+      "line": 141,
       "column": 21,
       "surface": "route.tickets",
       "tag": "button",
@@ -15866,7 +15866,7 @@
     {
       "elementId": "component.components-realm-realmnotificationbell.action.raven",
       "source": "components/realm/RealmNotificationBell.jsx",
-      "line": 80,
+      "line": 110,
       "column": 7,
       "surface": "component.components-realm-realmnotificationbell",
       "tag": "button",
@@ -15894,8 +15894,8 @@
     {
       "elementId": "component.components-realm-realmnotificationbell.action.ang-xu-ly-oc-tat-ca",
       "source": "components/realm/RealmNotificationBell.jsx",
-      "line": 95,
-      "column": 119,
+      "line": 130,
+      "column": 35,
       "surface": "component.components-realm-realmnotificationbell",
       "tag": "button",
       "kind": "action",
@@ -15920,14 +15920,70 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "component.components-realm-realmnotificationbell.action.markread-notification",
+      "elementId": "component.components-realm-realmnotificationbell.action.ong-raven-inbox",
       "source": "components/realm/RealmNotificationBell.jsx",
-      "line": 100,
+      "line": 131,
       "column": 15,
       "surface": "component.components-realm-realmnotificationbell",
       "tag": "button",
       "kind": "action",
-      "label": "",
+      "label": "Đóng Raven Inbox",
+      "handlerEvent": "onClick",
+      "handler": "() => closePanel()",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/notifications'",
+        "PUT '/api/notifications'",
+        "PUT '/api/notifications'"
+      ],
+      "routeCandidates": [
+        "String(notification.route || '/messages').startsWith('/') ? notification.route || '/messages' : '/messages'"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmnotificationbell.action.thu-lai",
+      "source": "components/realm/RealmNotificationBell.jsx",
+      "line": 136,
+      "column": 143,
+      "surface": "component.components-realm-realmnotificationbell",
+      "tag": "button",
+      "kind": "action",
+      "label": "Thử lại",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/notifications'",
+        "PUT '/api/notifications'",
+        "PUT '/api/notifications'"
+      ],
+      "routeCandidates": [
+        "String(notification.route || '/messages').startsWith('/') ? notification.route || '/messages' : '/messages'"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmnotificationbell.action.mo",
+      "source": "components/realm/RealmNotificationBell.jsx",
+      "line": 138,
+      "column": 15,
+      "surface": "component.components-realm-realmnotificationbell",
+      "tag": "button",
+      "kind": "action",
+      "label": "Mở",
       "handlerEvent": "onClick",
       "handler": "() => markRead(notification)",
       "target": "",
@@ -15945,9 +16001,7 @@
       "routeCandidates": [
         "String(notification.route || '/messages').startsWith('/') ? notification.route || '/messages' : '/messages'"
       ],
-      "uxRiskCandidates": [
-        "unlabelled_button_candidate"
-      ]
+      "uxRiskCandidates": []
     },
     {
       "elementId": "component.components-realm-realmoffice.action.ban-o-van-phong-ao-crmegoric-realms-dung-wasd-hoac-phim-mui-ten-",
@@ -18750,7 +18804,7 @@
     {
       "elementId": "component.components-realm-royalembassy.action.ve-guild-hall",
       "source": "components/realm/RoyalEmbassy.jsx",
-      "line": 27,
+      "line": 34,
       "column": 20,
       "surface": "component.components-realm-royalembassy",
       "tag": "button",
@@ -18774,7 +18828,7 @@
     {
       "elementId": "component.components-realm-royalembassy.action.thu-lai",
       "source": "components/realm/RoyalEmbassy.jsx",
-      "line": 28,
+      "line": 35,
       "column": 22,
       "surface": "component.components-realm-royalembassy",
       "tag": "button",
@@ -18798,7 +18852,7 @@
     {
       "elementId": "component.components-realm-royalembassy.action.ontransition-lead-nextstate",
       "source": "components/realm/RoyalEmbassy.jsx",
-      "line": 55,
+      "line": 75,
       "column": 41,
       "surface": "component.components-realm-royalembassy",
       "tag": "button",
@@ -18824,7 +18878,7 @@
     {
       "elementId": "component.components-realm-royalembassy.action.len-lich-follow-up",
       "source": "components/realm/RoyalEmbassy.jsx",
-      "line": 57,
+      "line": 77,
       "column": 42,
       "surface": "component.components-realm-royalembassy",
       "tag": "button",
@@ -18848,7 +18902,7 @@
     {
       "elementId": "component.components-realm-royalembassy.action.mo-lead-erp",
       "source": "components/realm/RoyalEmbassy.jsx",
-      "line": 58,
+      "line": 78,
       "column": 18,
       "surface": "component.components-realm-royalembassy",
       "tag": "button",
@@ -18872,7 +18926,7 @@
     {
       "elementId": "component.components-realm-royalembassy.action.mo-client-erp",
       "source": "components/realm/RoyalEmbassy.jsx",
-      "line": 71,
+      "line": 91,
       "column": 18,
       "surface": "component.components-realm-royalembassy",
       "tag": "button",
@@ -18896,7 +18950,7 @@
     {
       "elementId": "component.components-realm-royalembassy.action.ve-guild-hall.2",
       "source": "components/realm/RoyalEmbassy.jsx",
-      "line": 142,
+      "line": 162,
       "column": 22,
       "surface": "component.components-realm-royalembassy",
       "tag": "button",
@@ -18920,7 +18974,7 @@
     {
       "elementId": "component.components-realm-royalembassy.action.mo-crm-pipeline",
       "source": "components/realm/RoyalEmbassy.jsx",
-      "line": 149,
+      "line": 169,
       "column": 207,
       "surface": "component.components-realm-royalembassy",
       "tag": "button",
@@ -19241,7 +19295,7 @@
     {
       "elementId": "component.components-realm-warroom.action.ve-guild-hall",
       "source": "components/realm/WarRoom.jsx",
-      "line": 47,
+      "line": 54,
       "column": 20,
       "surface": "component.components-realm-warroom",
       "tag": "button",
@@ -19265,7 +19319,7 @@
     {
       "elementId": "component.components-realm-warroom.action.thu-lai",
       "source": "components/realm/WarRoom.jsx",
-      "line": 48,
+      "line": 55,
       "column": 19,
       "surface": "component.components-realm-warroom",
       "tag": "button",
@@ -19289,7 +19343,7 @@
     {
       "elementId": "component.components-realm-warroom.action.ontransition-task-nextstate",
       "source": "components/realm/WarRoom.jsx",
-      "line": 80,
+      "line": 96,
       "column": 41,
       "surface": "component.components-realm-warroom",
       "tag": "button",
@@ -19315,7 +19369,7 @@
     {
       "elementId": "component.components-realm-warroom.action.ghi-chu-war-council",
       "source": "components/realm/WarRoom.jsx",
-      "line": 82,
+      "line": 98,
       "column": 40,
       "surface": "component.components-realm-warroom",
       "tag": "button",
@@ -19339,7 +19393,7 @@
     {
       "elementId": "component.components-realm-warroom.action.mo-task-erp",
       "source": "components/realm/WarRoom.jsx",
-      "line": 83,
+      "line": 99,
       "column": 18,
       "surface": "component.components-realm-warroom",
       "tag": "button",
@@ -19363,7 +19417,7 @@
     {
       "elementId": "component.components-realm-warroom.action.ve-guild-hall.2",
       "source": "components/realm/WarRoom.jsx",
-      "line": 166,
+      "line": 182,
       "column": 22,
       "surface": "component.components-realm-warroom",
       "tag": "button",
@@ -19387,7 +19441,7 @@
     {
       "elementId": "component.components-realm-warroom.action.mo-project-trong-erp",
       "source": "components/realm/WarRoom.jsx",
-      "line": 219,
+      "line": 235,
       "column": 49,
       "surface": "component.components-realm-warroom",
       "tag": "button",
@@ -19511,7 +19565,7 @@
     {
       "elementId": "component.components-shell.form-control.go-ten-khach-deal-du-an-viec-hoa-on-ticket-2-ky-tu",
       "source": "components/Shell.jsx",
-      "line": 93,
+      "line": 94,
       "column": 7,
       "surface": "component.components-shell",
       "tag": "input",
@@ -19552,7 +19606,7 @@
     {
       "elementId": "component.components-shell.action.go-g-r",
       "source": "components/Shell.jsx",
-      "line": 102,
+      "line": 103,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "div",
@@ -19594,7 +19648,7 @@
     {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 142,
+      "line": 150,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -19633,7 +19687,7 @@
     {
       "elementId": "component.components-shell.action.ong",
       "source": "components/Shell.jsx",
-      "line": 143,
+      "line": 151,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -19670,14 +19724,14 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "component.components-shell.action.truoc",
+      "elementId": "component.components-shell.action.truoc-mo",
       "source": "components/Shell.jsx",
-      "line": 146,
+      "line": 154,
       "column": 11,
       "surface": "component.components-shell",
-      "tag": "div",
+      "tag": "button",
       "kind": "action",
-      "label": "trước",
+      "label": "trước / Mở",
       "handlerEvent": "onClick",
       "handler": "() => open(n)",
       "target": "",
@@ -19706,15 +19760,12 @@
         "g.href(r)",
         "n.route"
       ],
-      "uxRiskCandidates": [
-        "clickable_non_semantic",
-        "keyboard_path_unverified"
-      ]
+      "uxRiskCandidates": []
     },
     {
       "elementId": "component.components-shell.action.ong.2",
       "source": "components/Shell.jsx",
-      "line": 183,
+      "line": 192,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -19753,7 +19804,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 185,
+      "line": 194,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -19792,7 +19843,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 186,
+      "line": 195,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -19831,7 +19882,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so",
       "source": "components/Shell.jsx",
-      "line": 191,
+      "line": 200,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -19872,7 +19923,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so.2",
       "source": "components/Shell.jsx",
-      "line": 201,
+      "line": 210,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -19913,7 +19964,7 @@
     {
       "elementId": "component.components-shell.navigation.item-key",
       "source": "components/Shell.jsx",
-      "line": 316,
+      "line": 325,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -19952,7 +20003,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 330,
+      "line": 339,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -19991,7 +20042,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 333,
+      "line": 342,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20030,7 +20081,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 342,
+      "line": 351,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -20072,7 +20123,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 345,
+      "line": 354,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20111,7 +20162,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 349,
+      "line": 358,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20150,7 +20201,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 352,
+      "line": 361,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -20520,21 +20571,21 @@
   "summary": {
     "uiRoutes": 56,
     "apiRoutes": 53,
-    "interactiveElements": 627,
+    "interactiveElements": 629,
     "sourceFilesWithInteractions": 71,
     "routesInPrimaryNavigation": 52,
     "routesWithResourceCandidates": 43,
     "byKind": {
-      "action": 387,
+      "action": 389,
       "form-control": 197,
       "form-submit": 9,
       "navigation": 34
     },
     "uxRiskCandidates": {
-      "clickable_non_semantic": 19,
+      "clickable_non_semantic": 18,
       "control_binding_unverified": 188,
-      "keyboard_path_unverified": 19,
-      "unlabelled_button_candidate": 23
+      "keyboard_path_unverified": 18,
+      "unlabelled_button_candidate": 22
     },
     "topInteractiveSources": [
       {

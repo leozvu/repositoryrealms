@@ -585,7 +585,7 @@
     {
       "elementId": "route.tickets.action.anh-dau-a-xu-ly",
       "source": "app/(app)/tickets/page.jsx",
-      "line": 122,
+      "line": 134,
       "label": "Đánh dấu đã xử lý",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -681,7 +681,7 @@
     {
       "elementId": "component.components-realm-realmnotificationbell.action.ang-xu-ly-oc-tat-ca",
       "source": "components/realm/RealmNotificationBell.jsx",
-      "line": 95,
+      "line": 130,
       "label": "Đang xử lý… / Đọc tất cả",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -921,7 +921,7 @@
     {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 142,
+      "line": 150,
       "label": "Đọc tất cả",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -933,7 +933,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 185,
+      "line": 194,
       "label": "Tắt 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -945,7 +945,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 186,
+      "line": 195,
       "label": "Bật 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",

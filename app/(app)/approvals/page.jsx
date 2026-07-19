@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Icon, useToast, EmptyState } from '@/components/ui';
 import { money, fmtDate, parseItems } from '@/lib/format';
 
@@ -22,10 +22,10 @@ function Steps({ ap }) {
   );
 }
 
-function ApCard({ ap, mine, onDecide, busy }) {
+function ApCard({ ap, mine, onDecide, busy, focused = false }) {
   const [t, icon] = TYPE_META[ap.type] || [ap.type, 'alert'];
   return (
-    <div className="ap-card">
+    <div id={`approval-${ap.id}`} className="ap-card" data-inbox-focus={focused || undefined} tabIndex={focused ? -1 : undefined}>
       <span className="ap-icon"><Icon name={icon} size={17} /></span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="ap-title">{ap.title}</div>
@@ -49,8 +49,24 @@ export default function ApprovalsPage() {
   const [data, setData] = useState(null);
   const [decidingId, setDecidingId] = useState(null);
   const toast = useToast();
+  const [focusId, setFocusId] = useState('');
+  const focusedRecordRef = useRef(null);
   const load = useCallback(() => fetch('/api/approvals').then(r => r.json()).then(setData), []);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (!data || typeof window === 'undefined') return;
+    const requested = new URLSearchParams(window.location.search).get('focus') || '';
+    if (!requested || focusedRecordRef.current === requested) return;
+    const record = [...data.toApprove, ...data.mine].find((row) => row.id === requested);
+    focusedRecordRef.current = requested;
+    if (!record) return toast('Không tìm thấy phê duyệt hoặc bạn không còn quyền xem bản ghi này.', 'error');
+    setFocusId(requested);
+    window.requestAnimationFrame(() => {
+      const target = document.getElementById(`approval-${requested}`);
+      target?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+      target?.focus({ preventScroll: true });
+    });
+  }, [data, toast]);
 
   const decide = async (ap, decision) => {
     if (decidingId) return;
@@ -80,13 +96,13 @@ export default function ApprovalsPage() {
       <div className="card">
         <div className="card-head"><span className="card-title">Chờ tôi duyệt ({data.toApprove.length})</span></div>
         {data.toApprove.length
-          ? data.toApprove.map(ap => <ApCard key={ap.id} ap={ap} busy={decidingId === ap.id} onDecide={decide} />)
+          ? data.toApprove.map(ap => <ApCard key={ap.id} ap={ap} busy={decidingId === ap.id} focused={focusId === ap.id} onDecide={decide} />)
           : <div className="card-body"><EmptyState title="Không có gì chờ bạn duyệt" sub="Báo giá lớn, khoản chi lớn và đơn nghỉ phép sẽ xuất hiện ở đây" /></div>}
       </div>
       <div className="card" style={{ marginTop: 16 }}>
         <div className="card-head"><span className="card-title">Yêu cầu của tôi</span></div>
         {data.mine.length
-          ? data.mine.map(ap => <ApCard key={ap.id} ap={ap} mine onDecide={decide} />)
+          ? data.mine.map(ap => <ApCard key={ap.id} ap={ap} mine focused={focusId === ap.id} onDecide={decide} />)
           : <div className="card-body"><EmptyState title="Bạn chưa gửi yêu cầu nào" /></div>}
       </div>
       <p style={{ fontSize: '.76rem', color: 'var(--muted)', marginTop: 10 }}>

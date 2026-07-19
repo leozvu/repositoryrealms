@@ -12,6 +12,7 @@ import { ERP_NAV } from '@/lib/erp-navigation';
 import { realmRecordHref } from '@/lib/realm-business-bridge';
 import CollaborationBridge, { WorkspaceSurfaceSwitch } from './collaboration/CollaborationBridge';
 import { useRealmChangeFeed } from './realm/useRealmChangeFeed';
+import { NOTIFICATION_SYNC_EVENT } from '@/lib/notification-inbox';
 
 /* v3.14: TỰ GẮN NHÃN CỘT CHO BẢNG.
    Toàn app có 19 trang bảng, mỗi bảng viết tay riêng. Trên điện thoại, bảng 8 cột buộc phải
@@ -121,16 +122,23 @@ function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
   const [data, setData] = useState(null);
   const router = useRouter();
   const toast = useToast();
-  const load = () => fetch('/api/notifications').then(r => r.ok ? r.json() : null).then(setData);
-  useEffect(() => { load(); }, [dataRevision]);
+  const load = useCallback(() => fetch('/api/notifications', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(setData), []);
+  useEffect(() => { load(); }, [dataRevision, load]);
+  useEffect(() => {
+    window.addEventListener(NOTIFICATION_SYNC_EVENT, load);
+    return () => window.removeEventListener(NOTIFICATION_SYNC_EVENT, load);
+  }, [load]);
   const open = async n => {
-    await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: n.id }) });
+    const response = await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: n.id }) });
+    if (!response.ok) return toast('Không thể cập nhật thông báo', 'error');
+    window.dispatchEvent(new CustomEvent(NOTIFICATION_SYNC_EVENT));
     onChanged?.(); onClose();
     if (n.route) router.push(n.route);
   };
   const readAll = async () => {
     const res = await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ all: true }) });
     if (!res.ok) return toast('Không thể cập nhật thông báo', 'error');
+    window.dispatchEvent(new CustomEvent(NOTIFICATION_SYNC_EVENT));
     onChanged?.(); await load(); toast('Đã đánh dấu tất cả thông báo là đã đọc');
   };
   const ago = t => {
@@ -138,18 +146,19 @@ function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
     return m < 60 ? m + ' phút' : m < 1440 ? Math.round(m / 60) + ' giờ' : Math.round(m / 1440) + ' ngày';
   };
   return (
-    <Modal title="Thông báo" onClose={onClose}
+    <Modal title="Raven Inbox · Thông báo ERP" onClose={onClose}
       footer={<><AsyncButton className="btn btn-outline" onClick={readAll}>Đọc tất cả</AsyncButton>
         <button className="btn btn-primary" onClick={onClose}>Đóng</button></>}>
-      <div style={{ maxHeight: 420, overflowY: 'auto' }}>
+      <div className="notification-inbox-list" aria-live="polite">
         {(data?.rows || []).map(n => (
-          <div key={n.id} className="act-item" style={{ cursor: 'pointer', opacity: n.readAt ? .55 : 1 }} onClick={() => open(n)}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: n.readAt ? 'var(--border)' : 'var(--primary)', flex: 'none', marginTop: 7 }}></span>
-            <div style={{ flex: 1 }}>
-              <div className="act-title" style={{ fontWeight: n.readAt ? 400 : 700 }}>{n.text}</div>
-              <div className="act-sub">{ago(n.createdAt)} trước</div>
-            </div>
-          </div>
+          <button type="button" key={n.id} className="notification-inbox-item" data-unread={!n.readAt || undefined} onClick={() => open(n)}>
+            <span className="notification-inbox-icon"><Icon name={n.icon || 'bell'} size={17} /></span>
+            <span className="notification-inbox-copy">
+              <span><b>{n.kindLabel || 'Realm Dispatch'}</b><small>{ago(n.createdAt)} trước</small></span>
+              <strong>{n.text}</strong>
+              <em>Mở {n.targetLabel || 'ERP · CRM'}</em>
+            </span>
+          </button>
         ))}
         {data && !data.rows.length && <p style={{ fontSize: '.85rem', color: 'var(--muted)' }}>Chưa có thông báo nào — khi bạn được gán việc, được giao ticket hoặc có yêu cầu chờ duyệt, chúng sẽ hiện ở đây.</p>}
       </div>
@@ -220,6 +229,14 @@ export default function Shell({ user, company, children }) {
   const [notificationRevision, setNotificationRevision] = useState(0);
   const [roleLabels, setRoleLabels] = useState(ROLE_LABEL);
   const [modules, setModules] = useState(null); // v3.17: null = chưa tải/công ty cũ → bật hết
+  const [todayLabel, setTodayLabel] = useState('');
+  useEffect(() => {
+    // Vercel renders in UTC while the browser uses the employee's local timezone.
+    // Resolve the label client-side so midnight never causes a hydration mismatch.
+    setTodayLabel(new Date().toLocaleDateString('vi-VN', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    }));
+  }, []);
   useEffect(() => { // v3.6: chức danh tùy biến theo công ty · v3.17: phân hệ bật/tắt
     fetch('/api/settings').then(r => r.ok ? r.json() : null)
       .then(d => {
@@ -355,7 +372,7 @@ export default function Shell({ user, company, children }) {
                 <Icon name="bell" size={15} />
                 {unreadNotif > 0 && <span className="count" style={{ position: 'absolute', top: -7, right: -7, background: 'var(--danger)', color: '#fff' }}>{unreadNotif}</span>}
               </button>
-              <span id="today-label">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+              <span id="today-label">{todayLabel}</span>
               <span className={`role-chip role-${myRoles[0]}`}>{myRoles.map(r => roleLabels[r] || r).join(' · ')}</span>
             </div>
           </header>

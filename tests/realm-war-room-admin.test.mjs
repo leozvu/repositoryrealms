@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { loadRealmWarRoomDashboard } from '../lib/realm-war-room-admin.js';
 
 function warRoomDb() {
-  const calls = { team: null, users: null, tasks: null, project: null, phases: null, milestones: null, entries: null };
+  const calls = { team: null, users: null, tasks: null, project: null, phases: null, milestones: null, entries: null, comments: null };
   return {
     calls,
     db: {
@@ -14,6 +14,7 @@ function warRoomDb() {
       phase: { findMany: async (args) => { calls.phases = args; return [{ id: 'phase-1', name: 'Launch', order: 0, color: '#336655' }]; } },
       milestone: { findMany: async (args) => { calls.milestones = args; return [{ id: 'ms-1', name: 'Go live', date: '2026-07-20', done: false }]; } },
       realmGoldEntry: { findMany: async (args) => { calls.entries = args; return []; } },
+      taskComment: { findMany: async (args) => { calls.comments = args; return [{ id: 'comment-1', taskId: 'task-1', userId: 'staff-1', content: 'Đã chốt phương án', createdAt: new Date('2026-07-17T10:00:00.000Z') }]; } },
     },
   };
 }
@@ -25,9 +26,11 @@ test('ERP War Room chỉ query Task của Project trong member scope hiện tạ
   assert.deepEqual(calls.tasks.where, { projectId: 'project-1', assigneeId: { in: ['lead-1', 'staff-1'] } });
   assert.deepEqual(calls.project.where, { id: 'project-1' });
   assert.deepEqual(calls.entries.where.sourceId, { in: ['task-1'] });
+  assert.deepEqual(calls.comments.where.taskId, { in: ['task-1'] });
   assert.equal(dashboard.source, 'erp');
   assert.equal(dashboard.campaign.owner, 'Minh Quân');
   assert.equal(dashboard.permissions.teamId, 'delivery');
+  assert.equal(dashboard.phases[0].tasks[0].comments[0].author, 'Mai Anh');
 });
 
 test('Project không có Task trong Guild trả 404 trước khi đọc metadata Project', async () => {

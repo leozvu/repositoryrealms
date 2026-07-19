@@ -18,6 +18,13 @@ function dateLabel(value) {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+const ACTIVITY = {
+  call: { label: 'Cuộc gọi', icon: 'phone' },
+  meeting: { label: 'Cuộc họp', icon: 'meeting' },
+  email: { label: 'Email', icon: 'mail' },
+  note: { label: 'Ghi chú', icon: 'note' },
+};
+
 function StateCard({ loading = false, error = '', onRetry, onBack }) {
   return (
     <section className={styles.stateCard} role={error ? 'alert' : 'status'} aria-live="polite">
@@ -51,6 +58,19 @@ function LeadCard({ lead, onOpen, onTransition, onFollowUp }) {
         <span><Icon name="staff" size={13} />{lead.owner?.name || 'Chưa phân công'}</span>
         <span><Icon name="calendar" size={13} />{dateLabel(lead.expectedClose)}</span>
       </footer>
+      {lead.activities?.length > 0 && <details className={styles.timeline}>
+        <summary><Icon name="calendar" size={14} /><span>Diplomatic log</span><b>{lead.activities.length}</b></summary>
+        <ol>
+          {lead.activities.map((activity) => {
+            const meta = ACTIVITY[activity.kind] || ACTIVITY.note;
+            return <li key={activity.id}>
+              <div><span><Icon name={meta.icon} size={12} />{meta.label}</span><b data-done={activity.done || undefined}>{activity.done ? 'Đã xong' : dateLabel(activity.date)}</b></div>
+              <strong>{activity.title}</strong>
+              <small>{activity.author}</small>
+            </li>;
+          })}
+        </ol>
+      </details>}
       {transitions.length > 0 && <div className={styles.leadActions} aria-label={`Cập nhật ${lead.company}`}>
         {transitions.map((nextState) => <button type="button" key={nextState} onClick={() => onTransition(lead, nextState)}>{realmStateLabel(nextState)}</button>)}
       </div>}

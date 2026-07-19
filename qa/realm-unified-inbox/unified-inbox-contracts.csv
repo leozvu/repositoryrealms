@@ -1,0 +1,16 @@
+id,layer,source,signals,missingSignals,status
+single-notification-source,database,prisma/schema.prisma,"model Notification | @@index([userId, createdAt]) | @@index([userId, readAt])",,verified
+private-inbox-query,api,app/api/notifications/route.js,where: { userId: user.id } | rows.map(normalizeNotificationRow) | PRIVATE_HEADERS,,verified
+scoped-read-state,api,app/api/notifications/route.js,"id: notificationId, userId: user.id, readAt: null | changed: result.count | audienceUserId: user.id",,verified
+safe-route-contract,contract,lib/notification-inbox.js,normalizeNotificationRoute | route.startsWith('//') | notificationRecordRoute | normalizeNotificationRow,,verified
+exact-record-notifications,server,lib/events.js,notificationRecordRoute('tasks' | notificationRecordRoute('leads' | notificationRecordRoute('tickets',,verified
+exact-approval-notifications,server,lib/approvals.js,"notificationRecordRoute('approvals', ap.id)",,verified
+erp-inbox-shared-sync,client,components/Shell.jsx,Raven Inbox · Thông báo ERP | NOTIFICATION_SYNC_EVENT | fetch('/api/notifications',,verified
+realm-inbox-shared-sync,client,components/realm/RealmNotificationBell.jsx,"NOTIFICATION_SYNC_EVENT | window.setInterval(refresh, 15_000) | aria-labelledby | closePanel",,verified
+approval-deep-link-consumer,client,app/(app)/approvals/page.jsx,get('focus') | scrollIntoView | data-inbox-focus,,verified
+ticket-deep-link-consumer,client,app/(app)/tickets/page.jsx,"get('focus') | setModal({ mode: 'edit', row: ticket })",,verified
+scoped-war-council-history,server,lib/realm-war-room-admin.js,taskId: { in: tasks.map | commentsByTask | comments.length < 3,,verified
+war-council-timeline-ui,client,components/realm/WarRoom.jsx,War Council gần đây | task.comments.map | dateTime={comment.createdAt,,verified
+scoped-diplomatic-history,server,lib/realm-embassy-admin.js,"where: { refType: 'lead' | activitiesByLead | select: { id: true, refId: true, kind: true, title: true, date: true, done: true, userId: true }",,verified
+diplomatic-timeline-ui,client,components/realm/RoyalEmbassy.jsx,Diplomatic log | lead.activities.map | activity.author,,verified
+accessible-responsive-inbox,style,components/realm/realm-notification-bell.module.css,min-height: 44px | :focus-visible | @media (max-width: 390px) | @media (prefers-reduced-motion: reduce),,verified

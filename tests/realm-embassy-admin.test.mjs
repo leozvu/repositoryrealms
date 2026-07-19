@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import { loadRealmEmbassyDashboard, realmEmbassyScope } from '../lib/realm-embassy-admin.js';
 
 function embassyDb() {
-  const calls = { leads: null, owners: null, clients: null };
+  const calls = { leads: null, owners: null, clients: null, activities: null };
   return {
     calls,
     db: {
       lead: { findMany: async (args) => { calls.leads = args; return [{ id: 'lead-1', name: 'Lan', company: 'Lumen', source: 'Website', value: 100_000_000, stage: 'proposal', ownerId: 'am-1', createdAt: '2026-07-01', expectedClose: '2026-07-20' }]; } },
       user: { findMany: async (args) => { calls.owners = args; return [{ id: 'am-1', name: 'Quang Võ' }]; } },
       client: { findMany: async (args) => { calls.clients = args; return [{ id: 'client-1', name: 'Green Dragon', industry: 'F&B', projects: [] }]; } },
+      activity: { findMany: async (args) => { calls.activities = args; return [{ id: 'activity-1', refId: 'lead-1', kind: 'call', title: 'Gọi xác nhận proposal', date: '2026-07-19', done: false, userId: 'am-1', note: 'must-not-leak' }]; } },
     },
   };
 }
@@ -29,7 +30,11 @@ test('AM chỉ query lead của mình hoặc chưa gán', async () => {
   assert.equal(calls.clients.select.email, undefined);
   assert.equal(calls.clients.select.phone, undefined);
   assert.equal(dashboard.permissions.scope, 'portfolio');
-  assert.equal(dashboard.stages.find((stage) => stage.id === 'proposal').leads[0].owner.name, 'Quang Võ');
+  const lead = dashboard.stages.find((stage) => stage.id === 'proposal').leads[0];
+  assert.equal(lead.owner.name, 'Quang Võ');
+  assert.equal(lead.activities[0].author, 'Quang Võ');
+  assert.equal('note' in lead.activities[0], false);
+  assert.deepEqual(calls.activities.where, { refType: 'lead', refId: { in: ['lead-1'] } });
 });
 
 test('Director đọc pipeline company scope', async () => {
