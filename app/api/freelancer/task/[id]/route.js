@@ -6,7 +6,7 @@ import { emitEvent } from '@/lib/events';
 
 export async function PUT(req, { params }) {
   let ctx;
-  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message }, { status: e.status || 403 }); }
+  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message, code: e.status === 401 ? 'unauthorized' : undefined }, { status: e.status || 403 }); }
   const { user, projectIds } = ctx;
   const task = await prisma.task.findUnique({ where: { id: params.id } });
   if (!task || task.assigneeId !== user.id || !projectIds.includes(task.projectId)) {

@@ -19,11 +19,20 @@ test('legacy API 401 payloads keep error and expose the normalized unauthorized 
   const offenders = [];
   for (const file of routeFiles(path.join(root, 'app', 'api'))) {
     const relative = path.relative(root, file).split(path.sep).join('/');
-    const lines = fs.readFileSync(file, 'utf8').split(/\r?\n/);
+    const source = fs.readFileSync(file, 'utf8');
+    const lines = source.split(/\r?\n/);
     lines.forEach((line, index) => {
       if (!/error:\s*['"`]unauthorized/i.test(line) || !/(?:status:\s*401|,\s*401\s*\))/.test(line)) return;
       if (!/code:\s*['"`]unauthorized['"`]/.test(line)) offenders.push(`${relative}:${index + 1}`);
     });
+    if (source.includes('freelancerGuard()')) {
+      lines.forEach((line, index) => {
+        if (!line.includes('freelancerGuard()') || !line.includes('NextResponse.json')) return;
+        if (!/code:\s*e\.status\s*===\s*401\s*\?\s*['"`]unauthorized['"`]/.test(line)) {
+          offenders.push(`${relative}:${index + 1}`);
+        }
+      });
+    }
   }
   assert.deepEqual(offenders, []);
 });
