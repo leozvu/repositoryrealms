@@ -16,7 +16,7 @@ const CONTRACTS = [
   { id: 'fail-soft-publisher', layer: 'server', source: 'lib/realm-change-feed.js', signals: ['safelyPublishRealmChange', 'return null'] },
   { id: 'resilient-client-poll', layer: 'client', source: 'components/realm/useRealmChangeFeed.js', signals: ['MAX_RETRY_MS', "window.addEventListener('online'", "document.addEventListener('visibilitychange'", "setState((current) => current === 'ready' ? 'stale' : 'unavailable')"] },
   { id: 'targeted-panel-invalidation', layer: 'client', source: 'components/realm/RealmOffice.jsx', signals: ['useRealmChangeFeed({', 'setRealmDataRevision((current) => current + 1)', 'dataRevision={realmDataRevision}'] },
-  { id: 'schema-readiness', layer: 'health', source: 'app/api/realm-demo/health/route.js', signals: ['to_regclass(\'"RealmChangeEvent"\')', 'evaluateRealmSchemaReadiness'] },
+  { id: 'schema-readiness', layer: 'health', source: 'lib/realm-health.js', signals: ['to_regclass(\'"RealmChangeEvent"\')', 'evaluateRealmSchemaReadiness', 'inspectRealmSchemaReadiness'] },
 ];
 
 function csvCell(value) {

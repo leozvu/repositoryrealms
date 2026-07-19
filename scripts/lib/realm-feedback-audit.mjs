@@ -23,7 +23,7 @@ const CONTRACTS = [
   { id: 'pilot-operations-queue', layer: 'client', source: 'components/realm/RealmFeedbackOperations.jsx', signals: ['Guild Support · Pilot Operations', 'Hàng chờ xử lý', 'expectedUpdatedAt', 'Lưu &amp; thông báo'] },
   { id: 'accessible-responsive-launcher', layer: 'style', source: 'components/realm/realm-feedback-launcher.module.css', signals: ['min-height: 44px', ':focus-visible', '@media (max-width: 680px)', '@media (prefers-reduced-motion: reduce)'] },
   { id: 'accessible-responsive-operations', layer: 'style', source: 'components/realm/realm-feedback-operations.module.css', signals: ['min-height: 44px', ':focus-visible', '@media (max-width: 680px)', '@media (prefers-reduced-motion: reduce)'] },
-  { id: 'shell-available-on-both-surfaces', layer: 'client', source: 'components/Shell.jsx', signals: ['RealmFeedbackLauncher', '!isFL && <RealmFeedbackLauncher />'] },
+  { id: 'shell-available-on-both-surfaces', layer: 'client', source: 'components/Shell.jsx', signals: ['RealmFeedbackLauncher', 'realmPilot?.config?.features?.feedback !== false'] },
   { id: 'schema-readiness-v8', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 8', '20260719133000_add_realm_pilot_feedback', "missing.push('pilot_feedback')"] },
 ];
 

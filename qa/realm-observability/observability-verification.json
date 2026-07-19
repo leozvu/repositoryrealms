@@ -135,8 +135,7 @@
       "source": "app/api/realm-demo/health/route.js",
       "signals": [
         "const user = await currentUser()",
-        "evaluateRealmSchemaReadiness",
-        "LATEST_REALM_MIGRATION",
+        "inspectRealmSchemaReadiness",
         "migration: 'ready'"
       ],
       "missingSignals": [],

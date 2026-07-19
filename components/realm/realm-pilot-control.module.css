@@ -46,7 +46,7 @@
 .fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
 .fieldset legend { margin-bottom: 8px; color: var(--fg); font-size: .8rem; font-weight: 750; }
 
-.optionGrid, .surfaceChoice { display: grid; gap: 8px; }
+.optionGrid, .surfaceChoice, .featureGrid { display: grid; gap: 8px; }
 .option, .surfaceChoice label {
   min-height: 58px;
   display: grid;
@@ -79,6 +79,54 @@
   cursor: pointer;
 }
 .roleSelected { border-color: #315b43 !important; background: #f0f7f2; }
+
+.featureGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.featureGrid label {
+  min-height: 82px;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--card);
+  cursor: pointer;
+}
+.featureGrid label:hover { border-color: #7e9b89; }
+.featureGrid label:focus-within { outline: 3px solid color-mix(in srgb, #315b43 32%, transparent); outline-offset: 2px; }
+.featureGrid input { width: 18px; height: 18px; margin-top: 1px; accent-color: #315b43; }
+.featureGrid strong, .featureGrid small { display: block; }
+.featureGrid strong { font-size: .77rem; }
+.featureGrid small { margin-top: 3px; color: var(--muted); font-size: .68rem; line-height: 1.45; }
+.featureEnabled { border-color: #8eaa96 !important; background: #f0f7f2 !important; }
+
+.onboardingVersion { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; padding: 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg); }
+.onboardingVersion strong, .onboardingVersion span { display: block; }
+.onboardingVersion strong { font-size: .8rem; }
+.onboardingVersion span { margin-top: 2px; color: var(--muted); font-size: .68rem; line-height: 1.4; }
+.onboardingVersion button { min-height: 44px; }
+
+.readiness { display: grid; gap: 10px; padding-top: 14px; border-top: 1px solid var(--border); }
+.readinessHeader { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.readinessHeader strong, .readinessHeader span { display: block; }
+.readinessHeader strong { font-size: .82rem; }
+.readinessHeader div span { margin-top: 2px; color: var(--muted); font-size: .68rem; }
+.readinessStatus { padding: 5px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: .68rem; font-weight: 750; white-space: nowrap; }
+.readiness_ready { color: #21613d; background: #eaf6ef; }
+.readiness_attention { color: #8a5a08; background: #fff7df; }
+.readiness_blocked { color: var(--danger); background: color-mix(in srgb, var(--danger) 8%, var(--card)); }
+.gates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.gates > div { min-height: 64px; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: start; gap: 7px; padding: 9px; border: 1px solid #e3c9c9; border-radius: 8px; background: color-mix(in srgb, var(--danger) 4%, var(--card)); }
+.gates > div[data-passed] { border-color: #c9d8ce; background: #f3f8f4; }
+.gates > div > span { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--danger); background: color-mix(in srgb, var(--danger) 9%, var(--card)); }
+.gates > div[data-passed] > span { color: #315b43; background: #deece2; }
+.gates p { min-width: 0; margin: 0; }
+.gates strong, .gates small { display: block; }
+.gates strong { font-size: .72rem; }
+.gates small { margin-top: 2px; color: var(--muted); font-size: .66rem; line-height: 1.4; }
+.gates em { color: #8a5a08; font-size: .62rem; font-style: normal; font-weight: 700; }
+.rollback { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 7px; margin: 0; padding: 9px 10px; border-radius: 8px; color: #315b43; background: #eef5f0; font-size: .69rem; line-height: 1.5; }
 
 .assurance, .privacy {
   display: flex;
@@ -118,7 +166,10 @@
 @media (max-width: 680px) {
   .header { grid-template-columns: 38px minmax(0, 1fr); }
   .status { grid-column: 2; justify-self: start; }
-  .roles, .metrics { grid-template-columns: 1fr; }
+  .roles, .metrics, .featureGrid, .gates { grid-template-columns: 1fr; }
+  .onboardingVersion { grid-template-columns: 1fr; }
+  .onboardingVersion button { width: 100%; justify-content: center; }
+  .readinessHeader { align-items: flex-start; flex-direction: column; }
   .metricsHeader, .actions { align-items: stretch; flex-direction: column; }
   .actions button { width: 100%; justify-content: center; }
 }

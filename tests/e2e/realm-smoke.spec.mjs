@@ -41,7 +41,7 @@ test('the product Realm uses the original ERP authentication boundary', async ({
 });
 
 test('cross-surface collaboration APIs preserve the ERP authentication boundary', async ({ request }) => {
-  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle', '/api/realm-demo/pilot', '/api/realm-demo/feedback']) {
+  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle', '/api/realm-demo/pilot', '/api/realm-demo/feedback', '/api/realm-demo/readiness']) {
     const response = await request.get(route);
     expect([401, 503]).toContain(response.status());
     expect(response.headers()['cache-control']).toContain('no-store');
@@ -108,6 +108,14 @@ test('director can inspect the pilot policy and switch between the same ERP data
   await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 
+  const onboarding = page.getByRole('dialog', { name: 'Realm Pilot · Khởi hành an toàn' });
+  await expect(onboarding).toBeVisible();
+  await expect(onboarding).toContainText('Một dữ liệu, hai giao diện');
+  await expect(onboarding).toContainText('không đo thời lượng');
+  for (let step = 0; step < 3; step += 1) await onboarding.getByRole('button', { name: 'Tiếp tục' }).click();
+  await onboarding.getByRole('button', { name: 'Hoàn tất hướng dẫn' }).click();
+  await expect(page.getByRole('button', { name: 'Mở hướng dẫn Realm pilot' })).toBeVisible();
+
   await page.goto('/settings');
   const pilot = page.getByRole('region', { name: 'Realm Pilot Control' });
   await expect(pilot).toBeVisible();
@@ -115,21 +123,18 @@ test('director can inspect the pilot policy and switch between the same ERP data
   await expect(pilot.getByRole('radio', { name: /Pilot theo vai trò/ })).toBeVisible();
   await expect(pilot.getByRole('radio', { name: /Mở cho nội bộ/ })).toBeVisible();
   await expect(pilot).toContainText('Không ghi thời lượng làm việc');
+  await expect(pilot.getByRole('region', { name: 'Release readiness preflight' })).toBeVisible();
+  await expect(pilot).toContainText('Feature flags phát hành độc lập');
   const feedbackOperations = page.getByRole('region', { name: 'Guild Support · Pilot Operations' });
   await expect(feedbackOperations).toBeVisible();
   await expect(feedbackOperations).toContainText('Không dùng số phản hồi để đánh giá cá nhân');
 
-  const policyResponse = await page.evaluate(async () => {
-    const current = await fetch('/api/realm-demo/pilot', { cache: 'no-store' }).then((response) => response.json());
-    const response = await fetch('/api/realm-demo/pilot', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ policy: current.policy }),
-    });
+  const readinessResponse = await page.evaluate(async () => {
+    const response = await fetch('/api/realm-demo/readiness', { cache: 'no-store' });
     return { status: response.status, payload: await response.json() };
   });
-  expect(policyResponse.status).toBe(200);
-  expect(policyResponse.payload.ok).toBe(true);
+  expect(readinessResponse.status).toBe(200);
+  expect(readinessResponse.payload.privacy.performanceTracking).toBe(false);
 
   await page.goto('/dashboard');
   await page.getByRole('button', { name: 'Gửi phản hồi về Realm pilot' }).click();
@@ -142,6 +147,39 @@ test('director can inspect the pilot policy and switch between the same ERP data
   await expect(page).toHaveURL(/\/realm$/);
   await page.getByRole('link', { name: 'Chuyển sang giao diện ERP CRM' }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
+});
+
+test('pilot onboarding remains usable on mobile', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Mobile onboarding is covered once with the authenticated mobile project.');
+  test.skip(!process.env.REALM_PILOT_E2E_EMAIL || !process.env.REALM_PILOT_E2E_PASSWORD, 'Requires an ephemeral staging Director account.');
+
+  await page.goto('/login');
+  await page.getByLabel('Email', { exact: true }).fill(process.env.REALM_PILOT_E2E_EMAIL);
+  await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.REALM_PILOT_E2E_PASSWORD);
+  await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+
+  const onboarding = page.getByRole('dialog', { name: 'Realm Pilot · Khởi hành an toàn' });
+  await expect(onboarding).toBeVisible();
+  const metrics = await onboarding.evaluate((element) => ({
+    width: element.getBoundingClientRect().width,
+    viewport: window.visualViewport?.width || document.documentElement.clientWidth,
+  }));
+  expect(metrics.width).toBeLessThanOrEqual(metrics.viewport);
+  for (const button of await onboarding.getByRole('button').all()) {
+    const height = await button.evaluate((element) => element.getBoundingClientRect().height);
+    expect(height).toBeGreaterThanOrEqual(44);
+  }
+  await onboarding.getByRole('button', { name: 'Bỏ qua lúc này' }).click();
+  const launcher = page.getByRole('button', { name: 'Mở hướng dẫn Realm pilot' });
+  await expect(launcher).toBeVisible();
+  const launcherMetrics = await launcher.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return { left: rect.left, right: rect.right, height: rect.height, viewport: window.visualViewport?.width || document.documentElement.clientWidth };
+  });
+  expect(launcherMetrics.left).toBeGreaterThanOrEqual(0);
+  expect(launcherMetrics.right).toBeLessThanOrEqual(launcherMetrics.viewport + 1);
+  expect(launcherMetrics.height).toBeGreaterThanOrEqual(44);
 });
 
 test('Realm and ERP views expose the same live character status', async ({ page }) => {

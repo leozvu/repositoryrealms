@@ -1646,12 +1646,16 @@
       "methods": {
         "GET": {
           "models": [
+            "Setting",
             "Ticket",
             "User"
           ],
           "roles": [
+            "ACCOUNTANT",
+            "AM",
             "HR",
-            "PM"
+            "PM",
+            "STAFF"
           ],
           "guards": [
             "currentUser",
@@ -1662,7 +1666,8 @@
             400,
             401,
             403,
-            500
+            500,
+            503
           ],
           "permissionPolicy": "explicit-rbac",
           "usesModuleGuard": false,
@@ -1679,6 +1684,7 @@
             "Project",
             "RealmChangeEvent",
             "Rule",
+            "Setting",
             "Task",
             "TaskEvent",
             "Ticket",
@@ -1703,7 +1709,8 @@
             401,
             403,
             409,
-            500
+            500,
+            503
           ],
           "permissionPolicy": "explicit-rbac",
           "usesModuleGuard": false,
@@ -1720,6 +1727,7 @@
             "Project",
             "RealmChangeEvent",
             "Rule",
+            "Setting",
             "Task",
             "TaskEvent",
             "Ticket",
@@ -1745,7 +1753,8 @@
             403,
             404,
             409,
-            500
+            500,
+            503
           ],
           "permissionPolicy": "explicit-rbac",
           "usesModuleGuard": false,
@@ -1971,6 +1980,41 @@
             400,
             401,
             403,
+            409,
+            500
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/realm-demo/readiness",
+      "source": "app/api/realm-demo/readiness/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CollaborationPresenceSession",
+            "Setting",
+            "Ticket",
+            "User"
+          ],
+          "roles": [
+            "ACCOUNTANT",
+            "AM",
+            "PM",
+            "STAFF"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector",
+            "isFreelancer"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
             500
           ],
           "permissionPolicy": "explicit-rbac",
@@ -2086,7 +2130,9 @@
         "GET": {
           "models": [
             "Approval",
-            "RealmGoldEntry"
+            "RealmGoldEntry",
+            "Setting",
+            "User"
           ],
           "roles": [
             "ACCOUNTANT",
@@ -2117,7 +2163,9 @@
             "AuditLog",
             "Notification",
             "RealmChangeEvent",
-            "RealmGoldEntry"
+            "RealmGoldEntry",
+            "Setting",
+            "User"
           ],
           "roles": [
             "ACCOUNTANT",
@@ -38122,7 +38170,7 @@
         {
           "callback": "onOpenEmbassy",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1921,
+          "line": 1927,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -38139,7 +38187,7 @@
         {
           "callback": "onOpenEmbassy",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2379,
+          "line": 2385,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -38927,6 +38975,7 @@
         "Project",
         "RealmChangeEvent",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "Ticket",
@@ -39333,6 +39382,7 @@
         "Project",
         "RealmChangeEvent",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "Ticket",
@@ -39461,6 +39511,7 @@
       "resourceOperations": [],
       "contextResources": [],
       "prismaModels": [
+        "Setting",
         "Ticket",
         "User"
       ],
@@ -39469,8 +39520,11 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
+        "ACCOUNTANT",
+        "AM",
         "HR",
-        "PM"
+        "PM",
+        "STAFF"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -39525,6 +39579,7 @@
       "resourceOperations": [],
       "contextResources": [],
       "prismaModels": [
+        "Setting",
         "Ticket",
         "User"
       ],
@@ -39533,8 +39588,11 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
+        "ACCOUNTANT",
+        "AM",
         "HR",
-        "PM"
+        "PM",
+        "STAFF"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -39969,6 +40027,7 @@
         "Project",
         "RealmChangeEvent",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "Ticket",
@@ -40450,7 +40509,7 @@
         {
           "callback": "onEmote",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2125,
+          "line": 2131,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -40946,7 +41005,7 @@
         {
           "callback": "onMic",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2142,
+          "line": 2148,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -41051,7 +41110,7 @@
         {
           "callback": "onCamera",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2142,
+          "line": 2148,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -41155,7 +41214,7 @@
         {
           "callback": "onShare",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2142,
+          "line": 2148,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -41208,7 +41267,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.loai",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1648,
+      "line": 1654,
       "column": 25,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41278,7 +41337,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.thu-hoi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1663,
+      "line": 1669,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41350,7 +41409,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.invitetoparty-person",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1673,
+      "line": 1679,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41424,7 +41483,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.huy",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1696,
+      "line": 1702,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41494,7 +41553,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.xac-nhan",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1697,
+      "line": 1703,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41569,7 +41628,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ket-thuc-party-roi-party",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1701,
+      "line": 1707,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41639,7 +41698,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.thu-hoi-loi-moi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1708,
+      "line": 1714,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41711,7 +41770,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.invitetoparty-person.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1718,
+      "line": 1724,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41785,7 +41844,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-toi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1773,
+      "line": 1779,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41859,7 +41918,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.hi-vay-chao",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1774,
+      "line": 1780,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -41941,7 +42000,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.partyactionlabel",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1777,
+      "line": 1783,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -42013,7 +42072,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.thi-tham-rieng-chi-nhan-uoc-tin-nhan-nay",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1788,
+      "line": 1794,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -42090,7 +42149,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.viet-loi-nhan-rieng",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1792,
+      "line": 1798,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -42162,7 +42221,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1793,
+      "line": 1799,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -42239,7 +42298,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.go-cua-erp-nguoi-nhan-ang-offline-loi-nhan-van-uoc-luu-trong-not",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1798,
+      "line": 1804,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -42328,7 +42387,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.ban-muon-trao-oi-viec-gi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1804,
+      "line": 1810,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -42400,7 +42459,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1811,
+      "line": 1817,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -42489,7 +42548,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-lantern-mail",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1822,
+      "line": 1828,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -42559,7 +42618,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1842,
+      "line": 1848,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -42668,7 +42727,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.input",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1848,
+      "line": 1854,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -42740,7 +42799,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.select",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1851,
+      "line": 1857,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "select",
@@ -42812,7 +42871,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.input.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1856,
+      "line": 1862,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -42884,7 +42943,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1859,
+      "line": 1865,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -42993,7 +43052,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1895,
+      "line": 1901,
       "column": 44,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -43102,7 +43161,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-task-erp",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1897,
+      "line": 1903,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -43172,7 +43231,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.cap-nhat-tien-o-demo",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1898,
+      "line": 1904,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -43249,7 +43308,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.buyitem-item",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1981,
+      "line": 1987,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -43323,7 +43382,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.nhan-vao-tavern",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2008,
+      "line": 2014,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -43399,7 +43458,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.gui-tin-nhan",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2010,
+      "line": 2016,
       "column": 143,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -43475,7 +43534,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.viet-tin-nhan",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2010,
+      "line": 2016,
       "column": 16,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -43547,7 +43606,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-toi.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2031,
+      "line": 2037,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -43624,7 +43683,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2049,
+      "line": 2055,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -43694,7 +43753,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.chuyen-sang-giao-dien-erp-crm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2052,
+      "line": 2058,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -43766,7 +43825,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.so-realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2053,
+      "line": 2059,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -43836,7 +43895,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.erp-crm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2056,
+      "line": 2062,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -43906,7 +43965,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.trang-thai-hien-dien",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2064,
+      "line": 2070,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "select",
@@ -43978,7 +44037,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tu-choi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2083,
+      "line": 2089,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -44050,7 +44109,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tham-gia",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2084,
+      "line": 2090,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -44124,7 +44183,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.level",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2091,
+      "line": 2097,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -44194,7 +44253,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.movetoobject-item-id",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2101,
+      "line": 2107,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -44271,7 +44330,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ho-so-nhan-vat",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2111,
+      "line": 2117,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -44341,7 +44400,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-erp-crm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2112,
+      "line": 2118,
       "column": 25,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -44411,14 +44470,14 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "component.components-realm-realmoffice.action.so-realm-tavern-ieu-hanh-erp-crm",
+      "elementId": "component.components-realm-realmoffice.action.ieu-hanh-erp-crm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2113,
+      "line": 2119,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
       "kind": "action",
-      "label": "Sổ Realm & Tavern / Điều hành ERP · CRM",
+      "label": "Điều hành ERP · CRM",
       "handlerEvent": "onClick",
       "handler": "() => setMode('ledger')",
       "target": "",
@@ -44483,7 +44542,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.e",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2138,
+      "line": 2144,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -44558,7 +44617,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-kiem-tra-thu-ong-bo",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2262,
+      "line": 2268,
       "column": 37,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -44602,7 +44661,7 @@
         {
           "callback": "onRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2346,
+          "line": 2352,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -44613,7 +44672,7 @@
         {
           "callback": "onRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2523,
+          "line": 2529,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -44656,7 +44715,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.copy-ma",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2263,
+      "line": 2269,
       "column": 48,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -44699,7 +44758,7 @@
         {
           "callback": "onCopySupportId",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2346,
+          "line": 2352,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -44710,7 +44769,7 @@
         {
           "callback": "onCopySupportId",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2523,
+          "line": 2529,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -44753,7 +44812,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.setledgerview-tab-key-if-tab-key-guild-setwarroomcampaign-null-s",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2338,
+      "line": 2344,
       "column": 18,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -44823,7 +44882,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-ho-so-erp",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2421,
+      "line": 2427,
       "column": 40,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -44893,7 +44952,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.link",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2434,
+      "line": 2440,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -44963,7 +45022,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-task-erp.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2464,
+      "line": 2470,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -45033,7 +45092,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.cap-nhat-1",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2465,
+      "line": 2471,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -45078,7 +45137,7 @@
         {
           "callback": "onAdvanceQuest",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2163,
+          "line": 2169,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -45133,7 +45192,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2466,
+      "line": 2472,
       "column": 48,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -45181,7 +45240,7 @@
         {
           "callback": "onClaimQuest",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2163,
+          "line": 2169,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [
             "POST /api/realm-demo/operations"
@@ -45278,7 +45337,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-ho-so-nhan-su-goc",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2524,
+      "line": 2530,
       "column": 38,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -45348,7 +45407,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.mo-goc-nhin-realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2525,
+      "line": 2531,
       "column": 7,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -45391,7 +45450,7 @@
         {
           "callback": "onOpenRealm",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2196,
+          "line": 2202,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -45437,7 +45496,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.thu-lai",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 96,
+      "line": 128,
       "column": 13,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -45454,7 +45513,9 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
-        "PATCH '/api/realm-demo/pilot'"
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -45470,13 +45531,15 @@
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [
-        "GET /api/realm-demo/pilot"
+        "GET /api/realm-demo/pilot",
+        "GET /api/realm-demo/readiness"
       ],
       "resourceOperations": [],
       "contextResources": [],
       "prismaModels": [
         "CollaborationPresenceSession",
         "Setting",
+        "Ticket",
         "User"
       ],
       "contextModels": [],
@@ -45503,7 +45566,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-pilot-mode",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 105,
+      "line": 137,
       "column": 21,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -45520,7 +45583,9 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
-        "PATCH '/api/realm-demo/pilot'"
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -45554,7 +45619,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.input",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 124,
+      "line": 156,
       "column": 23,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -45571,7 +45636,9 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
-        "PATCH '/api/realm-demo/pilot'"
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -45609,7 +45676,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 136,
+      "line": 168,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -45626,7 +45693,9 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
-        "PATCH '/api/realm-demo/pilot'"
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -45660,7 +45729,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface.2",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 140,
+      "line": 172,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -45677,7 +45746,9 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
-        "PATCH '/api/realm-demo/pilot'"
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -45709,9 +45780,174 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "component.components-realm-realmpilotcontrol.form-control.input.2",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 184,
+      "column": 21,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "RealmPilotControl",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "toggleFeature"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.tao-tour-v",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 196,
+      "column": 17,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "button",
+      "kind": "action",
+      "label": "Tạo tour v",
+      "handlerEvent": "onClick",
+      "handler": "() => setDraft((current) => ({ ...current, onboardingVersion: Math.min(99, current.onboardingVersion + 1) }))",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotControl",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.mo-tour-cua-toi",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 197,
+      "column": 17,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "button",
+      "kind": "action",
+      "label": "Mở tour của tôi",
+      "handlerEvent": "onClick",
+      "handler": "() => { window.dispatchEvent(new CustomEvent(REALM_ONBOARDING_RESET_EVENT)); toast('Đã mở lại hướng dẫn trên thiết bị này.'); }",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotControl",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "browser-action",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.dispatchEvent"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "component.components-realm-realmpilotcontrol.action.luu-chinh-sach-pilot",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 162,
+      "line": 233,
       "column": 15,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "AsyncButton",
@@ -45728,7 +45964,9 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
-        "PATCH '/api/realm-demo/pilot'"
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -45737,6 +45975,7 @@
       "actionType": "data-action",
       "mappingConfidence": "high",
       "handlerChain": [
+        "load",
         "save"
       ],
       "delegatedCallbacks": [],
@@ -45744,6 +45983,8 @@
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [
+        "GET /api/realm-demo/pilot",
+        "GET /api/realm-demo/readiness",
         "PATCH /api/realm-demo/pilot"
       ],
       "resourceOperations": [],
@@ -45752,6 +45993,7 @@
         "AuditLog",
         "CollaborationPresenceSession",
         "Setting",
+        "Ticket",
         "User"
       ],
       "contextModels": [],
@@ -45772,6 +46014,206 @@
       "loadingState": "async-button-guard",
       "successState": "toast-or-state",
       "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotonboarding.action.mo-huong-dan-realm-pilot",
+      "source": "components/realm/RealmPilotOnboarding.jsx",
+      "line": 90,
+      "column": 9,
+      "surface": "component.components-realm-realmpilotonboarding",
+      "tag": "button",
+      "kind": "action",
+      "label": "Mở hướng dẫn Realm pilot",
+      "handlerEvent": "onClick",
+      "handler": "() => { setStep(0); setOpen(true); }",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOnboarding",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotonboarding.action.bo-qua-luc-nay",
+      "source": "components/realm/RealmPilotOnboarding.jsx",
+      "line": 107,
+      "column": 15,
+      "surface": "component.components-realm-realmpilotonboarding",
+      "tag": "button",
+      "kind": "action",
+      "label": "Bỏ qua lúc này",
+      "handlerEvent": "onClick",
+      "handler": "() => persist('skipped')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOnboarding",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "browser-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "persist"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.localStorage.setItem"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotonboarding.action.quay-lai",
+      "source": "components/realm/RealmPilotOnboarding.jsx",
+      "line": 109,
+      "column": 28,
+      "surface": "component.components-realm-realmpilotonboarding",
+      "tag": "button",
+      "kind": "action",
+      "label": "Quay lại",
+      "handlerEvent": "onClick",
+      "handler": "() => setStep((value) => value - 1)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOnboarding",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotonboarding.action.hoan-tat-huong-dan-tiep-tuc",
+      "source": "components/realm/RealmPilotOnboarding.jsx",
+      "line": 110,
+      "column": 15,
+      "surface": "component.components-realm-realmpilotonboarding",
+      "tag": "button",
+      "kind": "action",
+      "label": "Hoàn tất hướng dẫn / Tiếp tục",
+      "handlerEvent": "onClick",
+      "handler": "() => finalStep ? persist('completed') : setStep((value) => value + 1)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "RealmPilotOnboarding",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "browser-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "persist"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.localStorage.setItem"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
       "confirmationState": "not-required",
       "uxStateCandidates": []
     },
@@ -45869,7 +46311,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -45880,7 +46322,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -45977,7 +46419,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -45988,7 +46430,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -46192,7 +46634,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -46203,7 +46645,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -46512,7 +46954,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -46523,7 +46965,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -46781,7 +47223,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -46792,7 +47234,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -46944,7 +47386,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -46955,7 +47397,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -47106,7 +47548,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -47117,7 +47559,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -47214,7 +47656,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -47225,7 +47667,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2400,
+          "line": 2406,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49000,7 +49442,7 @@
         {
           "callback": "onBack",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1943,
+          "line": 1949,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49013,7 +49455,7 @@
         {
           "callback": "onBack",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2369,
+          "line": 2375,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49081,7 +49523,7 @@
         {
           "callback": "onOpenLeads",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1943,
+          "line": 1949,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49094,7 +49536,7 @@
         {
           "callback": "onOpenLeads",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2369,
+          "line": 2375,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49520,7 +49962,9 @@
         "AuditLog",
         "Notification",
         "RealmChangeEvent",
-        "RealmGoldEntry"
+        "RealmGoldEntry",
+        "Setting",
+        "User"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -49703,7 +50147,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1964,
+          "line": 1970,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49721,7 +50165,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1964,
+          "line": 1970,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [
             "GET /api/realm-demo/operations"
@@ -49757,7 +50201,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2390,
+          "line": 2396,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49768,7 +50212,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2390,
+          "line": 2396,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49885,7 +50329,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1964,
+          "line": 1970,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49903,7 +50347,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2390,
+          "line": 2396,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49980,7 +50424,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1964,
+          "line": 1970,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -49998,7 +50442,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2390,
+          "line": 2396,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50080,7 +50524,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1964,
+          "line": 1970,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50098,7 +50542,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1964,
+          "line": 1970,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [
             "GET /api/realm-demo/operations"
@@ -50134,7 +50578,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2390,
+          "line": 2396,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50145,7 +50589,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2390,
+          "line": 2396,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50266,7 +50710,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1964,
+          "line": 1970,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50284,7 +50728,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1964,
+          "line": 1970,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [
             "GET /api/realm-demo/operations"
@@ -50320,7 +50764,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2390,
+          "line": 2396,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50331,7 +50775,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2390,
+          "line": 2396,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50808,7 +51252,7 @@
         {
           "callback": "onBack",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1907,
+          "line": 1913,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50821,7 +51265,7 @@
         {
           "callback": "onBack",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2359,
+          "line": 2365,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50889,7 +51333,7 @@
         {
           "callback": "onOpenProject",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1907,
+          "line": 1913,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -50904,7 +51348,7 @@
         {
           "callback": "onOpenProject",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2359,
+          "line": 2365,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -51229,7 +51673,7 @@
     {
       "elementId": "component.components-shell.form-control.go-ten-khach-deal-du-an-viec-hoa-on-ticket-2-ky-tu",
       "source": "components/Shell.jsx",
-      "line": 95,
+      "line": 96,
       "column": 7,
       "surface": "component.components-shell",
       "tag": "input",
@@ -51302,7 +51746,7 @@
     {
       "elementId": "component.components-shell.action.go-g-r",
       "source": "components/Shell.jsx",
-      "line": 104,
+      "line": 105,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "div",
@@ -51354,7 +51798,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 360,
+          "line": 362,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -51396,7 +51840,7 @@
     {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 151,
+      "line": 152,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -51447,7 +51891,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 361,
+          "line": 363,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -51519,7 +51963,7 @@
     {
       "elementId": "component.components-shell.action.ong",
       "source": "components/Shell.jsx",
-      "line": 152,
+      "line": 153,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -51566,7 +52010,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 361,
+          "line": 363,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -51608,7 +52052,7 @@
     {
       "elementId": "component.components-shell.action.truoc-mo",
       "source": "components/Shell.jsx",
-      "line": 155,
+      "line": 156,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "button",
@@ -51659,7 +52103,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 361,
+          "line": 363,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -51679,7 +52123,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 361,
+          "line": 363,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -51744,7 +52188,7 @@
     {
       "elementId": "component.components-shell.action.ong.2",
       "source": "components/Shell.jsx",
-      "line": 193,
+      "line": 194,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -51791,7 +52235,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 359,
+          "line": 361,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -51833,7 +52277,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 195,
+      "line": 196,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -51882,7 +52326,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 359,
+          "line": 361,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -51931,7 +52375,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 196,
+      "line": 197,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -51980,7 +52424,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 359,
+          "line": 361,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -52029,7 +52473,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so",
       "source": "components/Shell.jsx",
-      "line": 201,
+      "line": 202,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -52102,7 +52546,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so.2",
       "source": "components/Shell.jsx",
-      "line": 211,
+      "line": 212,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -52175,7 +52619,7 @@
     {
       "elementId": "component.components-shell.navigation.item-key",
       "source": "components/Shell.jsx",
-      "line": 337,
+      "line": 339,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -52246,7 +52690,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 351,
+      "line": 353,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -52317,7 +52761,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 354,
+      "line": 356,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -52391,7 +52835,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 363,
+      "line": 365,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -52465,7 +52909,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 366,
+      "line": 368,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -52536,7 +52980,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 370,
+      "line": 372,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -52607,7 +53051,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 373,
+      "line": 375,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -53397,9 +53841,11 @@
         {
           "callback": "onClick",
           "source": "components/realm/RealmPilotControl.jsx",
-          "line": 162,
+          "line": 233,
           "surface": "component:realm/RealmPilotControl",
           "apiCalls": [
+            "GET /api/realm-demo/pilot",
+            "GET /api/realm-demo/readiness",
             "PATCH /api/realm-demo/pilot"
           ],
           "resourceOperations": [],
@@ -53413,7 +53859,7 @@
         {
           "callback": "onClick",
           "source": "components/Shell.jsx",
-          "line": 151,
+          "line": 152,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/notifications",
@@ -53427,7 +53873,7 @@
         {
           "callback": "onClick",
           "source": "components/Shell.jsx",
-          "line": 195,
+          "line": 196,
           "surface": "component:Shell",
           "apiCalls": [
             "DYNAMIC /api/users/2fa"
@@ -53442,7 +53888,7 @@
         {
           "callback": "onClick",
           "source": "components/Shell.jsx",
-          "line": 196,
+          "line": 197,
           "surface": "component:Shell",
           "apiCalls": [
             "DYNAMIC /api/users/2fa"
@@ -53492,6 +53938,8 @@
         "GET /api/notifications",
         "GET /api/payroll",
         "GET /api/realm-demo/feedback",
+        "GET /api/realm-demo/pilot",
+        "GET /api/realm-demo/readiness",
         "PATCH /api/realm-demo/feedback",
         "PATCH /api/realm-demo/pilot",
         "POST /api/apikeys",
@@ -53660,7 +54108,8 @@
       "actionType": "delegated-action",
       "mappingConfidence": "high",
       "handlerChain": [
-        "close"
+        "close",
+        "persist"
       ],
       "delegatedCallbacks": [
         "onClose"
@@ -53971,6 +54420,20 @@
         },
         {
           "callback": "onClose",
+          "source": "components/realm/RealmPilotOnboarding.jsx",
+          "line": 102,
+          "surface": "component:realm/RealmPilotOnboarding",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setOpen",
+            "setStep"
+          ]
+        },
+        {
+          "callback": "onClose",
           "source": "components/realm/RoyalCommandCenter.jsx",
           "line": 72,
           "surface": "component:realm/RoyalCommandCenter",
@@ -54005,7 +54468,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 94,
+          "line": 95,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54016,7 +54479,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 150,
+          "line": 151,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54027,7 +54490,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 191,
+          "line": 192,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54067,6 +54530,7 @@
         "component:realm/RealmCreateActionDialog",
         "component:realm/RealmFeedbackLauncher",
         "component:realm/RealmFeedbackOperations",
+        "component:realm/RealmPilotOnboarding",
         "component:realm/RoyalCommandCenter",
         "component:ui",
         "route:/attendance",
@@ -54097,7 +54561,8 @@
       "rowPolicy": false,
       "scopedRead": false,
       "browserActions": [
-        "window.confirm"
+        "window.confirm",
+        "window.localStorage.setItem"
       ],
       "helperCalls": [],
       "localMutations": [
@@ -54138,7 +54603,8 @@
       "actionType": "delegated-action",
       "mappingConfidence": "high",
       "handlerChain": [
-        "close"
+        "close",
+        "persist"
       ],
       "delegatedCallbacks": [
         "onClose"
@@ -54449,6 +54915,20 @@
         },
         {
           "callback": "onClose",
+          "source": "components/realm/RealmPilotOnboarding.jsx",
+          "line": 102,
+          "surface": "component:realm/RealmPilotOnboarding",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setOpen",
+            "setStep"
+          ]
+        },
+        {
+          "callback": "onClose",
           "source": "components/realm/RoyalCommandCenter.jsx",
           "line": 72,
           "surface": "component:realm/RoyalCommandCenter",
@@ -54483,7 +54963,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 94,
+          "line": 95,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54494,7 +54974,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 150,
+          "line": 151,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54505,7 +54985,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 191,
+          "line": 192,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54545,6 +55025,7 @@
         "component:realm/RealmCreateActionDialog",
         "component:realm/RealmFeedbackLauncher",
         "component:realm/RealmFeedbackOperations",
+        "component:realm/RealmPilotOnboarding",
         "component:realm/RoyalCommandCenter",
         "component:ui",
         "route:/attendance",
@@ -54575,7 +55056,8 @@
       "rowPolicy": false,
       "scopedRead": false,
       "browserActions": [
-        "window.confirm"
+        "window.confirm",
+        "window.localStorage.setItem"
       ],
       "helperCalls": [],
       "localMutations": [
@@ -67349,31 +67831,31 @@
     }
   ],
   "summary": {
-    "elements": 683,
-    "apiContracts": 57,
+    "elements": 690,
+    "apiContracts": 58,
     "registryResources": 50,
     "byActionType": {
-      "local-state": 219,
+      "local-state": 222,
       "data-action": 95,
-      "form-control": 219,
+      "form-control": 220,
       "delegated-action": 70,
       "navigation": 57,
-      "browser-action": 15,
+      "browser-action": 18,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 498,
+      "classified-local": 505,
       "delegated-resolved": 31,
       "handler-resolved": 84,
       "delegated": 70
     },
     "byConfidence": {
-      "high": 652,
+      "high": 659,
       "medium": 31
     },
     "uxStateCandidates": {},
     "dataActions": 95,
-    "delegatedBindings": 1045,
+    "delegatedBindings": 1047,
     "actionableUnresolved": 0
   }
 }

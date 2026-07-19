@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 19,
+    "verifiedContracts": 19,
+    "scenarios": 5,
+    "verifiedScenarios": 5,
+    "additiveMigrations": 0,
+    "parallelBusinessTables": 0,
+    "aggregateOnly": true,
+    "performanceTracking": false,
+    "durationTracking": false
+  },
+  "contracts": [
+    {
+      "id": "setting-policy-feature-flags",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "REALM_PILOT_FEATURES",
+        "features: Object.freeze({ office: true, tavern: true, feedback: true })",
+        "onboardingVersion",
+        "version: 0"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "policy-optimistic-concurrency",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "draft.version !== currentConfig.version",
+        "realm_pilot_version_conflict",
+        "currentConfig.version + 1",
+        "isolationLevel: 'Serializable'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "office-kill-switch-fallback",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "code: 'realm_office_disabled'",
+        "resolvedSurface: 'erp'",
+        "ERP vẫn hoạt động bình thường"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-release-evaluation",
+      "layer": "server",
+      "source": "lib/realm-readiness.js",
+      "signals": [
+        "eligibleUsers",
+        "onlineNow",
+        "aggregateOnly: true",
+        "performanceTracking: false",
+        "durationTracking: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "rollback-without-data-reversal",
+      "layer": "server",
+      "source": "lib/realm-readiness.js",
+      "signals": [
+        "action: 'set-policy-mode-off'",
+        "fallbackRoute: '/dashboard'",
+        "preservesErpData: true",
+        "reversesMigrations: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-readiness-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/readiness/route.js",
+      "signals": [
+        "currentUser()",
+        "isDirector(user)",
+        "loadRealmLaunchReadiness",
+        "realm_readiness_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "shared-schema-inspection",
+      "layer": "health",
+      "source": "lib/realm-health.js",
+      "signals": [
+        "inspectRealmSchemaReadiness",
+        "evaluateRealmSchemaReadiness",
+        "LATEST_REALM_MIGRATION"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "device-local-onboarding",
+      "layer": "client",
+      "source": "components/realm/RealmPilotOnboarding.jsx",
+      "signals": [
+        "window.localStorage",
+        "onboardingVersion",
+        "skipped",
+        "completed"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "onboarding-reopen-and-reset",
+      "layer": "client",
+      "source": "components/realm/RealmPilotOnboarding.jsx",
+      "signals": [
+        "REALM_ONBOARDING_RESET_EVENT",
+        "Mở hướng dẫn Realm pilot",
+        "Bỏ qua lúc này",
+        "Hoàn tất hướng dẫn"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "onboarding-privacy-copy",
+      "layer": "client",
+      "source": "components/realm/RealmPilotOnboarding.jsx",
+      "signals": [
+        "không dùng để chấm hiệu suất cá nhân",
+        "Tiến độ tour không gửi lên server",
+        "không đo thời lượng"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-onboarding",
+      "layer": "style",
+      "source": "components/realm/realm-pilot-onboarding.module.css",
+      "signals": [
+        "min-height: 44px",
+        ":focus-visible",
+        "@media (max-width: 680px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "release-control-surface",
+      "layer": "client",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "signals": [
+        "Feature flags phát hành độc lập",
+        "Release readiness preflight",
+        "Tạo tour v",
+        "Tổng hợp · riêng tư"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "guild-support-server-flag",
+      "layer": "api",
+      "source": "app/api/realm-demo/feedback/route.js",
+      "signals": [
+        "decision.config.features.feedback",
+        "realm_feedback_disabled"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "tavern-server-flag",
+      "layer": "api",
+      "source": "app/api/realm-demo/treasury/route.js",
+      "signals": [
+        "loadRealmPilotDecision",
+        "decision.config.features.tavern",
+        "realm_tavern_disabled"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "tavern-client-flag",
+      "layer": "client",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "pilotFeatures?.tavern !== false",
+        "['treasury', 'shop'].includes(panel)",
+        "Sổ Realm"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "shell-feature-enforcement",
+      "layer": "client",
+      "source": "components/Shell.jsx",
+      "signals": [
+        "realmPilot?.config?.features?.feedback !== false",
+        "RealmPilotOnboarding",
+        "RealmFeedbackLauncher"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "product-route-passes-feature-contract",
+      "layer": "server",
+      "source": "app/(app)/realm/page.jsx",
+      "signals": [
+        "pilotFeatures={pilot.config.features}",
+        "loadRealmPilotDecision"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "release-rollback-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-12-PILOT-RUNBOOK.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "mode = off",
+        "/dashboard",
+        "Không đảo migration",
+        "Không restore dữ liệu"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-onboarding-uat",
+      "layer": "test",
+      "source": "tests/e2e/realm-smoke.spec.mjs",
+      "signals": [
+        "Realm Pilot · Khởi hành an toàn",
+        "Mở hướng dẫn Realm pilot",
+        "pilot onboarding remains usable on mobile"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "safe-pilot-ready",
+      "expected": "ready:true:0",
+      "actual": "ready:true:0",
+      "status": "verified"
+    },
+    {
+      "id": "broad-rollout-blocked",
+      "expected": "blocked:false",
+      "actual": "blocked:false",
+      "status": "verified"
+    },
+    {
+      "id": "tavern-can-follow-office",
+      "expected": "attention:true:1",
+      "actual": "attention:true:1",
+      "status": "verified"
+    },
+    {
+      "id": "office-disabled-forces-erp",
+      "expected": "false:erp:realm_office_disabled",
+      "actual": "false:erp:realm_office_disabled",
+      "status": "verified"
+    },
+    {
+      "id": "legacy-policy-safe-defaults",
+      "expected": "true:true:true:1:0",
+      "actual": "true:true:true:1:0",
+      "status": "verified"
+    }
+  ]
+}

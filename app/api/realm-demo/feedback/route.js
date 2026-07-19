@@ -10,6 +10,7 @@ import {
 import { RealmOperationError } from '@/lib/realm-operation';
 import { realmErrorResponse, realmJsonResponse } from '@/lib/realm-api-response';
 import { startRealmApiRequest } from '@/lib/realm-observability';
+import { loadRealmPilotDecision } from '@/lib/realm-pilot';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -19,6 +20,13 @@ async function authenticatedUser() {
   if (!user) throw new RealmOperationError('Bạn cần đăng nhập ERP.', 401, 'unauthorized');
   if (isFreelancer(user)) throw new RealmOperationError('Realm pilot chỉ dành cho nhân sự nội bộ.', 403, 'freelancer_forbidden');
   return user;
+}
+
+async function requireFeedbackFeature(user) {
+  const decision = await loadRealmPilotDecision(prisma, user);
+  if (!decision.config.features.feedback) {
+    throw new RealmOperationError('Guild Support đang tạm tắt; hãy liên hệ quản lý qua ERP.', 503, 'realm_feedback_disabled');
+  }
 }
 
 async function feedbackHandlers() {
@@ -33,6 +41,7 @@ export async function GET(request) {
   const trace = startRealmApiRequest(request, { route: 'realm.feedback', operation: 'feedback.read' });
   try {
     const user = await authenticatedUser();
+    await requireFeedbackFeature(user);
     const mine = new URL(request.url).searchParams.get('scope') === 'mine';
     const overview = await loadRealmFeedbackOverview(prisma, user, { mine });
     return realmJsonResponse(trace, overview, { code: 'realm_feedback_ready' });
@@ -48,6 +57,7 @@ export async function POST(request) {
   const trace = startRealmApiRequest(request, { route: 'realm.feedback', operation: 'feedback.create' });
   try {
     const user = await authenticatedUser();
+    await requireFeedbackFeature(user);
     const body = await request.json().catch(() => ({}));
     const feedback = await createRealmFeedback(
       prisma,
@@ -82,6 +92,7 @@ export async function PATCH(request) {
   const trace = startRealmApiRequest(request, { route: 'realm.feedback', operation: 'feedback.update' });
   try {
     const user = await authenticatedUser();
+    await requireFeedbackFeature(user);
     const body = await request.json().catch(() => ({}));
     const feedback = await updateRealmFeedback(prisma, user, body.id, body);
     await emitEvent('tickets', 'update', feedback, null, user);

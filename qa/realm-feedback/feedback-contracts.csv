@@ -15,5 +15,5 @@ erp-safe-fallback,client,components/realm/RealmFeedbackLauncher.jsx,"persistWork
 pilot-operations-queue,client,components/realm/RealmFeedbackOperations.jsx,Guild Support · Pilot Operations | Hàng chờ xử lý | expectedUpdatedAt | Lưu &amp; thông báo,,,verified
 accessible-responsive-launcher,style,components/realm/realm-feedback-launcher.module.css,min-height: 44px | :focus-visible | @media (max-width: 680px) | @media (prefers-reduced-motion: reduce),,,verified
 accessible-responsive-operations,style,components/realm/realm-feedback-operations.module.css,min-height: 44px | :focus-visible | @media (max-width: 680px) | @media (prefers-reduced-motion: reduce),,,verified
-shell-available-on-both-surfaces,client,components/Shell.jsx,RealmFeedbackLauncher | !isFL && <RealmFeedbackLauncher />,,,verified
+shell-available-on-both-surfaces,client,components/Shell.jsx,RealmFeedbackLauncher | realmPilot?.config?.features?.feedback !== false,,,verified
 schema-readiness-v8,health,lib/realm-health.js,REALM_SCHEMA_VERSION = 8 | 20260719133000_add_realm_pilot_feedback | missing.push('pilot_feedback'),,,verified

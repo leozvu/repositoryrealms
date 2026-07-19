@@ -8,4 +8,4 @@ payload-free-response,server,lib/realm-change-feed.js,"select: { id: true, creat
 fail-soft-publisher,server,lib/realm-change-feed.js,safelyPublishRealmChange | return null,,verified
 resilient-client-poll,client,components/realm/useRealmChangeFeed.js,MAX_RETRY_MS | window.addEventListener('online' | document.addEventListener('visibilitychange' | setState((current) => current === 'ready' ? 'stale' : 'unavailable'),,verified
 targeted-panel-invalidation,client,components/realm/RealmOffice.jsx,useRealmChangeFeed({ | setRealmDataRevision((current) => current + 1) | dataRevision={realmDataRevision},,verified
-schema-readiness,health,app/api/realm-demo/health/route.js,"to_regclass('""RealmChangeEvent""') | evaluateRealmSchemaReadiness",,verified
+schema-readiness,health,lib/realm-health.js,"to_regclass('""RealmChangeEvent""') | evaluateRealmSchemaReadiness | inspectRealmSchemaReadiness",,verified

@@ -22,7 +22,7 @@ const CONTRACTS = [
   { id: 'private-no-store', source: 'lib/realm-api-response.js', signals: ["'Cache-Control': 'private, no-cache, no-store, max-age=0'", "Vary: 'Cookie'"] },
   { id: 'error-support-id', source: 'lib/realm-api-response.js', signals: ['requestId: observed.event.requestId', 'realmErrorResponse'] },
   { id: 'safe-exception-log', source: 'lib/realm-observability.js', signals: ['safeRealmException', 'errorName:', 'Logging failure is non-fatal'] },
-  { id: 'authenticated-health', source: 'app/api/realm-demo/health/route.js', signals: ['const user = await currentUser()', 'evaluateRealmSchemaReadiness', 'LATEST_REALM_MIGRATION', "migration: 'ready'"] },
+  { id: 'authenticated-health', source: 'app/api/realm-demo/health/route.js', signals: ['const user = await currentUser()', 'inspectRealmSchemaReadiness', "migration: 'ready'"] },
   { id: 'client-trace-capture', source: 'components/realm/RealmOffice.jsx', signals: ['function realmTraceFromResponse', "headers?.get('X-Realm-Request-Id')", "headers?.get('X-Realm-Duration-Ms')"] },
   { id: 'support-copy-ux', source: 'components/realm/RealmOffice.jsx', signals: ['copyRealmSupportId', 'Copy mã', 'Mã hỗ trợ'] },
 ];

@@ -739,8 +739,10 @@ function MediaDock({
   );
 }
 
-function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', initialBridge = null }) {
+function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null }) {
   const toast = useToast();
+  const tavernEnabled = pilotFeatures?.tavern !== false;
+  const realmNav = useMemo(() => tavernEnabled ? NAV : NAV.filter((item) => !['treasury', 'shop'].includes(item.id)), [tavernEnabled]);
   const dataSource = useMemo(
     () => realmDataSourceMode({ erpHref, syncEnabled: ERP_SYNC_REQUESTED }),
     [erpHref],
@@ -1170,6 +1172,10 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
   }, []);
 
   const openAuthorizedPanel = useCallback((panel, { campaign = null, announce = '' } = {}) => {
+    if (!tavernEnabled && ['treasury', 'shop'].includes(panel)) {
+      toast('Tavern đang tạm tắt theo release policy.', 'error');
+      return false;
+    }
     const access = realmAccessForPanel(businessBridge?.access, panel);
     if (!access.allowed) {
       toast(access.reason || 'Session ERP không có quyền mở khu vực này.', 'error');
@@ -1180,7 +1186,7 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
     setActivePanel(panel);
     if (announce) toast(announce);
     return true;
-  }, [businessBridge, toast]);
+  }, [businessBridge, tavernEnabled, toast]);
 
   const openObject = useCallback((object) => {
     openAuthorizedPanel(object.panel, { announce: `Đã mở ${object.name}` });
@@ -2095,7 +2101,7 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
           </button>
           <nav>
             <span className={styles.navLabel}>Vương quốc</span>
-            {NAV.map((item) => {
+            {realmNav.map((item) => {
               const access = realmAccessForPanel(businessBridge?.access, item.id);
               return (
                 <button type="button" key={item.id} disabled={!access.allowed} title={!access.allowed ? access.reason : undefined}
@@ -2110,7 +2116,7 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
             <span className={styles.navLabel}>Hệ thống</span>
             <button type="button" className={activePanel === 'profile' && mode === 'world' ? styles.navActive : ''} onClick={() => { setMode('world'); setActivePanel('profile'); }}><Icon name="staff" size={18} /><span>Hồ sơ nhân vật</span></button>
             {erpHref && <Link href={erpHref} onClick={() => persistWorkspaceSurface('erp')}><Icon name="reports" size={18} /><span>Mở ERP · CRM</span></Link>}
-            <button type="button" className={mode === 'ledger' ? styles.navActive : ''} onClick={() => setMode('ledger')}><Icon name="wallet" size={18} /><span>{erpHref ? 'Sổ Realm & Tavern' : 'Điều hành ERP · CRM'}</span></button>
+            <button type="button" className={mode === 'ledger' ? styles.navActive : ''} onClick={() => setMode('ledger')}><Icon name="wallet" size={18} /><span>{erpHref ? (tavernEnabled ? 'Sổ Realm & Tavern' : 'Sổ Realm') : 'Điều hành ERP · CRM'}</span></button>
           </nav>
           <div className={styles.onlineSummary}><span><i />{onlineCount} online</span><small>{TRANSPORT[transportState]?.short || 'Solo mode'}</small></div>
         </aside>
@@ -2527,6 +2533,6 @@ function CharacterDossier({ profile, playerStatus, career, wallet, operationsSou
   );
 }
 
-export default function RealmOffice({ erpHref = null, workspaceLabel = 'Demo entity', initialBridge = null }) {
-  return <ToastProvider><RealmOfficeInner erpHref={erpHref} workspaceLabel={workspaceLabel} initialBridge={initialBridge} /></ToastProvider>;
+export default function RealmOffice({ erpHref = null, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null }) {
+  return <ToastProvider><RealmOfficeInner erpHref={erpHref} workspaceLabel={workspaceLabel} initialBridge={initialBridge} pilotFeatures={pilotFeatures} /></ToastProvider>;
 }

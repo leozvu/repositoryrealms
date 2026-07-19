@@ -32,6 +32,7 @@ export default async function RealmPage() {
       erpHref="/dashboard"
       workspaceLabel="ERP · CRM companion"
       initialBridge={initialBridge}
+      pilotFeatures={pilot.config.features}
     />
   );
 }

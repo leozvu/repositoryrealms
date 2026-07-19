@@ -237,7 +237,7 @@
       "source": "components/Shell.jsx",
       "signals": [
         "RealmFeedbackLauncher",
-        "!isFL && <RealmFeedbackLauncher />"
+        "realmPilot?.config?.features?.feedback !== false"
       ],
       "missingSignals": [],
       "forbiddenSignals": [],

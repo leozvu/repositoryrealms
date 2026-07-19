@@ -12,6 +12,7 @@ import {
 import { realmErrorResponse, realmJsonResponse } from '@/lib/realm-api-response';
 import { startRealmApiRequest } from '@/lib/realm-observability';
 import { safelyPublishRealmChange } from '@/lib/realm-change-feed';
+import { loadRealmPilotDecision } from '@/lib/realm-pilot';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -28,6 +29,9 @@ async function authorizedUser() {
   const user = await currentUser();
   if (!user) throw new RealmOperationError('Bạn cần đăng nhập ERP.', 401, 'unauthorized');
   if (isFreelancer(user)) throw new RealmOperationError('Tài khoản freelancer chưa tham gia chương trình Gold.', 403, 'freelancer_forbidden');
+  const decision = await loadRealmPilotDecision(prisma, user);
+  if (!decision.allowed) throw new RealmOperationError(decision.reason, 403, decision.code);
+  if (!decision.config.features.tavern) throw new RealmOperationError('Tavern đang tạm tắt theo release policy.', 503, 'realm_tavern_disabled');
   return user;
 }
 

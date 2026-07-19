@@ -1,0 +1,20 @@
+id,layer,source,signals,missingSignals,status
+setting-policy-feature-flags,server,lib/realm-pilot.js,"REALM_PILOT_FEATURES | features: Object.freeze({ office: true, tavern: true, feedback: true }) | onboardingVersion | version: 0",,verified
+policy-optimistic-concurrency,server,lib/realm-pilot.js,draft.version !== currentConfig.version | realm_pilot_version_conflict | currentConfig.version + 1 | isolationLevel: 'Serializable',,verified
+office-kill-switch-fallback,server,lib/realm-pilot.js,code: 'realm_office_disabled' | resolvedSurface: 'erp' | ERP vẫn hoạt động bình thường,,verified
+aggregate-release-evaluation,server,lib/realm-readiness.js,eligibleUsers | onlineNow | aggregateOnly: true | performanceTracking: false | durationTracking: false,,verified
+rollback-without-data-reversal,server,lib/realm-readiness.js,action: 'set-policy-mode-off' | fallbackRoute: '/dashboard' | preservesErpData: true | reversesMigrations: false,,verified
+director-readiness-api,api,app/api/realm-demo/readiness/route.js,currentUser() | isDirector(user) | loadRealmLaunchReadiness | realm_readiness_forbidden,,verified
+shared-schema-inspection,health,lib/realm-health.js,inspectRealmSchemaReadiness | evaluateRealmSchemaReadiness | LATEST_REALM_MIGRATION,,verified
+device-local-onboarding,client,components/realm/RealmPilotOnboarding.jsx,window.localStorage | onboardingVersion | skipped | completed,,verified
+onboarding-reopen-and-reset,client,components/realm/RealmPilotOnboarding.jsx,REALM_ONBOARDING_RESET_EVENT | Mở hướng dẫn Realm pilot | Bỏ qua lúc này | Hoàn tất hướng dẫn,,verified
+onboarding-privacy-copy,client,components/realm/RealmPilotOnboarding.jsx,không dùng để chấm hiệu suất cá nhân | Tiến độ tour không gửi lên server | không đo thời lượng,,verified
+accessible-responsive-onboarding,style,components/realm/realm-pilot-onboarding.module.css,min-height: 44px | :focus-visible | @media (max-width: 680px) | @media (prefers-reduced-motion: reduce),,verified
+release-control-surface,client,components/realm/RealmPilotControl.jsx,Feature flags phát hành độc lập | Release readiness preflight | Tạo tour v | Tổng hợp · riêng tư,,verified
+guild-support-server-flag,api,app/api/realm-demo/feedback/route.js,decision.config.features.feedback | realm_feedback_disabled,,verified
+tavern-server-flag,api,app/api/realm-demo/treasury/route.js,loadRealmPilotDecision | decision.config.features.tavern | realm_tavern_disabled,,verified
+tavern-client-flag,client,components/realm/RealmOffice.jsx,"pilotFeatures?.tavern !== false | ['treasury', 'shop'].includes(panel) | Sổ Realm",,verified
+shell-feature-enforcement,client,components/Shell.jsx,realmPilot?.config?.features?.feedback !== false | RealmPilotOnboarding | RealmFeedbackLauncher,,verified
+product-route-passes-feature-contract,server,app/(app)/realm/page.jsx,pilotFeatures={pilot.config.features} | loadRealmPilotDecision,,verified
+release-rollback-runbook,operations,docs/realms/PHASE-12-PILOT-RUNBOOK.md,crmegoric-realms-demo | mode = off | /dashboard | Không đảo migration | Không restore dữ liệu,,verified
+authenticated-onboarding-uat,test,tests/e2e/realm-smoke.spec.mjs,Realm Pilot · Khởi hành an toàn | Mở hướng dẫn Realm pilot | pilot onboarding remains usable on mobile,,verified

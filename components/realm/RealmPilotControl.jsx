@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AsyncButton, Icon, useToast } from '@/components/ui';
 import { ROLES, ROLE_LABEL } from '@/lib/perm';
+import { REALM_ONBOARDING_RESET_EVENT } from './RealmPilotOnboarding';
 import styles from './realm-pilot-control.module.css';
 
 const MODE_OPTIONS = [
@@ -11,7 +12,17 @@ const MODE_OPTIONS = [
   { value: 'open', label: 'Mở cho nội bộ', description: 'Mọi nhân sự nội bộ có thể tự chọn Realm hoặc ERP.' },
 ];
 
-const EMPTY_POLICY = { mode: 'off', defaultSurface: 'erp', roles: [] };
+const FEATURE_OPTIONS = [
+  { value: 'office', label: 'Văn phòng Realm', description: 'Bật route, navigation và trải nghiệm virtual office cho cohort.' },
+  { value: 'tavern', label: 'Tavern', description: 'Bật Gold ledger, trang đổi thưởng và fulfillment có maker–checker.' },
+  { value: 'feedback', label: 'Guild Support', description: 'Cho cohort gửi phản hồi thành Ticket ERP và nhận cập nhật.' },
+];
+
+const EMPTY_POLICY = {
+  mode: 'off', defaultSurface: 'erp', roles: [],
+  features: { office: true, tavern: true, feedback: true },
+  onboardingVersion: 1, version: 0,
+};
 
 function Metric({ label, value, detail }) {
   return (
@@ -25,17 +36,24 @@ function Metric({ label, value, detail }) {
 
 export default function RealmPilotControl() {
   const toast = useToast();
-  const [state, setState] = useState({ loading: true, error: '', policy: EMPTY_POLICY, metrics: null });
+  const [state, setState] = useState({ loading: true, error: '', policy: EMPTY_POLICY, metrics: null, readiness: null });
   const [draft, setDraft] = useState(EMPTY_POLICY);
 
   const load = useCallback(async () => {
     setState((current) => ({ ...current, loading: true, error: '' }));
     try {
-      const response = await fetch('/api/realm-demo/pilot', { cache: 'no-store' });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error || 'Không thể tải Realm pilot.');
-      setState({ loading: false, error: '', policy: payload.policy, metrics: payload.metrics });
-      setDraft(payload.policy);
+      const [pilotResponse, readinessResponse] = await Promise.all([
+        fetch('/api/realm-demo/pilot', { cache: 'no-store' }),
+        fetch('/api/realm-demo/readiness', { cache: 'no-store' }),
+      ]);
+      const [pilotPayload, readinessPayload] = await Promise.all([
+        pilotResponse.json().catch(() => ({})),
+        readinessResponse.json().catch(() => ({})),
+      ]);
+      if (!pilotResponse.ok) throw new Error(pilotPayload.error || 'Không thể tải Realm pilot.');
+      if (!readinessResponse.ok) throw new Error(readinessPayload.error || 'Không thể chạy preflight Realm.');
+      setState({ loading: false, error: '', policy: pilotPayload.policy, metrics: pilotPayload.metrics, readiness: readinessPayload });
+      setDraft(pilotPayload.policy);
     } catch (error) {
       setState((current) => ({ ...current, loading: false, error: error.message || 'Không thể tải Realm pilot.' }));
     }
@@ -52,6 +70,17 @@ export default function RealmPilotControl() {
     }));
   };
 
+  const toggleFeature = (feature) => {
+    setDraft((current) => {
+      const enabled = !current.features?.[feature];
+      return {
+        ...current,
+        ...(feature === 'office' && !enabled ? { defaultSurface: 'erp' } : {}),
+        features: { ...current.features, [feature]: enabled },
+      };
+    });
+  };
+
   const save = async () => {
     if (draft.mode === 'pilot' && draft.roles.length === 0) {
       toast('Hãy chọn ít nhất một vai trò cho cohort pilot.', 'error');
@@ -64,10 +93,13 @@ export default function RealmPilotControl() {
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
+      if (response.status === 409) await load();
       toast(payload.error || 'Không thể lưu Realm pilot.', 'error');
       return false;
     }
-    setState({ loading: false, error: '', policy: payload.policy, metrics: payload.metrics });
+    const readinessResponse = await fetch('/api/realm-demo/readiness', { cache: 'no-store' });
+    const readiness = readinessResponse.ok ? await readinessResponse.json() : null;
+    setState({ loading: false, error: '', policy: payload.policy, metrics: payload.metrics, readiness });
     setDraft(payload.policy);
     toast('Đã cập nhật Realm pilot. ERP cổ điển vẫn luôn khả dụng.');
     return true;
@@ -143,6 +175,45 @@ export default function RealmPilotControl() {
               </div>
               <p className={styles.assurance}><Icon name="check" size={15} /> Mỗi nhân sự luôn có thể đổi lại ERP; dữ liệu nghiệp vụ vẫn dùng chung một nguồn.</p>
             </fieldset>
+
+            <fieldset className={styles.fieldset}>
+              <legend>Feature flags phát hành độc lập</legend>
+              <div className={styles.featureGrid}>
+                {FEATURE_OPTIONS.map((feature) => (
+                  <label key={feature.value} className={draft.features?.[feature.value] ? styles.featureEnabled : ''}>
+                    <input type="checkbox" checked={draft.features?.[feature.value] !== false} onChange={() => toggleFeature(feature.value)} />
+                    <span><strong>{feature.label}</strong><small>{feature.description}</small></span>
+                  </label>
+                ))}
+              </div>
+              <p className={styles.assurance}><Icon name="shield" size={15} /> Tắt Office hoặc chuyển mode sang “Tạm đóng” luôn đưa người dùng về ERP; không rollback migration.</p>
+            </fieldset>
+
+            <fieldset className={styles.fieldset}>
+              <legend>Phiên bản onboarding</legend>
+              <div className={styles.onboardingVersion}>
+                <div><strong>Tour v{draft.onboardingVersion}</strong><span>Tăng phiên bản để cohort thấy lại hướng dẫn ở lần mở tiếp theo.</span></div>
+                <button type="button" className="btn btn-outline btn-sm" onClick={() => setDraft((current) => ({ ...current, onboardingVersion: Math.min(99, current.onboardingVersion + 1) }))}>Tạo tour v{Math.min(99, draft.onboardingVersion + 1)}</button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => { window.dispatchEvent(new CustomEvent(REALM_ONBOARDING_RESET_EVENT)); toast('Đã mở lại hướng dẫn trên thiết bị này.'); }}>Mở tour của tôi</button>
+              </div>
+            </fieldset>
+
+            <section className={styles.readiness} aria-labelledby="realm-readiness-title">
+              <div className={styles.readinessHeader}>
+                <div><strong id="realm-readiness-title">Release readiness preflight</strong><span>Gate tổng hợp trước khi mời cohort thật.</span></div>
+                <span className={`${styles.readinessStatus} ${styles[`readiness_${state.readiness?.status || 'blocked'}`]}`}>{state.readiness?.status === 'ready' ? 'Sẵn sàng' : state.readiness?.status === 'attention' ? 'Cần chú ý' : 'Đang bị chặn'}</span>
+              </div>
+              <div className={styles.gates}>
+                {(state.readiness?.gates || []).map((gate) => (
+                  <div key={gate.id} data-passed={gate.passed || undefined}>
+                    <span><Icon name={gate.passed ? 'check' : 'alert'} size={15} /></span>
+                    <p><strong>{gate.label}</strong><small>{gate.detail}</small></p>
+                    {!gate.blocking && <em>Khuyến nghị</em>}
+                  </div>
+                ))}
+              </div>
+              <p className={styles.rollback}><Icon name="repeat" size={15} /> Rollback vận hành: chuyển mode sang “Tạm đóng”, xác minh <code>/dashboard</code>; giữ nguyên dữ liệu ERP và migration đã áp dụng.</p>
+            </section>
 
             <div className={styles.metricsHeader}>
               <div><strong>Adoption snapshot</strong><span>Hiện diện hoạt động trong 90 giây gần nhất.</span></div>

@@ -21,7 +21,7 @@ Phase 3 thêm kênh invalidation gần thời gian thực dùng chung database s
 | fail-soft-publisher | server | lib/realm-change-feed.js | verified |
 | resilient-client-poll | client | components/realm/useRealmChangeFeed.js | verified |
 | targeted-panel-invalidation | client | components/realm/RealmOffice.jsx | verified |
-| schema-readiness | health | app/api/realm-demo/health/route.js | verified |
+| schema-readiness | health | lib/realm-health.js | verified |
 
 ## Cơ chế đã khóa
 

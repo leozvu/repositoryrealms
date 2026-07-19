@@ -417,10 +417,10 @@ a.link:hover{text-decoration:underline}
    Modal cũ có padding 38px trên/dưới + max-height trừ 220px: trên máy 375px thì phần thân
    còn rất ít, form dài phải cuộn trong một khung bé tí. */
 @media(max-width:640px){
-  .modal-overlay{padding:0;align-items:flex-end}
-  .modal,.modal.modal-lg{max-width:100%;border-radius:16px 16px 0 0;max-height:94dvh;display:flex;flex-direction:column}
-  .modal-body{max-height:none;flex:1;padding:16px}
-  .modal-head,.modal-foot{padding:14px 16px}
+  .modal-overlay{inset:0 auto auto 0;width:100dvw;height:100dvh;padding:0;align-items:flex-end}
+  .modal,.modal.modal-lg{max-width:100%;border-radius:16px 16px 0 0;max-height:94dvh;display:flex;flex-direction:column;overflow:hidden}
+  .modal-body{max-height:none;min-height:0;flex:1;padding:16px}
+  .modal-head,.modal-foot{position:relative;z-index:1;flex:none;padding:14px 16px;background:var(--card)}
   /* nút trong modal xếp dọc, đủ rộng để bấm bằng ngón cái */
   .modal-foot{flex-direction:column-reverse;gap:8px}
   .modal-foot .btn{width:100%;justify-content:center}

@@ -114,10 +114,11 @@
     {
       "id": "schema-readiness",
       "layer": "health",
-      "source": "app/api/realm-demo/health/route.js",
+      "source": "lib/realm-health.js",
       "signals": [
         "to_regclass('\"RealmChangeEvent\"')",
-        "evaluateRealmSchemaReadiness"
+        "evaluateRealmSchemaReadiness",
+        "inspectRealmSchemaReadiness"
       ],
       "missingSignals": [],
       "status": "verified"

@@ -9,6 +9,7 @@ import {
   realmPilotDecision,
   saveRealmPilotConfig,
   saveRealmWorkspacePreference,
+  realmPilotFeatureEnabled,
 } from '../lib/realm-pilot.js';
 
 const DIRECTOR = { id: 'director-1', name: 'Director', role: 'DIRECTOR', roles: '["DIRECTOR"]', status: 'active', userType: 'employee' };
@@ -34,11 +35,19 @@ test('pilot config and workspace preferences normalize untrusted values safely',
   assert.equal(normalizeRealmWorkspacePreference('unknown'), 'auto');
   assert.deepEqual(normalizeRealmPilotConfig({ mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF', 'STAFF', 'INVALID'] }), {
     mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF'],
+    features: { office: true, tavern: true, feedback: true }, onboardingVersion: 1, version: 0,
   });
+  const flags = normalizeRealmPilotConfig({ features: { office: false, tavern: false }, onboardingVersion: 120, version: 4 });
+  assert.deepEqual(flags.features, { office: false, tavern: false, feedback: true });
+  assert.equal(flags.onboardingVersion, 99);
+  assert.equal(flags.version, 4);
+  assert.equal(realmPilotFeatureEnabled(flags, 'tavern'), false);
+  assert.equal(realmPilotFeatureEnabled(flags, 'unknown'), false);
   assert.deepEqual(normalizeRealmPilotConfig({ mode: 'invalid', defaultSurface: 'invalid' }), DEFAULT_REALM_PILOT_CONFIG);
   assert.deepEqual(parseRealmPilotConfig('{broken'), DEFAULT_REALM_PILOT_CONFIG);
   assert.deepEqual(parseRealmPilotConfig(JSON.stringify({ realmPilot: { mode: 'off', roles: [] } })), {
     mode: 'off', defaultSurface: 'erp', roles: [],
+    features: { office: true, tavern: true, feedback: true }, onboardingVersion: 1, version: 0,
   });
 });
 
@@ -51,6 +60,10 @@ test('pilot decision keeps ERP as fallback and enforces internal cohorts', () =>
   const disabled = realmPilotDecision(STAFF, { mode: 'off', defaultSurface: 'realm' }, 'realm');
   assert.equal(disabled.code, 'realm_pilot_disabled');
   assert.equal(disabled.resolvedSurface, 'erp');
+
+  const officeDisabled = realmPilotDecision(STAFF, { mode: 'pilot', roles: ['STAFF'], features: { office: false } }, 'realm');
+  assert.equal(officeDisabled.code, 'realm_office_disabled');
+  assert.equal(officeDisabled.resolvedSurface, 'erp');
 
   const denied = realmPilotDecision(STAFF, { mode: 'pilot', defaultSurface: 'realm', roles: ['PM'] }, 'realm');
   assert.equal(denied.code, 'realm_pilot_cohort_required');
@@ -122,11 +135,20 @@ test('only directors can save a valid pilot policy while preserving company sett
   await assert.rejects(() => saveRealmPilotConfig(db, STAFF, { mode: 'open' }), (error) => error.code === 'realm_pilot_admin_forbidden');
   await assert.rejects(() => saveRealmPilotConfig(db, DIRECTOR, { mode: 'pilot', roles: [] }), (error) => error.code === 'realm_pilot_roles_required');
   const saved = await saveRealmPilotConfig(db, DIRECTOR, { mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF', 'INVALID'] });
-  assert.deepEqual(saved, { mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF'] });
+  assert.deepEqual(saved, {
+    mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF'],
+    features: { office: true, tavern: true, feedback: true }, onboardingVersion: 1, version: 1,
+  });
   const merged = JSON.parse(calls.upserts[0].update.json);
   assert.equal(merged.company, 'Keep me');
   assert.equal(merged.smtpHost, 'mail.example');
   assert.deepEqual(merged.realmPilot, saved);
   assert.equal(calls.audits[0].data.entity, 'realm_pilot');
   assert.deepEqual(calls.transactionOptions, { isolationLevel: 'Serializable' });
+
+  tx.setting.findUnique = async () => ({ json: JSON.stringify({ realmPilot: { ...saved, version: 3 } }) });
+  await assert.rejects(
+    () => saveRealmPilotConfig(db, DIRECTOR, { ...saved, version: 2 }),
+    (error) => error.code === 'realm_pilot_version_conflict',
+  );
 });
