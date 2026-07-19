@@ -9,8 +9,8 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 88,
-    "asyncButtonGuards": 47,
+    "guardedActions": 89,
+    "asyncButtonGuards": 48,
     "disabledBindings": 38,
     "localPendingStates": 3,
     "destructiveFlows": 6,
@@ -799,10 +799,22 @@
       "status": "verified"
     },
     {
-      "elementId": "component.components-realm-realmpilotcontrol.action.luu-chinh-sach-pilot",
+      "elementId": "component.components-realm-realmpilotcontrol.action.chay-dry-run-phat-hanh",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 318,
-      "label": "Lưu chính sách pilot",
+      "line": 403,
+      "label": "Chạy dry-run phát hành",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.kich-hoat-kill-switch-luu-chinh-sach-pilot",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 405,
+      "label": "Kích hoạt kill switch / Lưu chính sách pilot",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
       "successState": "toast-or-state",

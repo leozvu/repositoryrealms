@@ -67,6 +67,11 @@ test('cross-surface collaboration APIs preserve the ERP authentication boundary'
     const body = await response.json();
     expect(['unauthorized', 'realm_erp_sync_disabled']).toContain(body.code);
   }
+  const launch = await request.post('/api/realm-demo/launch', { data: { policy: { mode: 'pilot' } } });
+  expect([401, 503]).toContain(launch.status());
+  expect(launch.headers()['cache-control']).toContain('no-store');
+  expect(launch.headers().vary).toContain('Cookie');
+  expect(['unauthorized', 'realm_erp_sync_disabled']).toContain((await launch.json()).code);
 });
 
 test('Realm API responses expose safe correlation and latency diagnostics', async ({ request }) => {
@@ -168,6 +173,13 @@ test('director can inspect the pilot policy and switch between the same ERP data
   await pilot.getByRole('radio', { name: /Nhân sự cụ thể/ }).check();
   await expect(pilot.getByLabel('Tìm nhân sự pilot')).toBeVisible();
   await expect(pilot).toContainText('không hiển thị thời lượng, tiến độ hay điểm hiệu suất');
+  await pilot.getByRole('group', { name: 'Danh sách nhân sự có thể tham gia pilot' }).getByRole('checkbox').first().check();
+  await pilot.getByRole('button', { name: 'Chạy dry-run phát hành' }).click();
+  const launchPreview = pilot.getByRole('region', { name: 'Controlled launch dry-run' });
+  await expect(launchPreview.getByRole('group', { name: 'Tác động rollout tổng hợp' })).toBeVisible();
+  await expect(launchPreview).toContainText('Fallback ERP');
+  await expect(launchPreview).toContainText('Dry-run chỉ trả số liệu tổng hợp');
+  await expect(pilot.getByRole('button', { name: 'Lưu chính sách pilot' })).toBeEnabled();
   const feedbackOperations = page.getByRole('region', { name: 'Guild Support · Pilot Operations' });
   await expect(feedbackOperations).toBeVisible();
   await expect(feedbackOperations).toContainText('Không dùng số phản hồi để đánh giá cá nhân');

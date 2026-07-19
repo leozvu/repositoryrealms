@@ -147,6 +147,26 @@
 .gates em { color: #8a5a08; font-size: .62rem; font-style: normal; font-weight: 700; }
 .rollback { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 7px; margin: 0; padding: 9px 10px; border-radius: 8px; color: #315b43; background: #eef5f0; font-size: .69rem; line-height: 1.5; }
 
+.launchControl { display: grid; gap: 10px; padding: 13px; border: 1px solid #c8d7cd; border-radius: 10px; background: color-mix(in srgb, #eef5f0 74%, var(--card)); }
+.launchHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.launchHeader strong, .launchHeader span { display: block; }
+.launchHeader strong { font-size: .82rem; }
+.launchHeader div > span { max-width: 72ch; margin-top: 3px; color: var(--muted); font-size: .69rem; line-height: 1.5; }
+.riskChip { flex: 0 0 auto; padding: 5px 8px; border: 1px solid currentColor; border-radius: 999px; font-size: .67rem; font-weight: 750; white-space: nowrap; }
+.risk_emergency, .risk_expansion { color: var(--danger); background: color-mix(in srgb, var(--danger) 7%, var(--card)); }
+.risk_restriction { color: #21613d; background: #eaf6ef; }
+.risk_operational { color: #75510a; background: #fff7df; }
+.launchPreview { display: grid; gap: 9px; }
+.previewGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+.launchAssurance, .launchEmpty, .launchError { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: start; gap: 8px; margin: 0; font-size: .7rem; line-height: 1.5; }
+.launchAssurance { color: #315b43; }
+.launchEmpty { min-height: 64px; align-items: center; padding: 10px; border: 1px dashed #aebfb3; border-radius: 8px; background: var(--card); }
+.launchEmpty strong, .launchEmpty span { display: block; }
+.launchEmpty strong { font-size: .74rem; }
+.launchEmpty span { margin-top: 2px; color: var(--muted); }
+.launchError { padding: 10px; border: 1px solid #e3c9c9; border-radius: 8px; color: var(--danger); background: color-mix(in srgb, var(--danger) 5%, var(--card)); }
+.launchPrivacy { display: flex; align-items: flex-start; gap: 6px; margin: 0; color: var(--muted); font-size: .68rem; line-height: 1.45; }
+
 .assurance, .privacy {
   display: flex;
   align-items: flex-start;
@@ -172,6 +192,8 @@
 .actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border); }
 .actions span { color: var(--muted); font-size: .7rem; }
 .actions button { min-height: 44px; }
+.launchActions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.launchActions button { min-width: 170px; }
 
 .option:focus-within, .surfaceChoice label:focus-within, .cohortStrategy label:focus-within, .roles label:focus-within, .memberToolbar > label:focus-within, .memberList label:focus-within {
   outline: 3px solid color-mix(in srgb, #315b43 32%, transparent);
@@ -191,8 +213,11 @@
   .onboardingVersion { grid-template-columns: 1fr; }
   .onboardingVersion button { width: 100%; justify-content: center; }
   .readinessHeader { align-items: flex-start; flex-direction: column; }
+  .launchHeader { flex-direction: column; }
+  .previewGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .metricsHeader, .actions { align-items: stretch; flex-direction: column; }
-  .actions button { width: 100%; justify-content: center; }
+  .launchActions { align-items: stretch; flex-direction: column; }
+  .actions button, .launchActions button { width: 100%; min-width: 0; justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {

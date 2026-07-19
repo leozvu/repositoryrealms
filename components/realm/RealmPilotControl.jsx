@@ -30,6 +30,13 @@ const EMPTY_POLICY = {
   onboardingVersion: 1, version: 0,
 };
 
+const RISK_LABELS = {
+  emergency: 'Khẩn cấp',
+  restriction: 'Thu hẹp an toàn',
+  operational: 'Vận hành',
+  expansion: 'Mở rộng cohort',
+};
+
 function Metric({ label, value, detail }) {
   return (
     <div className={styles.metric}>
@@ -45,6 +52,7 @@ export default function RealmPilotControl() {
   const [state, setState] = useState({ loading: true, error: '', policy: EMPTY_POLICY, metrics: null, readiness: null, directory: [] });
   const [draft, setDraft] = useState(EMPTY_POLICY);
   const [memberQuery, setMemberQuery] = useState('');
+  const [launch, setLaunch] = useState({ error: '', token: '', preview: null, draftKey: '' });
 
   const load = useCallback(async () => {
     setState((current) => ({ ...current, loading: true, error: '' }));
@@ -68,6 +76,7 @@ export default function RealmPilotControl() {
         directory: pilotPayload.directory || [],
       });
       setDraft(pilotPayload.policy);
+      setLaunch({ error: '', token: '', preview: null, draftKey: '' });
     } catch (error) {
       setState((current) => ({ ...current, loading: false, error: error.message || 'Không thể tải Realm pilot.' }));
     }
@@ -108,7 +117,7 @@ export default function RealmPilotControl() {
     });
   };
 
-  const save = async () => {
+  const validateDraft = () => {
     if (draft.mode === 'pilot' && draft.cohortStrategy === 'roles' && draft.roles.length === 0) {
       toast('Hãy chọn ít nhất một vai trò cho cohort pilot.', 'error');
       return false;
@@ -117,14 +126,53 @@ export default function RealmPilotControl() {
       toast('Hãy chọn ít nhất một nhân sự cho cohort pilot.', 'error');
       return false;
     }
-    const response = await fetch('/api/realm-demo/pilot', {
-      method: 'PATCH',
+    return true;
+  };
+
+  const draftKey = JSON.stringify(draft);
+  const previewValid = Boolean(launch.token && launch.draftKey === draftKey);
+  const previewAllowsApply = previewValid && (launch.preview?.risk !== 'expansion' || launch.preview?.readiness?.ready);
+
+  const runLaunchPreview = async () => {
+    if (!validateDraft()) return false;
+    setLaunch({ error: '', token: '', preview: null, draftKey: '' });
+    const response = await fetch('/api/realm-demo/launch', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ policy: draft }),
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      if (response.status === 409) await load();
+      if (response.status === 409 && payload.code === 'realm_pilot_version_conflict') await load();
+      setLaunch({ error: payload.error || 'Không thể chạy dry-run phát hành.', token: '', preview: null, draftKey });
+      return false;
+    }
+    setLaunch({ error: '', token: payload.token, preview: payload.preview, draftKey });
+    toast('Dry-run hoàn tất. Preview chỉ hợp lệ cho đúng bản nháp và policy version này.');
+    return true;
+  };
+
+  const save = async () => {
+    if (!validateDraft()) return false;
+    if (draft.mode !== 'off' && !previewValid) {
+      toast('Hãy chạy dry-run cho đúng bản nháp trước khi lưu.', 'error');
+      return false;
+    }
+    if (draft.mode !== 'off' && !previewAllowsApply) {
+      toast('Không thể mở rộng rollout khi preflight còn blocker.', 'error');
+      return false;
+    }
+    const response = await fetch('/api/realm-demo/pilot', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ policy: draft, launchPreviewToken: launch.token }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      if (payload.code === 'realm_pilot_version_conflict' || payload.code === 'realm_launch_preview_version_mismatch') await load();
+      else if (String(payload.code || '').startsWith('realm_launch_')) {
+        setLaunch({ error: payload.error || 'Preview không còn hợp lệ. Hãy chạy lại dry-run.', token: '', preview: null, draftKey });
+      }
       toast(payload.error || 'Không thể lưu Realm pilot.', 'error');
       return false;
     }
@@ -132,6 +180,7 @@ export default function RealmPilotControl() {
     const readiness = readinessResponse.ok ? await readinessResponse.json() : null;
     setState({ loading: false, error: '', policy: payload.policy, metrics: payload.metrics, readiness, directory: payload.directory || state.directory });
     setDraft(payload.policy);
+    setLaunch({ error: '', token: '', preview: null, draftKey: '' });
     toast('Đã cập nhật Realm pilot. ERP cổ điển vẫn luôn khả dụng.');
     return true;
   };
@@ -300,6 +349,40 @@ export default function RealmPilotControl() {
               <p className={styles.rollback}><Icon name="repeat" size={15} /> Rollback vận hành: chuyển mode sang “Tạm đóng”, xác minh <code>/dashboard</code>; giữ nguyên dữ liệu ERP và migration đã áp dụng.</p>
             </section>
 
+            <section className={styles.launchControl} aria-labelledby="realm-launch-title">
+              <div className={styles.launchHeader}>
+                <div>
+                  <strong id="realm-launch-title">Controlled launch dry-run</strong>
+                  <span>Preview được ký, hết hạn sau 10 phút và chỉ dùng cho đúng Director, policy version cùng bản nháp này.</span>
+                </div>
+                {previewValid && <span className={`${styles.riskChip} ${styles[`risk_${launch.preview?.risk}`]}`}>{RISK_LABELS[launch.preview?.risk] || launch.preview?.risk}</span>}
+              </div>
+              {launch.error ? (
+                <div className={styles.launchError} role="alert"><Icon name="alert" size={16} /><span>{launch.error} Sửa bản nháp hoặc tải lại rồi thử lại.</span></div>
+              ) : previewValid ? (
+                <div className={styles.launchPreview} aria-live="polite">
+                  <div className={styles.previewGrid} aria-label="Tác động rollout tổng hợp">
+                    <Metric label="Được mở Realm" value={launch.preview?.impact?.eligibleUsers} />
+                    <Metric label="Fallback ERP" value={launch.preview?.impact?.fallbackUsers} />
+                    <Metric label="Thay đổi cohort" value={launch.preview?.impact?.eligibleDelta > 0 ? `+${launch.preview.impact.eligibleDelta}` : launch.preview?.impact?.eligibleDelta} />
+                    <Metric label="Blocking gate" value={launch.preview?.readiness?.summary?.blockers} />
+                  </div>
+                  <p className={styles.launchAssurance}>
+                    <Icon name={launch.preview?.readiness?.ready ? 'check' : 'alert'} size={15} />
+                    {launch.preview?.risk === 'expansion' && !launch.preview?.readiness?.ready
+                      ? 'Mở rộng đang bị khóa cho tới khi mọi blocking gate đạt.'
+                      : `Preview ${launch.preview?.id} dùng được tới ${new Date(launch.preview?.expiresAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}.`}
+                  </p>
+                </div>
+              ) : (
+                <div className={styles.launchEmpty}>
+                  <Icon name="shield" size={18} />
+                  <div><strong>Chưa có preview cho bản nháp này</strong><span>Chạy kiểm tra tác động trước khi áp dụng policy.</span></div>
+                </div>
+              )}
+              <p className={styles.launchPrivacy}><Icon name="shield" size={15} /> Dry-run chỉ trả số liệu tổng hợp; không trả roster, thời lượng hay dữ liệu hiệu suất.</p>
+            </section>
+
             <div className={styles.metricsHeader}>
               <div><strong>Adoption snapshot</strong><span>Hiện diện hoạt động trong 90 giây gần nhất.</span></div>
               <span>Tổng hợp · riêng tư</span>
@@ -314,8 +397,18 @@ export default function RealmPilotControl() {
             <p className={styles.privacy}><Icon name="shield" size={15} /> Không ghi thời lượng làm việc, không dùng adoption để đánh giá hiệu suất cá nhân.</p>
 
             <div className={styles.actions}>
-              <span aria-live="polite">{changed ? 'Có thay đổi chưa lưu' : 'Chính sách đã đồng bộ'}</span>
-              <AsyncButton className="btn btn-primary" disabled={!changed} pendingLabel="Đang lưu…" onClick={save}>Lưu chính sách pilot</AsyncButton>
+              <span aria-live="polite">{changed ? previewValid ? 'Dry-run khớp với bản nháp hiện tại' : 'Có thay đổi chưa preview' : 'Chính sách đã đồng bộ'}</span>
+              <div className={styles.launchActions}>
+                {changed && draft.mode !== 'off' && (
+                  <AsyncButton className={`btn ${previewValid ? 'btn-outline' : 'btn-primary'}`} pendingLabel="Đang dry-run…" onClick={runLaunchPreview}>Chạy dry-run phát hành</AsyncButton>
+                )}
+                <AsyncButton
+                  className={`btn ${draft.mode === 'off' || previewAllowsApply ? 'btn-primary' : 'btn-outline'}`}
+                  disabled={!changed || (draft.mode !== 'off' && !previewAllowsApply)}
+                  pendingLabel={draft.mode === 'off' ? 'Đang tắt Realm…' : 'Đang áp dụng…'}
+                  onClick={save}
+                >{draft.mode === 'off' ? 'Kích hoạt kill switch' : 'Lưu chính sách pilot'}</AsyncButton>
+              </div>
             </div>
           </>
         )}

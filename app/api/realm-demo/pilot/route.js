@@ -10,6 +10,8 @@ import {
   saveRealmWorkspacePreference,
 } from '@/lib/realm-pilot';
 import { RealmOperationError } from '@/lib/realm-operation';
+import { verifyRealmLaunchApplication } from '@/lib/realm-launch';
+import { realmLaunchSecret } from '@/lib/realm-launch-token';
 import { realmErrorResponse, realmJsonResponse } from '@/lib/realm-api-response';
 import { startRealmApiRequest } from '@/lib/realm-observability';
 
@@ -81,7 +83,16 @@ export async function PATCH(request) {
   try {
     const user = await authenticatedUser();
     const body = await request.json().catch(() => ({}));
-    const policy = await saveRealmPilotConfig(prisma, user, body.policy);
+    const launchSecret = body.policy?.mode === 'off' ? '' : realmLaunchSecret();
+    const policy = await saveRealmPilotConfig(prisma, user, body.policy, {
+      requireLaunchPreview: true,
+      verifyLaunchPreview: body.policy?.mode === 'off' ? null : ({ db, currentPolicy, draftPolicy }) => verifyRealmLaunchApplication(db, user, {
+        token: body.launchPreviewToken,
+        currentPolicy,
+        draftPolicy,
+        secret: launchSecret,
+      }),
+    });
     const [metrics, directory] = await Promise.all([
       loadRealmPilotMetrics(prisma, policy),
       loadRealmPilotDirectory(prisma),

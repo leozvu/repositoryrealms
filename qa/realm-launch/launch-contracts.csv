@@ -1,0 +1,20 @@
+id,layer,source,signals,missingSignals,status
+hmac-signed-short-lived-preview,security,lib/realm-launch-token.js,createHmac('sha256' | REALM_LAUNCH_PREVIEW_TTL_MS = 10 * 60 * 1000 | timingSafeEqual,,verified
+actor-version-draft-binding,security,lib/realm-launch-token.js,realm_launch_preview_actor_mismatch | realm_launch_preview_version_mismatch | realm_launch_preview_draft_mismatch,,verified
+risk-classification,server,lib/realm-launch-token.js,classifyRealmLaunchChange | return 'expansion' | return 'restriction' | return 'emergency',,verified
+expansion-readiness-gate,server,lib/realm-launch-token.js,risk === 'expansion' | realm_launch_readiness_blocked,,verified
+director-only-preview,server,lib/realm-launch.js,isDirector(sessionUser) | realm_launch_admin_forbidden,,verified
+read-only-live-dry-run,server,lib/realm-launch.js,inspectRealmSchemaReadiness | loadRealmPilotMetrics | evaluateRealmLaunchReadiness,,verified
+aggregate-impact-no-roster,privacy,lib/realm-launch.js,fallbackUsers | eligibleDelta | rosterIncluded: false | performanceTracking: false | durationTracking: false,,verified
+active-member-revalidation,server,lib/realm-launch.js,status: 'active' | userType: 'employee' | realm_pilot_members_stale,,verified
+preview-api-private-response,api,app/api/realm-demo/launch/route.js,createRealmLaunchPreview | realmJsonResponse | realm_launch_preview_ready,,verified
+transactional-preview-verification,server,lib/realm-pilot.js,"verifyLaunchPreview({ db: tx, currentPolicy: currentConfig, draftPolicy: draft }) | isolationLevel: 'Serializable'",,verified
+apply-time-readiness-recheck,server,lib/realm-launch.js,"preview.risk === 'expansion' | loadRealmLaunchReadiness(db, draftPolicy, now) | realm_launch_readiness_stale",,verified
+api-enforces-preview,api,app/api/realm-demo/pilot/route.js,requireLaunchPreview: true | verifyRealmLaunchApplication | launchPreviewToken,,verified
+kill-switch-unconditional,safety,lib/realm-pilot.js,draft.mode !== 'off' | 'kill-switch' | 'emergency',,verified
+aggregate-audit-evidence,audit,lib/realm-pilot.js,eligible ${launchPreview?.eligibleUsers | fallback ${launchPreview?.fallbackUsers | entity: 'realm_pilot',,verified
+progressive-dry-run-ui,client,components/realm/RealmPilotControl.jsx,Controlled launch dry-run | Chạy dry-run phát hành | previewAllowsApply | Dry-run chỉ trả số liệu tổng hợp,,verified
+draft-change-invalidates-preview,client,components/realm/RealmPilotControl.jsx,launch.draftKey === draftKey | previewValid | Có thay đổi chưa preview,,verified
+accessible-responsive-launch-control,style,components/realm/realm-pilot-control.module.css,.launchActions button | min-height: 44px | .previewGrid | @media (max-width: 680px) | @media (prefers-reduced-motion: reduce),,verified
+operations-runbook,operations,docs/realms/PHASE-14-CONTROLLED-LAUNCH-RUNBOOK.md,crmegoric-realms-demo | 10 phút | mode = off | /dashboard | không tự bật pilot,,verified
+authenticated-launch-uat,test,tests/e2e/realm-smoke.spec.mjs,Chạy dry-run phát hành | Tác động rollout tổng hợp | Fallback ERP,,verified
