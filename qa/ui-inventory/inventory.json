@@ -1875,6 +1875,16 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/api/realm-demo/launch/approvals",
+      "source": "app/api/realm-demo/launch/approvals/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/api/realm-demo/operations",
       "source": "app/api/realm-demo/operations/route.js",
       "dynamic": false,
@@ -2104,7 +2114,7 @@
     {
       "elementId": "route.approvals.action.ang-xu-ly-duyet",
       "source": "app/(app)/approvals/page.jsx",
-      "line": 41,
+      "line": 42,
       "column": 11,
       "surface": "route.approvals",
       "tag": "button",
@@ -2129,7 +2139,7 @@
     {
       "elementId": "route.approvals.action.tu-choi",
       "source": "app/(app)/approvals/page.jsx",
-      "line": 42,
+      "line": 43,
       "column": 11,
       "surface": "route.approvals",
       "tag": "button",
@@ -19144,9 +19154,71 @@
       "uxRiskCandidates": []
     },
     {
+      "elementId": "component.components-realm-realmpilotcontrol.action.duyet-ap-dung",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 71,
+      "column": 13,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Duyệt & áp dụng",
+      "handlerEvent": "onClick",
+      "handler": "() => onDecide(approval, 'approve')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!approval.payloadReadable || busy",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
+        "POST '/api/realm-demo/launch'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.tu-choi",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 72,
+      "column": 13,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Từ chối",
+      "handlerEvent": "onClick",
+      "handler": "() => onDecide(approval, 'reject')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "busy",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
+        "POST '/api/realm-demo/launch'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "component.components-realm-realmpilotcontrol.action.thu-lai",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 216,
+      "line": 315,
       "column": 13,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -19164,9 +19236,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -19174,7 +19249,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-pilot-mode",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 225,
+      "line": 324,
       "column": 21,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19192,9 +19267,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -19202,7 +19280,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-cohort-strategy",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 244,
+      "line": 343,
       "column": 23,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19220,9 +19298,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -19230,7 +19311,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.input",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 259,
+      "line": 358,
       "column": 25,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19248,9 +19329,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -19260,7 +19344,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.tim-theo-ten-chuc-danh-hoac-vai-tro",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 270,
+      "line": 369,
       "column": 25,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19278,9 +19362,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -19290,7 +19377,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.bo-chon",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 274,
+      "line": 373,
       "column": 25,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -19308,9 +19395,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -19318,7 +19408,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.input.2",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 283,
+      "line": 382,
       "column": 29,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19336,9 +19426,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -19348,7 +19441,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 302,
+      "line": 401,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19366,9 +19459,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -19376,7 +19472,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface.2",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 306,
+      "line": 405,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19394,9 +19490,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -19404,7 +19503,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.input.3",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 318,
+      "line": 417,
       "column": 21,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19422,9 +19521,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -19434,7 +19536,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.tao-tour-v",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 330,
+      "line": 429,
       "column": 17,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -19452,9 +19554,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -19462,7 +19567,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.mo-tour-cua-toi",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 331,
+      "line": 430,
       "column": 17,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -19480,9 +19585,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -19490,7 +19598,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.chay-dry-run-phat-hanh",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 403,
+      "line": 536,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "AsyncButton",
@@ -19508,9 +19616,43 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.gui-director-khac-duyet",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 539,
+      "column": 19,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Gửi Director khác duyệt",
+      "handlerEvent": "onClick",
+      "handler": "requestExpansionApproval",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!changed || !previewAllowsApply",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
+        "POST '/api/realm-demo/launch'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -19518,8 +19660,8 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.kich-hoat-kill-switch-luu-chinh-sach-pilot",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 405,
-      "column": 17,
+      "line": 546,
+      "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "AsyncButton",
       "kind": "action",
@@ -19536,9 +19678,12 @@
       "apiCandidates": [
         "GET '/api/realm-demo/pilot'",
         "GET '/api/realm-demo/readiness'",
+        "GET '/api/realm-demo/launch/approvals'",
         "POST '/api/realm-demo/launch'",
         "PATCH '/api/realm-demo/pilot'",
-        "GET '/api/realm-demo/readiness'"
+        "GET '/api/realm-demo/readiness'",
+        "POST '/api/realm-demo/launch/approvals'",
+        "POST `/api/approvals/${approval.id}/decide`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -22369,13 +22514,13 @@
   ],
   "summary": {
     "uiRoutes": 56,
-    "apiRoutes": 59,
-    "interactiveElements": 695,
+    "apiRoutes": 60,
+    "interactiveElements": 698,
     "sourceFilesWithInteractions": 77,
     "routesInPrimaryNavigation": 52,
     "routesWithResourceCandidates": 43,
     "byKind": {
-      "action": 418,
+      "action": 421,
       "form-control": 223,
       "form-submit": 10,
       "navigation": 44
@@ -22432,6 +22577,10 @@
         "count": 17
       },
       {
+        "source": "components/realm/RealmPilotControl.jsx",
+        "count": 17
+      },
+      {
         "source": "components/Shell.jsx",
         "count": 17
       },
@@ -22442,10 +22591,6 @@
       {
         "source": "components/realm/RoyalCommandCenter.jsx",
         "count": 16
-      },
-      {
-        "source": "components/realm/RealmPilotControl.jsx",
-        "count": 14
       }
     ]
   }

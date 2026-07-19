@@ -246,6 +246,12 @@ Cả `Realm → Guild → Royal Embassy` và `ERP · CRM → Guild Hall → Roya
 
 ## Ranh giới của demo
 
+### Release track Phase 15 — Four-eyes Launch Approval
+
+Sau Controlled Launch dry-run, mọi policy được phân loại là **expansion** phải qua hai Director khác nhau: maker gửi proposal và checker duyệt. Proposal tái sử dụng model `Approval`, được mã hóa AES-256-GCM, khóa theo policy version + digest và hết hạn sau 24 giờ. Khi duyệt, server tái kiểm tra live readiness rồi claim approval, cập nhật `Setting.realmPilot` và ghi audit trong cùng transaction `Serializable`.
+
+Restriction và kill switch vẫn đi đường nhanh để giảm blast radius. UI/API chỉ trả số liệu tác động tổng hợp; không trả roster hoặc dữ liệu hiệu suất. Phase này không thêm schema/migration, không tự bật pilot và không thay ERP/CRM đang vận hành. Runbook nằm tại `docs/realms/PHASE-15-FOUR-EYES-LAUNCH-APPROVAL.md`.
+
 - Khi hai cờ ERP sync không bật, dữ liệu Quest, Gold, nhân sự và dự án vẫn là mock/local state và không gọi API CRMegoric.
 - Gateway hiện là single-node/in-memory; production nhiều instance cần Redis pub/sub hoặc sticky routing để đồng bộ room.
 - Không cấu hình LiveKit thì Party dùng mesh P2P; không cấu hình STUN/TURN thì mesh chỉ đáng tin cậy trong cùng máy/LAN.

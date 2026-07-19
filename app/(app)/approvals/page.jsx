@@ -7,6 +7,7 @@ const TYPE_META = {
   quote: ['Báo giá', 'quotes'], expense: ['Khoản chi', 'finance'],
   leave: ['Nghỉ phép', 'staff'], vendorbill: ['Trả nhà cung cấp', 'wallet'],
   task_handoff: ['Bàn giao công việc', 'tasks'],
+  realm_launch: ['Mở rộng Realm', 'shield'],
 };
 
 function Steps({ ap }) {
@@ -108,7 +109,8 @@ export default function ApprovalsPage() {
       </div>
       <p style={{ fontSize: '.76rem', color: 'var(--muted)', marginTop: 10 }}>
         Quy tắc: báo giá ≥ ngưỡng cần Giám đốc duyệt trước khi gửi · khoản chi ≥ ngưỡng cần Kế toán (rất lớn thêm Giám đốc) ·
-        nghỉ phép qua Trưởng nhóm rồi HR (nếu &gt;3 ngày) · bàn giao Task qua Trưởng Guild hoặc PM. Ngưỡng chỉnh trong Cài đặt. Giám đốc duyệt được mọi bước.
+        nghỉ phép qua Trưởng nhóm rồi HR (nếu &gt;3 ngày) · bàn giao Task qua Trưởng Guild hoặc PM · mở rộng Realm cần hai Director khác nhau.
+        Ngưỡng chỉnh trong Cài đặt. Giám đốc duyệt được mọi bước ngoại trừ yêu cầu Realm do chính mình tạo.
       </p>
     </>
   );

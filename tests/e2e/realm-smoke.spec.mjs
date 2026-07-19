@@ -179,6 +179,10 @@ test('director can inspect the pilot policy and switch between the same ERP data
   await expect(launchPreview.getByRole('group', { name: 'Tác động rollout tổng hợp' })).toBeVisible();
   await expect(launchPreview).toContainText('Fallback ERP');
   await expect(launchPreview).toContainText('Dry-run chỉ trả số liệu tổng hợp');
+  const approvalBoard = pilot.getByRole('region', { name: 'Bàn duyệt phát hành' });
+  await expect(approvalBoard).toBeVisible();
+  await expect(approvalBoard).toContainText('Director tạo bản mở rộng không thể tự duyệt');
+  await expect(approvalBoard).toContainText('Policy chi tiết được mã hóa');
   await expect(pilot.getByRole('button', { name: 'Lưu chính sách pilot' })).toBeEnabled();
   const feedbackOperations = page.getByRole('region', { name: 'Guild Support · Pilot Operations' });
   await expect(feedbackOperations).toBeVisible();

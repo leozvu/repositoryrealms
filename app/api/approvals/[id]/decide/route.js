@@ -7,6 +7,8 @@ import { RealmOperationError } from '@/lib/realm-operation';
 import { parseItems } from '@/lib/format';
 import { safelyPublishRealmChange } from '@/lib/realm-change-feed';
 import { notificationRecordRoute } from '@/lib/notification-inbox';
+import { decideRealmLaunchApproval } from '@/lib/realm-launch-approval';
+import { realmLaunchSecret } from '@/lib/realm-launch-token';
 
 export async function POST(req, { params }) {
   const user = await currentUser();
@@ -14,6 +16,40 @@ export async function POST(req, { params }) {
   const { decision, note } = await req.json(); // approve | reject
   const ap = await prisma.approval.findUnique({ where: { id: params.id } });
   if (!ap || ap.status !== 'pending') return NextResponse.json({ error: 'Yêu cầu không tồn tại hoặc đã xử lý' }, { status: 400 });
+  if (ap.type === 'realm_launch') {
+    try {
+      const result = await decideRealmLaunchApproval(prisma, user, {
+        approvalId: ap.id,
+        decision,
+        note,
+        secret: realmLaunchSecret(),
+      });
+      const finalStatus = result.approval.status;
+      await notify(
+        ap.requesterId,
+        result.outcome === 'stale'
+          ? `Yêu cầu "${ap.title}" đã bị đóng vì policy nguồn thay đổi hoặc hết hạn.`
+          : `Yêu cầu "${ap.title}" đã được ${finalStatus === 'approved' ? 'DUYỆT' : 'TỪ CHỐI'} bởi ${user.name}`,
+        notificationRecordRoute('approvals', ap.id),
+      );
+      await safelyPublishRealmChange(prisma, {
+        resource: 'approvals', action: finalStatus, entityId: ap.id, actorId: user.id,
+      });
+      if (result.outcome === 'stale') {
+        return NextResponse.json({
+          error: 'Yêu cầu đã hết hạn hoặc policy nguồn đã thay đổi. Policy Realm không bị cập nhật.',
+          code: 'realm_launch_approval_stale',
+          approval: result.approval,
+        }, { status: 409 });
+      }
+      return NextResponse.json({ ...result.approval, policy: result.policy });
+    } catch (error) {
+      if (error instanceof RealmOperationError) {
+        return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
+      }
+      throw error;
+    }
+  }
   if (['realm_redemption', 'task_handoff'].includes(ap.type) && ap.requesterId === user.id) {
     return NextResponse.json({ error: 'Người tạo yêu cầu không được tự duyệt yêu cầu của mình.', code: 'self_approval_forbidden' }, { status: 409 });
   }

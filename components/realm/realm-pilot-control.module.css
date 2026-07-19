@@ -167,6 +167,36 @@
 .launchError { padding: 10px; border: 1px solid #e3c9c9; border-radius: 8px; color: var(--danger); background: color-mix(in srgb, var(--danger) 5%, var(--card)); }
 .launchPrivacy { display: flex; align-items: flex-start; gap: 6px; margin: 0; color: var(--muted); font-size: .68rem; line-height: 1.45; }
 
+.approvalBoard { display: grid; gap: 11px; padding: 13px; border: 1px solid #d8c9ac; border-radius: 10px; background: color-mix(in srgb, #fff7df 54%, var(--card)); }
+.approvalBoardHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.approvalBoardHeader strong, .approvalBoardHeader span { display: block; }
+.approvalBoardHeader strong { font-size: .82rem; }
+.approvalBoardHeader div > span { max-width: 72ch; margin-top: 3px; color: var(--muted); font-size: .69rem; line-height: 1.5; }
+.approvalBoardHeader > span { flex: 0 0 auto; padding: 5px 8px; border: 1px solid #b69558; border-radius: 999px; color: #75510a; background: #fff7df; font-size: .67rem; font-weight: 750; white-space: nowrap; }
+.approvalColumns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.approvalColumns > div { min-width: 0; display: grid; align-content: start; gap: 7px; }
+.approvalColumns h3 { margin: 0; color: var(--fg); font-size: .72rem; }
+.approvalCard { min-width: 0; display: grid; gap: 9px; padding: 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--card); }
+.approvalCard[data-status="approved"] { border-color: #a9c4b2; }
+.approvalCard[data-status="rejected"] { opacity: .78; }
+.approvalCardHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.approvalCardHeader > div { min-width: 0; }
+.approvalCardHeader strong, .approvalCardHeader span { display: block; }
+.approvalCardHeader strong { font-size: .75rem; line-height: 1.4; }
+.approvalCardHeader div > span { margin-top: 2px; color: var(--muted); font-size: .65rem; line-height: 1.4; }
+.approvalStatus { flex: 0 0 auto; padding: 4px 6px; border-radius: 999px; color: #75510a; background: #fff7df; font-size: .62rem; font-weight: 750; white-space: nowrap; }
+.approvalCard[data-status="approved"] .approvalStatus { color: #21613d; background: #eaf6ef; }
+.approvalCard[data-status="rejected"] .approvalStatus { color: var(--danger); background: color-mix(in srgb, var(--danger) 7%, var(--card)); }
+.approvalImpact { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.approvalImpact span { min-width: 0; padding: 7px; border-radius: 7px; color: var(--muted); background: var(--bg); font-size: .63rem; line-height: 1.35; }
+.approvalImpact strong { display: block; color: var(--fg); font-size: .76rem; font-variant-numeric: tabular-nums; }
+.approvalCardFooter { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.approvalCardFooter > span { color: var(--muted); font-size: .63rem; line-height: 1.4; }
+.approvalCardFooter > div { display: flex; align-items: center; justify-content: flex-end; gap: 7px; }
+.approvalCardFooter button { min-height: 44px; }
+.approvalCardFooter :global(.btn-outline) { color: var(--danger); }
+.approvalEmpty { min-height: 76px; display: grid; place-items: center; margin: 0; padding: 12px; border: 1px dashed #c8b994; border-radius: 8px; color: var(--muted); background: color-mix(in srgb, var(--card) 82%, transparent); font-size: .69rem; text-align: center; }
+
 .assurance, .privacy {
   display: flex;
   align-items: flex-start;
@@ -214,6 +244,11 @@
   .onboardingVersion button { width: 100%; justify-content: center; }
   .readinessHeader { align-items: flex-start; flex-direction: column; }
   .launchHeader { flex-direction: column; }
+  .approvalBoardHeader, .approvalCardHeader, .approvalCardFooter { align-items: stretch; flex-direction: column; }
+  .approvalColumns { grid-template-columns: 1fr; }
+  .approvalImpact { grid-template-columns: 1fr; }
+  .approvalCardFooter > div { align-items: stretch; flex-direction: column; }
+  .approvalCardFooter button { width: 100%; justify-content: center; }
   .previewGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .metricsHeader, .actions { align-items: stretch; flex-direction: column; }
   .launchActions { align-items: stretch; flex-direction: column; }

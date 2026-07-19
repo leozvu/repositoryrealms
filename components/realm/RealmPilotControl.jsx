@@ -47,26 +47,68 @@ function Metric({ label, value, detail }) {
   );
 }
 
+function LaunchApprovalCard({ approval, mine = false, busy = false, onDecide }) {
+  const statusLabel = approval.status === 'approved' ? 'Đã duyệt' : approval.status === 'rejected' ? 'Đã đóng' : mine ? 'Chờ Director khác' : 'Chờ bạn duyệt';
+  const expiresAt = approval.expiresAt ? new Date(approval.expiresAt) : null;
+  return (
+    <article className={styles.approvalCard} data-status={approval.status}>
+      <div className={styles.approvalCardHeader}>
+        <div>
+          <strong>{approval.title}</strong>
+          <span>{mine ? 'Bạn tạo yêu cầu' : `${approval.requesterName} tạo yêu cầu`} · {new Date(approval.createdAt).toLocaleString('vi-VN')}</span>
+        </div>
+        <span className={styles.approvalStatus}>{statusLabel}</span>
+      </div>
+      <div className={styles.approvalImpact} aria-label="Tác động yêu cầu phát hành tổng hợp">
+        <span><strong>{approval.impact?.eligibleUsers ?? 0}</strong> được mở Realm</span>
+        <span><strong>{approval.impact?.fallbackUsers ?? 0}</strong> fallback ERP</span>
+        <span><strong>v{approval.policyVersion ?? '—'}</strong> policy nguồn</span>
+      </div>
+      <div className={styles.approvalCardFooter}>
+        <span>{expiresAt ? `Hết hạn ${expiresAt.toLocaleString('vi-VN')}` : 'Payload không thể xác minh — không được duyệt'}</span>
+        {!mine && approval.status === 'pending' && (
+          <div>
+            <AsyncButton className="btn btn-primary btn-sm" disabled={!approval.payloadReadable || busy} pendingLabel="Đang duyệt…" onClick={() => onDecide(approval, 'approve')}>Duyệt &amp; áp dụng</AsyncButton>
+            <AsyncButton className="btn btn-outline btn-sm" disabled={busy} pendingLabel="Đang đóng…" onClick={() => onDecide(approval, 'reject')}>Từ chối</AsyncButton>
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
 export default function RealmPilotControl() {
   const toast = useToast();
-  const [state, setState] = useState({ loading: true, error: '', policy: EMPTY_POLICY, metrics: null, readiness: null, directory: [] });
+  const [state, setState] = useState({
+    loading: true,
+    error: '',
+    policy: EMPTY_POLICY,
+    metrics: null,
+    readiness: null,
+    directory: [],
+    approvals: { toReview: [], mine: [] },
+  });
   const [draft, setDraft] = useState(EMPTY_POLICY);
   const [memberQuery, setMemberQuery] = useState('');
   const [launch, setLaunch] = useState({ error: '', token: '', preview: null, draftKey: '' });
+  const [approvalBusyId, setApprovalBusyId] = useState('');
 
   const load = useCallback(async () => {
     setState((current) => ({ ...current, loading: true, error: '' }));
     try {
-      const [pilotResponse, readinessResponse] = await Promise.all([
+      const [pilotResponse, readinessResponse, approvalsResponse] = await Promise.all([
         fetch('/api/realm-demo/pilot', { cache: 'no-store' }),
         fetch('/api/realm-demo/readiness', { cache: 'no-store' }),
+        fetch('/api/realm-demo/launch/approvals', { cache: 'no-store' }),
       ]);
-      const [pilotPayload, readinessPayload] = await Promise.all([
+      const [pilotPayload, readinessPayload, approvalsPayload] = await Promise.all([
         pilotResponse.json().catch(() => ({})),
         readinessResponse.json().catch(() => ({})),
+        approvalsResponse.json().catch(() => ({})),
       ]);
       if (!pilotResponse.ok) throw new Error(pilotPayload.error || 'Không thể tải Realm pilot.');
       if (!readinessResponse.ok) throw new Error(readinessPayload.error || 'Không thể chạy preflight Realm.');
+      if (!approvalsResponse.ok) throw new Error(approvalsPayload.error || 'Không thể tải bàn duyệt phát hành.');
       setState({
         loading: false,
         error: '',
@@ -74,6 +116,7 @@ export default function RealmPilotControl() {
         metrics: pilotPayload.metrics,
         readiness: readinessPayload,
         directory: pilotPayload.directory || [],
+        approvals: { toReview: approvalsPayload.toReview || [], mine: approvalsPayload.mine || [] },
       });
       setDraft(pilotPayload.policy);
       setLaunch({ error: '', token: '', preview: null, draftKey: '' });
@@ -132,6 +175,7 @@ export default function RealmPilotControl() {
   const draftKey = JSON.stringify(draft);
   const previewValid = Boolean(launch.token && launch.draftKey === draftKey);
   const previewAllowsApply = previewValid && (launch.preview?.risk !== 'expansion' || launch.preview?.readiness?.ready);
+  const expansionPreview = previewValid && launch.preview?.risk === 'expansion';
 
   const runLaunchPreview = async () => {
     if (!validateDraft()) return false;
@@ -162,6 +206,10 @@ export default function RealmPilotControl() {
       toast('Không thể mở rộng rollout khi preflight còn blocker.', 'error');
       return false;
     }
+    if (expansionPreview) {
+      toast('Mở rộng Realm phải được gửi tới một Director khác phê duyệt.', 'error');
+      return false;
+    }
     const response = await fetch('/api/realm-demo/pilot', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -178,11 +226,62 @@ export default function RealmPilotControl() {
     }
     const readinessResponse = await fetch('/api/realm-demo/readiness', { cache: 'no-store' });
     const readiness = readinessResponse.ok ? await readinessResponse.json() : null;
-    setState({ loading: false, error: '', policy: payload.policy, metrics: payload.metrics, readiness, directory: payload.directory || state.directory });
+    setState((current) => ({ ...current, loading: false, error: '', policy: payload.policy, metrics: payload.metrics, readiness, directory: payload.directory || current.directory }));
     setDraft(payload.policy);
     setLaunch({ error: '', token: '', preview: null, draftKey: '' });
     toast('Đã cập nhật Realm pilot. ERP cổ điển vẫn luôn khả dụng.');
     return true;
+  };
+
+  const requestExpansionApproval = async () => {
+    if (!validateDraft()) return false;
+    if (!expansionPreview || !previewAllowsApply) {
+      toast('Hãy chạy dry-run hợp lệ cho bản mở rộng trước khi gửi duyệt.', 'error');
+      return false;
+    }
+    const response = await fetch('/api/realm-demo/launch/approvals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ policy: draft, launchPreviewToken: launch.token }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      if (String(payload.code || '').includes('version') || payload.code === 'realm_launch_approval_duplicate') await load();
+      toast(payload.error || 'Không thể gửi yêu cầu mở rộng Realm.', 'error');
+      return false;
+    }
+    toast('Đã gửi Director thứ hai duyệt. Policy hiện tại chưa thay đổi.');
+    await load();
+    return true;
+  };
+
+  const decideLaunchApproval = async (approval, decision) => {
+    if (approvalBusyId) return false;
+    if (decision === 'reject' && !window.confirm(`Từ chối yêu cầu "${approval.title}"? Policy hiện tại sẽ được giữ nguyên.`)) return false;
+    setApprovalBusyId(approval.id);
+    try {
+      const response = await fetch(`/api/approvals/${approval.id}/decide`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        toast(payload.error || 'Không thể xử lý yêu cầu phát hành.', 'error');
+        await load();
+        return false;
+      }
+      toast(decision === 'approve'
+        ? 'Đã duyệt và áp dụng policy Realm. ERP vẫn là source of truth.'
+        : 'Đã từ chối yêu cầu. Policy hiện tại được giữ nguyên.');
+      await load();
+      return true;
+    } catch {
+      toast('Không thể kết nối máy chủ phê duyệt. Policy chưa bị thay đổi.', 'error');
+      return false;
+    } finally {
+      setApprovalBusyId('');
+    }
   };
 
   const changed = JSON.stringify(draft) !== JSON.stringify(state.policy);
@@ -383,6 +482,40 @@ export default function RealmPilotControl() {
               <p className={styles.launchPrivacy}><Icon name="shield" size={15} /> Dry-run chỉ trả số liệu tổng hợp; không trả roster, thời lượng hay dữ liệu hiệu suất.</p>
             </section>
 
+            <section className={styles.approvalBoard} aria-labelledby="realm-launch-approval-title">
+              <div className={styles.approvalBoardHeader}>
+                <div>
+                  <strong id="realm-launch-approval-title">Bàn duyệt phát hành</strong>
+                  <span>Four-eyes control: Director tạo bản mở rộng không thể tự duyệt. Thu hẹp và kill switch không bị trì hoãn.</span>
+                </div>
+                <span>{state.approvals.toReview.length} chờ bạn</span>
+              </div>
+              <div className={styles.approvalColumns}>
+                <div>
+                  <h3>Chờ tôi duyệt</h3>
+                  {state.approvals.toReview.length ? state.approvals.toReview.map((approval) => (
+                    <LaunchApprovalCard
+                      key={approval.id}
+                      approval={approval}
+                      busy={Boolean(approvalBusyId)}
+                      onDecide={decideLaunchApproval}
+                    />
+                  )) : (
+                    <p className={styles.approvalEmpty}>Không có yêu cầu mở rộng nào chờ bạn.</p>
+                  )}
+                </div>
+                <div>
+                  <h3>Yêu cầu của tôi</h3>
+                  {state.approvals.mine.length ? state.approvals.mine.map((approval) => (
+                    <LaunchApprovalCard key={approval.id} approval={approval} mine />
+                  )) : (
+                    <p className={styles.approvalEmpty}>Bạn chưa gửi yêu cầu mở rộng Realm.</p>
+                  )}
+                </div>
+              </div>
+              <p className={styles.launchPrivacy}><Icon name="shield" size={15} /> Approval chỉ hiển thị số lượng tổng hợp. Policy chi tiết được mã hóa và chỉ giải mã trong transaction duyệt.</p>
+            </section>
+
             <div className={styles.metricsHeader}>
               <div><strong>Adoption snapshot</strong><span>Hiện diện hoạt động trong 90 giây gần nhất.</span></div>
               <span>Tổng hợp · riêng tư</span>
@@ -397,17 +530,26 @@ export default function RealmPilotControl() {
             <p className={styles.privacy}><Icon name="shield" size={15} /> Không ghi thời lượng làm việc, không dùng adoption để đánh giá hiệu suất cá nhân.</p>
 
             <div className={styles.actions}>
-              <span aria-live="polite">{changed ? previewValid ? 'Dry-run khớp với bản nháp hiện tại' : 'Có thay đổi chưa preview' : 'Chính sách đã đồng bộ'}</span>
+              <span aria-live="polite">{changed ? previewValid ? expansionPreview ? 'Bản mở rộng sẵn sàng gửi Director khác' : 'Dry-run khớp với bản nháp hiện tại' : 'Có thay đổi chưa preview' : 'Chính sách đã đồng bộ'}</span>
               <div className={styles.launchActions}>
                 {changed && draft.mode !== 'off' && (
                   <AsyncButton className={`btn ${previewValid ? 'btn-outline' : 'btn-primary'}`} pendingLabel="Đang dry-run…" onClick={runLaunchPreview}>Chạy dry-run phát hành</AsyncButton>
                 )}
-                <AsyncButton
-                  className={`btn ${draft.mode === 'off' || previewAllowsApply ? 'btn-primary' : 'btn-outline'}`}
-                  disabled={!changed || (draft.mode !== 'off' && !previewAllowsApply)}
-                  pendingLabel={draft.mode === 'off' ? 'Đang tắt Realm…' : 'Đang áp dụng…'}
-                  onClick={save}
-                >{draft.mode === 'off' ? 'Kích hoạt kill switch' : 'Lưu chính sách pilot'}</AsyncButton>
+                {expansionPreview ? (
+                  <AsyncButton
+                    className="btn btn-primary"
+                    disabled={!changed || !previewAllowsApply}
+                    pendingLabel="Đang gửi bàn duyệt…"
+                    onClick={requestExpansionApproval}
+                  >Gửi Director khác duyệt</AsyncButton>
+                ) : (
+                  <AsyncButton
+                    className={`btn ${draft.mode === 'off' || previewAllowsApply ? 'btn-primary' : 'btn-outline'}`}
+                    disabled={!changed || (draft.mode !== 'off' && !previewAllowsApply)}
+                    pendingLabel={draft.mode === 'off' ? 'Đang tắt Realm…' : 'Đang áp dụng…'}
+                    onClick={save}
+                  >{draft.mode === 'off' ? 'Kích hoạt kill switch' : 'Lưu chính sách pilot'}</AsyncButton>
+                )}
               </div>
             </div>
           </>

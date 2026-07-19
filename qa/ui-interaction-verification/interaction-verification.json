@@ -9,8 +9,8 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 89,
-    "asyncButtonGuards": 48,
+    "guardedActions": 92,
+    "asyncButtonGuards": 51,
     "disabledBindings": 38,
     "localPendingStates": 3,
     "destructiveFlows": 6,
@@ -21,7 +21,7 @@
     {
       "elementId": "route.approvals.action.ang-xu-ly-duyet",
       "source": "app/(app)/approvals/page.jsx",
-      "line": 41,
+      "line": 42,
       "label": "Đang xử lý… / Duyệt",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -33,7 +33,7 @@
     {
       "elementId": "route.approvals.action.tu-choi",
       "source": "app/(app)/approvals/page.jsx",
-      "line": 42,
+      "line": 43,
       "label": "Từ chối",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -799,10 +799,46 @@
       "status": "verified"
     },
     {
+      "elementId": "component.components-realm-realmpilotcontrol.action.duyet-ap-dung",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 71,
+      "label": "Duyệt & áp dụng",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.tu-choi",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 72,
+      "label": "Từ chối",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
       "elementId": "component.components-realm-realmpilotcontrol.action.chay-dry-run-phat-hanh",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 403,
+      "line": 536,
       "label": "Chạy dry-run phát hành",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.gui-director-khac-duyet",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 539,
+      "label": "Gửi Director khác duyệt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
       "successState": "toast-or-state",
@@ -813,7 +849,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.kich-hoat-kill-switch-luu-chinh-sach-pilot",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 405,
+      "line": 546,
       "label": "Kích hoạt kill switch / Lưu chính sách pilot",
       "actionType": "data-action",
       "loadingState": "async-button-guard",

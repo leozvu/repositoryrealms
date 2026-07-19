@@ -86,12 +86,18 @@ export async function PATCH(request) {
     const launchSecret = body.policy?.mode === 'off' ? '' : realmLaunchSecret();
     const policy = await saveRealmPilotConfig(prisma, user, body.policy, {
       requireLaunchPreview: true,
-      verifyLaunchPreview: body.policy?.mode === 'off' ? null : ({ db, currentPolicy, draftPolicy }) => verifyRealmLaunchApplication(db, user, {
-        token: body.launchPreviewToken,
-        currentPolicy,
-        draftPolicy,
-        secret: launchSecret,
-      }),
+      verifyLaunchPreview: body.policy?.mode === 'off' ? null : async ({ db, currentPolicy, draftPolicy }) => {
+        const preview = await verifyRealmLaunchApplication(db, user, {
+          token: body.launchPreviewToken,
+          currentPolicy,
+          draftPolicy,
+          secret: launchSecret,
+        });
+        if (preview.risk === 'expansion') {
+          throw new RealmOperationError('Mở rộng Realm cần một Director khác phê duyệt.', 409, 'realm_launch_approval_required');
+        }
+        return preview;
+      },
     });
     const [metrics, directory] = await Promise.all([
       loadRealmPilotMetrics(prisma, policy),

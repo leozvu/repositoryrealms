@@ -41,6 +41,7 @@
 "/api/realm-demo/guild","app/api/realm-demo/guild/route.js","false","GET","unreviewed"
 "/api/realm-demo/health","app/api/realm-demo/health/route.js","false","GET","unreviewed"
 "/api/realm-demo/launch","app/api/realm-demo/launch/route.js","false","POST","unreviewed"
+"/api/realm-demo/launch/approvals","app/api/realm-demo/launch/approvals/route.js","false","GET | POST","unreviewed"
 "/api/realm-demo/operations","app/api/realm-demo/operations/route.js","false","GET | POST","unreviewed"
 "/api/realm-demo/pilot","app/api/realm-demo/pilot/route.js","false","GET | PUT | PATCH","unreviewed"
 "/api/realm-demo/readiness","app/api/realm-demo/readiness/route.js","false","GET","unreviewed"
