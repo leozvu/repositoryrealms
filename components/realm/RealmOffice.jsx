@@ -17,7 +17,7 @@ import {
   privateZoneAt,
   roomAt,
 } from './world';
-import { DEFAULT_PROFILE, isInVoiceRange, mergeRealmPresencePeople, normalizeProfile } from '@/lib/realm-protocol';
+import { createRealmDemoGuestProfile, DEFAULT_PROFILE, isInVoiceRange, mergeRealmPresencePeople, normalizeProfile } from '@/lib/realm-protocol';
 import {
   REALM_OPERATIONS_STORAGE_KEY,
   advanceRealmQuest,
@@ -66,6 +66,7 @@ import {
 import styles from './realm-office.module.css';
 
 const PROFILE_STORAGE_KEY = 'crmegoric-realms-profile-v1';
+const GUEST_ID_STORAGE_KEY = 'crmegoric-realms-guest-id-v1';
 const PROFILE_ROLES = ['Realm Builder', 'Questsmith', 'Guild Master', 'Alchemist', 'Scout'];
 const ERP_SYNC_REQUESTED = process.env.NEXT_PUBLIC_REALM_ERP_SYNC === '1';
 const REALM_REMOTE_REFRESH_MS = 60_000;
@@ -1027,11 +1028,21 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
   useEffect(() => {
     if (dataSource.isErp) return;
     try {
-      const saved = normalizeProfile(JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY) || '{}'));
+      let guestId = localStorage.getItem(GUEST_ID_STORAGE_KEY);
+      if (!guestId) {
+        guestId = crypto.randomUUID();
+        localStorage.setItem(GUEST_ID_STORAGE_KEY, guestId);
+      }
+      const saved = createRealmDemoGuestProfile(
+        JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY) || '{}'),
+        guestId,
+      );
       setProfile(saved);
       setProfileDraft(saved);
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(saved));
     } catch {
       localStorage.removeItem(PROFILE_STORAGE_KEY);
+      localStorage.removeItem(GUEST_ID_STORAGE_KEY);
     }
   }, [dataSource.isErp]);
   useEffect(() => {

@@ -10,7 +10,7 @@ async function membership(convId, userId) {
 // GET: 100 tin gần nhất (?after=ISO chỉ lấy tin mới) + đánh dấu đã đọc
 export async function GET(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const mem = await membership(params.id, user.id);
   if (!mem) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const after = new URL(req.url).searchParams.get('after');
@@ -40,7 +40,7 @@ export async function GET(req, { params }) {
 // POST: gửi tin nhắn
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const mem = await membership(params.id, user.id);
   if (!mem) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { content } = await req.json();

@@ -217,7 +217,10 @@ function sourceSurface(relativeFile) {
 function routeSegments(relativeFile, marker) {
   const normalized = normalizePath(relativeFile);
   const prefix = marker === 'page' ? 'app/' : 'app/api/';
-  const suffix = new RegExp(`/${marker}\\.(?:js|jsx|ts|tsx)$`);
+  // Root files become `page.jsx` / `route.js` after the prefix is removed,
+  // while nested files still contain a slash. Accept both shapes so app/page.jsx
+  // is represented by `/` instead of the phantom `/page.jsx` route.
+  const suffix = new RegExp(`(?:^|/)${marker}\\.(?:js|jsx|ts|tsx)$`);
   const withoutFile = normalized.replace(prefix, '').replace(suffix, '');
   return withoutFile
     .split('/')

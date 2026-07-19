@@ -20,7 +20,7 @@ function transactionDb(taskRow, extras = {}) {
   const tx = {
     task: { findUnique: async () => taskRow },
     realmGoldEntry: {
-      findFirst: async () => null,
+      findFirst: async () => extras.issued || null,
       findMany: async () => extras.entries || [],
     },
     realmRewardBudget: { findUnique: async () => extras.budget || null },
@@ -78,6 +78,40 @@ test('STAFF không thể đọc Reward Control Center trước khi query databas
   );
 });
 
+test('Reward dashboard tổng hợp policy đã duyệt, issued, committed và quyền từng dòng', async () => {
+  const approvedAt = new Date('2026-07-05T08:00:00.000Z');
+  const tasks = [
+    task({
+      id: 'reward-1', taskId: 'task-1', gold: 12, renown: 80, status: 'approved', active: true,
+      configuredById: PM.id, configuredBy: { name: PM.name }, approvedBy: { name: HR.name }, approvedAt, version: 3,
+    }),
+    { ...task({ id: 'reward-2', gold: 7, renown: 30, status: 'pending', configuredById: PM.id, version: 1 }), id: 'task-2', assigneeId: 'staff-2' },
+    { ...task(), id: 'task-3', assigneeId: 'staff-3', project: null },
+  ];
+  const db = {
+    task: { findMany: async () => tasks },
+    realmRewardBudget: { findUnique: async () => ({
+      id: 'budget-1', period: '2026-07', goldCap: 200, perUserGoldCap: 60, status: 'approved',
+      version: 2, configuredById: DIRECTOR_A.id, configuredBy: { name: DIRECTOR_A.name },
+      approvedById: DIRECTOR_B.id, approvedBy: { name: DIRECTOR_B.name }, approvedAt,
+    }) },
+    realmGoldEntry: {
+      findMany: async ({ where }) => where.sourceType === 'task'
+        ? [{ sourceId: 'task-2' }]
+        : [{ amount: 15, userId: 'staff-9', sourceId: 'task-old' }, { amount: -5, userId: 'staff-9' }],
+    },
+  };
+  const dashboard = await loadRealmRewardDashboard(db, DIRECTOR_A, new Date('2026-07-17T10:00:00.000Z'));
+  assert.equal(dashboard.budget.policyStatus, 'approved');
+  assert.equal(dashboard.budget.issued, 15);
+  assert.equal(dashboard.budget.committed, 12);
+  assert.equal(dashboard.budget.pending, 7);
+  assert.equal(dashboard.rows[0].canConfigure, true);
+  assert.equal(dashboard.rows[1].rewardIssued, true);
+  assert.equal(dashboard.rows[1].canApprove, false);
+  assert.equal(dashboard.rows[2].project, 'Công việc nội bộ');
+});
+
 test('PM lưu draft trong transaction và tạo TaskEvent + AuditLog', async () => {
   const { db, state } = transactionDb(task());
   const result = await applyRealmRewardAdminAction(db, PM, {
@@ -88,6 +122,45 @@ test('PM lưu draft trong transaction và tạo TaskEvent + AuditLog', async () 
   assert.equal(state.events.length, 1);
   assert.equal(state.audits[0].action, 'realm_reward_draft');
   assert.deepEqual(state.options, { isolationLevel: 'Serializable' });
+});
+
+test('Reward lifecycle hỗ trợ submit, reject và chặn version/ràng buộc Task', async () => {
+  const draft = { id: 'reward-1', taskId: 'task-1', gold: 5, renown: 120, status: 'draft', configuredById: PM.id, version: 1 };
+  const submitted = transactionDb(task(draft));
+  assert.equal((await applyRealmRewardAdminAction(submitted.db, PM, { action: 'submit', taskId: 'task-1', version: 1 })).type, 'submit');
+  assert.equal(submitted.state.updated.status, 'pending');
+
+  const pending = { ...draft, status: 'pending', version: 2 };
+  const rejected = transactionDb(task(pending));
+  assert.equal((await applyRealmRewardAdminAction(rejected.db, HR, {
+    action: 'reject', taskId: 'task-1', version: 2, reviewNote: 'Cần làm rõ tiêu chí nghiệm thu.',
+  })).type, 'reject');
+  assert.equal(rejected.state.updated.status, 'rejected');
+
+  await assert.rejects(
+    applyRealmRewardAdminAction(transactionDb(task(draft)).db, PM, { action: 'submit', taskId: 'task-1', version: 99 }),
+    (error) => error.code === 'reward_version_conflict',
+  );
+  await assert.rejects(
+    applyRealmRewardAdminAction(transactionDb(null).db, PM, { action: 'save-draft', taskId: 'missing', version: 0, gold: 5, renown: 10 }),
+    (error) => error.code === 'task_not_found',
+  );
+  await assert.rejects(
+    applyRealmRewardAdminAction(transactionDb({ ...task(), assigneeId: null }).db, PM, { action: 'save-draft', taskId: 'task-1', version: 0, gold: 5, renown: 10 }),
+    (error) => error.code === 'task_unassigned',
+  );
+  await assert.rejects(
+    applyRealmRewardAdminAction(transactionDb(task(draft), { issued: { id: 'gold-1' } }).db, PM, { action: 'submit', taskId: 'task-1', version: 1 }),
+    (error) => error.code === 'reward_already_issued',
+  );
+  await assert.rejects(
+    applyRealmRewardAdminAction(transactionDb(task(pending)).db, HR, { action: 'unknown', taskId: 'task-1', version: 2 }),
+    (error) => error.code === 'unsupported_reward_action',
+  );
+  await assert.rejects(
+    applyRealmRewardAdminAction(transactionDb(task()).db, PM, { action: 'save-draft', taskId: '' }),
+    (error) => error.code === 'invalid_task_id',
+  );
 });
 
 test('HR approve reward qua budget check và không thể approve reward do chính mình cấu hình', async () => {
@@ -157,5 +230,46 @@ test('Budget maker/checker chặn tự duyệt và cap thấp hơn nghĩa vụ h
       approvedConfigs: [{ gold: 10, taskId: 'open-task', task: { assigneeId: 'staff-2' } }],
     }).db, DIRECTOR_B, { action: 'budget-approve', version: 2 }),
     (error) => error.code === 'budget_below_existing_commitments',
+  );
+});
+
+test('Budget lifecycle hỗ trợ submit/reject và khóa conflict, permission, user cap', async () => {
+  const draft = {
+    id: 'budget-1', period: '2026-07', goldCap: 100, perUserGoldCap: 20,
+    note: 'Budget draft.', status: 'draft', configuredById: DIRECTOR_A.id, version: 1,
+  };
+  const submit = budgetTransactionDb(draft);
+  assert.equal((await applyRealmRewardAdminAction(submit.db, DIRECTOR_A, { action: 'budget-submit', version: 1 })).type, 'budget-submit');
+  assert.equal(submit.state.updated.status, 'pending');
+
+  const pending = { ...draft, status: 'pending', version: 2 };
+  const reject = budgetTransactionDb(pending);
+  assert.equal((await applyRealmRewardAdminAction(reject.db, DIRECTOR_B, {
+    action: 'budget-reject', version: 2, reviewNote: 'Cần bổ sung dự báo campaign.',
+  })).type, 'budget-reject');
+  assert.equal(reject.state.updated.status, 'rejected');
+
+  await assert.rejects(
+    applyRealmRewardAdminAction(budgetTransactionDb(pending).db, DIRECTOR_B, { action: 'budget-approve', version: 99 }),
+    (error) => error.code === 'budget_version_conflict',
+  );
+  await assert.rejects(
+    applyRealmRewardAdminAction(budgetTransactionDb().db, DIRECTOR_A, { action: 'budget-submit', version: 0 }),
+    (error) => error.code === 'budget_not_configured',
+  );
+  await assert.rejects(
+    applyRealmRewardAdminAction(budgetTransactionDb(pending).db, HR, { action: 'budget-approve', version: 2 }),
+    (error) => error.code === 'budget_forbidden',
+  );
+  await assert.rejects(
+    applyRealmRewardAdminAction(budgetTransactionDb(pending).db, DIRECTOR_B, { action: 'budget-unknown', version: 2 }),
+    (error) => error.code === 'unsupported_budget_action',
+  );
+  await assert.rejects(
+    applyRealmRewardAdminAction(budgetTransactionDb({ ...pending, perUserGoldCap: 5 }, {
+      entries: [{ amount: 10, userId: 'staff-1', sourceId: 'issued-task' }],
+      issuedEntries: [{ sourceId: 'issued-task' }],
+    }).db, DIRECTOR_B, { action: 'budget-approve', version: 2 }),
+    (error) => error.code === 'budget_below_user_commitments',
   );
 });

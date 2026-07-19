@@ -38,7 +38,7 @@ async function attendanceOf(month) {
 // GET: HR/Kế toán/GĐ thấy toàn bộ; nhân viên chỉ nhận phiếu lương của mình
 export async function GET() {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const rows = await prisma.payroll.findMany({ orderBy: { month: 'desc' } });
   if (canManage(user)) return NextResponse.json({ manage: true, payrolls: rows });
   const mine = rows
@@ -50,7 +50,7 @@ export async function GET() {
 // POST {month}: tạo bảng lương nháp từ danh sách nhân sự đang hoạt động
 export async function POST(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!canManage(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { month } = await req.json();
   if (!/^\d{4}-\d{2}$/.test(month || '')) return NextResponse.json({ error: 'Tháng không hợp lệ' }, { status: 400 });
@@ -75,7 +75,7 @@ export async function POST(req) {
 // PUT {id, lines}: sửa phụ cấp/thưởng khi còn nháp — server tính lại toàn bộ
 export async function PUT(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!canManage(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { id, lines, regenerate } = await req.json();
   const p = await prisma.payroll.findUnique({ where: { id } });

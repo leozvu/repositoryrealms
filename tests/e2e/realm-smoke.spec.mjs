@@ -1,5 +1,20 @@
 import { test, expect } from '@playwright/test';
 
+const runtimeIssues = new WeakMap();
+
+test.beforeEach(async ({ page }) => {
+  const issues = [];
+  runtimeIssues.set(page, issues);
+  page.on('pageerror', (error) => issues.push(`pageerror: ${error.message}`));
+  page.on('console', (message) => {
+    if (message.type() === 'error') issues.push(`console.error: ${message.text()}`);
+  });
+});
+
+test.afterEach(async ({ page }) => {
+  expect(runtimeIssues.get(page) || []).toEqual([]);
+});
+
 test('root uses a real HTTP redirect and all pages receive baseline security headers', async ({ request }) => {
   const root = await request.get('/', { maxRedirects: 0 });
   expect(root.status()).toBe(307);
@@ -83,8 +98,8 @@ test('anonymous ERP navigation lands on an accessible login form', async ({ page
 test('Realm and ERP views expose the same live character status', async ({ page }) => {
   await page.goto('/realm-demo');
   await page.getByRole('button', { name: 'ERP · CRM', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Hồ sơ nhân sự kết nối nhân vật' })).toContainText('Adventurer Zero');
-  await expect(page.getByRole('region', { name: 'Adventurer Zero' })).toContainText('Gold');
+  await expect(page.getByRole('region', { name: 'Hồ sơ nhân sự kết nối nhân vật' })).toContainText(/Adventurer [A-Z0-9]{4}/);
+  await expect(page.getByRole('region', { name: /Adventurer [A-Z0-9]{4}/ })).toContainText('Gold');
   await expect(page.getByText('Quest ↔ công việc ERP/CRM', { exact: true })).toBeVisible();
   const access = page.getByRole('region', { name: 'Quyền truy cập phiên ERP' });
   await expect(access).toContainText('DEMO · 9/9 khu vực khả dụng');
@@ -100,7 +115,7 @@ test('Realm and ERP views expose the same live character status', async ({ page 
   await expect(bridge.locator('[aria-disabled="true"]')).toHaveCount(0);
 
   const chronicle = page.getByRole('region', { name: 'Adventurer Chronicle từ dữ liệu ERP cá nhân' });
-  await expect(chronicle.getByRole('heading', { name: 'Nhật trình của Adventurer Zero' })).toBeVisible();
+  await expect(chronicle.getByRole('heading', { name: /Nhật trình của Adventurer [A-Z0-9]{4}/ })).toBeVisible();
   await expect(chronicle).toContainText('Demo cục bộ');
   await expect(chronicle).toContainText('Giờ tự ghi tuần này');
   await expect(chronicle).toContainText('Hồ sơ tự phục vụ, không phải công cụ giám sát');
@@ -112,6 +127,19 @@ test('Realm and ERP views expose the same live character status', async ({ page 
   await expect(page.getByText('Điều phối nguồn lực, không xếp hạng con người', { exact: true })).toBeVisible();
   const taskLinks = page.getByRole('link', { name: 'Mở Task ERP' });
   await expect(taskLinks.first()).toHaveAttribute('href', /^\/tasks\?focus=/);
+});
+
+test('all Realm navigation surfaces open without runtime errors or horizontal overflow', async ({ page }) => {
+  await page.goto('/realm-demo');
+  const destinations = [
+    'Đại sảnh', 'Quest Board', 'Royal Command', 'Chiến dịch', 'Guild',
+    'Royal Treasury', 'Arcane Forge', 'Lantern Chat', 'Party Voice',
+    'Hồ sơ nhân vật', 'Điều hành ERP · CRM',
+  ];
+  for (const name of destinations) {
+    await page.getByRole('button', { name, exact: name !== 'Quest Board' }).click();
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+  }
 });
 
 test('demo Realm stays an explicit local sandbox when product ERP sync is enabled', async ({ page }) => {

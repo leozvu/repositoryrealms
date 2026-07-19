@@ -36,7 +36,7 @@ async function preview(projectId) {
 
 export async function GET(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!canBill(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const projectId = new URL(req.url).searchParams.get('projectId');
   if (!projectId) return NextResponse.json({ error: 'Thiếu projectId' }, { status: 400 });
@@ -45,7 +45,7 @@ export async function GET(req) {
 
 export async function POST(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!canBill(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const { projectId, rate, dueDays, note } = await req.json();

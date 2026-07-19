@@ -11,7 +11,7 @@ import { parseStrict, docGrand, paidOf } from '@/lib/format';
 // Ghi nhận thanh toán: cập nhật payments + tự tạo giao dịch thu — 1 transaction nguyên tử
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!hasAny(user, ['ACCOUNTANT'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { amount, date, note } = await req.json();
   const inv = await prisma.invoice.findUnique({ where: { id: params.id }, include: { client: true } });

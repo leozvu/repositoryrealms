@@ -5,7 +5,7 @@ import { currentStep, canDecide } from '@/lib/approvals';
 
 export async function GET() {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const pending = await prisma.approval.findMany({ where: { status: 'pending' }, orderBy: { createdAt: 'desc' } });
   const toApprove = pending.filter(ap => canDecide(currentStep(ap), user));
   const mine = await prisma.approval.findMany({ where: { requesterId: user.id }, orderBy: { createdAt: 'desc' }, take: 30 });

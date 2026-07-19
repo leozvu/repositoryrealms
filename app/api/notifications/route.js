@@ -9,7 +9,7 @@ const PRIVATE_HEADERS = { 'Cache-Control': 'private, no-cache, no-store, max-age
 
 export async function GET() {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401, headers: PRIVATE_HEADERS });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401, headers: PRIVATE_HEADERS });
   const rows = await prisma.notification.findMany({
     where: { userId: user.id }, orderBy: { createdAt: 'desc' }, take: 30,
   });
@@ -20,7 +20,7 @@ export async function GET() {
 // PUT {id} đánh dấu 1 cái đã đọc · {all:true} đọc tất cả
 export async function PUT(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401, headers: PRIVATE_HEADERS });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401, headers: PRIVATE_HEADERS });
   const { id, all } = await req.json().catch(() => ({}));
   const notificationId = String(id ?? '').trim();
   if (!all && !/^[a-zA-Z0-9:_-]{1,100}$/.test(notificationId)) {

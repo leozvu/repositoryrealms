@@ -1,4 +1,5 @@
 "route","source","dynamic","auth","inNavigation","navLabel","navSection","roles","module","resourceCandidates","apiCandidates","routeCandidates","mappingStatus"
+"/","app/page.jsx","false","public","false","","","","","","","","unreviewed"
 "/analytics","app/(app)/analytics/page.jsx","false","authenticated","true","Analytics (MRR/LTV)","Công ty","DIRECTOR | ACCOUNTANT | AM | PM","analytics","clients | csat | invoices | leads | nps | transactions","","","unreviewed"
 "/approvals","app/(app)/approvals/page.jsx","false","authenticated","true","Phê duyệt","Tổng quan","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","","GET '/api/approvals' | POST `/api/approvals/${ap.id}/decide`","","unreviewed"
 "/assets","app/(app)/assets/page.jsx","false","authenticated","true","Tài sản","Công ty","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","assets | users","","","unreviewed"
@@ -32,7 +33,6 @@
 "/messages","app/(app)/messages/page.jsx","false","authenticated","true","Tin nhắn","Tổng quan","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","","POST '/api/chat' | GET '/api/chat' | GET `/api/chat/${id}` | GET url | POST `/api/chat/${sel}`","","unreviewed"
 "/myday","app/(app)/myday/page.jsx","false","authenticated","true","Việc của tôi","Tổng quan","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","activities | tasks | timelogs","GET '/api/approvals'","","unreviewed"
 "/okr","app/(app)/okr/page.jsx","false","authenticated","true","KPI / OKR","Công ty","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","okrs | users","","","unreviewed"
-"/page.jsx","app/page.jsx","false","unverified","false","","","","","","","","unreviewed"
 "/payroll","app/(app)/payroll/page.jsx","false","authenticated","true","Bảng lương","Nhân sự","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","","GET '/api/payroll' | POST '/api/payroll' | PUT '/api/payroll' | PUT '/api/payroll' | POST `/api/payroll/${cur.id}/finalize`","","unreviewed"
 "/portfolio","app/(app)/portfolio/page.jsx","false","authenticated","true","Sở chỉ huy DA","Vận hành","DIRECTOR | PM | LEAD | ACCOUNTANT","delivery","clients | projects | tasks | users","GET '/api/projects/stats'","","unreviewed"
 "/projects","app/(app)/projects/page.jsx","false","authenticated","true","Dự án","Vận hành","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","delivery","clients | projects | projecttemplates","GET '/api/projects/stats' | POST '/api/data/phases' | POST '/api/data/tasks' | POST '/api/data/milestones'","","unreviewed"

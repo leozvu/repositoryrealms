@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  createRealmDemoGuestProfile,
   createEnvelope,
   DEFAULT_PROFILE,
   isInVoiceRange,
   isRealmMessage,
   mergeRealmPresencePeople,
   normalizeProfile,
+  REALM_CHANNEL,
   REALM_PROTOCOL_VERSION,
 } from '../lib/realm-protocol.js';
 import { normalizeRealmText, realmEmote, REALM_EMOTES } from '../lib/realm-social.js';
@@ -18,6 +20,11 @@ import {
   normalizePartyMedia,
 } from '../lib/realm-party.js';
 import { RealmPartyDirectory } from '../lib/realm-party-directory.js';
+import {
+  createBroadcastTransport,
+  createGatewayTransport,
+  resolveRealmGatewayUrl,
+} from '../components/realm/realm-transports.js';
 import { TokenVerifier } from 'livekit-server-sdk';
 import { issueRealmSfuGrant, loadRealmSfuConfig, probeRealmSfu, realmLiveKitRoomName, realmSfuHealthUrl } from '../lib/realm-sfu-server.js';
 
@@ -30,6 +37,166 @@ test('normalizeProfile trims and validates identity fields', () => {
   });
   assert.equal(normalizeProfile({ name: '', role: '', color: 'red' }).name, DEFAULT_PROFILE.name);
   assert.equal(normalizeProfile({ color: 'red' }).color, DEFAULT_PROFILE.color);
+});
+
+test('demo guest identity is stable per browser profile and distinct across browsers', () => {
+  assert.equal(createRealmDemoGuestProfile({}, 'browser-abc1234').name, 'Adventurer 1234');
+  assert.equal(createRealmDemoGuestProfile({}, 'browser-abc1234').name, 'Adventurer 1234');
+  assert.equal(createRealmDemoGuestProfile({}, 'browser-xyz9876').name, 'Adventurer 9876');
+  assert.equal(createRealmDemoGuestProfile({ name: 'Sơn Vũ' }, 'browser-abc1234').name, 'Sơn Vũ');
+});
+
+test('gateway signaling is opt-in and never probes an unconfigured local service', () => {
+  const previous = process.env.NEXT_PUBLIC_REALM_SIGNAL_URL;
+  try {
+    delete process.env.NEXT_PUBLIC_REALM_SIGNAL_URL;
+    assert.equal(resolveRealmGatewayUrl(), '');
+    process.env.NEXT_PUBLIC_REALM_SIGNAL_URL = '  wss://realm.example.test/realm  ';
+    assert.equal(resolveRealmGatewayUrl(), 'wss://realm.example.test/realm');
+  } finally {
+    if (previous === undefined) delete process.env.NEXT_PUBLIC_REALM_SIGNAL_URL;
+    else process.env.NEXT_PUBLIC_REALM_SIGNAL_URL = previous;
+  }
+});
+
+test('broadcast transport connects, forwards messages and closes cleanly', async () => {
+  const previous = globalThis.BroadcastChannel;
+  const received = [];
+  let instance;
+  class FakeBroadcastChannel {
+    constructor(name) {
+      this.name = name;
+      this.sent = [];
+      this.closed = false;
+      instance = this;
+    }
+    postMessage(message) { this.sent.push(message); }
+    close() { this.closed = true; }
+  }
+  globalThis.BroadcastChannel = FakeBroadcastChannel;
+  try {
+    const transport = createBroadcastTransport({ onMessage: (message) => received.push(message) });
+    assert.equal(transport.kind, 'broadcast');
+    await transport.connect();
+    assert.equal(instance.name, REALM_CHANNEL);
+    assert.equal(transport.send({ type: 'presence' }), true);
+    assert.deepEqual(instance.sent, [{ type: 'presence' }]);
+    instance.onmessage({ data: { type: 'chat' } });
+    assert.deepEqual(received, [{ type: 'chat' }]);
+    transport.close();
+    assert.equal(instance.closed, true);
+    assert.equal(transport.send({ type: 'leave' }), false);
+  } finally {
+    if (previous === undefined) delete globalThis.BroadcastChannel;
+    else globalThis.BroadcastChannel = previous;
+  }
+});
+
+test('broadcast transport reports unsupported browsers', async () => {
+  const previous = globalThis.BroadcastChannel;
+  delete globalThis.BroadcastChannel;
+  try {
+    await assert.rejects(
+      createBroadcastTransport({ onMessage() {} }).connect(),
+      /BroadcastChannel unsupported/,
+    );
+  } finally {
+    if (previous === undefined) delete globalThis.BroadcastChannel;
+    else globalThis.BroadcastChannel = previous;
+  }
+});
+
+test('gateway transport completes its token and socket lifecycle without leaking the grant', async () => {
+  const previous = {
+    fetch: globalThis.fetch,
+    WebSocket: globalThis.WebSocket,
+    window: globalThis.window,
+  };
+  const states = [];
+  const messages = [];
+  const tokenInfo = [];
+  const sockets = [];
+  class FakeWebSocket {
+    static OPEN = 1;
+    constructor(url, protocols) {
+      this.url = url;
+      this.protocols = protocols;
+      this.readyState = 0;
+      this.sent = [];
+      sockets.push(this);
+      queueMicrotask(() => {
+        this.readyState = FakeWebSocket.OPEN;
+        this.onopen?.();
+      });
+    }
+    send(payload) { this.sent.push(payload); }
+    close() {
+      this.readyState = 3;
+      this.onclose?.();
+    }
+  }
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, '/api/realm-demo/token');
+    assert.equal(options.method, 'POST');
+    return {
+      ok: true,
+      json: async () => ({ token: 'signed-grant', realmId: 'realm-1', mapId: 'castle', iceServers: [] }),
+    };
+  };
+  globalThis.WebSocket = FakeWebSocket;
+  globalThis.window = { setTimeout, clearTimeout };
+  try {
+    const transport = createGatewayTransport({
+      gatewayUrl: 'wss://realm.example.test/realm',
+      sessionId: 'session-1',
+      profile: DEFAULT_PROFILE,
+      onMessage: (message) => messages.push(message),
+      onState: (state) => states.push(state),
+      onToken: (payload) => tokenInfo.push(payload),
+      onOpen: () => states.push('opened'),
+    });
+    assert.equal(transport.kind, 'gateway');
+    await transport.connect();
+    assert.deepEqual(states, ['gateway-connecting', 'gateway-ready', 'opened']);
+    assert.equal(tokenInfo[0].token, 'signed-grant');
+    assert.deepEqual(sockets[0].protocols, ['realm-v2', 'signed-grant']);
+    assert.equal(transport.send({ type: 'presence' }), true);
+    assert.deepEqual(JSON.parse(sockets[0].sent[0]), { type: 'presence' });
+    sockets[0].onmessage({ data: JSON.stringify({ type: 'chat' }) });
+    sockets[0].onmessage({ data: 'not-json' });
+    assert.deepEqual(messages, [{ type: 'chat' }]);
+    transport.close();
+    assert.equal(transport.send({ type: 'leave' }), false);
+  } finally {
+    globalThis.fetch = previous.fetch;
+    if (previous.WebSocket === undefined) delete globalThis.WebSocket;
+    else globalThis.WebSocket = previous.WebSocket;
+    if (previous.window === undefined) delete globalThis.window;
+    else globalThis.window = previous.window;
+  }
+});
+
+test('gateway transport fails closed when the server cannot issue a token', async () => {
+  const previous = { fetch: globalThis.fetch, window: globalThis.window };
+  globalThis.fetch = async () => ({ ok: false, json: async () => ({ error: 'Realm signaling chưa được cấu hình.' }) });
+  globalThis.window = { clearTimeout };
+  try {
+    const transport = createGatewayTransport({
+      gatewayUrl: 'wss://realm.example.test/realm',
+      sessionId: 'session-1',
+      profile: DEFAULT_PROFILE,
+      onMessage() {},
+      onState() {},
+      onToken() {},
+      onOpen() {},
+    });
+    await assert.rejects(transport.connect(), /Realm signaling chưa được cấu hình/);
+    transport.close();
+  } finally {
+    globalThis.fetch = previous.fetch;
+    if (previous.window === undefined) delete globalThis.window;
+    else globalThis.window = previous.window;
+  }
 });
 
 test('normalizeProfile chỉ phát loadout hợp lệ qua presence protocol', () => {
@@ -247,6 +414,51 @@ test('gateway party directory owns multi-member room state and host controls', (
   directory.end({ roomKey, senderId: 'member-2' });
   assert.equal(directory.size, 0);
   assert.equal(directory.partyFor(roomKey, 'member-2'), null);
+});
+
+test('party directory rejects invalid, offline, duplicate and expired invitations', () => {
+  const roomKey = 'realm:castle';
+  const invalidIdDirectory = new RealmPartyDirectory({ makePartyId: () => 'bad id' });
+  assert.equal(invalidIdDirectory.invite({ roomKey, senderId: 'host-1', targetId: 'host-1' })[0].payload.code, 'invalid-target');
+  assert.equal(invalidIdDirectory.invite({ roomKey, senderId: 'host-1', targetId: 'member-1', targetConnected: false })[0].payload.code, 'target-offline');
+  assert.equal(invalidIdDirectory.invite({ roomKey, senderId: 'host-1', targetId: 'member-1' })[0].payload.code, 'party-id-failed');
+
+  const directory = new RealmPartyDirectory({ maxPartySize: 3, makePartyId: () => 'party-12345678' });
+  directory.invite({ roomKey, senderId: 'host-1', senderProfile: { name: 'Host' }, targetId: 'member-1', targetProfile: { name: 'Member' } });
+  assert.equal(directory.sync(roomKey, 'member-1')[0].type, 'party-invite');
+  assert.equal(directory.invite({ roomKey, senderId: 'host-1', targetId: 'member-1' })[0].payload.code, 'target-invited');
+  assert.equal(directory.cancelInvite({ roomKey, senderId: 'outsider-1', partyId: 'party-12345678', targetId: 'member-1' })[0].payload.code, 'host-only');
+  assert.equal(directory.cancelInvite({ roomKey, senderId: 'host-1', partyId: 'party-12345678', targetId: 'missing-1' })[0].payload.code, 'invite-expired');
+  assert.equal(directory.cancelInvite({ roomKey, senderId: 'host-1', partyId: 'party-12345678', targetId: 'member-1' }).some((item) => item.payload.kind === 'invite-cancelled'), true);
+  assert.deepEqual(directory.sync(roomKey, 'member-1'), []);
+
+  directory.invite({ roomKey, senderId: 'host-1', senderProfile: { name: 'Host' }, targetId: 'member-1', targetProfile: { name: 'Member' } });
+  const declined = directory.respond({ roomKey, senderId: 'member-1', senderProfile: { name: 'Member' }, partyId: 'party-12345678', accepted: false });
+  assert.equal(declined.some((item) => item.payload.kind === 'invite-declined'), true);
+  assert.equal(directory.respond({ roomKey, senderId: 'member-1', partyId: 'party-12345678', accepted: true })[0].payload.code, 'invite-expired');
+});
+
+test('party directory handles capacity races, member leave and pending cleanup', () => {
+  const roomKey = 'realm:castle';
+  const full = new RealmPartyDirectory({ maxPartySize: 2, makePartyId: () => 'party-12345678' });
+  full.invite({ roomKey, senderId: 'host-1', senderProfile: { name: 'Host' }, targetId: 'member-1', targetProfile: { name: 'Member' } });
+  full.partyFor(roomKey, 'host-1').members.set('race-member', { id: 'race-member', profile: normalizeProfile({ name: 'Race' }), joinedAt: 2 });
+  assert.equal(full.respond({ roomKey, senderId: 'member-1', senderProfile: { name: 'Member' }, partyId: 'party-12345678', accepted: true }).some((item) => item.payload.code === 'party-full'), true);
+
+  const directory = new RealmPartyDirectory({ maxPartySize: 4, makePartyId: () => 'party-abcdefgh' });
+  directory.invite({ roomKey, senderId: 'host-1', senderProfile: { name: 'Host' }, targetId: 'member-1', targetProfile: { name: 'Member' } });
+  directory.respond({ roomKey, senderId: 'member-1', senderProfile: { name: 'Member' }, partyId: 'party-abcdefgh', accepted: true });
+  directory.invite({ roomKey, senderId: 'host-1', senderProfile: { name: 'Host' }, targetId: 'member-2', targetProfile: { name: 'Pending' } });
+  assert.equal(directory.kick({ roomKey, senderId: 'member-1', targetId: 'host-1' })[0].payload.code, 'host-only');
+  assert.equal(directory.kick({ roomKey, senderId: 'host-1', targetId: 'host-1' })[0].payload.code, 'invalid-member');
+  assert.equal(directory.end({ roomKey, senderId: 'member-1' })[0].payload.code, 'host-only');
+  const left = directory.leave({ roomKey, senderId: 'member-1' });
+  assert.equal(left.some((item) => item.payload.kind === 'member-left' && item.payload.code === 'left'), true);
+  assert.equal(directory.leave({ roomKey, senderId: 'member-1' })[0].payload.code, 'not-in-party');
+  assert.deepEqual(directory.disconnect(roomKey, 'absent-1'), []);
+  const ended = directory.end({ roomKey, senderId: 'host-1' });
+  assert.equal(ended.some((item) => item.targetId === 'member-2' && item.payload.kind === 'invite-cancelled'), true);
+  assert.equal(directory.size, 0);
 });
 
 test('voice range uses five tiles and lets matching private areas override distance', () => {

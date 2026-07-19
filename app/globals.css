@@ -447,6 +447,7 @@ a.link:hover{text-decoration:underline}
 .login-sub{text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:22px}
 .login-err{background:var(--danger-soft);color:var(--danger);font-size:.8rem;padding:9px 13px;border-radius:8px;margin-bottom:14px;font-weight:600}
 .login-card .field{margin-bottom:14px}
+.login-card .field input,.login-card .btn{min-height:44px}
 .role-chip{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.03em}
 .role-DIRECTOR{background:#EDE9FE;color:#7C3AED}
 .role-MANAGER{background:#DBEAFE;color:#1D4ED8}

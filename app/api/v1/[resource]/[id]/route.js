@@ -14,7 +14,7 @@ async function audit(user, action, entity, refId, detail) {
 
 export async function GET(req, { params }) {
   const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canRead(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
@@ -24,7 +24,7 @@ export async function GET(req, { params }) {
 
 export async function PUT(req, { params }) {
   const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
@@ -53,7 +53,7 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(req, { params }) {
   const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canDelete(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });

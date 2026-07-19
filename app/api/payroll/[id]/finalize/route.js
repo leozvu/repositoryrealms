@@ -7,7 +7,7 @@ import { parseStrict } from '@/lib/format';
 // Chốt bảng lương: khóa sửa + ghi tổng chi phí công ty vào sổ quỹ (1 giao dịch nguyên tử)
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!hasAny(user, ['HR', 'ACCOUNTANT'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const p = await prisma.payroll.findUnique({ where: { id: params.id } });
   if (!p) return NextResponse.json({ error: 'not found' }, { status: 404 });

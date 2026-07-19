@@ -15,7 +15,7 @@ async function audit(user, action, entity, refId, detail) {
 
 export async function GET(req, { params }) {
   const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized — thiếu hoặc sai Bearer API key' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized — thiếu hoặc sai Bearer API key', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canRead(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const where = cfg.scope ? await cfg.scope(user, prisma) : {};
@@ -26,7 +26,7 @@ export async function GET(req, { params }) {
 
 export async function POST(req, { params }) {
   const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized — thiếu hoặc sai Bearer API key' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized — thiếu hoặc sai Bearer API key', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   let data = await req.json();

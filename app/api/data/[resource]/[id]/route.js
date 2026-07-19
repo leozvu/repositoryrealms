@@ -15,7 +15,7 @@ async function audit(user, action, entity, refId, detail) {
 
 export async function PUT(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
@@ -47,7 +47,7 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canDelete(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });

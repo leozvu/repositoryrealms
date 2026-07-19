@@ -9,7 +9,7 @@ import { cached } from '@/lib/cache';
 
 export async function GET() {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const canSeeMoney = hasAny(user, ['ACCOUNTANT', 'PM', 'LEAD']); // + DIRECTOR ngầm định trong hasAny
 

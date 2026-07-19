@@ -9,7 +9,7 @@ import { reconcile, hostPay, hostPit, PIT_DEFAULT_PCT } from '@/lib/livestream';
 // thành phiếu chi thật — Kế toán không có gì để trả. Đây là chỗ nối chuỗi tiền còn thiếu.
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user) || !hasAny(user, ['LEAD', 'ACCOUNTANT', 'PM'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const { netGmv, platformFee, taxWithheld, hostPitPct } = await req.json();

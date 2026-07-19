@@ -22,6 +22,8 @@ test('all generated element IDs are unique and stable-shaped', () => {
 
 test('critical ERP and Realm routes are present with expected auth boundaries', () => {
   const routes = new Map(inventory.uiRoutes.map((route) => [route.route, route]));
+  assert.equal(routes.get('/')?.source, 'app/page.jsx');
+  assert.equal(routes.has('/page.jsx'), false);
   assert.equal(routes.get('/dashboard')?.auth, 'authenticated');
   assert.equal(routes.get('/realm')?.auth, 'authenticated');
   assert.equal(routes.get('/realm-demo')?.auth, 'public');

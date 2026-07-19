@@ -25,7 +25,7 @@ const SECRET_KEYS = ['anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPo
 
 export async function GET() {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const row = await prisma.setting.findUnique({ where: { id: 1 } });
   const data = { ...DEFAULTS, ...(row ? JSON.parse(row.json) : {}) };
   if (!isDirector(user)) SECRET_KEYS.forEach(k => delete data[k]);
@@ -34,7 +34,7 @@ export async function GET() {
 
 export async function PUT(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!isDirector(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const data = await req.json();
   const json = JSON.stringify({ ...DEFAULTS, ...data });

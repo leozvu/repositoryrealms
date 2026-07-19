@@ -11,7 +11,7 @@ import { realizedFx } from '@/lib/fx';
 // Nguyên tử: 1 $transaction cho cả cập nhật lô + phiếu thu + audit.
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user) || !hasAny(user, ['ACCOUNTANT', 'PM'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const { date, payFxRate } = await req.json().catch(() => ({}));

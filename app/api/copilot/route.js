@@ -55,7 +55,7 @@ async function buildContext(user) {
 
 export async function POST(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const { messages } = await req.json();
 
   let apiKey = process.env.ANTHROPIC_API_KEY;

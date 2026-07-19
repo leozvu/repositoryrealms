@@ -693,7 +693,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.go-cua-erp-nguoi-nhan-ang-offline-loi-nhan-van-uoc-luu-trong-not",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1787,
+      "line": 1798,
       "label": "Gõ cửa ERP / Người nhận đang offline; lời nhắn vẫn được lưu trong Notification và Lantern Mail.",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -705,7 +705,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1800,
+      "line": 1811,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -717,7 +717,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1831,
+      "line": 1842,
       "label": "Tên hiển thị / Class trong Realm / Màu huy hiệu / Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -729,7 +729,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1848,
+      "line": 1859,
       "label": "Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -741,7 +741,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1884,
+      "line": 1895,
       "label": "Nhận / Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -753,7 +753,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2455,
+      "line": 2466,
       "label": "Đang ghi… / Ghi nhận Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",

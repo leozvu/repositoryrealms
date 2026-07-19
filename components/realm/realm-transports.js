@@ -1,14 +1,10 @@
 'use client';
 
-import { REALM_CHANNEL } from '@/lib/realm-protocol';
+import { REALM_CHANNEL } from '../../lib/realm-protocol.js';
 
 export function resolveRealmGatewayUrl() {
   const configured = process.env.NEXT_PUBLIC_REALM_SIGNAL_URL?.trim();
-  if (configured) return configured;
-  if (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
-    return `ws://${window.location.hostname}:3301/realm`;
-  }
-  return '';
+  return configured || '';
 }
 
 export function createBroadcastTransport({ onMessage }) {

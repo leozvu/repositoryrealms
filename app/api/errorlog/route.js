@@ -37,7 +37,7 @@ function consumeReportQuota(userId, now = Date.now()) {
 // AuditLog không trở thành một endpoint ghi dữ liệu công khai.
 export async function POST(req) {
   const user = await currentUser().catch(() => null);
-  if (!user) return json({ error: 'unauthorized' }, 401);
+  if (!user) return json({ error: 'unauthorized', code: 'unauthorized' }, 401);
 
   const contentLength = Number(req.headers.get('content-length') || 0);
   if (contentLength > MAX_REPORT_BYTES) return json({ error: 'payload_too_large' }, 413);

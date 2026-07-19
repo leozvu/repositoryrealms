@@ -10,7 +10,7 @@ import { notificationRecordRoute } from '@/lib/notification-inbox';
 
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const { decision, note } = await req.json(); // approve | reject
   const ap = await prisma.approval.findUnique({ where: { id: params.id } });
   if (!ap || ap.status !== 'pending') return NextResponse.json({ error: 'Yêu cầu không tồn tại hoặc đã xử lý' }, { status: 400 });

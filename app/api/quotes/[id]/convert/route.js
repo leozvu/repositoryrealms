@@ -19,7 +19,7 @@ const canConvert = user => !isFreelancer(user) && hasAny(user, ['AM', 'ACCOUNTAN
 
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!canConvert(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const { to } = await req.json(); // 'invoice' | 'project'
