@@ -9,6 +9,7 @@ import {
   transitionRealmPilotWave,
 } from '../lib/realm-pilot-operations.js';
 import { normalizeRealmPilotConfig } from '../lib/realm-pilot.js';
+import { REALM_REHEARSAL_SCENARIOS } from '../lib/realm-pilot-rehearsal.js';
 
 const NOW = new Date('2026-07-19T16:00:00.000Z');
 const MAKER = { id: 'director-maker', name: 'Maker', role: 'DIRECTOR', roles: '["DIRECTOR"]', status: 'active', userType: 'employee', workspacePreference: 'erp' };
@@ -26,6 +27,18 @@ function database() {
       roles: [],
       version: 4,
     }),
+    realmPilotRehearsal: {
+      version: 1,
+      runs: [{
+        id: 'rpr-sealed',
+        name: 'Sealed rehearsal',
+        status: 'sealed',
+        policyVersion: 4,
+        checks: REALM_REHEARSAL_SCENARIOS.map((scenario) => ({ id: scenario.id, result: 'passed', evidence: 'Operational evidence verified', updatedAt: NOW.toISOString() })),
+        sealedAt: NOW.toISOString(),
+        expiresAt: new Date(NOW.getTime() + 24 * 3_600_000).toISOString(),
+      }],
+    },
   };
   let rawCall = 0;
   const audits = [];
@@ -99,6 +112,8 @@ test('Phase 16 requires a different Director and revalidates readiness before ac
     action: 'submit', waveId: 'rpw_wave-1', expectedVersion: 1,
   }, { now: new Date(NOW.getTime() + 60_000) });
   assert.equal(submitted.wave.status, 'awaiting_approval');
+  assert.equal(submitted.wave.rehearsalId, 'rpr-sealed');
+  assert.equal(Boolean(submitted.wave.rehearsalExpiresAt), true);
   assert.equal(submitted.notificationCount, 1);
   assert.equal(fixture.notifications[0].userId, CHECKER.id);
 
@@ -114,6 +129,7 @@ test('Phase 16 requires a different Director and revalidates readiness before ac
     action: 'approve', waveId: 'rpw_wave-1', expectedVersion: 2,
   }, { now: new Date(NOW.getTime() + 180_000) });
   assert.equal(approved.wave.status, 'active');
+  assert.equal(approved.wave.rehearsalId, 'rpr-sealed');
   assert.equal(approved.notificationCount, 1);
   assert.equal(fixture.notifications.at(-1).userId, STAFF.id);
   assert.equal(fixture.notifications.at(-1).route, '/realm');

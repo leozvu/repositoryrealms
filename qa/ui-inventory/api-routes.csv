@@ -45,6 +45,7 @@
 "/api/realm-demo/operations","app/api/realm-demo/operations/route.js","false","GET | POST","unreviewed"
 "/api/realm-demo/pilot","app/api/realm-demo/pilot/route.js","false","GET | PUT | PATCH","unreviewed"
 "/api/realm-demo/pilot/operations","app/api/realm-demo/pilot/operations/route.js","false","GET | POST","unreviewed"
+"/api/realm-demo/pilot/rehearsal","app/api/realm-demo/pilot/rehearsal/route.js","false","GET | POST","unreviewed"
 "/api/realm-demo/readiness","app/api/realm-demo/readiness/route.js","false","GET","unreviewed"
 "/api/realm-demo/rewards","app/api/realm-demo/rewards/route.js","false","GET | POST","unreviewed"
 "/api/realm-demo/token","app/api/realm-demo/token/route.js","false","POST","unreviewed"

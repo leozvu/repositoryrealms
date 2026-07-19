@@ -5,6 +5,7 @@ import { Icon, Forbidden, useToast, useResource, Modal, ConfirmDialog, AsyncButt
 import { ROLES, ROLE_LABEL } from '@/lib/perm';
 import { MODULE_GROUPS, MODULE_PRESETS } from '@/lib/modules';
 import RealmPilotControl from '@/components/realm/RealmPilotControl';
+import RealmPilotRehearsal from '@/components/realm/RealmPilotRehearsal';
 import RealmPilotOperations from '@/components/realm/RealmPilotOperations';
 import RealmFeedbackOperations from '@/components/realm/RealmFeedbackOperations';
 
@@ -261,6 +262,7 @@ export default function SettingsPage() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <RealmPilotControl />
+        <RealmPilotRehearsal />
         <RealmPilotOperations />
         <RealmFeedbackOperations />
         <div className="card">

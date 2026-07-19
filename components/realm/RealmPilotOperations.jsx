@@ -111,6 +111,7 @@ export default function RealmPilotOperations() {
   const hasOpenWave = wave && OPEN_STATUSES.has(wave.status);
   const metrics = dashboard?.metrics;
   const readiness = dashboard?.readiness;
+  const rehearsal = dashboard?.rehearsal;
   const report = dashboard?.report;
   const [reportCode, reportCopy, reportTone] = REPORT[report?.recommendation] || REPORT.hold;
   const history = useMemo(() => (dashboard?.operations?.waves || []).filter((item) => item.id !== wave?.id).slice(0, 4), [dashboard, wave?.id]);
@@ -164,18 +165,19 @@ export default function RealmPilotOperations() {
                   <span><b>Dự kiến</b>{formatDate(wave.plannedStartAt)} → {formatDate(wave.plannedEndAt)}</span>
                   <span><b>Kích hoạt</b>{formatDate(wave.activatedAt, true)}</span>
                   <span><b>Maker</b>{wave.submittedByName || wave.createdByName}</span>
+                  <span><b>Rehearsal</b>{wave.rehearsalId ? `Sealed · ${formatDate(wave.rehearsalExpiresAt, true)}` : 'Chưa khóa'}</span>
                 </div>
                 {wave.decisionNote && <p className={styles.note}><Icon name="note" size={14} /> {wave.decisionNote}</p>}
                 <div className={styles.waveActions}>
                   <span aria-live="polite">
-                    {wave.status === 'draft' && (wave.policyVersion === dashboard.policy.version ? 'Sẵn sàng kiểm tra readiness và gửi duyệt.' : 'Policy đã đổi; hãy đóng wave cũ.')}
+                    {wave.status === 'draft' && (wave.policyVersion !== dashboard.policy.version ? 'Policy đã đổi; hãy đóng wave cũ.' : rehearsal?.readyForWave ? 'Readiness và sealed rehearsal đã sẵn sàng.' : rehearsal?.reason)}
                     {wave.status === 'awaiting_approval' && (wave.canApprove ? 'Bạn là checker hợp lệ cho wave này.' : 'Đang chờ một Director khác duyệt.')}
                     {wave.status === 'active' && 'Invitation đã gửi; ERP vẫn là fallback.'}
                     {wave.status === 'paused' && 'Kill switch đang bật; hoàn tất wave để lưu báo cáo.'}
                   </span>
                   <div>
-                    {wave.status === 'draft' && <AsyncButton className="btn btn-primary" pendingLabel="Đang gửi…" disabled={!readiness.ready || wave.policyVersion !== dashboard.policy.version} onClick={() => mutate('submit')}>Gửi Director duyệt</AsyncButton>}
-                    {wave.status === 'awaiting_approval' && wave.canApprove && <><AsyncButton className="btn btn-outline" pendingLabel="Đang trả về…" onClick={() => mutate('reject')}>Trả về nháp</AsyncButton><AsyncButton className="btn btn-primary" pendingLabel="Đang kích hoạt…" disabled={!readiness.ready} onClick={() => mutate('approve')}>Duyệt &amp; mời cohort</AsyncButton></>}
+                    {wave.status === 'draft' && <AsyncButton className="btn btn-primary" pendingLabel="Đang gửi…" disabled={!readiness.ready || !rehearsal?.readyForWave || wave.policyVersion !== dashboard.policy.version} onClick={() => mutate('submit')}>Gửi Director duyệt</AsyncButton>}
+                    {wave.status === 'awaiting_approval' && wave.canApprove && <><AsyncButton className="btn btn-outline" pendingLabel="Đang trả về…" onClick={() => mutate('reject')}>Trả về nháp</AsyncButton><AsyncButton className="btn btn-primary" pendingLabel="Đang kích hoạt…" disabled={!readiness.ready || !rehearsal?.readyForWave} onClick={() => mutate('approve')}>Duyệt &amp; mời cohort</AsyncButton></>}
                     {wave.status === 'active' && <><button type="button" className="btn btn-outline" onClick={() => setConfirm('pause')}>Tạm dừng</button><button type="button" className="btn btn-primary" onClick={() => setConfirm('complete')}>Hoàn tất wave</button></>}
                     {['draft', 'awaiting_approval', 'paused'].includes(wave.status) && <button type="button" className="btn btn-outline" onClick={() => setConfirm('complete')}>Đóng wave</button>}
                   </div>

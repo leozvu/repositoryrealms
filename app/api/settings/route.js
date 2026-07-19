@@ -34,6 +34,7 @@ export async function GET() {
     // vận hành wave chỉ được đọc qua các API Director chuyên biệt.
     delete data.realmPilot;
     delete data.realmPilotOperations;
+    delete data.realmPilotRehearsal;
   }
   return NextResponse.json(data);
 }
@@ -47,13 +48,16 @@ export async function PUT(req) {
     const row = await tx.setting.findUnique({ where: { id: 1 }, select: { json: true } });
     let current = {};
     try { current = JSON.parse(row?.json || '{}'); } catch { current = {}; }
-    // Realm pilot và Pilot Operations có endpoint riêng để validate cohort, wave và kill
-    // switch. Form công ty dùng snapshot cũ nên không được ghi đè hai control-plane này.
+    // Realm pilot, Pilot Operations và Launch Rehearsal có endpoint riêng để validate
+    // cohort, wave, four-eyes seal và kill switch. Form công ty dùng snapshot cũ nên
+    // không được ghi đè các control-plane này.
     const next = { ...DEFAULTS, ...data };
     if (current.realmPilot) next.realmPilot = current.realmPilot;
     else delete next.realmPilot;
     if (current.realmPilotOperations) next.realmPilotOperations = current.realmPilotOperations;
     else delete next.realmPilotOperations;
+    if (current.realmPilotRehearsal) next.realmPilotRehearsal = current.realmPilotRehearsal;
+    else delete next.realmPilotRehearsal;
     const json = JSON.stringify(next);
     await tx.setting.upsert({ where: { id: 1 }, create: { id: 1, json }, update: { json } });
     await tx.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'settings', detail: 'Cập nhật cài đặt công ty' } });
