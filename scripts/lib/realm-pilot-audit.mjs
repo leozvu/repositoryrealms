@@ -11,7 +11,7 @@ const CONTRACTS = [
   { id: 'preference-only-migration', layer: 'database', source: 'prisma/migrations/20260719110000_add_realm_pilot_preference/migration.sql', signals: ['ALTER TABLE "User"', 'ADD COLUMN "workspacePreference"', 'User_status_userType_workspacePreference_idx'], forbiddenSignals: ['CREATE TABLE', 'DROP TABLE'] },
   { id: 'single-setting-policy', layer: 'server', source: 'lib/realm-pilot.js', signals: ['parseRealmPilotConfig', 'JSON.stringify({ ...current, realmPilot: config })', 'setting.upsert'] },
   { id: 'generic-settings-preserve-policy', layer: 'server', source: 'app/api/settings/route.js', signals: ['if (current.realmPilot) next.realmPilot = current.realmPilot', "delete next.realmPilot", "isolationLevel: 'Serializable'"] },
-  { id: 'kill-switch-and-role-cohort', layer: 'contract', source: 'lib/realm-pilot.js', signals: ["config.mode === 'off'", "config.mode === 'pilot'", 'config.roles.includes(role)', "resolvedSurface: 'erp'"] },
+  { id: 'kill-switch-and-cohort', layer: 'contract', source: 'lib/realm-pilot.js', signals: ["config.mode === 'off'", "config.mode === 'pilot'", "config.memberIds.includes(user.id)", 'config.roles.includes(role)', "resolvedSurface: 'erp'"] },
   { id: 'explicit-user-opt-out', layer: 'contract', source: 'lib/realm-pilot.js', signals: ["REALM_WORKSPACE_PREFERENCES", "['auto', 'erp', 'realm']", 'saveRealmWorkspacePreference'] },
   { id: 'server-route-enforcement', layer: 'server', source: 'app/(app)/realm/page.jsx', signals: ['loadRealmPilotDecision', 'if (!pilot.allowed)', 'redirect(`/dashboard?realm='] },
   { id: 'authenticated-policy-api', layer: 'api', source: 'app/api/realm-demo/pilot/route.js', signals: ['authenticatedUser()', 'export async function GET', 'export async function PUT', 'export async function PATCH'] },
@@ -20,7 +20,7 @@ const CONTRACTS = [
   { id: 'policy-aware-login', layer: 'client', source: 'app/login/page.jsx', signals: ["fetch('/api/realm-demo/pilot'", 'pilot.user?.allowed', "destination = '/realm'"] },
   { id: 'cross-surface-preference', layer: 'client', source: 'lib/collaboration.js', signals: ['persistWorkspaceSurface', "window.fetch('/api/realm-demo/pilot'", 'preference: normalized', 'keepalive: true'] },
   { id: 'both-surfaces-persist-choice', layer: 'client', source: 'components/realm/RealmOffice.jsx', signals: ["persistWorkspaceSurface('erp')", 'Chuyển sang giao diện ERP CRM', 'Mở ERP · CRM'] },
-  { id: 'pilot-admin-control', layer: 'client', source: 'components/realm/RealmPilotControl.jsx', signals: ['Realm Pilot Control', 'Pilot theo vai trò', 'Lưu chính sách pilot', 'không thay thế ERP'] },
+  { id: 'pilot-admin-control', layer: 'client', source: 'components/realm/RealmPilotControl.jsx', signals: ['Realm Pilot Control', 'Pilot theo cohort', 'Lưu chính sách pilot', 'không thay thế ERP'] },
   { id: 'accessible-responsive-control', layer: 'style', source: 'components/realm/realm-pilot-control.module.css', signals: ['min-height: 44px', ':focus-within', '@media (max-width: 680px)', '@media (prefers-reduced-motion: reduce)'] },
   { id: 'classic-erp-always-reachable', layer: 'client', source: 'components/collaboration/CollaborationBridge.jsx', signals: ["realm ? '/dashboard'", "surface = realm ? 'erp'", 'ERP · CRM'] },
   { id: 'schema-readiness-v8', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 8', '20260719133000_add_realm_pilot_feedback', "missing.push('pilot_preference')"] },
@@ -91,7 +91,7 @@ function report(result) {
     `- Performance tracking: **${s.performanceTracking}**\n\n` +
     `## Contract matrix\n\n${markdownTable(result.contracts, [['Contract', 'id'], ['Layer', 'layer'], ['Evidence', 'source'], ['Status', 'status']])}\n\n` +
     `## Rollout và quyền riêng tư\n\n` +
-    `- Giám đốc có kill switch, cohort theo vai trò và chế độ mở cho toàn bộ nhân sự nội bộ.\n` +
+    `- Giám đốc có kill switch, cohort theo nhân sự hoặc vai trò và chế độ mở cho toàn bộ nhân sự nội bộ.\n` +
     `- Mỗi nhân sự có lựa chọn auto/ERP/Realm; ERP luôn là fallback và luôn có thể quay lại.\n` +
     `- /realm được enforce phía server; giấu menu không phải là lớp bảo mật duy nhất.\n` +
     `- Adoption chỉ đếm preference và presence hết hạn sau 90 giây ở mức tổng hợp. Không ghi thời lượng hoặc hiệu suất cá nhân.\n` +

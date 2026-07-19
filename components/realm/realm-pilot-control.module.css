@@ -46,8 +46,8 @@
 .fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
 .fieldset legend { margin-bottom: 8px; color: var(--fg); font-size: .8rem; font-weight: 750; }
 
-.optionGrid, .surfaceChoice, .featureGrid { display: grid; gap: 8px; }
-.option, .surfaceChoice label {
+.optionGrid, .surfaceChoice, .featureGrid, .cohortStrategy { display: grid; gap: 8px; }
+.option, .surfaceChoice label, .cohortStrategy label {
   min-height: 58px;
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr);
@@ -60,11 +60,30 @@
   cursor: pointer;
 }
 
-.option:hover, .surfaceChoice label:hover { border-color: #7e9b89; }
+.option:hover, .surfaceChoice label:hover, .cohortStrategy label:hover { border-color: #7e9b89; }
 .selected { border-color: #315b43 !important; background: #f0f7f2 !important; box-shadow: 0 0 0 1px rgba(49, 91, 67, .1); }
-.option input, .surfaceChoice input, .roles input { width: 18px; height: 18px; accent-color: #315b43; }
-.option strong, .surfaceChoice strong { display: block; font-size: .8rem; }
-.option small, .surfaceChoice small { display: block; margin-top: 2px; color: var(--muted); font-size: .7rem; line-height: 1.4; }
+.option input, .surfaceChoice input, .cohortStrategy input, .roles input { width: 18px; height: 18px; accent-color: #315b43; }
+.option strong, .surfaceChoice strong, .cohortStrategy strong { display: block; font-size: .8rem; }
+.option small, .surfaceChoice small, .cohortStrategy small { display: block; margin-top: 2px; color: var(--muted); font-size: .7rem; line-height: 1.4; }
+
+.cohortStrategy { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 9px; }
+
+.memberPicker { display: grid; gap: 8px; }
+.memberToolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; }
+.memberToolbar > label { min-height: 44px; display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 7px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); }
+.memberToolbar input { min-width: 0; height: 42px; padding: 0; border: 0; outline: 0; background: transparent; }
+.memberToolbar > span { color: var(--muted); font-size: .7rem; white-space: nowrap; }
+.memberToolbar button { min-height: 44px; }
+.memberList { max-height: 320px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; overflow: auto; padding: 2px; scrollbar-gutter: stable; }
+.memberList label { min-height: 56px; display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 8px; padding: 8px 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); cursor: pointer; }
+.memberList label:hover { border-color: #7e9b89; }
+.memberList label[aria-disabled] { opacity: .55; cursor: not-allowed; }
+.memberList input { width: 18px; height: 18px; accent-color: #315b43; }
+.memberList strong, .memberList small { display: block; }
+.memberList strong { overflow: hidden; font-size: .76rem; text-overflow: ellipsis; white-space: nowrap; }
+.memberList small { margin-top: 2px; color: var(--muted); font-size: .67rem; line-height: 1.35; }
+.memberSelected { border-color: #315b43 !important; background: #f0f7f2 !important; }
+.memberEmpty { grid-column: 1 / -1; margin: 0; padding: 18px; border: 1px dashed var(--border); border-radius: 8px; color: var(--muted); font-size: .74rem; text-align: center; }
 
 .roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 .roles label {
@@ -154,7 +173,7 @@
 .actions span { color: var(--muted); font-size: .7rem; }
 .actions button { min-height: 44px; }
 
-.option:focus-within, .surfaceChoice label:focus-within, .roles label:focus-within {
+.option:focus-within, .surfaceChoice label:focus-within, .cohortStrategy label:focus-within, .roles label:focus-within, .memberToolbar > label:focus-within, .memberList label:focus-within {
   outline: 3px solid color-mix(in srgb, #315b43 32%, transparent);
   outline-offset: 2px;
 }
@@ -166,7 +185,9 @@
 @media (max-width: 680px) {
   .header { grid-template-columns: 38px minmax(0, 1fr); }
   .status { grid-column: 2; justify-self: start; }
-  .roles, .metrics, .featureGrid, .gates { grid-template-columns: 1fr; }
+  .roles, .metrics, .featureGrid, .gates, .cohortStrategy, .memberList { grid-template-columns: 1fr; }
+  .memberToolbar { grid-template-columns: 1fr auto; }
+  .memberToolbar > label { grid-column: 1 / -1; }
   .onboardingVersion { grid-template-columns: 1fr; }
   .onboardingVersion button { width: 100%; justify-content: center; }
   .readinessHeader { align-items: flex-start; flex-direction: column; }
@@ -175,5 +196,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .option, .surfaceChoice label, .roles label { transition: none; }
+  .option, .surfaceChoice label, .cohortStrategy label, .roles label, .memberList label { transition: none; }
 }

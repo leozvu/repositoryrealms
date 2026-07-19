@@ -19137,7 +19137,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.thu-lai",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 128,
+      "line": 167,
       "column": 13,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -19164,7 +19164,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-pilot-mode",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 137,
+      "line": 176,
       "column": 21,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19189,10 +19189,37 @@
       "uxRiskCandidates": []
     },
     {
+      "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-cohort-strategy",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 195,
+      "column": 23,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "realm-cohort-strategy",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.input",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 156,
-      "column": 23,
+      "line": 210,
+      "column": 25,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
       "kind": "form-control",
@@ -19218,9 +19245,94 @@
       ]
     },
     {
+      "elementId": "component.components-realm-realmpilotcontrol.form-control.tim-theo-ten-chuc-danh-hoac-vai-tro",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 221,
+      "column": 25,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "Tìm theo tên, chức danh hoặc vai trò…",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.action.bo-chon",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 225,
+      "column": 25,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "button",
+      "kind": "action",
+      "label": "Bỏ chọn",
+      "handlerEvent": "onClick",
+      "handler": "() => setDraft((current) => ({ ...current, memberIds: [] }))",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotcontrol.form-control.input.2",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "line": 234,
+      "column": 29,
+      "surface": "component.components-realm-realmpilotcontrol",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "disabled",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'",
+        "PATCH '/api/realm-demo/pilot'",
+        "GET '/api/realm-demo/readiness'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 168,
+      "line": 253,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19247,7 +19359,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.form-control.realm-default-surface.2",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 172,
+      "line": 257,
       "column": 19,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19272,9 +19384,9 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "component.components-realm-realmpilotcontrol.form-control.input.2",
+      "elementId": "component.components-realm-realmpilotcontrol.form-control.input.3",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 184,
+      "line": 269,
       "column": 21,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "input",
@@ -19303,7 +19415,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.tao-tour-v",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 196,
+      "line": 281,
       "column": 17,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -19330,7 +19442,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.mo-tour-cua-toi",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 197,
+      "line": 282,
       "column": 17,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "button",
@@ -19357,7 +19469,7 @@
     {
       "elementId": "component.components-realm-realmpilotcontrol.action.luu-chinh-sach-pilot",
       "source": "components/realm/RealmPilotControl.jsx",
-      "line": 233,
+      "line": 318,
       "column": 15,
       "surface": "component.components-realm-realmpilotcontrol",
       "tag": "AsyncButton",
@@ -22208,19 +22320,19 @@
   "summary": {
     "uiRoutes": 56,
     "apiRoutes": 58,
-    "interactiveElements": 690,
+    "interactiveElements": 694,
     "sourceFilesWithInteractions": 77,
     "routesInPrimaryNavigation": 52,
     "routesWithResourceCandidates": 43,
     "byKind": {
-      "action": 416,
-      "form-control": 220,
+      "action": 417,
+      "form-control": 223,
       "form-submit": 10,
       "navigation": 44
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 207,
+      "control_binding_unverified": 209,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 22
     },

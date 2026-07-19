@@ -2,10 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   DEFAULT_REALM_PILOT_CONFIG,
+  loadRealmPilotDirectory,
   loadRealmPilotMetrics,
   normalizeRealmPilotConfig,
   normalizeRealmWorkspacePreference,
   parseRealmPilotConfig,
+  publicRealmPilotConfig,
   realmPilotDecision,
   saveRealmPilotConfig,
   saveRealmWorkspacePreference,
@@ -34,7 +36,7 @@ test('pilot config and workspace preferences normalize untrusted values safely',
   assert.equal(normalizeRealmWorkspacePreference(' REALM '), 'realm');
   assert.equal(normalizeRealmWorkspacePreference('unknown'), 'auto');
   assert.deepEqual(normalizeRealmPilotConfig({ mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF', 'STAFF', 'INVALID'] }), {
-    mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF'],
+    mode: 'pilot', defaultSurface: 'realm', cohortStrategy: 'roles', roles: ['STAFF'], memberIds: [],
     features: { office: true, tavern: true, feedback: true }, onboardingVersion: 1, version: 0,
   });
   const flags = normalizeRealmPilotConfig({ features: { office: false, tavern: false }, onboardingVersion: 120, version: 4 });
@@ -46,7 +48,7 @@ test('pilot config and workspace preferences normalize untrusted values safely',
   assert.deepEqual(normalizeRealmPilotConfig({ mode: 'invalid', defaultSurface: 'invalid' }), DEFAULT_REALM_PILOT_CONFIG);
   assert.deepEqual(parseRealmPilotConfig('{broken'), DEFAULT_REALM_PILOT_CONFIG);
   assert.deepEqual(parseRealmPilotConfig(JSON.stringify({ realmPilot: { mode: 'off', roles: [] } })), {
-    mode: 'off', defaultSurface: 'erp', roles: [],
+    mode: 'off', defaultSurface: 'erp', cohortStrategy: 'roles', roles: [], memberIds: [],
     features: { office: true, tavern: true, feedback: true }, onboardingVersion: 1, version: 0,
   });
 });
@@ -72,7 +74,22 @@ test('pilot decision keeps ERP as fallback and enforces internal cohorts', () =>
   const granted = realmPilotDecision(STAFF, { mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF'] }, 'auto');
   assert.equal(granted.allowed, true);
   assert.equal(granted.resolvedSurface, 'realm');
+  const namedGranted = realmPilotDecision(STAFF, { mode: 'pilot', cohortStrategy: 'members', memberIds: ['staff-1'] }, 'realm');
+  assert.equal(namedGranted.allowed, true);
+  const namedDenied = realmPilotDecision(STAFF, { mode: 'pilot', cohortStrategy: 'members', memberIds: ['director-1'], roles: ['STAFF'] }, 'realm');
+  assert.equal(namedDenied.code, 'realm_pilot_cohort_required');
   assert.equal(realmPilotDecision(STAFF, { mode: 'open', defaultSurface: 'realm' }, 'erp').resolvedSurface, 'erp');
+});
+
+test('named cohort normalization is bounded and public policy never exposes member ids', () => {
+  const ids = Array.from({ length: 54 }, (_, index) => `member-${index}`);
+  const policy = normalizeRealmPilotConfig({ cohortStrategy: 'members', memberIds: ['staff-1', 'staff-1', ...ids] });
+  assert.equal(policy.memberIds.length, 50);
+  assert.equal(policy.memberIds[0], 'staff-1');
+  const publicPolicy = publicRealmPilotConfig(policy);
+  assert.equal('memberIds' in publicPolicy, false);
+  assert.equal(publicPolicy.memberCount, 50);
+  assert.equal(publicPolicy.cohortStrategy, 'members');
 });
 
 test('adoption metrics deduplicate tabs and expose aggregate privacy-safe counts', async () => {
@@ -98,6 +115,7 @@ test('adoption metrics deduplicate tabs and expose aggregate privacy-safe counts
   assert.equal(metrics.eligibleUsers, 2);
   assert.deepEqual(metrics.preferences, { auto: 1, erp: 0, realm: 1 });
   assert.deepEqual(metrics.online, { total: 2, erp: 1, realm: 1 });
+  assert.deepEqual(metrics.cohort, { strategy: 'roles', selected: 2, available: 3 });
   assert.deepEqual(metrics.privacy, {
     aggregateOnly: true,
     performanceTracking: false,
@@ -128,6 +146,7 @@ test('only directors can save a valid pilot policy while preserving company sett
       findUnique: async () => ({ json: JSON.stringify({ company: 'Keep me', smtpHost: 'mail.example' }) }),
       upsert: async (value) => { calls.upserts.push(value); return value; },
     },
+    user: { findMany: async ({ where }) => where.id.in.map((id) => ({ id })) },
     auditLog: { create: async (value) => { calls.audits.push(value); return value; } },
   };
   const db = { $transaction: async (operation, options) => { calls.transactionOptions = options; return operation(tx); } };
@@ -136,7 +155,7 @@ test('only directors can save a valid pilot policy while preserving company sett
   await assert.rejects(() => saveRealmPilotConfig(db, DIRECTOR, { mode: 'pilot', roles: [] }), (error) => error.code === 'realm_pilot_roles_required');
   const saved = await saveRealmPilotConfig(db, DIRECTOR, { mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF', 'INVALID'] });
   assert.deepEqual(saved, {
-    mode: 'pilot', defaultSurface: 'realm', roles: ['STAFF'],
+    mode: 'pilot', defaultSurface: 'realm', cohortStrategy: 'roles', roles: ['STAFF'], memberIds: [],
     features: { office: true, tavern: true, feedback: true }, onboardingVersion: 1, version: 1,
   });
   const merged = JSON.parse(calls.upserts[0].update.json);
@@ -151,4 +170,55 @@ test('only directors can save a valid pilot policy while preserving company sett
     () => saveRealmPilotConfig(db, DIRECTOR, { ...saved, version: 2 }),
     (error) => error.code === 'realm_pilot_version_conflict',
   );
+});
+
+test('director can save only active internal named cohort members', async () => {
+  const calls = { audit: null, saved: null, members: ['staff-1'] };
+  const tx = {
+    setting: {
+      findUnique: async () => ({ json: '{}' }),
+      upsert: async (value) => { calls.saved = JSON.parse(value.update.json).realmPilot; },
+    },
+    user: { findMany: async () => calls.members.map((id) => ({ id })) },
+    auditLog: { create: async (value) => { calls.audit = value.data; } },
+  };
+  const db = { $transaction: async (operation) => operation(tx) };
+  const saved = await saveRealmPilotConfig(db, DIRECTOR, {
+    mode: 'pilot', defaultSurface: 'erp', cohortStrategy: 'members', memberIds: ['staff-1'], version: 0,
+  });
+  assert.equal(saved.cohortStrategy, 'members');
+  assert.deepEqual(saved.memberIds, ['staff-1']);
+  assert.match(calls.audit.detail, /cohort members; members 1/);
+
+  calls.members = [];
+  await assert.rejects(
+    () => saveRealmPilotConfig(db, DIRECTOR, { ...saved, version: 0 }),
+    (error) => error.code === 'realm_pilot_members_stale',
+  );
+  await assert.rejects(
+    () => saveRealmPilotConfig(db, DIRECTOR, { mode: 'pilot', cohortStrategy: 'members', memberIds: [] }),
+    (error) => error.code === 'realm_pilot_members_required',
+  );
+
+  const disabled = await saveRealmPilotConfig(db, DIRECTOR, {
+    mode: 'off', defaultSurface: 'erp', cohortStrategy: 'members', memberIds: ['inactive-user'], version: 0,
+  });
+  assert.equal(disabled.mode, 'off');
+  assert.deepEqual(disabled.memberIds, ['inactive-user']);
+});
+
+test('pilot directory exposes identity needed for access control without preference or performance data', async () => {
+  const db = {
+    user: {
+      findMany: async (query) => {
+        assert.deepEqual(query.where, { status: 'active', userType: 'employee' });
+        assert.equal(query.take, 500);
+        return [{ id: 'staff-1', name: 'Staff', title: 'Designer', role: 'STAFF', roles: '["STAFF"]', workspacePreference: 'realm', salary: 99 }];
+      },
+    },
+  };
+  const directory = await loadRealmPilotDirectory(db);
+  assert.deepEqual(directory, [{ id: 'staff-1', name: 'Staff', title: 'Designer', roles: ['STAFF'] }]);
+  assert.equal(JSON.stringify(directory).includes('workspacePreference'), false);
+  assert.equal(JSON.stringify(directory).includes('salary'), false);
 });

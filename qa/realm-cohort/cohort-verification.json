@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 17,
+    "verifiedContracts": 17,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "additiveMigrations": 0,
+    "parallelBusinessTables": 0,
+    "memberLimit": 50,
+    "rosterHiddenFromNonDirectors": true,
+    "aggregateOnly": true,
+    "performanceTracking": false,
+    "durationTracking": false
+  },
+  "contracts": [
+    {
+      "id": "backward-compatible-cohort-policy",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "REALM_PILOT_COHORT_STRATEGIES",
+        "cohortStrategy: 'roles'",
+        "memberIds: Object.freeze([])",
+        "REALM_PILOT_MEMBER_LIMIT = 50"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "named-member-server-enforcement",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "config.cohortStrategy === 'members'",
+        "config.memberIds.includes(user.id)",
+        "code: 'realm_pilot_cohort_required'",
+        "resolvedSurface: 'erp'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "active-internal-member-validation",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "status: 'active'",
+        "userType: 'employee'",
+        "realm_pilot_members_stale",
+        "realm_pilot_members_required"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "bounded-cohort-input",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "REALM_PILOT_MEMBER_LIMIT",
+        "realm_pilot_member_limit",
+        ".slice(0, REALM_PILOT_MEMBER_LIMIT)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-only-minimal-directory",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/route.js",
+      "signals": [
+        "const director = isDirector(user)",
+        "loadRealmPilotDirectory(prisma)",
+        "directory"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "non-director-member-redaction",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/route.js",
+      "signals": [
+        "publicRealmPilotConfig(decision.config)",
+        "director ? decision.config"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "minimal-directory-fields",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "select: { id: true, name: true, title: true, role: true, roles: true }",
+        "loadRealmPilotDirectory"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "serializable-versioned-policy",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "realm_pilot_version_conflict",
+        "currentConfig.version + 1",
+        "isolationLevel: 'Serializable'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "audit-count-not-roster",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "cohort ${config.cohortStrategy}; members ${config.memberIds.length}",
+        "entity: 'realm_pilot'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-only-adoption",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "eligibleUsers",
+        "aggregateOnly: true",
+        "performanceTracking: false",
+        "durationTracking: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "strategy-aware-readiness",
+      "layer": "server",
+      "source": "lib/realm-readiness.js",
+      "signals": [
+        "policy.cohortStrategy === 'members'",
+        "nhân sự được chọn đích danh",
+        "Pilot theo cohort"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "named-cohort-control",
+      "layer": "client",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "signals": [
+        "Nhân sự cụ thể",
+        "Tìm nhân sự pilot",
+        "Đã chọn {draft.memberIds.length}",
+        "không hiển thị thời lượng, tiến độ hay điểm hiệu suất"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-picker",
+      "layer": "style",
+      "source": "components/realm/realm-pilot-control.module.css",
+      "signals": [
+        "min-height: 44px",
+        ".memberList label:focus-within",
+        "@media (max-width: 680px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-default-and-kill-switch",
+      "layer": "client",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "signals": [
+        "An toàn nhất cho rollout ban đầu",
+        "ERP cổ điển vẫn luôn khả dụng",
+        "Tạm đóng"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "kill-switch-bypasses-stale-roster",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "draft.mode === 'pilot' && draft.cohortStrategy === 'members'",
+        "config.mode === 'off'",
+        "resolvedSurface: 'erp'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "operations-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-13-NAMED-COHORT-RUNBOOK.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "3–8",
+        "mode = off",
+        "/dashboard",
+        "không tự bật pilot"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-cohort-uat",
+      "layer": "test",
+      "source": "tests/e2e/realm-smoke.spec.mjs",
+      "signals": [
+        "Pilot theo cohort",
+        "Nhân sự cụ thể",
+        "Tìm nhân sự pilot"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "legacy-role-policy-still-works",
+      "expected": "true:realm",
+      "actual": "true:realm",
+      "status": "verified"
+    },
+    {
+      "id": "named-member-granted",
+      "expected": "true:realm_pilot_granted",
+      "actual": "true:realm_pilot_granted",
+      "status": "verified"
+    },
+    {
+      "id": "role-cannot-bypass-named-cohort",
+      "expected": "false:realm_pilot_cohort_required:erp",
+      "actual": "false:realm_pilot_cohort_required:erp",
+      "status": "verified"
+    },
+    {
+      "id": "member-roster-redacted",
+      "expected": "false:1",
+      "actual": "false:1",
+      "status": "verified"
+    },
+    {
+      "id": "cohort-size-bounded",
+      "expected": "50",
+      "actual": "50",
+      "status": "verified"
+    },
+    {
+      "id": "kill-switch-keeps-erp",
+      "expected": "false:erp",
+      "actual": "false:erp",
+      "status": "verified"
+    }
+  ]
+}

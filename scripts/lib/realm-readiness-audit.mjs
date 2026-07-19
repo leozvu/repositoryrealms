@@ -94,7 +94,7 @@ function report(result) {
     `- Duration tracking: **${s.durationTracking}**\n\n` +
     `## Contract matrix\n\n${markdownTable(result.contracts, [['Contract', 'id'], ['Layer', 'layer'], ['Evidence', 'source'], ['Status', 'status']])}\n\n` +
     `## Nguyên tắc phát hành\n\n` +
-    `- Cohort nhỏ theo vai trò, ERP là giao diện mặc định và /dashboard là đường fallback.\n` +
+    `- Cohort nhỏ theo nhân sự hoặc vai trò, ERP là giao diện mặc định và /dashboard là đường fallback.\n` +
     `- Office, Tavern và Guild Support có feature flag độc lập; server vẫn enforce dù client ẩn nút.\n` +
     `- Onboarding được lưu trên thiết bị, có thể bỏ qua/mở lại/reset và không gửi tiến độ lên server.\n` +
     `- Readiness chỉ trả số đếm tổng hợp; không trả user ID, tên, hiệu suất hoặc thời lượng.\n` +

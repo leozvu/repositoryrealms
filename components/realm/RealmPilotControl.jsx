@@ -1,15 +1,21 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AsyncButton, Icon, useToast } from '@/components/ui';
 import { ROLES, ROLE_LABEL } from '@/lib/perm';
+import { REALM_PILOT_MEMBER_LIMIT } from '@/lib/realm-pilot';
 import { REALM_ONBOARDING_RESET_EVENT } from './RealmPilotOnboarding';
 import styles from './realm-pilot-control.module.css';
 
 const MODE_OPTIONS = [
   { value: 'off', label: 'Tạm đóng', description: 'Kill switch: toàn bộ nhân sự tiếp tục dùng ERP cổ điển.' },
-  { value: 'pilot', label: 'Pilot theo vai trò', description: 'Chỉ các vai trò được chọn có thể mở Realm.' },
+  { value: 'pilot', label: 'Pilot theo cohort', description: 'Chỉ danh sách nhân sự hoặc vai trò được chọn có thể mở Realm.' },
   { value: 'open', label: 'Mở cho nội bộ', description: 'Mọi nhân sự nội bộ có thể tự chọn Realm hoặc ERP.' },
+];
+
+const COHORT_OPTIONS = [
+  { value: 'members', label: 'Nhân sự cụ thể', description: 'Khuyến nghị: mở cho một nhóm nhỏ được chọn đích danh.' },
+  { value: 'roles', label: 'Theo vai trò', description: 'Mở cho toàn bộ nhân sự có một trong các vai trò đã chọn.' },
 ];
 
 const FEATURE_OPTIONS = [
@@ -19,7 +25,7 @@ const FEATURE_OPTIONS = [
 ];
 
 const EMPTY_POLICY = {
-  mode: 'off', defaultSurface: 'erp', roles: [],
+  mode: 'off', defaultSurface: 'erp', cohortStrategy: 'roles', roles: [], memberIds: [],
   features: { office: true, tavern: true, feedback: true },
   onboardingVersion: 1, version: 0,
 };
@@ -36,8 +42,9 @@ function Metric({ label, value, detail }) {
 
 export default function RealmPilotControl() {
   const toast = useToast();
-  const [state, setState] = useState({ loading: true, error: '', policy: EMPTY_POLICY, metrics: null, readiness: null });
+  const [state, setState] = useState({ loading: true, error: '', policy: EMPTY_POLICY, metrics: null, readiness: null, directory: [] });
   const [draft, setDraft] = useState(EMPTY_POLICY);
+  const [memberQuery, setMemberQuery] = useState('');
 
   const load = useCallback(async () => {
     setState((current) => ({ ...current, loading: true, error: '' }));
@@ -52,7 +59,14 @@ export default function RealmPilotControl() {
       ]);
       if (!pilotResponse.ok) throw new Error(pilotPayload.error || 'Không thể tải Realm pilot.');
       if (!readinessResponse.ok) throw new Error(readinessPayload.error || 'Không thể chạy preflight Realm.');
-      setState({ loading: false, error: '', policy: pilotPayload.policy, metrics: pilotPayload.metrics, readiness: readinessPayload });
+      setState({
+        loading: false,
+        error: '',
+        policy: pilotPayload.policy,
+        metrics: pilotPayload.metrics,
+        readiness: readinessPayload,
+        directory: pilotPayload.directory || [],
+      });
       setDraft(pilotPayload.policy);
     } catch (error) {
       setState((current) => ({ ...current, loading: false, error: error.message || 'Không thể tải Realm pilot.' }));
@@ -70,6 +84,19 @@ export default function RealmPilotControl() {
     }));
   };
 
+  const toggleMember = (id) => {
+    setDraft((current) => {
+      const selected = current.memberIds.includes(id);
+      if (!selected && current.memberIds.length >= REALM_PILOT_MEMBER_LIMIT) return current;
+      return {
+        ...current,
+        memberIds: selected
+          ? current.memberIds.filter((item) => item !== id)
+          : [...current.memberIds, id],
+      };
+    });
+  };
+
   const toggleFeature = (feature) => {
     setDraft((current) => {
       const enabled = !current.features?.[feature];
@@ -82,8 +109,12 @@ export default function RealmPilotControl() {
   };
 
   const save = async () => {
-    if (draft.mode === 'pilot' && draft.roles.length === 0) {
+    if (draft.mode === 'pilot' && draft.cohortStrategy === 'roles' && draft.roles.length === 0) {
       toast('Hãy chọn ít nhất một vai trò cho cohort pilot.', 'error');
+      return false;
+    }
+    if (draft.mode === 'pilot' && draft.cohortStrategy === 'members' && draft.memberIds.length === 0) {
+      toast('Hãy chọn ít nhất một nhân sự cho cohort pilot.', 'error');
       return false;
     }
     const response = await fetch('/api/realm-demo/pilot', {
@@ -99,7 +130,7 @@ export default function RealmPilotControl() {
     }
     const readinessResponse = await fetch('/api/realm-demo/readiness', { cache: 'no-store' });
     const readiness = readinessResponse.ok ? await readinessResponse.json() : null;
-    setState({ loading: false, error: '', policy: payload.policy, metrics: payload.metrics, readiness });
+    setState({ loading: false, error: '', policy: payload.policy, metrics: payload.metrics, readiness, directory: payload.directory || state.directory });
     setDraft(payload.policy);
     toast('Đã cập nhật Realm pilot. ERP cổ điển vẫn luôn khả dụng.');
     return true;
@@ -107,6 +138,14 @@ export default function RealmPilotControl() {
 
   const changed = JSON.stringify(draft) !== JSON.stringify(state.policy);
   const metrics = state.metrics;
+  const filteredDirectory = useMemo(() => {
+    const query = memberQuery.trim().toLocaleLowerCase('vi');
+    if (!query) return state.directory;
+    return state.directory.filter((member) => {
+      const roles = member.roles.map((role) => ROLE_LABEL[role] || role).join(' ');
+      return `${member.name} ${member.title} ${roles}`.toLocaleLowerCase('vi').includes(query);
+    });
+  }, [memberQuery, state.directory]);
 
   return (
     <section className={`card ${styles.card}`} aria-labelledby="realm-pilot-title">
@@ -150,14 +189,60 @@ export default function RealmPilotControl() {
             {draft.mode === 'pilot' && (
               <fieldset className={styles.fieldset}>
                 <legend>Cohort được tham gia</legend>
-                <div className={styles.roles}>
-                  {ROLES.map((role) => (
-                    <label key={role} className={draft.roles.includes(role) ? styles.roleSelected : ''}>
-                      <input type="checkbox" checked={draft.roles.includes(role)} onChange={() => toggleRole(role)} />
-                      <span>{ROLE_LABEL[role]}</span>
+                <div className={styles.cohortStrategy}>
+                  {COHORT_OPTIONS.map((option) => (
+                    <label key={option.value} className={draft.cohortStrategy === option.value ? styles.selected : ''}>
+                      <input
+                        type="radio"
+                        name="realm-cohort-strategy"
+                        checked={draft.cohortStrategy === option.value}
+                        onChange={() => setDraft((current) => ({ ...current, cohortStrategy: option.value }))}
+                      />
+                      <span><strong>{option.label}</strong><small>{option.description}</small></span>
                     </label>
                   ))}
                 </div>
+
+                {draft.cohortStrategy === 'roles' ? (
+                  <div className={styles.roles}>
+                    {ROLES.map((role) => (
+                      <label key={role} className={draft.roles.includes(role) ? styles.roleSelected : ''}>
+                        <input type="checkbox" checked={draft.roles.includes(role)} onChange={() => toggleRole(role)} />
+                        <span>{ROLE_LABEL[role]}</span>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={styles.memberPicker}>
+                    <div className={styles.memberToolbar}>
+                      <label>
+                        <span className="sr-only">Tìm nhân sự pilot</span>
+                        <Icon name="search" size={15} />
+                        <input value={memberQuery} onChange={(event) => setMemberQuery(event.target.value)} placeholder="Tìm theo tên, chức danh hoặc vai trò…" />
+                      </label>
+                      <span aria-live="polite">Đã chọn {draft.memberIds.length}/{REALM_PILOT_MEMBER_LIMIT}</span>
+                      {draft.memberIds.length > 0 && (
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setDraft((current) => ({ ...current, memberIds: [] }))}>Bỏ chọn</button>
+                      )}
+                    </div>
+                    <div className={styles.memberList} role="group" aria-label="Danh sách nhân sự có thể tham gia pilot">
+                      {filteredDirectory.length ? filteredDirectory.map((member) => {
+                        const selected = draft.memberIds.includes(member.id);
+                        const disabled = !selected && draft.memberIds.length >= REALM_PILOT_MEMBER_LIMIT;
+                        return (
+                          <label key={member.id} className={selected ? styles.memberSelected : ''} aria-disabled={disabled || undefined}>
+                            <input type="checkbox" checked={selected} disabled={disabled} onChange={() => toggleMember(member.id)} />
+                            <span>
+                              <strong>{member.name}</strong>
+                              <small>{[member.title, member.roles.map((role) => ROLE_LABEL[role] || role).join(', ')].filter(Boolean).join(' · ')}</small>
+                            </span>
+                          </label>
+                        );
+                      }) : <p className={styles.memberEmpty}>Không tìm thấy nhân sự nội bộ phù hợp.</p>}
+                    </div>
+                    <p className={styles.assurance}><Icon name="shield" size={15} /> Danh sách này chỉ kiểm soát quyền mở Realm; không hiển thị thời lượng, tiến độ hay điểm hiệu suất.</p>
+                  </div>
+                )}
               </fieldset>
             )}
 

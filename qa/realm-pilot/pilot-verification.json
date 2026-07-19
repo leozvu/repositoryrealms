@@ -64,12 +64,13 @@
       "status": "verified"
     },
     {
-      "id": "kill-switch-and-role-cohort",
+      "id": "kill-switch-and-cohort",
       "layer": "contract",
       "source": "lib/realm-pilot.js",
       "signals": [
         "config.mode === 'off'",
         "config.mode === 'pilot'",
+        "config.memberIds.includes(user.id)",
         "config.roles.includes(role)",
         "resolvedSurface: 'erp'"
       ],
@@ -191,7 +192,7 @@
       "source": "components/realm/RealmPilotControl.jsx",
       "signals": [
         "Realm Pilot Control",
-        "Pilot theo vai trò",
+        "Pilot theo cohort",
         "Lưu chính sách pilot",
         "không thay thế ERP"
       ],

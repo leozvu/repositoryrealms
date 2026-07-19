@@ -2,6 +2,24 @@ import { test, expect } from '@playwright/test';
 
 const runtimeIssues = new WeakMap();
 
+async function loginPilotDirector(page) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await page.goto('/login');
+    await page.getByLabel('Email', { exact: true }).fill(process.env.REALM_PILOT_E2E_EMAIL);
+    await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.REALM_PILOT_E2E_PASSWORD);
+    await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
+    try {
+      await expect(page).toHaveURL(/\/(dashboard|realm)$/, { timeout: 10_000 });
+      return;
+    } catch (error) {
+      if (attempt === 1) {
+        const alert = await page.getByRole('alert').textContent().catch(() => '');
+        throw new Error(`Pilot Director login failed${alert ? `: ${alert}` : ''}`, { cause: error });
+      }
+    }
+  }
+}
+
 test.beforeEach(async ({ page }) => {
   const issues = [];
   runtimeIssues.set(page, issues);
@@ -125,11 +143,7 @@ test('director can inspect the pilot policy and switch between the same ERP data
   test.skip(isMobile, 'Authenticated pilot control is covered once on desktop; mobile controls are covered by CSS and inventory gates.');
   test.skip(!process.env.REALM_PILOT_E2E_EMAIL || !process.env.REALM_PILOT_E2E_PASSWORD, 'Requires an ephemeral staging Director account.');
 
-  await page.goto('/login');
-  await page.getByLabel('Email', { exact: true }).fill(process.env.REALM_PILOT_E2E_EMAIL);
-  await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.REALM_PILOT_E2E_PASSWORD);
-  await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
-  await expect(page).toHaveURL(/\/(dashboard|realm)$/);
+  await loginPilotDirector(page);
   if (new URL(page.url()).pathname !== '/dashboard') await page.goto('/dashboard');
 
   const onboarding = page.getByRole('dialog', { name: 'Realm Pilot · Khởi hành an toàn' });
@@ -144,11 +158,16 @@ test('director can inspect the pilot policy and switch between the same ERP data
   const pilot = page.getByRole('region', { name: 'Realm Pilot Control' });
   await expect(pilot).toBeVisible();
   await expect(pilot.getByRole('radio', { name: /Tạm đóng/ })).toBeVisible();
-  await expect(pilot.getByRole('radio', { name: /Pilot theo vai trò/ })).toBeVisible();
+  const cohortMode = pilot.getByRole('radio', { name: /Pilot theo cohort/ });
+  await expect(cohortMode).toBeVisible();
   await expect(pilot.getByRole('radio', { name: /Mở cho nội bộ/ })).toBeVisible();
   await expect(pilot).toContainText('Không ghi thời lượng làm việc');
   await expect(pilot.getByRole('region', { name: 'Release readiness preflight' })).toBeVisible();
   await expect(pilot).toContainText('Feature flags phát hành độc lập');
+  await cohortMode.check();
+  await pilot.getByRole('radio', { name: /Nhân sự cụ thể/ }).check();
+  await expect(pilot.getByLabel('Tìm nhân sự pilot')).toBeVisible();
+  await expect(pilot).toContainText('không hiển thị thời lượng, tiến độ hay điểm hiệu suất');
   const feedbackOperations = page.getByRole('region', { name: 'Guild Support · Pilot Operations' });
   await expect(feedbackOperations).toBeVisible();
   await expect(feedbackOperations).toContainText('Không dùng số phản hồi để đánh giá cá nhân');
@@ -177,11 +196,7 @@ test('pilot onboarding remains usable on mobile', async ({ page, isMobile }) => 
   test.skip(!isMobile, 'Mobile onboarding is covered once with the authenticated mobile project.');
   test.skip(!process.env.REALM_PILOT_E2E_EMAIL || !process.env.REALM_PILOT_E2E_PASSWORD, 'Requires an ephemeral staging Director account.');
 
-  await page.goto('/login');
-  await page.getByLabel('Email', { exact: true }).fill(process.env.REALM_PILOT_E2E_EMAIL);
-  await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.REALM_PILOT_E2E_PASSWORD);
-  await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
-  await expect(page).toHaveURL(/\/(dashboard|realm)$/);
+  await loginPilotDirector(page);
   if (new URL(page.url()).pathname !== '/dashboard') await page.goto('/dashboard');
 
   const onboarding = page.getByRole('dialog', { name: 'Realm Pilot · Khởi hành an toàn' });

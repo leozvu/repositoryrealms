@@ -3,7 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { isDirector } from '@/lib/perm';
 import {
   loadRealmPilotDecision,
+  loadRealmPilotDirectory,
   loadRealmPilotMetrics,
+  publicRealmPilotConfig,
   saveRealmPilotConfig,
   saveRealmWorkspacePreference,
 } from '@/lib/realm-pilot';
@@ -35,12 +37,16 @@ export async function GET(request) {
   try {
     const user = await authenticatedUser();
     const decision = await loadRealmPilotDecision(prisma, user);
-    const metrics = isDirector(user) ? await loadRealmPilotMetrics(prisma, decision.config) : null;
+    const director = isDirector(user);
+    const [metrics, directory] = director
+      ? await Promise.all([loadRealmPilotMetrics(prisma, decision.config), loadRealmPilotDirectory(prisma)])
+      : [null, null];
     return realmJsonResponse(trace, {
       source: 'erp',
       user: safeDecision(decision),
-      policy: decision.config,
+      policy: director ? decision.config : publicRealmPilotConfig(decision.config),
       metrics,
+      directory,
       privacy: metrics?.privacy || {
         aggregateOnly: true,
         performanceTracking: false,
@@ -76,8 +82,11 @@ export async function PATCH(request) {
     const user = await authenticatedUser();
     const body = await request.json().catch(() => ({}));
     const policy = await saveRealmPilotConfig(prisma, user, body.policy);
-    const metrics = await loadRealmPilotMetrics(prisma, policy);
-    return realmJsonResponse(trace, { ok: true, policy, metrics }, { code: 'realm_pilot_updated' });
+    const [metrics, directory] = await Promise.all([
+      loadRealmPilotMetrics(prisma, policy),
+      loadRealmPilotDirectory(prisma),
+    ]);
+    return realmJsonResponse(trace, { ok: true, policy, metrics, directory }, { code: 'realm_pilot_updated' });
   } catch (error) {
     return realmErrorResponse(trace, error, {
       fallbackMessage: 'Không thể cập nhật Realm pilot.',

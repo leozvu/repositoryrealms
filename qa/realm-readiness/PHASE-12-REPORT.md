@@ -38,7 +38,7 @@ Phase 12 đóng gói Realm thành một pilot có thể phát hành và rollback
 
 ## Nguyên tắc phát hành
 
-- Cohort nhỏ theo vai trò, ERP là giao diện mặc định và /dashboard là đường fallback.
+- Cohort nhỏ theo nhân sự hoặc vai trò, ERP là giao diện mặc định và /dashboard là đường fallback.
 - Office, Tavern và Guild Support có feature flag độc lập; server vẫn enforce dù client ẩn nút.
 - Onboarding được lưu trên thiết bị, có thể bỏ qua/mở lại/reset và không gửi tiến độ lên server.
 - Readiness chỉ trả số đếm tổng hợp; không trả user ID, tên, hiệu suất hoặc thời lượng.
