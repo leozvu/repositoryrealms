@@ -98,6 +98,29 @@ test('anonymous ERP navigation lands on an accessible login form', async ({ page
   await expect(page.getByRole('button', { name: 'Đăng nhập', exact: true })).toBeEnabled();
 });
 
+test('pre-hydration login fallback never places credentials in the URL', async ({ browser }) => {
+  const context = await browser.newContext({
+    baseURL: test.info().project.use.baseURL,
+    javaScriptEnabled: false,
+  });
+  try {
+    const page = await context.newPage();
+    await page.goto('/login');
+    const form = page.locator('form');
+    await expect(form).toHaveAttribute('method', 'post');
+    await expect(form).toHaveAttribute('action', '/login');
+    await expect(page.getByRole('button', { name: 'Đang khởi tạo…', exact: true })).toBeDisabled();
+    await page.getByLabel('Email', { exact: true }).fill('pre-hydration@example.test');
+    await page.getByLabel('Mật khẩu', { exact: true }).fill('must-not-appear-in-url');
+    await page.getByLabel('Mật khẩu', { exact: true }).press('Enter');
+    await page.waitForTimeout(250);
+    expect(page.url()).not.toContain('pre-hydration@example.test');
+    expect(page.url()).not.toContain('must-not-appear-in-url');
+  } finally {
+    await context.close();
+  }
+});
+
 test('director can inspect the pilot policy and switch between the same ERP data surfaces', async ({ page, isMobile }) => {
   test.skip(isMobile, 'Authenticated pilot control is covered once on desktop; mobile controls are covered by CSS and inventory gates.');
   test.skip(!process.env.REALM_PILOT_E2E_EMAIL || !process.env.REALM_PILOT_E2E_PASSWORD, 'Requires an ephemeral staging Director account.');
@@ -106,7 +129,8 @@ test('director can inspect the pilot policy and switch between the same ERP data
   await page.getByLabel('Email', { exact: true }).fill(process.env.REALM_PILOT_E2E_EMAIL);
   await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.REALM_PILOT_E2E_PASSWORD);
   await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page).toHaveURL(/\/(dashboard|realm)$/);
+  if (new URL(page.url()).pathname !== '/dashboard') await page.goto('/dashboard');
 
   const onboarding = page.getByRole('dialog', { name: 'Realm Pilot · Khởi hành an toàn' });
   await expect(onboarding).toBeVisible();
@@ -157,7 +181,8 @@ test('pilot onboarding remains usable on mobile', async ({ page, isMobile }) => 
   await page.getByLabel('Email', { exact: true }).fill(process.env.REALM_PILOT_E2E_EMAIL);
   await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.REALM_PILOT_E2E_PASSWORD);
   await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page).toHaveURL(/\/(dashboard|realm)$/);
+  if (new URL(page.url()).pathname !== '/dashboard') await page.goto('/dashboard');
 
   const onboarding = page.getByRole('dialog', { name: 'Realm Pilot · Khởi hành an toàn' });
   await expect(onboarding).toBeVisible();

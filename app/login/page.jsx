@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { preferredWorkspaceSurface } from '@/lib/collaboration';
@@ -10,7 +10,10 @@ export default function LoginPage() {
   const [otp, setOtp] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const router = useRouter();
+
+  useEffect(() => { setHydrated(true); }, []);
 
   const submit = async e => {
     e.preventDefault();
@@ -40,7 +43,7 @@ export default function LoginPage() {
         <div className="login-title">Agency ERP</div>
         <div className="login-sub">Đăng nhập vào hệ thống quản trị</div>
         {err && <div className="login-err" role="alert" aria-live="polite">{err}</div>}
-        <form onSubmit={submit}>
+        <form method="post" action="/login" onSubmit={submit}>
           <div className="field">
             <label htmlFor="login-email">Email</label>
             <input id="login-email" name="email" type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} required autoFocus placeholder="ban@congty.vn" />
@@ -53,8 +56,8 @@ export default function LoginPage() {
             <label htmlFor="login-otp">Mã 2FA (bỏ trống nếu chưa bật)</label>
             <input id="login-otp" name="otp" type="text" inputMode="numeric" maxLength={6} value={otp} onChange={e => setOtp(e.target.value)} placeholder="000000" autoComplete="one-time-code" />
           </div>
-          <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px' }} disabled={busy} aria-busy={busy || undefined}>
-            {busy ? 'Đang đăng nhập…' : 'Đăng nhập'}
+          <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px' }} disabled={!hydrated || busy} aria-busy={busy || undefined}>
+            {!hydrated ? 'Đang khởi tạo…' : busy ? 'Đang đăng nhập…' : 'Đăng nhập'}
           </button>
         </form>
       </div>
