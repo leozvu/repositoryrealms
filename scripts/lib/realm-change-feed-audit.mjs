@@ -37,8 +37,8 @@ function buildScenarios() {
   const cursor = encodeRealmChangeCursor({ createdAt: '2026-07-18T12:00:00.000Z', id: 'event-1' });
   const decoded = decodeRealmChangeCursor(cursor);
   return [
-    { id: 'task-domain-fanout', expected: 'operations,guild,campaigns,command,rewards', actual: realmChangeDomains('tasks').join(',') },
-    { id: 'approval-command-fanout', expected: 'command,notifications', actual: realmChangeDomains('approvals').join(',') },
+    { id: 'task-domain-fanout', expected: 'operations,guild,campaigns,command,rewards,chronicle', actual: realmChangeDomains('tasks').join(',') },
+    { id: 'approval-command-fanout', expected: 'command,notifications,chronicle', actual: realmChangeDomains('approvals').join(',') },
     { id: 'lead-domain-isolation', expected: 'embassy', actual: realmChangeDomains('leads').join(',') },
     { id: 'unmapped-domain-suppressed', expected: '', actual: realmChangeDomains('payroll').join(',') },
     { id: 'cursor-time-roundtrip', expected: '2026-07-18T12:00:00.000Z', actual: decoded.createdAt.toISOString() },

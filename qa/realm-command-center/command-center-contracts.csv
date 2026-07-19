@@ -12,7 +12,7 @@ handoff-owner-team-and-dedup,server,lib/realm-command-center-admin.js,"task.assi
 handoff-maker-checker,api,app/api/approvals/[id]/decide/route.js,"['realm_redemption', 'task_handoff'].includes(ap.type) | ap.requesterId === user.id | 'self_approval_forbidden'",,verified
 handoff-approval-claim-transaction,api,app/api/approvals/[id]/decide/route.js,"prisma.$transaction(async (tx) | where: { id: ap.id, status: 'pending', steps: ap.steps } | 'approval_decision_stale'",,verified
 handoff-cas-team-and-event,server,lib/approvals.js,"executeTaskHandoff | where: { id: taskId, assigneeId: expectedAssigneeId | 'task_handoff_target_outside_team' | await emitEvent('tasks', 'update'",,verified
-realtime-task-and-approval-domains,sync,lib/realm-change-feed.js,"tasks: ['operations', 'guild', 'campaigns', 'command', 'rewards'] | approvals: ['command', 'notifications']",,verified
+realtime-task-and-approval-domains,sync,lib/realm-change-feed.js,"tasks: ['operations', 'guild', 'campaigns', 'command', 'rewards', 'chronicle'] | approvals: ['command', 'notifications', 'chronicle']",,verified
 accessible-command-ui,client,components/realm/RoyalCommandCenter.jsx,"role=""progressbar"" | aria-busy={saving || undefined} | Mở Task ERP | Điều phối nguồn lực, không xếp hạng con người",,verified
 responsive-command-ui,style,components/realm/royal-command-center.module.css,min-height: 44px | :focus-visible | @media (max-width: 420px) | @media (prefers-reduced-motion: reduce),,verified
 classic-erp-task-surface-preserved,client,app/(app)/tasks/page.jsx,useResource('taskcomments' | useResource('timelogs' | useResource('taskevents' | Chi tiết công việc,,verified

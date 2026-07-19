@@ -38,6 +38,7 @@ import { createRealmGuildDemoDashboard } from '@/lib/realm-guild';
 import { createRealmWarRoomDemoDashboard } from '@/lib/realm-war-room';
 import { createRealmEmbassyDemoDashboard } from '@/lib/realm-embassy';
 import { createRealmCommandCenterDemoDashboard } from '@/lib/realm-command-center';
+import { createRealmChronicleDemoDashboard } from '@/lib/realm-chronicle';
 import { normalizeRealmText, realmEmote, REALM_EMOTES } from '@/lib/realm-social';
 import { REALM_CORE_PORTALS, createRealmErpBridge, realmRecordHref } from '@/lib/realm-business-bridge';
 import { realmAccessForPanel, realmAccessForSurface } from '@/lib/realm-access';
@@ -49,6 +50,7 @@ import GuildHall from './GuildHall';
 import WarRoom from './WarRoom';
 import RoyalEmbassy from './RoyalEmbassy';
 import RoyalCommandCenter from './RoyalCommandCenter';
+import AdventurerChronicle from './AdventurerChronicle';
 import { useProximityMedia } from './useProximityMedia';
 import { usePartySfuMedia } from './usePartySfuMedia';
 import { useRealmParty } from './useRealmParty';
@@ -1499,6 +1501,10 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
     () => realmLocalFixture(dataSource, createRealmCommandCenterDemoDashboard({ members: realmPeople, quests })),
     [dataSource, quests, realmPeople],
   );
+  const chronicleDashboard = useMemo(
+    () => realmLocalFixture(dataSource, createRealmChronicleDemoDashboard({ profile, career, quests, ledger, wallet })),
+    [career, dataSource, ledger, profile, quests, wallet],
+  );
   const embassyDashboard = useMemo(() => realmLocalFixture(dataSource, createRealmEmbassyDemoDashboard()), [dataSource]);
   const localWarRoom = useMemo(
     () => realmLocalFixture(dataSource, createRealmWarRoomDemoDashboard({ campaign: selectedCampaign || CAMPAIGNS[0], quests })),
@@ -2165,6 +2171,7 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
               onCopySupportId={copyRealmSupportId}
               guildDashboard={guildDashboard}
               commandDashboard={commandDashboard}
+              chronicleDashboard={chronicleDashboard}
               guildPresence={realmPeople}
               embassyDashboard={embassyDashboard}
               businessBridge={businessBridge}
@@ -2270,6 +2277,7 @@ function LedgerMode({
   onCopySupportId,
   guildDashboard,
   commandDashboard,
+  chronicleDashboard,
   guildPresence,
   embassyDashboard,
   businessBridge,
@@ -2401,6 +2409,12 @@ function LedgerMode({
         </div>
         {operationsSource === 'erp' && <Link className={styles.profileErpLink} href={businessBridge?.profileHref || '/staff'}><Icon name="staff" size={15} />Mở hồ sơ ERP</Link>}
       </section>
+
+      <AdventurerChronicle
+        operationsSource={operationsSource}
+        localDashboard={chronicleDashboard}
+        dataRevision={dataRevision}
+      />
 
       <section className={styles.ledgerSection} aria-labelledby="realm-erp-portals-title">
         <div className={styles.sectionHead}><div><span>Business bridge</span><h2 id="realm-erp-portals-title">Cổng nghiệp vụ ERP/CRM</h2></div><p>Medieval label chỉ là lớp giao diện; route, dữ liệu và RBAC vẫn thuộc ERP gốc.</p></div>

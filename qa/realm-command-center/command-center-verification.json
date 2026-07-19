@@ -174,8 +174,8 @@
       "layer": "sync",
       "source": "lib/realm-change-feed.js",
       "signals": [
-        "tasks: ['operations', 'guild', 'campaigns', 'command', 'rewards']",
-        "approvals: ['command', 'notifications']"
+        "tasks: ['operations', 'guild', 'campaigns', 'command', 'rewards', 'chronicle']",
+        "approvals: ['command', 'notifications', 'chronicle']"
       ],
       "missingSignals": [],
       "status": "verified"

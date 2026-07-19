@@ -126,14 +126,14 @@
   "scenarios": [
     {
       "id": "task-domain-fanout",
-      "expected": "operations,guild,campaigns,command,rewards",
-      "actual": "operations,guild,campaigns,command,rewards",
+      "expected": "operations,guild,campaigns,command,rewards,chronicle",
+      "actual": "operations,guild,campaigns,command,rewards,chronicle",
       "status": "verified"
     },
     {
       "id": "approval-command-fanout",
-      "expected": "command,notifications",
-      "actual": "command,notifications",
+      "expected": "command,notifications,chronicle",
+      "actual": "command,notifications,chronicle",
       "status": "verified"
     },
     {

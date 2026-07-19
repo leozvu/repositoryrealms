@@ -1,0 +1,259 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 15,
+    "verifiedContracts": 15,
+    "scenarios": 8,
+    "verifiedScenarios": 8,
+    "databaseMigrations": 0,
+    "parallelBusinessTables": 0,
+    "writeEndpoints": 0
+  },
+  "contracts": [
+    {
+      "id": "erp-records-remain-source-of-truth",
+      "layer": "database",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model User {",
+        "model Task {",
+        "model TimeLog {",
+        "model Leave {",
+        "model Attendance {",
+        "model Approval {",
+        "model RealmGoldEntry {"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "personal-surface-for-internal-users",
+      "layer": "access",
+      "source": "lib/realm-access.js",
+      "signals": [
+        "key: 'personal'",
+        "roles: ERP_ALL_ROLES",
+        "module: null"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-feature-gated-read-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/chronicle/route.js",
+      "signals": [
+        "process.env.REALM_ERP_SYNC_ENABLED !== '1'",
+        "realmSurfaceDecision(user, 'personal'",
+        "isFreelancer(user)",
+        "export async function GET"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "self-scoped-business-queries",
+      "layer": "server",
+      "source": "lib/realm-chronicle-admin.js",
+      "signals": [
+        "where: { assigneeId: user.id }",
+        "where: { userId: user.id",
+        "where: { requesterId: user.id }",
+        "where: { userId: user.id }"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "sensitive-fields-never-selected",
+      "layer": "server",
+      "source": "lib/realm-chronicle-admin.js",
+      "signals": [
+        "id: true, name: true, title: true, teamId: true, status: true, userType: true, realmProfile: true",
+        "select: { id: true, from: true, to: true, type: true, status: true }",
+        "select: { id: true, type: true, title: true, status: true, createdAt: true }"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "privacy-and-no-ranking-contract",
+      "layer": "contract",
+      "source": "lib/realm-chronicle.js",
+      "signals": [
+        "scope: 'self'",
+        "performanceRanking: false",
+        "sensitiveFieldsExcluded: ['salary', 'hourlyRate', 'reviewScores', 'managerNotes', 'privateNotes']",
+        "sourceOfTruth: 'erp-records'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "allowlisted-personal-timeline",
+      "layer": "contract",
+      "source": "lib/realm-chronicle.js",
+      "signals": [
+        "kind: 'gold'",
+        "kind: 'time'",
+        "kind: 'leave'",
+        "kind: 'approval'",
+        ".slice(0, 16)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "exact-erp-deep-links",
+      "layer": "contract",
+      "source": "lib/realm-chronicle.js",
+      "signals": [
+        "?focus=${encodeURIComponent(id)}&from=realm",
+        "?focus=${encodeURIComponent(safeId(taskId))}&from=realm",
+        "links.projects}/${encodeURIComponent"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realtime-personal-domains",
+      "layer": "sync",
+      "source": "lib/realm-change-feed.js",
+      "signals": [
+        "timelogs: ['operations', 'command', 'chronicle']",
+        "leaves: ['chronicle']",
+        "attendance: ['chronicle']",
+        "realm_gold: ['operations', 'treasury', 'rewards', 'chronicle']"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-chronicle-ui",
+      "layer": "client",
+      "source": "components/realm/AdventurerChronicle.jsx",
+      "signals": [
+        "role=\"progressbar\"",
+        "aria-live=\"polite\"",
+        "aria-label=\"Adventurer Chronicle từ dữ liệu ERP cá nhân\"",
+        "Hồ sơ tự phục vụ, không phải công cụ giám sát"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "resilient-chronicle-ui",
+      "layer": "client",
+      "source": "components/realm/AdventurerChronicle.jsx",
+      "signals": [
+        "AbortController",
+        "window.setTimeout(() => controller.abort(), 7000)",
+        "Snapshot gần nhất vẫn được giữ",
+        "Thử lại"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-accessible-style",
+      "layer": "style",
+      "source": "components/realm/adventurer-chronicle.module.css",
+      "signals": [
+        "min-height: 44px",
+        ":focus-visible",
+        "@media (max-width: 480px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "chronicle-integrated-without-replacement",
+      "layer": "client",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "<AdventurerChronicle",
+        "Cổng nghiệp vụ ERP/CRM",
+        "Quest ↔ công việc ERP/CRM",
+        "Gold journal"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "classic-personal-erp-routes-preserved",
+      "layer": "client",
+      "source": "lib/realm-business-bridge.js",
+      "signals": [
+        "timesheet: ['Chronicle'",
+        "attendance: ['Royal Muster'",
+        "approvals: ['Council Chamber'",
+        "staff: ['Guild Roster'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "no-chronicle-write-endpoint",
+      "layer": "api",
+      "source": "app/api/realm-demo/chronicle/route.js",
+      "signals": [
+        "export async function GET",
+        "operation: 'self.read'",
+        "code: 'realm_chronicle_ready'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "self-scope-no-ranking",
+      "expected": "self:false:erp-records",
+      "actual": "self:false:erp-records",
+      "status": "verified"
+    },
+    {
+      "id": "personal-metrics",
+      "expected": "1:1:4:1",
+      "actual": "1:1:4:1",
+      "status": "verified"
+    },
+    {
+      "id": "sensitive-values-excluded",
+      "expected": "false:false:false:false:false",
+      "actual": "false:false:false:false:false",
+      "status": "verified"
+    },
+    {
+      "id": "exact-record-links",
+      "expected": "/tasks?focus=task-1&from=realm:/approvals?focus=approval-1&from=realm",
+      "actual": "/tasks?focus=task-1&from=realm:/approvals?focus=approval-1&from=realm",
+      "status": "verified"
+    },
+    {
+      "id": "timeline-allowlist",
+      "expected": "approval,gold,leave,time",
+      "actual": "approval,gold,leave,time",
+      "status": "verified"
+    },
+    {
+      "id": "task-refreshes-chronicle",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "timelog-refreshes-chronicle",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "leave-attendance-refresh-chronicle",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    }
+  ]
+}

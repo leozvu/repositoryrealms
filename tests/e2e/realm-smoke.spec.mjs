@@ -23,7 +23,7 @@ test('the product Realm uses the original ERP authentication boundary', async ({
 });
 
 test('cross-surface collaboration APIs preserve the ERP authentication boundary', async ({ request }) => {
-  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center']) {
+  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle']) {
     const response = await request.get(route);
     expect([401, 503]).toContain(response.status());
     expect(response.headers()['cache-control']).toContain('no-store');
@@ -99,6 +99,13 @@ test('Realm and ERP views expose the same live character status', async ({ page 
   await expect(bridge.getByRole('link', { name: /Guild Roster/ })).toHaveAttribute('href', '/staff');
   await expect(bridge.locator('[aria-disabled="true"]')).toHaveCount(0);
 
+  const chronicle = page.getByRole('region', { name: 'Adventurer Chronicle từ dữ liệu ERP cá nhân' });
+  await expect(chronicle.getByRole('heading', { name: 'Nhật trình của Adventurer Zero' })).toBeVisible();
+  await expect(chronicle).toContainText('Demo cục bộ');
+  await expect(chronicle).toContainText('Giờ tự ghi tuần này');
+  await expect(chronicle).toContainText('Hồ sơ tự phục vụ, không phải công cụ giám sát');
+  await expect(chronicle.getByRole('link', { name: 'Mở Task ERP' }).first()).toHaveAttribute('href', /^\/tasks\?focus=/);
+
   await page.getByRole('navigation', { name: 'Chọn khu vực điều hành ERP' }).getByRole('button', { name: 'Royal Command', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Điều phối Quest xuyên ERP và Realm' })).toBeVisible();
   await expect(page.getByText('Demo cục bộ', { exact: true })).toBeVisible();
@@ -141,6 +148,7 @@ test('Realm and ERP views remain usable without horizontal overflow', async ({ p
   await erpMode.click();
   await expect(page.getByRole('heading', { name: 'Sổ điều hành CRMegoric' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Chọn khu vực điều hành ERP' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Adventurer Chronicle từ dữ liệu ERP cá nhân' })).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
 
