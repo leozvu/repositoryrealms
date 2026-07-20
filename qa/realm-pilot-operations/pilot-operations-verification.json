@@ -237,7 +237,7 @@
       "signals": [
         "button { min-height: 44px;",
         "@media (max-width: 680px)",
-        ".metrics, .waveFacts, .criteria { grid-template-columns: 1fr;",
+        ".metrics, .waveFacts, .activationFacts, .activationCriteria, .criteria { grid-template-columns: 1fr;",
         "@media (prefers-reduced-motion: reduce)"
       ],
       "missingSignals": [],

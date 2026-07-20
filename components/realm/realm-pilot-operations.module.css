@@ -46,6 +46,32 @@
 .waveFacts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
 .waveFacts span { min-width: 0; padding: 8px; border-radius: 7px; color: var(--muted); background: var(--card); font-size: .65rem; line-height: 1.4; overflow-wrap: anywhere; }
 .waveFacts b { display: block; margin-bottom: 2px; color: var(--fg); font-size: .62rem; text-transform: uppercase; }
+.activation { display: grid; gap: 10px; padding: 12px; border: 1px solid #c7b98f; border-radius: 9px; background: color-mix(in srgb, #fff7df 42%, var(--card)); }
+.activationHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.activationHead > div { min-width: 0; }
+.activationHead > div > span { color: #6f5630; font-size: .61rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.activationHead h4 { margin: 2px 0 0; color: var(--fg); font-size: .82rem; }
+.activationHead p { margin: 3px 0 0; color: var(--muted); font-size: .66rem; line-height: 1.45; }
+.canary_neutral, .canary_watching, .canary_ready, .canary_blocked, .canary_cleared, .canary_rolledBack { display: inline-flex; width: max-content; min-height: 30px; align-items: center; gap: 5px; padding: 0 9px; border: 1px solid currentColor; border-radius: 999px; font-size: .64rem; font-weight: 800; white-space: nowrap; }
+.canary_neutral { color: #58645c; background: var(--bg); }
+.canary_watching { color: #75510a; background: #fff7df; }
+.canary_ready, .canary_cleared { color: #21613d; background: #eaf6ef; }
+.canary_blocked, .canary_rolledBack { color: var(--danger); background: color-mix(in srgb, var(--danger) 7%, var(--card)); }
+.activationFacts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.activationFacts span { min-width: 0; padding: 8px; border: 1px solid color-mix(in srgb, var(--border) 70%, transparent); border-radius: 7px; color: var(--muted); background: var(--card); font-size: .64rem; line-height: 1.4; overflow-wrap: anywhere; }
+.activationFacts b { display: block; margin-bottom: 2px; color: var(--fg); font-size: .6rem; text-transform: uppercase; }
+.activationCriteria { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; }
+.activationCriteria > div { min-width: 0; display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: start; gap: 6px; padding: 7px; border: 1px solid #e3c9c9; border-radius: 7px; background: color-mix(in srgb, var(--danger) 4%, var(--card)); }
+.activationCriteria > div[data-passed] { border-color: #c9d8ce; background: #f3f8f4; }
+.activationCriteria > div > span { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--danger); background: color-mix(in srgb, var(--danger) 9%, var(--card)); }
+.activationCriteria > div[data-passed] > span { color: #315b43; background: #deece2; }
+.activationCriteria p, .activationCriteria strong, .activationCriteria small { min-width: 0; display: block; margin: 0; }
+.activationCriteria strong { font-size: .64rem; }
+.activationCriteria small { margin-top: 2px; color: var(--muted); font-size: .6rem; line-height: 1.35; overflow-wrap: anywhere; }
+.activationActions { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 9px; border-top: 1px solid #d8c9ac; }
+.activationActions > span { color: var(--muted); font-size: .67rem; line-height: 1.4; }
+.activationActions > div { display: flex; align-items: center; justify-content: flex-end; gap: 7px; }
+.activationActions button { min-height: 44px; }
 .note, .creatorHint { display: flex; align-items: flex-start; gap: 6px; margin: 0; color: #725a30; font-size: .68rem; line-height: 1.45; }
 .waveActions { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid #c8d7cd; }
 .waveActions > span { color: var(--muted); font-size: .68rem; line-height: 1.4; }
@@ -89,17 +115,17 @@
   .header { grid-template-columns: 38px minmax(0, 1fr); }
   .header button { grid-column: 2; width: 44px; justify-content: center; }
   .header button span { display: none; }
-  .metrics, .waveFacts, .criteria { grid-template-columns: 1fr; }
-  .waveHead, .reportHead, .waveActions { align-items: stretch; flex-direction: column; }
+  .metrics, .waveFacts, .activationFacts, .activationCriteria, .criteria { grid-template-columns: 1fr; }
+  .waveHead, .activationHead, .reportHead, .waveActions, .activationActions { align-items: stretch; flex-direction: column; }
   .timeline { grid-template-columns: 1fr; gap: 7px; }
   .timeline li:not(:last-child)::after { width: 2px; height: auto; top: 26px; bottom: -7px; left: 12px; right: auto; }
   .createForm { grid-template-columns: 1fr; }
-  .waveActions > div { align-items: stretch; flex-direction: column; }
-  .waveActions button, .createForm button { width: 100%; justify-content: center; }
+  .waveActions > div, .activationActions > div { align-items: stretch; flex-direction: column; }
+  .waveActions button, .activationActions button, .createForm button { width: 100%; justify-content: center; }
   .history p { grid-template-columns: auto minmax(0, 1fr); }
   .history small { grid-column: 2; white-space: normal; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wave, .creator, .report, .alerts > div { transition: none; }
+  .wave, .activation, .creator, .report, .alerts > div { transition: none; }
 }

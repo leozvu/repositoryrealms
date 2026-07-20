@@ -1,0 +1,283 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 19,
+    "verifiedContracts": 19,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "canaryWindowMinutes": 90,
+    "additiveMigrations": 0,
+    "parallelBusinessTables": 0,
+    "aggregateOnly": true,
+    "automaticCohortExpansion": false,
+    "rollbackAlwaysAvailable": true
+  },
+  "contracts": [
+    {
+      "id": "reuse-pilot-wave-setting",
+      "layer": "data",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "realmPilotOperations:",
+        "activation:",
+        "tx.setting.upsert"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "ninety-minute-canary-window",
+      "layer": "domain",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "REALM_PILOT_CANARY_WINDOW_MINUTES = 90",
+        "activationWindow"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "activation-starts-after-checker",
+      "layer": "rbac",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "action === 'approve'",
+        "state: 'watching'",
+        "approvedById: sessionUser.id"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-baseline-only",
+      "layer": "privacy",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "activationBaseline",
+        "eligibleUsers:",
+        "fallbackUsers:",
+        "blockedFeedback:",
+        "aggregateOnly: true"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canary-policy-binding",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "wave?.policyVersion === policy?.version",
+        "realm_pilot_wave_policy_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canary-live-readiness",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "buildRealmPilotActivationGuard",
+        "id: 'live-readiness'",
+        "id: 'blocked-feedback'",
+        "id: 'erp-fallback'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "checkpoint-fails-closed",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "realm_pilot_canary_window_open",
+        "realm_pilot_canary_blocked",
+        "guard.state !== 'ready'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "clear-rechecks-live-state",
+      "layer": "concurrency",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "action === 'clear_activation'",
+        "loadRealmLaunchReadiness(tx, policy, now)",
+        "validateExpectedVersion(operations, input.expectedVersion)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "clear-does-not-expand-cohort",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "state: 'cleared'",
+        "cohort hiện tại tiếp tục, chưa mở rộng tự động"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "rollback-reuses-kill-switch",
+      "layer": "rollback",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "action === 'pause'",
+        "mode: 'off'",
+        "state: 'rolled_back'",
+        "status: 'paused'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canary-operational-alerts",
+      "layer": "operations",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "id: 'canary-blocked'",
+        "id: 'canary-checkpoint-ready'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-notifications",
+      "layer": "integration",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "await directorIds(tx, sessionUser.id)",
+        "'/settings#realm-pilot-operations-title'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "serializable-cas",
+      "layer": "concurrency",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "isolationLevel: 'Serializable'",
+        "realm_pilot_operations_version_conflict"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "existing-traced-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/operations/route.js",
+      "signals": [
+        "authenticatedUser()",
+        "startRealmApiRequest",
+        "safelyPublishRealmChange"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "activation-guard-ui",
+      "layer": "client",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "signals": [
+        "Canary Activation Guard",
+        "Xác nhận qua canary gate",
+        "Rollback về ERP",
+        "Canary guardrails"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "semantic-state-with-icon-text",
+      "layer": "accessibility",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "signals": [
+        "ACTIVATION",
+        "<Icon name={icon}",
+        "{label}</span>"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-touch-safe-ui",
+      "layer": "style",
+      "source": "components/realm/realm-pilot-operations.module.css",
+      "signals": [
+        ".activationActions button { min-height: 44px;",
+        "@media (max-width: 680px)",
+        ".activationCriteria { display: grid;",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase18-unit-tests",
+      "layer": "test",
+      "source": "tests/realm-pilot-operations.test.mjs",
+      "signals": [
+        "Phase 18 canary guard waits 90 minutes",
+        "Phase 18 activation guard fails closed"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase18-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-18-CANARY-ACTIVATION.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "90 phút",
+        "mode = off",
+        "Không tự mở rộng cohort"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "approve-opens-canary-watch",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "early-clear-is-rejected",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "blocker-prevents-clear",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "clear-keeps-current-cohort",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "rollback-closes-realm-not-data",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "ui-exposes-clear-and-rollback",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    }
+  ]
+}

@@ -9,8 +9,8 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 101,
-    "asyncButtonGuards": 60,
+    "guardedActions": 102,
+    "asyncButtonGuards": 61,
     "disabledBindings": 38,
     "localPendingStates": 3,
     "destructiveFlows": 6,
@@ -859,9 +859,21 @@
       "status": "verified"
     },
     {
+      "elementId": "component.components-realm-realmpilotoperations.action.xac-nhan-qua-canary-gate",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 98,
+      "label": "Xác nhận qua canary gate",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
       "elementId": "component.components-realm-realmpilotoperations.action.gui-director-duyet",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 179,
+      "line": 239,
       "label": "Gửi Director duyệt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -873,7 +885,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.duyet-moi-cohort",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 180,
+      "line": 240,
       "label": "Duyệt & mời cohort",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -885,7 +897,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.tra-ve-nhap",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 180,
+      "line": 240,
       "label": "Trả về nháp",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -897,7 +909,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.tao-ban-nhap",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 192,
+      "line": 252,
       "label": "Tạo bản nháp",
       "actionType": "data-action",
       "loadingState": "async-button-guard",

@@ -19797,9 +19797,59 @@
       "uxRiskCandidates": []
     },
     {
+      "elementId": "component.components-realm-realmpilotoperations.action.xac-nhan-qua-canary-gate",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 98,
+      "column": 43,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Xác nhận qua canary gate",
+      "handlerEvent": "onClick",
+      "handler": "onClear",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!guard.canClear",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.rollback-ve-erp",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 99,
+      "column": 13,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "button",
+      "kind": "action",
+      "label": "Rollback về ERP",
+      "handlerEvent": "onClick",
+      "handler": "onRollback",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "component.components-realm-realmpilotoperations.action.tai-lai-pilot-operations",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 127,
+      "line": 186,
       "column": 9,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "button",
@@ -19824,7 +19874,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.thu-lai",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 134,
+      "line": 193,
       "column": 80,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "button",
@@ -19849,7 +19899,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.gui-director-duyet",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 179,
+      "line": 239,
       "column": 49,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "AsyncButton",
@@ -19874,7 +19924,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.duyet-moi-cohort",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 180,
+      "line": 240,
       "column": 209,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "AsyncButton",
@@ -19899,7 +19949,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.tra-ve-nhap",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 180,
+      "line": 240,
       "column": 82,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "AsyncButton",
@@ -19924,8 +19974,8 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.hoan-tat-wave",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 181,
-      "column": 155,
+      "line": 241,
+      "column": 50,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "button",
       "kind": "action",
@@ -19947,34 +19997,9 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "component.components-realm-realmpilotoperations.action.tam-dung",
-      "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 181,
-      "column": 52,
-      "surface": "component.components-realm-realmpilotoperations",
-      "tag": "button",
-      "kind": "action",
-      "label": "Tạm dừng",
-      "handlerEvent": "onClick",
-      "handler": "() => setConfirm('pause')",
-      "target": "",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "handler-candidate",
-      "mappingStatus": "unreviewed",
-      "businessFeature": "",
-      "resourceCandidates": [],
-      "apiCandidates": [
-        "GET '/api/realm-demo/pilot/operations'",
-        "POST '/api/realm-demo/pilot/operations'"
-      ],
-      "routeCandidates": [],
-      "uxRiskCandidates": []
-    },
-    {
       "elementId": "component.components-realm-realmpilotoperations.action.ong-wave",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 182,
+      "line": 242,
       "column": 88,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "button",
@@ -19999,7 +20024,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.form-control.input",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 190,
+      "line": 250,
       "column": 47,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "input",
@@ -20026,7 +20051,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.form-control.7-ngay-10-ngay-14-ngay",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 191,
+      "line": 251,
       "column": 49,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "select",
@@ -20053,7 +20078,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.tao-ban-nhap",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 192,
+      "line": 252,
       "column": 19,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "AsyncButton",
@@ -23122,12 +23147,12 @@
   "summary": {
     "uiRoutes": 56,
     "apiRoutes": 62,
-    "interactiveElements": 721,
+    "interactiveElements": 722,
     "sourceFilesWithInteractions": 79,
     "routesInPrimaryNavigation": 52,
     "routesWithResourceCandidates": 43,
     "byKind": {
-      "action": 437,
+      "action": 438,
       "form-control": 229,
       "form-submit": 10,
       "navigation": 45

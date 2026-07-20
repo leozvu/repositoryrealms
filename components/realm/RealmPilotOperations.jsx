@@ -18,6 +18,14 @@ const REPORT = {
   hold: ['HOLD', 'Tiếp tục quan sát', 'hold'],
   no_go: ['NO-GO', 'Dừng mở rộng và xử lý blocker', 'noGo'],
 };
+const ACTIVATION = {
+  not_started: ['Chưa bắt đầu', 'neutral', 'clock'],
+  watching: ['Đang quan sát', 'watching', 'clock'],
+  ready: ['Chờ xác nhận', 'ready', 'check'],
+  blocked: ['Guardrail bị chặn', 'blocked', 'alert'],
+  cleared: ['Canary đã đạt', 'cleared', 'check'],
+  rolled_back: ['Đã rollback', 'rolledBack', 'shield'],
+};
 
 function Metric({ value, label, detail }) {
   return <div className={styles.metric}><strong>{Number(value || 0).toLocaleString('vi-VN')}</strong><span>{label}</span>{detail && <small>{detail}</small>}</div>;
@@ -44,6 +52,55 @@ function WaveTimeline({ wave }) {
         return <li key={`${wave.id}-${status}`} data-done={done || undefined} data-current={current || undefined}><span>{done ? <Icon name="check" size={13} /> : index + 1}</span><strong>{label}</strong></li>;
       })}
     </ol>
+  );
+}
+
+function ActivationGuard({ guard, wave, onClear, onRollback }) {
+  if (!guard || (!wave?.activation && !['active', 'paused'].includes(wave?.status))) return null;
+  const [label, tone, icon] = ACTIVATION[guard.state] || ACTIVATION.not_started;
+  return (
+    <section className={styles.activation} aria-labelledby={`canary-${wave.id}`}>
+      <div className={styles.activationHead}>
+        <div>
+          <span>90-minute launch watch</span>
+          <h4 id={`canary-${wave.id}`}>Canary Activation Guard</h4>
+          <p>Quan sát gate vận hành tổng hợp; không đo thời lượng hay hành vi của từng nhân sự.</p>
+        </div>
+        <span className={styles[`canary_${tone}`]}><Icon name={icon} size={13} /> {label}</span>
+      </div>
+
+      <div className={styles.activationFacts} aria-label="Canary activation snapshot">
+        <span><b>Bắt đầu</b>{formatDate(guard.startedAt, true)}</span>
+        <span><b>Checkpoint</b>{formatDate(guard.checkpointDueAt, true)}</span>
+        <span><b>Trạng thái cửa sổ</b>{guard.state === 'watching' ? `Còn ${guard.remainingMinutes} phút` : guard.state === 'ready' ? 'Đã đến hạn' : guard.state === 'cleared' ? 'Đã xác nhận' : guard.state === 'rolled_back' ? 'Đã dừng' : 'Bị chặn'}</span>
+        <span><b>Baseline</b>{guard.baseline ? `${guard.baseline.eligibleUsers} eligible · ${guard.baseline.fallbackUsers} fallback` : 'Aggregate only'}</span>
+      </div>
+
+      <div className={styles.activationCriteria} aria-label="Canary guardrails">
+        {(guard.criteria || []).map((criterion) => (
+          <div key={criterion.id} data-passed={criterion.passed || undefined}>
+            <span><Icon name={criterion.passed ? 'check' : 'alert'} size={12} /></span>
+            <p><strong>{criterion.label}</strong><small>{criterion.detail}</small></p>
+          </div>
+        ))}
+      </div>
+
+      {guard.decisionNote && <p className={styles.note}><Icon name="note" size={14} /> {guard.decisionNote}</p>}
+      {wave.status === 'active' && (
+        <div className={styles.activationActions}>
+          <span aria-live="polite">
+            {guard.state === 'watching' && `Giữ nguyên cohort thêm ${guard.remainingMinutes} phút trước khi xác nhận.`}
+            {guard.state === 'ready' && 'Mọi guardrail đều đạt; Director có thể xác nhận canary.'}
+            {guard.state === 'blocked' && 'Không tiếp tục activation. Xử lý blocker hoặc rollback về ERP.'}
+            {guard.state === 'cleared' && `Đã xác nhận bởi ${guard.clearedByName || 'Director'} lúc ${formatDate(guard.clearedAt, true)}.`}
+          </span>
+          <div>
+            {guard.state !== 'cleared' && <AsyncButton className="btn btn-primary" pendingLabel="Đang kiểm tra…" disabled={!guard.canClear} onClick={onClear}><Icon name="check" size={14} /> Xác nhận qua canary gate</AsyncButton>}
+            <button type="button" className="btn btn-danger" onClick={onRollback}><Icon name="shield" size={14} /> Rollback về ERP</button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -99,6 +156,7 @@ export default function RealmPilotOperations() {
       submit: 'Đã gửi wave cho Director khác duyệt.',
       approve: 'Wave đã kích hoạt và invitation đã gửi qua ERP.',
       reject: 'Đã trả wave về bản nháp.',
+      clear_activation: 'Canary gate đã đạt; cohort hiện tại tiếp tục mà không tự mở rộng.',
       pause: 'Đã tạm dừng wave và bật ERP fallback.',
       complete: 'Đã hoàn tất wave và giữ nguyên toàn bộ dữ liệu.',
     };
@@ -112,6 +170,7 @@ export default function RealmPilotOperations() {
   const metrics = dashboard?.metrics;
   const readiness = dashboard?.readiness;
   const rehearsal = dashboard?.rehearsal;
+  const activationGuard = dashboard?.activationGuard;
   const report = dashboard?.report;
   const [reportCode, reportCopy, reportTone] = REPORT[report?.recommendation] || REPORT.hold;
   const history = useMemo(() => (dashboard?.operations?.waves || []).filter((item) => item.id !== wave?.id).slice(0, 4), [dashboard, wave?.id]);
@@ -167,18 +226,19 @@ export default function RealmPilotOperations() {
                   <span><b>Maker</b>{wave.submittedByName || wave.createdByName}</span>
                   <span><b>Rehearsal</b>{wave.rehearsalId ? `Sealed · ${formatDate(wave.rehearsalExpiresAt, true)}` : 'Chưa khóa'}</span>
                 </div>
+                <ActivationGuard guard={activationGuard} wave={wave} onClear={() => mutate('clear_activation')} onRollback={() => setConfirm('pause')} />
                 {wave.decisionNote && <p className={styles.note}><Icon name="note" size={14} /> {wave.decisionNote}</p>}
                 <div className={styles.waveActions}>
                   <span aria-live="polite">
                     {wave.status === 'draft' && (wave.policyVersion !== dashboard.policy.version ? 'Policy đã đổi; hãy đóng wave cũ.' : rehearsal?.readyForWave ? 'Readiness và sealed rehearsal đã sẵn sàng.' : rehearsal?.reason)}
                     {wave.status === 'awaiting_approval' && (wave.canApprove ? 'Bạn là checker hợp lệ cho wave này.' : 'Đang chờ một Director khác duyệt.')}
-                    {wave.status === 'active' && 'Invitation đã gửi; ERP vẫn là fallback.'}
+                    {wave.status === 'active' && (activationGuard?.state === 'cleared' ? 'Canary đã đạt; wave tiếp tục trong đúng cohort hiện tại.' : 'Invitation đã gửi; Canary Guard đang theo dõi và ERP vẫn là fallback.')}
                     {wave.status === 'paused' && 'Kill switch đang bật; hoàn tất wave để lưu báo cáo.'}
                   </span>
                   <div>
                     {wave.status === 'draft' && <AsyncButton className="btn btn-primary" pendingLabel="Đang gửi…" disabled={!readiness.ready || !rehearsal?.readyForWave || wave.policyVersion !== dashboard.policy.version} onClick={() => mutate('submit')}>Gửi Director duyệt</AsyncButton>}
                     {wave.status === 'awaiting_approval' && wave.canApprove && <><AsyncButton className="btn btn-outline" pendingLabel="Đang trả về…" onClick={() => mutate('reject')}>Trả về nháp</AsyncButton><AsyncButton className="btn btn-primary" pendingLabel="Đang kích hoạt…" disabled={!readiness.ready || !rehearsal?.readyForWave} onClick={() => mutate('approve')}>Duyệt &amp; mời cohort</AsyncButton></>}
-                    {wave.status === 'active' && <><button type="button" className="btn btn-outline" onClick={() => setConfirm('pause')}>Tạm dừng</button><button type="button" className="btn btn-primary" onClick={() => setConfirm('complete')}>Hoàn tất wave</button></>}
+                    {wave.status === 'active' && <button type="button" className="btn btn-outline" onClick={() => setConfirm('complete')}>Hoàn tất wave</button>}
                     {['draft', 'awaiting_approval', 'paused'].includes(wave.status) && <button type="button" className="btn btn-outline" onClick={() => setConfirm('complete')}>Đóng wave</button>}
                   </div>
                 </div>
