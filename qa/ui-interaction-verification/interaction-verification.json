@@ -9,8 +9,8 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 102,
-    "asyncButtonGuards": 61,
+    "guardedActions": 105,
+    "asyncButtonGuards": 64,
     "disabledBindings": 38,
     "localPendingStates": 3,
     "destructiveFlows": 6,
@@ -861,8 +861,44 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.xac-nhan-qua-canary-gate",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 98,
+      "line": 108,
       "label": "Xác nhận qua canary gate",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.ghi-nhan-su-co",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 156,
+      "label": "Ghi nhận sự cố",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.bat-au-theo-doi",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 169,
+      "label": "Bắt đầu theo dõi",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.xac-nhan-a-khong-che",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 170,
+      "label": "Xác nhận đã khống chế",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
       "successState": "toast-or-state",
@@ -873,7 +909,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.gui-director-duyet",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 239,
+      "line": 325,
       "label": "Gửi Director duyệt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -885,7 +921,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.duyet-moi-cohort",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 240,
+      "line": 326,
       "label": "Duyệt & mời cohort",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -897,7 +933,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.tra-ve-nhap",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 240,
+      "line": 326,
       "label": "Trả về nháp",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -909,7 +945,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.tao-ban-nhap",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 252,
+      "line": 338,
       "label": "Tạo bản nháp",
       "actionType": "data-action",
       "loadingState": "async-button-guard",

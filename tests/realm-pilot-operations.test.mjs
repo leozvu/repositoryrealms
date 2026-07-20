@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   REALM_PILOT_CANARY_WINDOW_MINUTES,
+  REALM_PILOT_INCIDENT_LIMIT,
   buildRealmPilotActivationGuard,
   buildRealmPilotGoNoGoReport,
+  buildRealmPilotIncidentCommand,
   buildRealmPilotOperationAlerts,
   createRealmPilotWave,
   normalizeRealmPilotOperations,
@@ -80,7 +82,7 @@ test('Phase 16 normalizes bounded aggregate-only wave state safely', () => {
   assert.equal(operations.waves[0].name, 'First wave');
   assert.equal(operations.waves[0].durationDays, 14);
   assert.equal(operations.waves[0].eligibleUsers, 0);
-  assert.deepEqual(parseRealmPilotOperations('{broken'), { version: 0, waves: [] });
+  assert.deepEqual(parseRealmPilotOperations('{broken'), { version: 0, waves: [], incidents: [] });
 });
 
 test('Phase 16 creates a draft in existing Setting without replacing ERP configuration', async () => {
@@ -242,4 +244,79 @@ test('Phase 16 alerts surface readiness, policy drift and kill-switch state with
   });
   assert.deepEqual(alerts.map((row) => row.id), ['readiness-blocked', 'blocked-feedback', 'policy-drift', 'kill-switch-active']);
   assert.equal(JSON.stringify(alerts).includes(STAFF.id), false);
+});
+
+test('Phase 19 warning incident holds Go/No-go until aggregate review is resolved', async () => {
+  const fixture = database();
+  await createRealmPilotWave(fixture.db, MAKER, { expectedVersion: 0, name: 'Incident Watch', durationDays: 7 }, { now: NOW, idFactory: () => 'incident-watch' });
+  await transitionRealmPilotWave(fixture.db, MAKER, { action: 'submit', waveId: 'rpw_incident-watch', expectedVersion: 1 }, { now: new Date(NOW.getTime() + 60_000) });
+  await transitionRealmPilotWave(fixture.db, CHECKER, { action: 'approve', waveId: 'rpw_incident-watch', expectedVersion: 2 }, { now: new Date(NOW.getTime() + 120_000) });
+
+  const reported = await transitionRealmPilotWave(fixture.db, MAKER, {
+    action: 'report_incident', waveId: 'rpw_incident-watch', expectedVersion: 3,
+    category: 'communications', severity: 'warning',
+  }, { now: new Date(NOW.getTime() + 180_000), idFactory: () => 'warning-1' });
+  assert.equal(reported.incident.id, 'rpi_warning-1');
+  assert.equal(reported.incident.status, 'open');
+  assert.equal(reported.incident.severity, 'warning');
+  assert.equal(reported.incident.rollbackTriggered, false);
+  assert.equal(reported.wave.status, 'active');
+  assert.equal(reported.policy.mode, 'pilot');
+  assert.equal(reported.operations.incidents.length, 1);
+
+  const readiness = { ready: true, summary: { blockers: 0, blockedFeedback: 0 }, gates: [{ id: 'erp-fallback', passed: true }] };
+  const command = buildRealmPilotIncidentCommand({ operations: reported.operations, wave: reported.wave, policy: reported.policy, readiness, now: new Date(NOW.getTime() + 8 * 86_400_000) });
+  assert.equal(command.state, 'degraded');
+  assert.equal(command.summary.warningOpen, 1);
+  assert.equal(command.privacy.aggregateOnly, true);
+  assert.equal(JSON.stringify(command).includes(MAKER.id), false);
+  const held = buildRealmPilotGoNoGoReport({ wave: reported.wave, readiness, incidentCommand: command, now: new Date(NOW.getTime() + 8 * 86_400_000) });
+  assert.equal(held.recommendation, 'hold');
+
+  const monitoring = await transitionRealmPilotWave(fixture.db, CHECKER, {
+    action: 'monitor_incident', waveId: 'rpw_incident-watch', incidentId: 'rpi_warning-1', expectedVersion: 4,
+  }, { now: new Date(NOW.getTime() + 240_000) });
+  assert.equal(monitoring.incident.status, 'monitoring');
+  const resolved = await transitionRealmPilotWave(fixture.db, MAKER, {
+    action: 'resolve_incident', waveId: 'rpw_incident-watch', incidentId: 'rpi_warning-1', expectedVersion: 5,
+  }, { now: new Date(NOW.getTime() + 300_000) });
+  assert.equal(resolved.incident.status, 'resolved');
+  assert.equal(resolved.incident.resolution, 'verified_recovery');
+  assert.match(fixture.audits.at(-1).detail, /incident communications/);
+});
+
+test('Phase 19 critical incident atomically rolls back to ERP and blocks wave completion', async () => {
+  const fixture = database();
+  await createRealmPilotWave(fixture.db, MAKER, { expectedVersion: 0, name: 'Critical Guard', durationDays: 7 }, { now: NOW, idFactory: () => 'critical-guard' });
+  await transitionRealmPilotWave(fixture.db, MAKER, { action: 'submit', waveId: 'rpw_critical-guard', expectedVersion: 1 }, { now: new Date(NOW.getTime() + 60_000) });
+  await transitionRealmPilotWave(fixture.db, CHECKER, { action: 'approve', waveId: 'rpw_critical-guard', expectedVersion: 2 }, { now: new Date(NOW.getTime() + 120_000) });
+
+  const critical = await transitionRealmPilotWave(fixture.db, MAKER, {
+    action: 'report_incident', waveId: 'rpw_critical-guard', expectedVersion: 3,
+    category: 'erp_fallback', severity: 'warning',
+  }, { now: new Date(NOW.getTime() + 180_000), idFactory: () => 'critical-1' });
+  assert.equal(critical.incident.severity, 'critical');
+  assert.equal(critical.incident.rollbackTriggered, true);
+  assert.equal(critical.wave.status, 'paused');
+  assert.equal(critical.wave.activation.state, 'rolled_back');
+  assert.equal(critical.policy.mode, 'off');
+  assert.equal(fixture.setting().realmPilot.mode, 'off');
+  assert.equal(critical.notificationCount, 2);
+  assert.equal(critical.operations.incidents.length <= REALM_PILOT_INCIDENT_LIMIT, true);
+
+  await assert.rejects(
+    () => transitionRealmPilotWave(fixture.db, CHECKER, { action: 'complete', waveId: 'rpw_critical-guard', expectedVersion: 4 }, { now: new Date(NOW.getTime() + 240_000) }),
+    (error) => error.code === 'realm_pilot_incident_open',
+  );
+  const monitoring = await transitionRealmPilotWave(fixture.db, CHECKER, {
+    action: 'monitor_incident', waveId: 'rpw_critical-guard', incidentId: 'rpi_critical-1', expectedVersion: 4,
+  }, { now: new Date(NOW.getTime() + 300_000) });
+  assert.equal(monitoring.incident.status, 'monitoring');
+  const resolved = await transitionRealmPilotWave(fixture.db, MAKER, {
+    action: 'resolve_incident', waveId: 'rpw_critical-guard', incidentId: 'rpi_critical-1', expectedVersion: 5,
+  }, { now: new Date(NOW.getTime() + 360_000) });
+  assert.equal(resolved.incident.status, 'resolved');
+  assert.equal(resolved.incident.resolution, 'contained_in_erp');
+  assert.equal(resolved.wave.status, 'paused');
+  assert.equal(resolved.policy.mode, 'off');
 });

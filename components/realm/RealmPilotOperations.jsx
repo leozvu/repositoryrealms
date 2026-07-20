@@ -26,6 +26,16 @@ const ACTIVATION = {
   cleared: ['Canary đã đạt', 'cleared', 'check'],
   rolled_back: ['Đã rollback', 'rolledBack', 'shield'],
 };
+const INCIDENT_STATE = {
+  stable: ['Ổn định', 'stable', 'check'],
+  degraded: ['Đang theo dõi', 'degraded', 'clock'],
+  critical: ['Critical · ERP fallback', 'critical', 'shield'],
+};
+const INCIDENT_STATUS = {
+  open: ['Mới', 'open'],
+  monitoring: ['Đang theo dõi', 'monitoring'],
+  resolved: ['Đã khống chế', 'resolved'],
+};
 
 function Metric({ value, label, detail }) {
   return <div className={styles.metric}><strong>{Number(value || 0).toLocaleString('vi-VN')}</strong><span>{label}</span>{detail && <small>{detail}</small>}</div>;
@@ -104,6 +114,78 @@ function ActivationGuard({ guard, wave, onClear, onRollback }) {
   );
 }
 
+function IncidentCommand({ command, wave, onReport, onMonitor, onResolve }) {
+  const [category, setCategory] = useState('communications');
+  const [severity, setSeverity] = useState('warning');
+  if (!command || !wave) return null;
+  const categories = command.categories || [];
+  const categoryMeta = categories.find((item) => item.id === category) || categories[0];
+  const effectiveCategory = categoryMeta?.id || '';
+  const effectiveSeverity = categoryMeta?.defaultSeverity === 'critical' ? 'critical' : severity;
+  const [stateLabel, stateTone, stateIcon] = INCIDENT_STATE[command.state] || INCIDENT_STATE.stable;
+  const unresolved = (command.incidents || []).filter((incident) => incident.status !== 'resolved');
+
+  const changeCategory = (event) => {
+    const next = categories.find((item) => item.id === event.target.value);
+    setCategory(event.target.value);
+    setSeverity(next?.defaultSeverity || 'warning');
+  };
+
+  return (
+    <section className={styles.incident} aria-labelledby={`incident-command-${wave.id}`}>
+      <div className={styles.incidentHead}>
+        <div>
+          <span>Aggregate incident response</span>
+          <h3 id={`incident-command-${wave.id}`}>Incident Command · Timeline</h3>
+          <p>Ghi nhận theo loại sự cố cố định; không nhập tên người, nội dung record hoặc dữ liệu hiệu suất.</p>
+        </div>
+        <span className={styles[`incidentState_${stateTone}`]}><Icon name={stateIcon} size={13} /> {stateLabel}</span>
+      </div>
+
+      <div className={styles.incidentMetrics} aria-label="Incident command snapshot">
+        <Metric value={command.summary?.criticalOpen} label="Critical đang mở" detail="Critical luôn rollback ERP" />
+        <Metric value={command.summary?.warningOpen} label="Warning đang theo dõi" detail="Giữ Go/No-go ở HOLD" />
+        <Metric value={command.summary?.resolved} label="Đã khống chế" detail="Không tự tái kích hoạt Realm" />
+        <Metric value={command.summary?.rollbackTriggered} label="Rollback đã kích hoạt" detail="Dữ liệu và migration được giữ" />
+      </div>
+
+      {command.canReport && categoryMeta && (
+        <div className={styles.incidentForm}>
+          <label><span>Loại sự cố</span><select value={effectiveCategory} onChange={changeCategory}>{categories.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
+          <label><span>Mức độ</span><select value={effectiveSeverity} disabled={categoryMeta.defaultSeverity === 'critical'} onChange={(event) => setSeverity(event.target.value)}><option value="warning">Warning · theo dõi</option><option value="critical">Critical · rollback ERP</option></select></label>
+          <AsyncButton className={effectiveSeverity === 'critical' ? 'btn btn-danger' : 'btn btn-outline'} pendingLabel="Đang ghi nhận…" onClick={() => onReport(effectiveCategory, effectiveSeverity)}><Icon name="alert" size={14} /> Ghi nhận sự cố</AsyncButton>
+          <p><Icon name="shield" size={14} /> {categoryMeta.detail} {effectiveSeverity === 'critical' && 'Khi xác nhận, kill switch được bật trong cùng transaction.'}</p>
+        </div>
+      )}
+
+      {unresolved.length > 0 && (
+        <div className={styles.incidentQueue} aria-label="Incident đang xử lý">
+          {unresolved.map((incident) => {
+            const [statusLabel, statusTone] = INCIDENT_STATUS[incident.status] || INCIDENT_STATUS.open;
+            return <article key={incident.id} data-severity={incident.severity}>
+              <span className={styles[`incidentStatus_${statusTone}`]}><Icon name={incident.severity === 'critical' ? 'shield' : 'clock'} size={12} /> {statusLabel}</span>
+              <div><strong>{incident.categoryLabel}</strong><small>{incident.categoryDetail}</small></div>
+              <div>
+                {incident.canMonitor && <AsyncButton className="btn btn-outline" pendingLabel="Đang cập nhật…" onClick={() => onMonitor(incident.id)}>Bắt đầu theo dõi</AsyncButton>}
+                {incident.canResolve && <AsyncButton className="btn btn-primary" pendingLabel="Đang xác minh…" onClick={() => onResolve(incident.id)}>Xác nhận đã khống chế</AsyncButton>}
+              </div>
+            </article>;
+          })}
+        </div>
+      )}
+
+      <ol className={styles.incidentTimeline} aria-label="Dòng thời gian incident và rollout">
+        {(command.timeline || []).map((event) => <li key={event.id} data-tone={event.tone}>
+          <span><Icon name={event.tone === 'critical' ? 'shield' : event.tone === 'warning' ? 'clock' : event.tone === 'success' ? 'check' : 'reports'} size={13} /></span>
+          <div><strong>{event.label}</strong><small>{event.detail}</small></div>
+          <time dateTime={event.at}>{formatDate(event.at, true)}</time>
+        </li>)}
+        {!command.timeline?.length && <li className={styles.incidentEmpty}><span><Icon name="reports" size={13} /></span><div><strong>Chưa có sự kiện vận hành</strong><small>Timeline bắt đầu khi wave được tạo; không ghi hoạt động cá nhân.</small></div></li>}
+      </ol>
+    </section>
+  );
+}
+
 export default function RealmPilotOperations() {
   const toast = useToast();
   const [state, setState] = useState({ loading: true, error: '', dashboard: null });
@@ -146,7 +228,7 @@ export default function RealmPilotOperations() {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
       if (response.status === 409) await load({ quiet: true });
-      toast(payload.error || 'Không thể cập nhật pilot wave.', 'error');
+      toast(payload.error || 'Không thể cập nhật Pilot Operations.', 'error');
       return false;
     }
     setState({ loading: false, error: '', dashboard: payload });
@@ -157,6 +239,9 @@ export default function RealmPilotOperations() {
       approve: 'Wave đã kích hoạt và invitation đã gửi qua ERP.',
       reject: 'Đã trả wave về bản nháp.',
       clear_activation: 'Canary gate đã đạt; cohort hiện tại tiếp tục mà không tự mở rộng.',
+      report_incident: 'Đã ghi nhận incident và cập nhật guardrail vận hành.',
+      monitor_incident: 'Incident đã chuyển sang trạng thái theo dõi.',
+      resolve_incident: 'Incident đã được khống chế; Realm không tự tái kích hoạt.',
       pause: 'Đã tạm dừng wave và bật ERP fallback.',
       complete: 'Đã hoàn tất wave và giữ nguyên toàn bộ dữ liệu.',
     };
@@ -171,6 +256,7 @@ export default function RealmPilotOperations() {
   const readiness = dashboard?.readiness;
   const rehearsal = dashboard?.rehearsal;
   const activationGuard = dashboard?.activationGuard;
+  const incidentCommand = dashboard?.incidentCommand;
   const report = dashboard?.report;
   const [reportCode, reportCopy, reportTone] = REPORT[report?.recommendation] || REPORT.hold;
   const history = useMemo(() => (dashboard?.operations?.waves || []).filter((item) => item.id !== wave?.id).slice(0, 4), [dashboard, wave?.id]);
@@ -226,7 +312,7 @@ export default function RealmPilotOperations() {
                   <span><b>Maker</b>{wave.submittedByName || wave.createdByName}</span>
                   <span><b>Rehearsal</b>{wave.rehearsalId ? `Sealed · ${formatDate(wave.rehearsalExpiresAt, true)}` : 'Chưa khóa'}</span>
                 </div>
-                <ActivationGuard guard={activationGuard} wave={wave} onClear={() => mutate('clear_activation')} onRollback={() => setConfirm('pause')} />
+                <ActivationGuard guard={activationGuard} wave={wave} onClear={() => mutate('clear_activation')} onRollback={() => setConfirm({ type: 'pause' })} />
                 {wave.decisionNote && <p className={styles.note}><Icon name="note" size={14} /> {wave.decisionNote}</p>}
                 <div className={styles.waveActions}>
                   <span aria-live="polite">
@@ -238,8 +324,8 @@ export default function RealmPilotOperations() {
                   <div>
                     {wave.status === 'draft' && <AsyncButton className="btn btn-primary" pendingLabel="Đang gửi…" disabled={!readiness.ready || !rehearsal?.readyForWave || wave.policyVersion !== dashboard.policy.version} onClick={() => mutate('submit')}>Gửi Director duyệt</AsyncButton>}
                     {wave.status === 'awaiting_approval' && wave.canApprove && <><AsyncButton className="btn btn-outline" pendingLabel="Đang trả về…" onClick={() => mutate('reject')}>Trả về nháp</AsyncButton><AsyncButton className="btn btn-primary" pendingLabel="Đang kích hoạt…" disabled={!readiness.ready || !rehearsal?.readyForWave} onClick={() => mutate('approve')}>Duyệt &amp; mời cohort</AsyncButton></>}
-                    {wave.status === 'active' && <button type="button" className="btn btn-outline" onClick={() => setConfirm('complete')}>Hoàn tất wave</button>}
-                    {['draft', 'awaiting_approval', 'paused'].includes(wave.status) && <button type="button" className="btn btn-outline" onClick={() => setConfirm('complete')}>Đóng wave</button>}
+                    {wave.status === 'active' && <button type="button" className="btn btn-outline" onClick={() => setConfirm({ type: 'complete' })}>Hoàn tất wave</button>}
+                    {['draft', 'awaiting_approval', 'paused'].includes(wave.status) && <button type="button" className="btn btn-outline" onClick={() => setConfirm({ type: 'complete' })}>Đóng wave</button>}
                   </div>
                 </div>
               </section>
@@ -254,6 +340,16 @@ export default function RealmPilotOperations() {
                 {dashboard.policy.mode !== 'pilot' && <p className={styles.creatorHint}><Icon name="shield" size={14} /> Dùng Controlled Launch phía trên để đưa policy vào pilot trước.</p>}
               </section>
             )}
+
+            {wave && <IncidentCommand
+              command={incidentCommand}
+              wave={wave}
+              onReport={(category, severity) => severity === 'critical'
+                ? setConfirm({ type: 'critical_incident', category, severity })
+                : mutate('report_incident', { category, severity })}
+              onMonitor={(incidentId) => mutate('monitor_incident', { incidentId })}
+              onResolve={(incidentId) => mutate('resolve_incident', { incidentId })}
+            />}
 
             <section className={styles.report} aria-labelledby="pilot-report-title">
               <div className={styles.reportHead}>
@@ -275,10 +371,16 @@ export default function RealmPilotOperations() {
       </div>
 
       {confirm && <ConfirmDialog
-        msg={confirm === 'pause' ? 'Tạm dừng wave sẽ bật kill switch và đưa toàn bộ cohort về ERP. Dữ liệu và migration được giữ nguyên.' : 'Hoàn tất wave sẽ lưu snapshot Go/No-go. Nếu wave đang active, Realm sẽ đóng và ERP trở thành fallback.'}
-        yesLabel={confirm === 'pause' ? 'Tạm dừng & về ERP' : 'Hoàn tất wave'}
+        msg={confirm.type === 'pause'
+          ? 'Tạm dừng wave sẽ bật kill switch và đưa toàn bộ cohort về ERP. Dữ liệu và migration được giữ nguyên.'
+          : confirm.type === 'critical_incident'
+            ? 'Incident critical sẽ được ghi nhận và kill switch sẽ đưa toàn bộ cohort về ERP trong cùng transaction. Không xóa dữ liệu hoặc rollback migration.'
+            : 'Hoàn tất wave sẽ lưu snapshot Go/No-go. Nếu wave đang active, Realm sẽ đóng và ERP trở thành fallback.'}
+        yesLabel={confirm.type === 'pause' ? 'Tạm dừng & về ERP' : confirm.type === 'critical_incident' ? 'Ghi nhận & rollback ERP' : 'Hoàn tất wave'}
         onClose={() => setConfirm(null)}
-        onYes={() => mutate(confirm)}
+        onYes={() => confirm.type === 'critical_incident'
+          ? mutate('report_incident', { category: confirm.category, severity: confirm.severity })
+          : mutate(confirm.type)}
       />}
     </section>
   );

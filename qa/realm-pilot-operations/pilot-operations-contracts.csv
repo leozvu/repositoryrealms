@@ -17,7 +17,7 @@ authenticated-traced-api,api,app/api/realm-demo/pilot/operations/route.js,authen
 cross-surface-change-signal,integration,app/api/realm-demo/pilot/operations/route.js,safelyPublishRealmChange | resource: 'settings',,verified
 stale-settings-write-protection,data,app/api/settings/route.js,current.realmPilotOperations | delete data.realmPilotOperations,,verified
 operations-dashboard-ui,client,components/realm/RealmPilotOperations.jsx,Pilot Operations · Rollout Waves | Duyệt &amp; mời cohort | Báo cáo Go / No-go | ERP fallback,,verified
-accessible-responsive-ui,style,components/realm/realm-pilot-operations.module.css,"button { min-height: 44px; | @media (max-width: 680px) | .metrics, .waveFacts, .activationFacts, .activationCriteria, .criteria { grid-template-columns: 1fr; | @media (prefers-reduced-motion: reduce)",,verified
+accessible-responsive-ui,style,components/realm/realm-pilot-operations.module.css,"button { min-height: 44px; | @media (max-width: 680px) | .metrics, .waveFacts, .activationFacts, .activationCriteria, .incidentMetrics, .criteria { grid-template-columns: 1fr; | @media (prefers-reduced-motion: reduce)",,verified
 mobile-erp-toolbar-containment,style,app/globals.css,Phase 16: toolbar ERP co giãn | .topbar-right>.btn{width:44px | #page-title{min-width:0;flex:1;overflow:hidden,,verified
 phase16-test-suite,test,tests/realm-pilot-operations.test.mjs,requires a different Director | pause atomically activates the existing kill switch | Go/No-go report respects the 7–14 day window,,verified
 phase16-runbook,operations,docs/realms/PHASE-16-PILOT-OPERATIONS.md,crmegoric-realms-demo | codex/realms-demo | 7–14 ngày | mode = off | không có migration,,verified

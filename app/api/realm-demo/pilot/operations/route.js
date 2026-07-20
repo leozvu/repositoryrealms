@@ -51,7 +51,7 @@ export async function POST(request) {
     return realmJsonResponse(trace, { ok: true, ...dashboard }, { code: 'realm_pilot_operations_updated' });
   } catch (error) {
     return realmErrorResponse(trace, error, {
-      fallbackMessage: 'Không thể cập nhật pilot wave.',
+      fallbackMessage: 'Không thể cập nhật Pilot Operations.',
       fallbackCode: 'realm_pilot_operations_update_error',
     });
   }

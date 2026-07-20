@@ -19799,7 +19799,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.xac-nhan-qua-canary-gate",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 98,
+      "line": 108,
       "column": 43,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "AsyncButton",
@@ -19824,7 +19824,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.rollback-ve-erp",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 99,
+      "line": 109,
       "column": 13,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "button",
@@ -19847,9 +19847,138 @@
       "uxRiskCandidates": []
     },
     {
+      "elementId": "component.components-realm-realmpilotoperations.form-control.select",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 154,
+      "column": 41,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.form-control.warning-theo-doi-critical-rollback-erp",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 155,
+      "column": 37,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Warning · theo dõi / Critical · rollback ERP",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "categoryMeta.defaultSeverity === 'critical'",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.ghi-nhan-su-co",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 156,
+      "column": 11,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Ghi nhận sự cố",
+      "handlerEvent": "onClick",
+      "handler": "() => onReport(effectiveCategory, effectiveSeverity)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.bat-au-theo-doi",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 169,
+      "column": 41,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Bắt đầu theo dõi",
+      "handlerEvent": "onClick",
+      "handler": "() => onMonitor(incident.id)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-realm-realmpilotoperations.action.xac-nhan-a-khong-che",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "line": 170,
+      "column": 41,
+      "surface": "component.components-realm-realmpilotoperations",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Xác nhận đã khống chế",
+      "handlerEvent": "onClick",
+      "handler": "() => onResolve(incident.id)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/realm-demo/pilot/operations'",
+        "POST '/api/realm-demo/pilot/operations'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "component.components-realm-realmpilotoperations.action.tai-lai-pilot-operations",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 186,
+      "line": 272,
       "column": 9,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "button",
@@ -19874,7 +20003,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.thu-lai",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 193,
+      "line": 279,
       "column": 80,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "button",
@@ -19899,7 +20028,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.gui-director-duyet",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 239,
+      "line": 325,
       "column": 49,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "AsyncButton",
@@ -19924,7 +20053,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.duyet-moi-cohort",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 240,
+      "line": 326,
       "column": 209,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "AsyncButton",
@@ -19949,7 +20078,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.tra-ve-nhap",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 240,
+      "line": 326,
       "column": 82,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "AsyncButton",
@@ -19974,14 +20103,14 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.hoan-tat-wave",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 241,
+      "line": 327,
       "column": 50,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "button",
       "kind": "action",
       "label": "Hoàn tất wave",
       "handlerEvent": "onClick",
-      "handler": "() => setConfirm('complete')",
+      "handler": "() => setConfirm({ type: 'complete' })",
       "target": "",
       "insideForm": false,
       "disabledBinding": "",
@@ -19999,14 +20128,14 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.ong-wave",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 242,
+      "line": 328,
       "column": 88,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "button",
       "kind": "action",
       "label": "Đóng wave",
       "handlerEvent": "onClick",
-      "handler": "() => setConfirm('complete')",
+      "handler": "() => setConfirm({ type: 'complete' })",
       "target": "",
       "insideForm": false,
       "disabledBinding": "",
@@ -20024,7 +20153,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.form-control.input",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 250,
+      "line": 336,
       "column": 47,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "input",
@@ -20051,7 +20180,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.form-control.7-ngay-10-ngay-14-ngay",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 251,
+      "line": 337,
       "column": 49,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "select",
@@ -20078,7 +20207,7 @@
     {
       "elementId": "component.components-realm-realmpilotoperations.action.tao-ban-nhap",
       "source": "components/realm/RealmPilotOperations.jsx",
-      "line": 252,
+      "line": 338,
       "column": 19,
       "surface": "component.components-realm-realmpilotoperations",
       "tag": "AsyncButton",
@@ -23147,19 +23276,19 @@
   "summary": {
     "uiRoutes": 56,
     "apiRoutes": 62,
-    "interactiveElements": 722,
+    "interactiveElements": 727,
     "sourceFilesWithInteractions": 79,
     "routesInPrimaryNavigation": 52,
     "routesWithResourceCandidates": 43,
     "byKind": {
-      "action": 438,
-      "form-control": 229,
+      "action": 441,
+      "form-control": 231,
       "form-submit": 10,
       "navigation": 45
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 215,
+      "control_binding_unverified": 217,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 22
     },
@@ -23213,15 +23342,15 @@
         "count": 17
       },
       {
+        "source": "components/realm/RealmPilotOperations.jsx",
+        "count": 17
+      },
+      {
         "source": "components/Shell.jsx",
         "count": 17
       },
       {
         "source": "app/(app)/attendance/page.jsx",
-        "count": 16
-      },
-      {
-        "source": "components/realm/RoyalCommandCenter.jsx",
         "count": 16
       }
     ]

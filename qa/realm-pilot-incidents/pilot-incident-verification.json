@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 23,
+    "verifiedContracts": 23,
+    "scenarios": 7,
+    "verifiedScenarios": 7,
+    "incidentLimit": 40,
+    "additiveMigrations": 0,
+    "parallelBusinessTables": 0,
+    "aggregateOnly": true,
+    "automaticReactivation": false,
+    "criticalRollbackAtomic": true
+  },
+  "contracts": [
+    {
+      "id": "reuse-pilot-operations-setting",
+      "layer": "data",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "realmPilotOperations:",
+        "incidents:",
+        "tx.setting.upsert"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "bounded-incident-history",
+      "layer": "data",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "REALM_PILOT_INCIDENT_LIMIT = 40",
+        "slice(0, REALM_PILOT_INCIDENT_LIMIT)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "fixed-incident-taxonomy",
+      "layer": "privacy",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "REALM_PILOT_INCIDENT_CATEGORIES",
+        "id: 'realm_access'",
+        "id: 'sync_integrity'",
+        "id: 'erp_fallback'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "critical-category-cannot-downgrade",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "categoryMeta.defaultSeverity === 'critical'",
+        "? 'critical'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-only-incident-command",
+      "layer": "rbac",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "requireDirector(sessionUser)",
+        "realm_pilot_operations_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "critical-atomic-kill-switch",
+      "layer": "rollback",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "action === 'report_incident'",
+        "severity === 'critical'",
+        "mode: 'off'",
+        "status: 'paused'",
+        "state: 'rolled_back'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "warning-holds-go-no-go",
+      "layer": "decision",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "openIncidents === 0",
+        "recommendation = hardStop ? 'no_go'",
+        "minimumObserved && openIncidents === 0 ? 'go' : 'hold'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "critical-forces-no-go",
+      "layer": "decision",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "criticalIncidents > 0",
+        "id: 'critical-incidents'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "incident-lifecycle",
+      "layer": "domain",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "new Set(['open', 'monitoring', 'resolved'])",
+        "action === 'monitor_incident'",
+        "action === 'resolve_incident'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "duplicate-incident-blocked",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "realm_pilot_incident_duplicate",
+        "item.status !== 'resolved'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "resolution-rechecks-safe-state",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "containedInErp",
+        "verifiedRecovery",
+        "realm_pilot_incident_resolution_blocked"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "completion-blocked-by-incident",
+      "layer": "safety",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "realm_pilot_incident_open",
+        "Còn incident chưa khép lại"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "serializable-cas",
+      "layer": "concurrency",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "validateExpectedVersion(operations, input.expectedVersion)",
+        "isolationLevel: 'Serializable'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-incident-snapshot",
+      "layer": "privacy",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "incidentSnapshot",
+        "eligibleUsers:",
+        "fallbackUsers:",
+        "blockedFeedback:"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "timeline-excludes-actor-history",
+      "layer": "privacy",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "actorHistoryIncluded: false",
+        "performanceTracking: false",
+        "durationTracking: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-and-cohort-notifications",
+      "layer": "integration",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "await directorIds(tx, sessionUser.id)",
+        "Tiếp tục công việc trên ERP · CRM",
+        "'/dashboard'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "incident-alerts",
+      "layer": "operations",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "id: 'critical-incident-open'",
+        "id: 'warning-incident-open'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "existing-traced-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/operations/route.js",
+      "signals": [
+        "startRealmApiRequest",
+        "transitionRealmPilotWave",
+        "safelyPublishRealmChange"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "incident-command-ui",
+      "layer": "client",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "signals": [
+        "Incident Command · Timeline",
+        "Ghi nhận sự cố",
+        "Xác nhận đã khống chế",
+        "Dòng thời gian incident và rollout"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "semantic-status-icon-text",
+      "layer": "accessibility",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "signals": [
+        "INCIDENT_STATE",
+        "<Icon name={stateIcon}",
+        "{stateLabel}</span>"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-touch-safe-ui",
+      "layer": "style",
+      "source": "components/realm/realm-pilot-operations.module.css",
+      "signals": [
+        ".incidentForm select, .incidentForm button { min-width: 0; min-height: 44px;",
+        ".incidentQueue article button { min-height: 44px;",
+        "@media (max-width: 680px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase19-unit-tests",
+      "layer": "test",
+      "source": "tests/realm-pilot-operations.test.mjs",
+      "signals": [
+        "Phase 19 warning incident holds Go/No-go",
+        "Phase 19 critical incident atomically rolls back"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase19-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-19-INCIDENT-COMMAND.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "Critical",
+        "mode = off",
+        "không tự tái kích hoạt"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "warning-does-not-close-realm",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "critical-closes-realm",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "critical-category-is-escalated",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "incident-must-be-monitored-before-resolve",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "open-incident-blocks-completion",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "timeline-is-aggregate-only",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "ui-confirms-critical-rollback",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    }
+  ]
+}
