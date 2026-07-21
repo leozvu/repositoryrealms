@@ -1017,6 +1017,39 @@ model AuditLog {
   @@index([at])
 }
 
+// ===== CEO-2: central entity registry =====
+// Only an environment-variable REFERENCE is persisted in credentialRef. The API key value
+// stays in the server secret store and is never serialized to the browser.
+model CeoEntityRegistry {
+  id                   String    @id
+  displayName          String
+  baseUrl              String    @unique
+  businessProfile      String
+  capabilities         String    @default("[]")
+  environment          String    @default("production")
+  enabled              Boolean   @default(false)
+  status               String    @default("unverified")
+  credentialRef        String
+  credentialVersion    Int       @default(1)
+  contractVersion      String    @default("1.0.0")
+  schemaVersion        Int       @default(1)
+  recordVersion        Int       @default(1)
+  lastSyncAttemptAt    DateTime?
+  lastSuccessfulSyncAt DateTime?
+  consecutiveErrors    Int       @default(0)
+  lastErrorCode        String?
+  circuitState         String    @default("closed")
+  circuitOpenedAt      DateTime?
+  circuitRetryAt       DateTime?
+  rotatedAt            DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([enabled, status])
+  @@index([circuitState, circuitRetryAt])
+  @@index([environment])
+}
+
 // ===== v3.19: XUẤT NHẬP KHẨU NÔNG SẢN (phân hệ 'export' — Fretas) =====
 // Vùng trồng (PUC) + cơ sở đóng gói (PHC). Gộp một model, phân biệt bằng type.
 model GrowingArea {

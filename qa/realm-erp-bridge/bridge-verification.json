@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 50,
-    "mappedNavigationRoutes": 50,
-    "verifiedNavigationRoutes": 50,
+    "erpNavigationRoutes": 51,
+    "mappedNavigationRoutes": 51,
+    "verifiedNavigationRoutes": 51,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -745,6 +745,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/audit/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "ceo-registry",
+      "erpLabel": "CEO · Danh bạ công ty",
+      "realmLabel": "Realm Registry",
+      "realmSurface": "Phòng điều hành CEO",
+      "group": "Công ty",
+      "href": "/ceo-registry",
+      "icon": "shield",
+      "roles": "DIRECTOR only",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/ceo-registry/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

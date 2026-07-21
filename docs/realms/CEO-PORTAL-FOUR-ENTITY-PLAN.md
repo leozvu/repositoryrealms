@@ -209,6 +209,8 @@ Exit gate: all four entity adapters pass the same contract suite.
 
 ### CEO-2 — Entity Registry
 
+Implementation status: code-complete on `codex/realms-demo`; migration and deployment remain blocked by the CEO-0 production safety gate. See `CEO-2-ENTITY-REGISTRY.md`.
+
 - Registry record: stable entity ID, display name, URL, type, capabilities, environment and status.
 - Store credential references in server secrets, never raw keys in the database or frontend.
 - Key rotation, last successful sync, error count and circuit-breaker state.

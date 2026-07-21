@@ -9,8 +9,8 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 108,
-    "asyncButtonGuards": 55,
+    "guardedActions": 110,
+    "asyncButtonGuards": 57,
     "disabledBindings": 49,
     "localPendingStates": 4,
     "destructiveFlows": 6,
@@ -111,6 +111,30 @@
       "loadingState": "async-button-guard",
       "successState": "hook-refresh",
       "errorState": "hook-error-toast",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.ceo-registry.action.toggle-entity",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 239,
+      "label": "",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.ceo-registry.action.submitrotation",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 260,
+      "label": "",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
       "confirmationState": "not-required",
       "status": "verified"
     },

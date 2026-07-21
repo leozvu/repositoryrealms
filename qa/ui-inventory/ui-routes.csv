@@ -7,6 +7,7 @@
 "/audit","app/(app)/audit/page.jsx","false","authenticated","true","Nhật ký hệ thống","Công ty","DIRECTOR","","","GET '/api/audit'","","unreviewed"
 "/automation","app/(app)/automation/page.jsx","false","authenticated","true","Tự động hóa","Công ty","DIRECTOR","","rules | users","","","unreviewed"
 "/calendar","app/(app)/calendar/page.jsx","false","authenticated","true","Lịch làm việc","Tổng quan","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","activities | contracts | invoices | leaves | projects | tasks | users","GET '/api/ics'","","unreviewed"
+"/ceo-registry","app/(app)/ceo-registry/page.jsx","false","authenticated","true","CEO · Danh bạ công ty","Công ty","DIRECTOR","","","GET '/api/ceo/v1/registry' | PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}` | POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`","","unreviewed"
 "/clients","app/(app)/clients/page.jsx","false","authenticated","true","Khách hàng","CRM — Bán hàng","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","clients","","","unreviewed"
 "/clients/[id]","app/(app)/clients/[id]/page.jsx","true","authenticated","true","Khách hàng","CRM — Bán hàng","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","activities | clients | contacts | csat | invoices | nps | projects | quotes | tickets","","","unreviewed"
 "/commissions","app/(app)/commissions/page.jsx","false","authenticated","true","Hoa hồng Sales","Tài chính","DIRECTOR | ACCOUNTANT | AM | PM","commissions","commissions | invoices | users","GET '/api/settings'","","unreviewed"

@@ -7,6 +7,8 @@ route.attendance.action.them,app/(app)/attendance/page.jsx,148,Thêm,data-action
 route.attendance.action.luu-ot,app/(app)/attendance/page.jsx,170,Lưu OT,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.automation.action.luu,app/(app)/automation/page.jsx,34,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.automation.action.tat-bat,app/(app)/automation/page.jsx,126,Tắt / Bật,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
+route.ceo-registry.action.toggle-entity,app/(app)/ceo-registry/page.jsx,239,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-registry.action.submitrotation,app/(app)/ceo-registry/page.jsx,260,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.commissions.action.a-tra,app/(app)/commissions/page.jsx,156,Đã trả,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.commissions.action.luu,app/(app)/commissions/page.jsx,180,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.copilot.action.s,app/(app)/copilot/page.jsx,58,💬 / {s},data-action,local-state,toast-or-state,handled-candidate,not-required,verified
