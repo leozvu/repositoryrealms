@@ -1,0 +1,59 @@
+{
+  "manifestVersion": 1,
+  "auditMode": "read-only",
+  "auditedAt": "2026-07-21T15:25:56.9089118Z",
+  "entity": {
+    "id": "vnecom",
+    "expectedName": "Vnecom LLC",
+    "businessProfile": "entity-specific; live modules not yet verified"
+  },
+  "vercel": {
+    "project": "erp-vnecom",
+    "projectId": "prj_Vaz8Su75zNPtjnX6M7ouR7aQ5Vrc",
+    "productionUrl": "https://erp-vnecom.vercel.app",
+    "httpStatus": 200,
+    "latestReadyProduction": {
+      "url": "https://erp-vnecom-oljkqdsha-leozs-projects-64a5f0c8.vercel.app",
+      "createdAt": "2026-07-17T11:29:23.776Z",
+      "gitCommitSha": "d78f686a7dd5e5be2dc96826acce2c18d5ea1986",
+      "gitCommitRef": "main"
+    },
+    "rollbackCandidate": {
+      "url": "https://erp-vnecom-qbxvkweh5-leozs-projects-64a5f0c8.vercel.app",
+      "createdAt": "2026-07-17T06:37:19.852Z",
+      "gitCommitSha": "42576b5cfdfc4ef22deafa75bd13b7bb4aa16f88",
+      "state": "READY"
+    },
+    "productionEnvironment": {
+      "DATABASE_URL": "configured-encrypted",
+      "DIRECT_URL": "configured-encrypted",
+      "NEXTAUTH_URL": "configured-encrypted",
+      "NEXTAUTH_SECRET": "configured-encrypted"
+    }
+  },
+  "database": {
+    "expectedSchema": "vnecom",
+    "schemaEvidence": "repository deployment and backup configuration",
+    "runtimeConnectivity": "verified",
+    "runtimeProbe": "GET /api/v1/summary with an invalid key returned 401 after the server-side API-key lookup path",
+    "fingerprint": null,
+    "migrationLevel": null,
+    "tableCount": null,
+    "settingsCompany": null,
+    "modules": null,
+    "accountCount": null,
+    "introspectionStatus": "blocked-encrypted-production-credentials"
+  },
+  "backup": {
+    "productionArtifactFoundLocally": false,
+    "scheduledTaskAgencyErpBackupFound": false,
+    "deploymentRollbackAvailable": true,
+    "restoreReadiness": "unverified"
+  },
+  "gitProvenance": {
+    "deploymentShaReachableFromRepository": false,
+    "repositoryEquivalentRelease": "76082dc287258203a7a6515545b2dd2ba5fbd202",
+    "status": "hash-lineage-mismatch"
+  },
+  "decision": "HOLD"
+}
