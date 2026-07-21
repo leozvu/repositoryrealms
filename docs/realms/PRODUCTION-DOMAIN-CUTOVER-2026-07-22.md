@@ -1,6 +1,6 @@
 # Production domain cutover — 2026-07-22
 
-Owner: Vũ Lương Sơn  
+Owner: Vũ Lương Sơn
 Status: prepared; waiting for the five approved hostnames and DNS-provider access.
 
 ## Domain matrix
