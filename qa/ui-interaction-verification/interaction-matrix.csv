@@ -7,6 +7,7 @@ route.attendance.action.them,app/(app)/attendance/page.jsx,148,Thêm,data-action
 route.attendance.action.luu-ot,app/(app)/attendance/page.jsx,170,Lưu OT,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.automation.action.luu,app/(app)/automation/page.jsx,34,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.automation.action.tat-bat,app/(app)/automation/page.jsx,126,Tắt / Bật,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
+route.ceo-overview.action.refresh-filter,app/(app)/ceo-overview/page.jsx,177,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.activateidentity,app/(app)/ceo-registry/page.jsx,301,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.stepupidentity,app/(app)/ceo-registry/page.jsx,319,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.rotaterecoverycodes,app/(app)/ceo-registry/page.jsx,320,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified

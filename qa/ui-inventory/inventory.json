@@ -202,6 +202,30 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/ceo-overview",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "dynamic": false,
+      "auth": "authenticated",
+      "inNavigation": true,
+      "navLabel": "CEO · Tổng quan 4 công ty",
+      "navSection": "Công ty",
+      "roles": [
+        "DIRECTOR"
+      ],
+      "module": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/ceo-registry",
       "source": "app/(app)/ceo-registry/page.jsx",
       "dynamic": false,
@@ -1584,6 +1608,24 @@
       "dynamic": false,
       "methods": [
         "GET"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/dashboard",
+      "source": "app/api/ceo/v1/dashboard/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/dashboard/refresh",
+      "source": "app/api/ceo/v1/dashboard/refresh/route.js",
+      "dynamic": false,
+      "methods": [
+        "POST"
       ],
       "mappingStatus": "unreviewed"
     },
@@ -3759,6 +3801,186 @@
         "clickable_non_semantic",
         "keyboard_path_unverified"
       ]
+    },
+    {
+      "elementId": "route.ceo-overview.action.refresh-filter",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 177,
+      "column": 9,
+      "surface": "route.ceo-overview",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => refresh(filter)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-overview.action.setfilter-all",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 189,
+      "column": 9,
+      "surface": "route.ceo-overview",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setFilter('all')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-overview.action.setfilter-entity-id",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 190,
+      "column": 40,
+      "surface": "route.ceo-overview",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setFilter(entity.id)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-overview.action.load-filter",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 194,
+      "column": 111,
+      "surface": "route.ceo-overview",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => load(filter)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-overview.navigation.ceo-registry",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 206,
+      "column": 161,
+      "surface": "route.ceo-overview",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-registry",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-overview.action.opendetail-entity-domain",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 258,
+      "column": 216,
+      "surface": "route.ceo-overview",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openDetail(entity, domain)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!identityReady || !entity.drillDowns?.[domain]",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
     },
     {
       "elementId": "route.ceo-registry.action.load",
@@ -26067,23 +26289,23 @@
     }
   ],
   "summary": {
-    "uiRoutes": 58,
-    "apiRoutes": 86,
-    "interactiveElements": 813,
-    "sourceFilesWithInteractions": 86,
-    "routesInPrimaryNavigation": 54,
+    "uiRoutes": 59,
+    "apiRoutes": 88,
+    "interactiveElements": 819,
+    "sourceFilesWithInteractions": 87,
+    "routesInPrimaryNavigation": 55,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 494,
+      "action": 499,
       "form-control": 255,
       "form-submit": 11,
-      "navigation": 53
+      "navigation": 54
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 17,
       "control_binding_unverified": 234,
       "keyboard_path_unverified": 17,
-      "unlabelled_button_candidate": 28
+      "unlabelled_button_candidate": 31
     },
     "topInteractiveSources": [
       {

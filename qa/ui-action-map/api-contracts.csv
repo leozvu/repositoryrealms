@@ -9,6 +9,8 @@
 "/api/auth/[...nextauth]","GET","app/api/auth/[...nextauth]/route.js","","","","public-or-unverified","false","false",""
 "/api/auth/[...nextauth]","POST","app/api/auth/[...nextauth]/route.js","","","","public-or-unverified","false","false",""
 "/api/ceo/v1/capabilities","GET","app/api/ceo/v1/capabilities/route.js","Setting","DIRECTOR","apiUser","explicit-rbac","false","true","401 | 403 | 503"
+"/api/ceo/v1/dashboard","GET","app/api/ceo/v1/dashboard/route.js","CeoEntityRegistry | CeoEntitySnapshotCache","","currentUser | isDirector","explicit-rbac","false","true","400 | 401 | 403 | 404 | 503"
+"/api/ceo/v1/dashboard/refresh","POST","app/api/ceo/v1/dashboard/refresh/route.js","AuditLog | CeoEntityRegistry | CeoEntitySnapshotCache","","currentUser | isDirector","explicit-rbac","false","true","400 | 401 | 403 | 404 | 409 | 503"
 "/api/ceo/v1/health","GET","app/api/ceo/v1/health/route.js","Setting","DIRECTOR","apiUser","explicit-rbac","false","true","401 | 403 | 503"
 "/api/ceo/v1/identity/recover","POST","app/api/ceo/v1/identity/recover/route.js","AuditLog | CeoGlobalIdentity | CeoPortalSession | CeoRecoveryCode | User","ACCOUNTANT | AM | PM | STAFF","isDirector","explicit-rbac","false","true","400 | 401 | 403 | 503"
 "/api/ceo/v1/identity/recovery","POST","app/api/ceo/v1/identity/recovery/route.js","AuditLog | CeoGlobalIdentity | CeoPortalSession | CeoRecoveryCode","","currentUser | isDirector","explicit-rbac","false","true","400 | 401 | 403 | 503"

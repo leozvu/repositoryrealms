@@ -1045,10 +1045,32 @@ model CeoEntityRegistry {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
   memberships          CeoEntityMembership[]
+  snapshotCache        CeoEntitySnapshotCache?
 
   @@index([enabled, status])
   @@index([circuitState, circuitRetryAt])
   @@index([environment])
+}
+
+// ===== CEO-4: sanitized aggregate read cache =====
+// One latest aggregate snapshot is retained per entity. snapshotJson is validated against
+// the CEO v1 contract before persistence and cannot contain entity business records.
+model CeoEntitySnapshotCache {
+  id              String            @id @default(cuid())
+  entityId        String            @unique
+  entity          CeoEntityRegistry @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  contractVersion String
+  schemaVersion   Int
+  snapshotJson    String
+  sourceAsOf      DateTime
+  fetchedAt       DateTime
+  freshUntil      DateTime
+  staleUntil      DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([freshUntil])
+  @@index([staleUntil])
 }
 
 // ===== CEO-3: central CEO identity and cross-domain SSO control plane =====

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 51,
-    "mappedNavigationRoutes": 51,
-    "verifiedNavigationRoutes": 51,
+    "erpNavigationRoutes": 52,
+    "mappedNavigationRoutes": 52,
+    "verifiedNavigationRoutes": 52,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -745,6 +745,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/audit/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "ceo-overview",
+      "erpLabel": "CEO · Tổng quan 4 công ty",
+      "realmLabel": "Royal Realm Overview",
+      "realmSurface": "Phòng điều hành CEO",
+      "group": "Công ty",
+      "href": "/ceo-overview",
+      "icon": "dashboard",
+      "roles": "DIRECTOR only",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/ceo-overview/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

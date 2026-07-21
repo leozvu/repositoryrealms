@@ -9,8 +9,8 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 113,
-    "asyncButtonGuards": 61,
+    "guardedActions": 114,
+    "asyncButtonGuards": 62,
     "disabledBindings": 48,
     "localPendingStates": 4,
     "destructiveFlows": 6,
@@ -111,6 +111,18 @@
       "loadingState": "async-button-guard",
       "successState": "hook-refresh",
       "errorState": "hook-error-toast",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.ceo-overview.action.refresh-filter",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 177,
+      "label": "",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
       "confirmationState": "not-required",
       "status": "verified"
     },

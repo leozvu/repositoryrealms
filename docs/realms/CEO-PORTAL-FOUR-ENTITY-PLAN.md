@@ -230,11 +230,15 @@ Exit gate: one CEO login opens all four entities without credential re-entry and
 
 ### CEO-4 — Unified read dashboard
 
+Implementation status: code complete on `codex/realms-demo` with a durable aggregate cache, validated CEO v1 snapshots, per-entity circuit-breaker refresh, stale-if-error fallback, currency-safe comparison and signed SSO drill-downs. Migration/deployment and the four-entity operational exit gate remain on HOLD behind CEO-0. See `CEO-4-UNIFIED-READ-DASHBOARD.md`.
+
 - Entity cards and `All companies` comparison.
 - Finance, CRM, delivery, people/operations and Egolive vertical KPIs.
 - Staleness and source provenance on every card.
 - Drill-down uses a signed deep link to the owning entity.
 - Cached snapshots with background refresh and graceful degradation.
+
+Exit gate: all four registered entities populate the dashboard from their own CEO v1 endpoint; one unavailable entity is visibly stale/degraded without hiding or corrupting the other three.
 
 ### CEO-5 — Cross-entity command gateway
 

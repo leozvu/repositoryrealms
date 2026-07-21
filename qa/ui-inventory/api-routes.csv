@@ -5,6 +5,8 @@
 "/api/audit","app/api/audit/route.js","false","GET","unreviewed"
 "/api/auth/[...nextauth]","app/api/auth/[...nextauth]/route.js","true","GET | POST","unreviewed"
 "/api/ceo/v1/capabilities","app/api/ceo/v1/capabilities/route.js","false","GET","unreviewed"
+"/api/ceo/v1/dashboard","app/api/ceo/v1/dashboard/route.js","false","GET","unreviewed"
+"/api/ceo/v1/dashboard/refresh","app/api/ceo/v1/dashboard/refresh/route.js","false","POST","unreviewed"
 "/api/ceo/v1/health","app/api/ceo/v1/health/route.js","false","GET","unreviewed"
 "/api/ceo/v1/identity/recover","app/api/ceo/v1/identity/recover/route.js","false","POST","unreviewed"
 "/api/ceo/v1/identity/recovery","app/api/ceo/v1/identity/recovery/route.js","false","POST","unreviewed"
