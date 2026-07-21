@@ -463,7 +463,7 @@ async function main() {
     const createdUser = usingExistingUser
       ? await prisma.user.findFirst({
           where: { email, status: 'active', userType: 'employee' },
-          select: { id: true, role: true, roles: true, salary: true },
+          select: { id: true, role: true, roles: true, salary: true, workspacePreference: true },
         })
       : await prisma.user.create({
           data: {
@@ -476,13 +476,13 @@ async function main() {
             salary: 17_600_000,
             workspacePreference: 'erp',
           },
-          select: { id: true, role: true, roles: true, salary: true },
+          select: { id: true, role: true, roles: true, salary: true, workspacePreference: true },
         });
     if (!createdUser) fail(`Existing staging smoke identity ${email} is unavailable.`);
     createdUserId = createdUser.id;
     expectedRole = createdUser.role;
     if (usingExistingUser) {
-      identityRestore = { role: createdUser.role, roles: createdUser.roles, salary: createdUser.salary };
+      identityRestore = { role: createdUser.role, roles: createdUser.roles, salary: createdUser.salary, workspacePreference: createdUser.workspacePreference };
       const currentRoles = (() => { try { return JSON.parse(createdUser.roles || '[]'); } catch { return [createdUser.role]; } })();
       await prisma.user.update({
         where: { id: createdUser.id },
