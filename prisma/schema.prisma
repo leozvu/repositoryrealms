@@ -1044,10 +1044,108 @@ model CeoEntityRegistry {
   rotatedAt            DateTime?
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
+  memberships          CeoEntityMembership[]
 
   @@index([enabled, status])
   @@index([circuitState, circuitRetryAt])
   @@index([environment])
+}
+
+// ===== CEO-3: central CEO identity and cross-domain SSO control plane =====
+// These tables hold identity/control metadata only. Entity business records stay in the
+// owning ERP database, and all browser/session/code secrets are persisted as keyed hashes.
+model CeoGlobalIdentity {
+  id              String                         @id @default(cuid())
+  subject         String                         @unique
+  userId          String                         @unique
+  email           String
+  displayName     String
+  status          String                         @default("active")
+  recoveryVersion Int                            @default(0)
+  createdAt       DateTime                       @default(now())
+  updatedAt       DateTime                       @updatedAt
+  memberships     CeoEntityMembership[]
+  sessions        CeoPortalSession[]
+  recoveryCodes   CeoRecoveryCode[]
+  authorizationCodes CeoSsoAuthorizationCode[]
+
+  @@index([status, email])
+}
+
+model CeoEntityMembership {
+  id             String                  @id @default(cuid())
+  identityId     String
+  identity       CeoGlobalIdentity       @relation(fields: [identityId], references: [id], onDelete: Restrict)
+  entityId       String
+  entity         CeoEntityRegistry       @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  localUserEmail String
+  localRole      String                  @default("DIRECTOR")
+  scopes         String                  @default("[]")
+  status         String                  @default("active")
+  recordVersion  Int                     @default(1)
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  @@unique([identityId, entityId])
+  @@index([entityId, status])
+  @@index([localUserEmail])
+}
+
+model CeoPortalSession {
+  id             String                         @id @default(cuid())
+  identityId     String
+  identity       CeoGlobalIdentity              @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  tokenHash      String                         @unique
+  deviceLabel    String
+  userAgentHash  String?
+  ipHash         String?
+  assuranceLevel String                         @default("mfa")
+  stepUpAt       DateTime?
+  lastSeenAt     DateTime                       @default(now())
+  idleExpiresAt  DateTime
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  revokeReason   String?
+  createdAt      DateTime                       @default(now())
+  authorizationCodes CeoSsoAuthorizationCode[]
+
+  @@index([identityId, revokedAt, expiresAt])
+  @@index([idleExpiresAt])
+}
+
+model CeoRecoveryCode {
+  id         String            @id @default(cuid())
+  identityId String
+  identity   CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  codeHash   String            @unique
+  version    Int
+  usedAt     DateTime?
+  createdAt  DateTime          @default(now())
+
+  @@index([identityId, version, usedAt])
+}
+
+model CeoSsoAuthorizationCode {
+  id             String            @id @default(cuid())
+  codeHash       String            @unique
+  stateHash      String
+  nonce          String
+  identityId     String
+  identity       CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  sessionId      String
+  session        CeoPortalSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  entityId       String
+  audience       String
+  scopes         String            @default("[]")
+  localUserEmail String
+  redirectPath   String            @default("/dashboard")
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  createdAt      DateTime          @default(now())
+
+  @@index([entityId, expiresAt, consumedAt])
+  @@index([identityId, createdAt])
+  @@index([sessionId, createdAt])
 }
 
 // ===== v3.19: XUẤT NHẬP KHẨU NÔNG SẢN (phân hệ 'export' — Fretas) =====

@@ -218,6 +218,8 @@ Implementation status: code-complete on `codex/realms-demo`; migration and deplo
 
 ### CEO-3 — Central CEO Identity and SSO
 
+Implementation status: code complete on `codex/realms-demo` with password + TOTP, versioned recovery codes, revocable CEO sessions, 45-second single-use authorization codes and local Director mapping. Migration/deployment and the four-entity operational exit gate remain on HOLD behind CEO-0. See `CEO-3-CENTRAL-IDENTITY-SSO.md`.
+
 - Global identity, entity membership and scoped role model.
 - Passkey/TOTP, recovery and session revocation.
 - One-time authorization-code exchange for each entity.

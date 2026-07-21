@@ -19,6 +19,9 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
+  const [recoveryCode, setRecoveryCode] = useState('');
+  const [recoveryMode, setRecoveryMode] = useState(false);
+  const [deviceLabel, setDeviceLabel] = useState('CEO recovery browser');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -32,6 +35,18 @@ export default function LoginPage() {
   const submit = async e => {
     e.preventDefault();
     setBusy(true); setErr('');
+    if (recoveryMode) {
+      const response = await fetch('/api/ceo/v1/identity/recover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, recoveryCode, deviceLabel }),
+      }).catch(() => null);
+      const body = response ? await response.json().catch(() => ({})) : {};
+      setBusy(false);
+      if (!response?.ok) { setErr(body.error || 'Không thể khôi phục phiên CEO'); return; }
+      window.location.assign('/ceo-registry');
+      return;
+    }
     const res = await signIn('credentials', { email, password, otp, redirect: false });
     setBusy(false);
     if (res?.error) setErr('Email, mật khẩu hoặc mã 2FA không đúng');
@@ -73,8 +88,21 @@ export default function LoginPage() {
             <label htmlFor="login-otp">Mã 2FA (bỏ trống nếu chưa bật)</label>
             <input id="login-otp" name="otp" type="text" inputMode="numeric" maxLength={6} value={otp} onChange={e => setOtp(e.target.value)} placeholder="000000" autoComplete="one-time-code" />
           </div>
+          {recoveryMode && <>
+            <div className="field">
+              <label htmlFor="login-recovery-code">CEO recovery code</label>
+              <input id="login-recovery-code" name="recoveryCode" type="text" value={recoveryCode} onChange={e => setRecoveryCode(e.target.value.toUpperCase())} placeholder="RR-XXXX-XXXX-XXXX" autoComplete="one-time-code" required />
+            </div>
+            <div className="field">
+              <label htmlFor="login-recovery-device">Tên thiết bị khôi phục</label>
+              <input id="login-recovery-device" name="deviceLabel" type="text" value={deviceLabel} onChange={e => setDeviceLabel(e.target.value)} maxLength={80} autoComplete="off" required />
+            </div>
+          </>}
           <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px' }} disabled={!hydrated || busy} aria-busy={busy || undefined}>
-            {!hydrated ? 'Đang khởi tạo…' : busy ? 'Đang đăng nhập…' : 'Đăng nhập'}
+            {!hydrated ? 'Đang khởi tạo…' : busy ? 'Đang đăng nhập…' : recoveryMode ? 'Khôi phục phiên CEO' : 'Đăng nhập'}
+          </button>
+          <button type="button" className="btn btn-outline" style={{ width: '100%', justifyContent: 'center', marginTop: 10 }} onClick={() => { setRecoveryMode((value) => !value); setErr(''); }} disabled={busy}>
+            {recoveryMode ? 'Quay lại đăng nhập TOTP' : 'CEO mất thiết bị TOTP? Dùng recovery code'}
           </button>
         </form>
       </div>

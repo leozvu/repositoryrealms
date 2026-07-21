@@ -36,6 +36,18 @@ const COPY = {
     securityTitle: 'Nguyên tắc an toàn',
     securityText: 'Không xóa entity, không hiển thị key, không bật khi secret còn thiếu. Mọi thay đổi dùng version check và được ghi AuditLog.',
     noDelete: 'Không có thao tác xóa',
+    ssoTitle: 'Danh tính CEO & đăng nhập một lần',
+    ssoIntro: 'Lớp bảo mật riêng cho Vũ Lương Sơn. Mật khẩu + TOTP mở Portal; code 45 giây chỉ mở đúng công ty đã cấp quyền.',
+    ssoInactive: 'CEO session chưa kích hoạt', ssoActive: 'CEO session đang hoạt động', stepUpReady: 'TOTP vừa xác minh', stepUpExpired: 'Cần xác minh lại TOTP',
+    otpLabel: 'Mã TOTP 6 số', otpHint: 'Dùng mã hiện tại trong ứng dụng xác thực. Mã không được lưu.',
+    deviceLabel: 'Tên thiết bị', activate: 'Kích hoạt CEO session', activating: 'Đang kích hoạt…', stepUp: 'Xác minh lại', steppingUp: 'Đang xác minh…',
+    sessionCount: 'Phiên thiết bị', recoveryRemaining: 'Recovery code còn lại', memberships: 'Công ty được cấp quyền',
+    rotateRecovery: 'Tạo bộ recovery code mới', rotatingRecovery: 'Đang tạo…', recoveryTitle: 'Recovery codes — chỉ hiển thị một lần',
+    recoveryWarning: 'Lưu các mã này ở nơi an toàn. Tạo bộ mới sẽ vô hiệu hóa toàn bộ mã cũ.', copyCodes: 'Sao chép mã', copied: 'Đã sao chép recovery codes.',
+    sessionsTitle: 'Thiết bị đang đăng nhập', currentSession: 'Thiết bị này', revoke: 'Thu hồi', revoking: 'Đang thu hồi…',
+    openEntity: 'Mở bằng SSO', openingEntity: 'Đang cấp code…', ssoNotReady: 'Kích hoạt và xác minh CEO session trước.',
+    identityError: 'Dịch vụ CEO Identity chưa sẵn sàng. Registry vẫn có thể được quản trị độc lập.',
+    activatedToast: 'CEO session đã được kích hoạt.', steppedUpToast: 'Đã xác minh lại TOTP.', revokedToast: 'Đã thu hồi session.',
   },
   en: {
     eyebrow: 'CEO CONTROL PLANE · ENTITY REGISTRY',
@@ -65,6 +77,18 @@ const COPY = {
     securityTitle: 'Safety policy',
     securityText: 'No entity deletion, no key exposure, and no enablement while a secret is missing. Every change uses version checks and is written to AuditLog.',
     noDelete: 'No delete operation',
+    ssoTitle: 'CEO identity & single sign-on',
+    ssoIntro: 'A dedicated security layer for Vũ Lương Sơn. Password + TOTP opens the Portal; a 45-second code opens only the authorized company.',
+    ssoInactive: 'CEO session is not active', ssoActive: 'CEO session is active', stepUpReady: 'TOTP recently verified', stepUpExpired: 'TOTP re-verification required',
+    otpLabel: '6-digit TOTP', otpHint: 'Use the current code from your authenticator. The code is never stored.',
+    deviceLabel: 'Device name', activate: 'Activate CEO session', activating: 'Activating…', stepUp: 'Verify again', steppingUp: 'Verifying…',
+    sessionCount: 'Device sessions', recoveryRemaining: 'Recovery codes remaining', memberships: 'Authorized companies',
+    rotateRecovery: 'Create new recovery codes', rotatingRecovery: 'Creating…', recoveryTitle: 'Recovery codes — shown once',
+    recoveryWarning: 'Store these codes securely. Creating a new set invalidates every old code.', copyCodes: 'Copy codes', copied: 'Recovery codes copied.',
+    sessionsTitle: 'Signed-in devices', currentSession: 'This device', revoke: 'Revoke', revoking: 'Revoking…',
+    openEntity: 'Open with SSO', openingEntity: 'Issuing code…', ssoNotReady: 'Activate and verify the CEO session first.',
+    identityError: 'CEO Identity is not ready. The registry can still be managed independently.',
+    activatedToast: 'CEO session activated.', steppedUpToast: 'TOTP verification refreshed.', revokedToast: 'Session revoked.',
   },
 };
 
@@ -80,6 +104,11 @@ export default function CeoRegistryPage() {
   const [forbidden, setForbidden] = useState(false);
   const [rotating, setRotating] = useState(null);
   const [credentialRef, setCredentialRef] = useState('');
+  const [identity, setIdentity] = useState(null);
+  const [identityError, setIdentityError] = useState('');
+  const [otp, setOtp] = useState('');
+  const [deviceLabel, setDeviceLabel] = useState('CEO browser');
+  const [recoveryCodes, setRecoveryCodes] = useState(null);
 
   const load = useCallback(async () => {
     setError('');
@@ -90,9 +119,17 @@ export default function CeoRegistryPage() {
     setPayload(body);
   }, [c.loadError]);
 
+  const loadIdentity = useCallback(async () => {
+    setIdentityError('');
+    const response = await fetch('/api/ceo/v1/identity/session', { cache: 'no-store' }).catch(() => null);
+    const body = response ? await response.json().catch(() => ({})) : {};
+    if (!response?.ok) { setIdentityError(body.error || c.identityError); return; }
+    setIdentity(body);
+  }, [c.identityError]);
+
   useEffect(() => {
-    if (sessionStatus === 'authenticated') load();
-  }, [load, sessionStatus]);
+    if (sessionStatus === 'authenticated') Promise.all([load(), loadIdentity()]);
+  }, [load, loadIdentity, sessionStatus]);
 
   const entities = payload?.entities || [];
   const stats = useMemo(() => ({
@@ -146,6 +183,65 @@ export default function CeoRegistryPage() {
     return true;
   };
 
+  const activateIdentity = async () => {
+    const response = await fetch('/api/ceo/v1/identity/session', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otp, deviceLabel }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || c.identityError, 'error'); return false; }
+    setOtp('');
+    await loadIdentity();
+    toast(c.activatedToast);
+    return true;
+  };
+
+  const stepUpIdentity = async () => {
+    const response = await fetch('/api/ceo/v1/identity/session/step-up', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otp }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || c.identityError, 'error'); return false; }
+    setOtp('');
+    await loadIdentity();
+    toast(c.steppedUpToast);
+    return true;
+  };
+
+  const rotateRecoveryCodes = async () => {
+    const response = await fetch('/api/ceo/v1/identity/recovery', { method: 'POST' });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || c.identityError, 'error'); return false; }
+    setRecoveryCodes(body.codes || []);
+    await loadIdentity();
+    return true;
+  };
+
+  const revokeSession = async (sessionId) => {
+    const response = await fetch(`/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`, { method: 'POST' });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || c.identityError, 'error'); return false; }
+    if (body.currentRevoked) setIdentity((current) => ({ ...current, active: false, stepUp: false, sessions: [] }));
+    else await loadIdentity();
+    toast(c.revokedToast);
+    return true;
+  };
+
+  const openEntity = async (entity) => {
+    if (!identity?.active || !identity.stepUp) { toast(c.ssoNotReady, 'error'); return false; }
+    const response = await fetch('/api/ceo/v1/sso/authorize', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entityId: entity.id, redirectPath: '/dashboard' }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || c.identityError, 'error'); return false; }
+    window.location.assign(body.destination);
+    return true;
+  };
+
+  const copyRecoveryCodes = async () => {
+    await navigator.clipboard.writeText((recoveryCodes || []).join('\n'));
+    toast(c.copied);
+  };
+
   if (sessionStatus === 'loading') return <div className={styles.loading}>{c.loading}</div>;
   if (!rolesOf(session?.user).includes('DIRECTOR') || forbidden) return <Forbidden />;
 
@@ -175,6 +271,65 @@ export default function CeoRegistryPage() {
         <span className={styles.policyIcon}><Icon name="shield" size={21} /></span>
         <div><h2 id="ceo-registry-policy-title">{c.securityTitle}</h2><p>{c.securityText}</p></div>
         <span className="badge b-green"><span className="dot"></span>{c.noDelete}</span>
+      </section>
+
+      <section className={`card ${styles.identityPanel}`} aria-labelledby="ceo-identity-title">
+        <header className={styles.identityPanelHead}>
+          <div>
+            <p className={styles.eyebrow}>CEO-3 · CENTRAL IDENTITY</p>
+            <h2 id="ceo-identity-title">{c.ssoTitle}</h2>
+            <p>{c.ssoIntro}</p>
+          </div>
+          <span className={`${styles.status} ${identity?.active ? styles.good : styles.neutral}`}>
+            <span></span>{identity?.active ? c.ssoActive : c.ssoInactive}
+          </span>
+        </header>
+
+        {identityError && <div className={styles.inlineNotice} role="status"><Icon name="alert" size={18} /><span>{c.identityError}</span><button type="button" className="btn btn-outline btn-sm" onClick={loadIdentity}>{c.retry}</button></div>}
+
+        {!identity?.active && !identityError && (
+          <div className={styles.activationForm}>
+            <div className={styles.fieldGroup}>
+              <label htmlFor="ceo-device-label">{c.deviceLabel}</label>
+              <input id="ceo-device-label" value={deviceLabel} onChange={(event) => setDeviceLabel(event.target.value)} maxLength={80} autoComplete="off" />
+            </div>
+            <div className={styles.fieldGroup}>
+              <label htmlFor="ceo-activation-otp">{c.otpLabel}</label>
+              <input id="ceo-activation-otp" value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" maxLength={6} aria-describedby="ceo-activation-otp-hint" />
+              <small id="ceo-activation-otp-hint">{c.otpHint}</small>
+            </div>
+            <AsyncButton type="button" className="btn btn-primary" pendingLabel={c.activating} disabled={otp.length !== 6} onClick={activateIdentity}><Icon name="shield" size={16} />{c.activate}</AsyncButton>
+          </div>
+        )}
+
+        {identity?.active && (
+          <>
+            <div className={styles.identityMetrics}>
+              <div><span>{c.stepUpReady}</span><strong className={identity.stepUp ? styles.textGood : styles.textBad}>{identity.stepUp ? c.stepUpReady : c.stepUpExpired}</strong></div>
+              <div><span>{c.sessionCount}</span><strong>{identity.sessions?.filter((item) => !item.revokedAt).length || 0}</strong></div>
+              <div><span>{c.recoveryRemaining}</span><strong>{identity.recoveryCodesRemaining || 0}</strong></div>
+              <div><span>{c.memberships}</span><strong>{identity.memberships?.filter((item) => item.status === 'active').length || 0}</strong></div>
+            </div>
+            <div className={styles.securityActions}>
+              <div className={styles.fieldGroup}>
+                <label htmlFor="ceo-step-up-otp">{c.otpLabel}</label>
+                <input id="ceo-step-up-otp" value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" maxLength={6} aria-describedby="ceo-step-up-otp-hint" />
+                <small id="ceo-step-up-otp-hint">{c.otpHint}</small>
+              </div>
+              <AsyncButton type="button" className="btn btn-primary" pendingLabel={c.steppingUp} disabled={otp.length !== 6} onClick={stepUpIdentity}><Icon name="shield" size={16} />{c.stepUp}</AsyncButton>
+              <AsyncButton type="button" className="btn btn-outline" pendingLabel={c.rotatingRecovery} disabled={!identity.stepUp} onClick={rotateRecoveryCodes}><Icon name="repeat" size={16} />{c.rotateRecovery}</AsyncButton>
+            </div>
+            <div className={styles.sessionList} aria-label={c.sessionsTitle}>
+              <h3>{c.sessionsTitle}</h3>
+              {(identity.sessions || []).map((item) => (
+                <div className={styles.sessionRow} key={item.id}>
+                  <div><strong>{item.deviceLabel}</strong><span>{item.current ? c.currentSession : dateLabel(item.lastSeenAt)}</span></div>
+                  <AsyncButton type="button" className="btn btn-outline btn-sm" pendingLabel={c.revoking} disabled={Boolean(item.revokedAt)} onClick={() => revokeSession(item.id)}>{item.revokedAt ? c.disabledStatus : c.revoke}</AsyncButton>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       {error && (
@@ -237,6 +392,16 @@ export default function CeoRegistryPage() {
 
                 <footer className={styles.actions}>
                   <AsyncButton
+                    type="button"
+                    className="btn btn-primary"
+                    pendingLabel={c.openingEntity}
+                    disabled={!entity.enabled || !entity.credential.configured || !identity?.active || !identity.stepUp || !identity.memberships?.some((item) => item.entityId === entity.id && item.status === 'active')}
+                    onClick={() => openEntity(entity)}
+                  >
+                    <Icon name="link" size={15} /> {c.openEntity}
+                  </AsyncButton>
+                  <AsyncButton
+                    type="button"
                     className={entity.enabled ? 'btn btn-outline' : 'btn btn-primary'}
                     pendingLabel={entity.enabled ? c.disabling : c.enabling}
                     onClick={() => toggle(entity)}
@@ -272,6 +437,18 @@ export default function CeoRegistryPage() {
               aria-describedby="ceo-credential-ref-hint"
             />
             <small id="ceo-credential-ref-hint">{c.refHint}</small>
+          </div>
+        </Modal>
+      )}
+
+      {recoveryCodes && (
+        <Modal title={c.recoveryTitle} onClose={() => setRecoveryCodes(null)} footer={<>
+          <button type="button" className="btn btn-outline" onClick={() => setRecoveryCodes(null)}>{c.cancel}</button>
+          <AsyncButton type="button" className="btn btn-primary" onClick={copyRecoveryCodes}>{c.copyCodes}</AsyncButton>
+        </>}>
+          <div className={styles.recoverySheet}>
+            <p role="alert"><Icon name="alert" size={18} />{c.recoveryWarning}</p>
+            <ol>{recoveryCodes.map((code) => <li key={code}><code>{code}</code></li>)}</ol>
           </div>
         </Modal>
       )}

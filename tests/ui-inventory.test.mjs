@@ -45,7 +45,7 @@ test('critical API contracts and generic resource bindings are discoverable', ()
   assert.ok(dashboard.resourceCandidates.includes('projects'));
   const login = inventory.uiRoutes.find((route) => route.route === '/login');
   assert.ok(login.apiCandidates.includes("GET '/api/realm-demo/pilot'"));
-  assert.deepEqual(login.routeCandidates, ['destination']);
+  assert.deepEqual(login.routeCandidates, ["'/ceo-registry'", 'destination']);
 });
 
 test('rendered artifacts are deterministic', () => {

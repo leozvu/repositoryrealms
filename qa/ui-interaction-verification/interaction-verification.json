@@ -9,9 +9,9 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 110,
-    "asyncButtonGuards": 57,
-    "disabledBindings": 49,
+    "guardedActions": 113,
+    "asyncButtonGuards": 61,
+    "disabledBindings": 48,
     "localPendingStates": 4,
     "destructiveFlows": 6,
     "destructiveFlowsVerified": 6,
@@ -115,9 +115,57 @@
       "status": "verified"
     },
     {
+      "elementId": "route.ceo-registry.action.activateidentity",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 301,
+      "label": "",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.ceo-registry.action.stepupidentity",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 319,
+      "label": "",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.ceo-registry.action.rotaterecoverycodes",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 320,
+      "label": "",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.ceo-registry.action.revokesession-item-id",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 327,
+      "label": "",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
       "elementId": "route.ceo-registry.action.toggle-entity",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 239,
+      "line": 403,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -129,7 +177,7 @@
     {
       "elementId": "route.ceo-registry.action.submitrotation",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 260,
+      "line": 425,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1288,18 +1336,6 @@
       "successState": "toast-or-state",
       "errorState": "handled-candidate",
       "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
-      "elementId": "component.components-ui.action.run",
-      "source": "components/ui.jsx",
-      "line": 128,
-      "label": "",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "hook-refresh",
-      "errorState": "hook-error-toast",
-      "confirmationState": "confirmed",
       "status": "verified"
     },
     {

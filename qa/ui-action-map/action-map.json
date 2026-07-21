@@ -264,6 +264,176 @@
       }
     },
     {
+      "route": "/api/ceo/v1/identity/recover",
+      "source": "app/api/ceo/v1/identity/recover/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoGlobalIdentity",
+            "CeoPortalSession",
+            "CeoRecoveryCode",
+            "User"
+          ],
+          "roles": [
+            "ACCOUNTANT",
+            "AM",
+            "PM",
+            "STAFF"
+          ],
+          "guards": [
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/identity/recovery",
+      "source": "app/api/ceo/v1/identity/recovery/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoGlobalIdentity",
+            "CeoPortalSession",
+            "CeoRecoveryCode"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/identity/session",
+      "source": "app/api/ceo/v1/identity/session/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoEntityMembership",
+            "CeoGlobalIdentity",
+            "CeoPortalSession",
+            "CeoRecoveryCode"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoGlobalIdentity",
+            "CeoPortalSession",
+            "User"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/identity/session/step-up",
+      "source": "app/api/ceo/v1/identity/session/step-up/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoPortalSession",
+            "User"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            409,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/identity/sessions/[id]/revoke",
+      "source": "app/api/ceo/v1/identity/sessions/[id]/revoke/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoPortalSession"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/ceo/v1/registry",
       "source": "app/api/ceo/v1/registry/route.js",
       "methods": {
@@ -375,6 +545,94 @@
           "statuses": [
             401,
             403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/sso/authorize",
+      "source": "app/api/ceo/v1/sso/authorize/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoPortalSession",
+            "CeoSsoAuthorizationCode"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/sso/callback",
+      "source": "app/api/ceo/v1/sso/callback/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "AuditLog",
+            "User"
+          ],
+          "roles": [
+            "ACCOUNTANT",
+            "AM",
+            "DIRECTOR",
+            "PM",
+            "STAFF"
+          ],
+          "guards": [],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/sso/exchange",
+      "source": "app/api/ceo/v1/sso/exchange/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoSsoAuthorizationCode"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [],
+          "statuses": [
+            400,
+            401,
+            403,
+            409,
             503
           ],
           "permissionPolicy": "explicit-rbac",
@@ -8498,7 +8756,7 @@
     {
       "elementId": "route.ceo-registry.action.load",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 169,
+      "line": 265,
       "column": 9,
       "surface": "route.ceo-registry",
       "tag": "button",
@@ -8515,10 +8773,18 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
         "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
-        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`"
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
       ],
-      "routeCandidates": [],
+      "routeCandidates": [
+        "body.destination"
+      ],
       "uxRiskCandidates": [
         "unlabelled_button_candidate"
       ],
@@ -8532,7 +8798,9 @@
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
-      "routeTargets": [],
+      "routeTargets": [
+        "body.destination"
+      ],
       "apiCalls": [
         "GET /api/ceo/v1/registry"
       ],
@@ -8558,9 +8826,585 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "route.ceo-registry.action.loadidentity",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 288,
+      "column": 139,
+      "surface": "route.ceo-registry",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "loadIdentity",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "loadIdentity"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "CeoEntityMembership",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-registry.form-control.input",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 294,
+      "column": 15,
+      "surface": "route.ceo-registry",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-registry.form-control.input.2",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 298,
+      "column": 15,
+      "surface": "route.ceo-registry",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-registry.action.activateidentity",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 301,
+      "column": 13,
+      "surface": "route.ceo-registry",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "activateIdentity",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "otp.length !== 6",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "activateIdentity",
+        "loadIdentity"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session",
+        "POST /api/ceo/v1/identity/session"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-registry.form-control.input.3",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 316,
+      "column": 17,
+      "surface": "route.ceo-registry",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-registry.action.stepupidentity",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 319,
+      "column": 15,
+      "surface": "route.ceo-registry",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "stepUpIdentity",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "otp.length !== 6",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "loadIdentity",
+        "stepUpIdentity"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session",
+        "POST /api/ceo/v1/identity/session/step-up"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-registry.action.rotaterecoverycodes",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 320,
+      "column": 15,
+      "surface": "route.ceo-registry",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "rotateRecoveryCodes",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!identity.stepUp",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "loadIdentity",
+        "rotateRecoveryCodes"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session",
+        "POST /api/ceo/v1/identity/recovery"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-registry.action.revokesession-item-id",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 327,
+      "column": 19,
+      "surface": "route.ceo-registry",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => revokeSession(item.id)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "Boolean(item.revokedAt)",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "loadIdentity",
+        "revokeSession"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session",
+        "POST /api/ceo/v1/identity/sessions/*/revoke"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "route.ceo-registry.action.load.2",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 183,
+      "line": 338,
       "column": 11,
       "surface": "route.ceo-registry",
       "tag": "button",
@@ -8577,10 +9421,18 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
         "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
-        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`"
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
       ],
-      "routeCandidates": [],
+      "routeCandidates": [
+        "body.destination"
+      ],
       "uxRiskCandidates": [
         "unlabelled_button_candidate"
       ],
@@ -8594,7 +9446,9 @@
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
-      "routeTargets": [],
+      "routeTargets": [
+        "body.destination"
+      ],
       "apiCalls": [
         "GET /api/ceo/v1/registry"
       ],
@@ -8622,7 +9476,7 @@
     {
       "elementId": "route.ceo-registry.navigation.entity-baseurl",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 216,
+      "line": 371,
       "column": 17,
       "surface": "route.ceo-registry",
       "tag": "a",
@@ -8639,10 +9493,18 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
         "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
-        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`"
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
       ],
-      "routeCandidates": [],
+      "routeCandidates": [
+        "body.destination"
+      ],
       "uxRiskCandidates": [],
       "ownerComponent": "CeoRegistryPage",
       "effectiveHandlerEvent": "",
@@ -8652,7 +9514,9 @@
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
-      "routeTargets": [],
+      "routeTargets": [
+        "body.destination"
+      ],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [],
@@ -8672,9 +9536,87 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "route.ceo-registry.action.openentity-entity",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 394,
+      "column": 19,
+      "surface": "route.ceo-registry",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openEntity(entity)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!entity.enabled || !entity.credential.configured || !identity?.active || !identity.stepUp || !identity.memberships?.some((item) => item.entityId === entity.id && item.status === 'active')",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "openEntity"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/sso/authorize"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoSsoAuthorizationCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.location.assign"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "route.ceo-registry.action.toggle-entity",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 239,
+      "line": 403,
       "column": 19,
       "surface": "route.ceo-registry",
       "tag": "AsyncButton",
@@ -8691,10 +9633,18 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
         "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
-        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`"
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
       ],
-      "routeCandidates": [],
+      "routeCandidates": [
+        "body.destination"
+      ],
       "uxRiskCandidates": [],
       "ownerComponent": "CeoRegistryPage",
       "effectiveHandlerEvent": "onClick",
@@ -8707,7 +9657,9 @@
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
-      "routeTargets": [],
+      "routeTargets": [
+        "body.destination"
+      ],
       "apiCalls": [
         "PATCH /api/ceo/v1/registry/*"
       ],
@@ -8736,7 +9688,7 @@
     {
       "elementId": "route.ceo-registry.action.setrotating-entity-setcredentialref",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 246,
+      "line": 411,
       "column": 19,
       "surface": "route.ceo-registry",
       "tag": "button",
@@ -8753,10 +9705,18 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
         "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
-        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`"
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
       ],
-      "routeCandidates": [],
+      "routeCandidates": [
+        "body.destination"
+      ],
       "uxRiskCandidates": [
         "unlabelled_button_candidate"
       ],
@@ -8768,7 +9728,9 @@
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
-      "routeTargets": [],
+      "routeTargets": [
+        "body.destination"
+      ],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [],
@@ -8790,7 +9752,7 @@
     {
       "elementId": "route.ceo-registry.action.setrotating-null",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 259,
+      "line": 424,
       "column": 11,
       "surface": "route.ceo-registry",
       "tag": "button",
@@ -8807,10 +9769,18 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
         "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
-        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`"
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
       ],
-      "routeCandidates": [],
+      "routeCandidates": [
+        "body.destination"
+      ],
       "uxRiskCandidates": [
         "unlabelled_button_candidate"
       ],
@@ -8822,7 +9792,9 @@
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
-      "routeTargets": [],
+      "routeTargets": [
+        "body.destination"
+      ],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [],
@@ -8844,7 +9816,7 @@
     {
       "elementId": "route.ceo-registry.action.submitrotation",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 260,
+      "line": 425,
       "column": 11,
       "surface": "route.ceo-registry",
       "tag": "AsyncButton",
@@ -8861,10 +9833,18 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
         "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
-        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`"
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
       ],
-      "routeCandidates": [],
+      "routeCandidates": [
+        "body.destination"
+      ],
       "uxRiskCandidates": [],
       "ownerComponent": "CeoRegistryPage",
       "effectiveHandlerEvent": "onClick",
@@ -8876,7 +9856,9 @@
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
-      "routeTargets": [],
+      "routeTargets": [
+        "body.destination"
+      ],
       "apiCalls": [
         "POST /api/ceo/v1/registry/*/rotate"
       ],
@@ -8903,9 +9885,9 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.ceo-registry.form-control.input",
+      "elementId": "route.ceo-registry.form-control.input.4",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 265,
+      "line": 430,
       "column": 13,
       "surface": "route.ceo-registry",
       "tag": "input",
@@ -8922,10 +9904,18 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
         "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
-        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`"
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
       ],
-      "routeCandidates": [],
+      "routeCandidates": [
+        "body.destination"
+      ],
       "uxRiskCandidates": [
         "control_binding_unverified"
       ],
@@ -8937,7 +9927,9 @@
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
-      "routeTargets": [],
+      "routeTargets": [
+        "body.destination"
+      ],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [],
@@ -8948,6 +9940,136 @@
       "rowPolicy": false,
       "scopedRead": false,
       "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-registry.action.setrecoverycodes-null",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 446,
+      "column": 11,
+      "surface": "route.ceo-registry",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setRecoveryCodes(null)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-registry.action.copyrecoverycodes",
+      "source": "app/(app)/ceo-registry/page.jsx",
+      "line": 447,
+      "column": 11,
+      "surface": "route.ceo-registry",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "copyRecoveryCodes",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "PATCH `/api/ceo/v1/registry/${encodeURIComponent(entity.id)}`",
+        "POST `/api/ceo/v1/registry/${encodeURIComponent(rotating.id)}/rotate`",
+        "POST '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/identity/session/step-up'",
+        "POST '/api/ceo/v1/identity/recovery'",
+        "POST `/api/ceo/v1/identity/sessions/${encodeURIComponent(sessionId)}/revoke`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoRegistryPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "browser-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "copyRecoveryCodes"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "navigator.clipboard.writeText"
+      ],
       "helperCalls": [],
       "localMutations": [],
       "loadingState": "not-required",
@@ -38623,14 +39745,14 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.login.form-submit.email-mat-khau-ma-2fa-bo-trong-neu-chua-bat-ang-khoi-tao",
+      "elementId": "route.login.form-submit.email-mat-khau-ma-2fa-bo-trong-neu-chua-bat-ang-khoi-tao-quay-la",
       "source": "app/login/page.jsx",
-      "line": 63,
+      "line": 78,
       "column": 9,
       "surface": "route.login",
       "tag": "form",
       "kind": "form-submit",
-      "label": "Email / Mật khẩu / Mã 2FA (bỏ trống nếu chưa bật) / Đang khởi tạo…",
+      "label": "Email / Mật khẩu / Mã 2FA (bỏ trống nếu chưa bật) / Đang khởi tạo… / Quay lại đăng nhập TOTP / CEO mất thiết bị TOTP? Dùng recovery code",
       "handlerEvent": "onSubmit",
       "handler": "submit",
       "target": "/login",
@@ -38641,9 +39763,11 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "POST '/api/ceo/v1/identity/recover'",
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
+        "'/ceo-registry'",
         "destination"
       ],
       "uxRiskCandidates": [],
@@ -38658,15 +39782,22 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-registry'",
+        "/ceo-registry",
         "/dashboard",
         "destination"
       ],
       "apiCalls": [
-        "GET /api/realm-demo/pilot"
+        "GET /api/realm-demo/pilot",
+        "POST /api/ceo/v1/identity/recover"
       ],
       "resourceOperations": [],
       "contextResources": [],
       "prismaModels": [
+        "AuditLog",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode",
         "CollaborationPresenceSession",
         "Setting",
         "User"
@@ -38703,7 +39834,7 @@
     {
       "elementId": "route.login.form-control.ban-congty-vn",
       "source": "app/login/page.jsx",
-      "line": 66,
+      "line": 81,
       "column": 13,
       "surface": "route.login",
       "tag": "input",
@@ -38719,9 +39850,11 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "POST '/api/ceo/v1/identity/recover'",
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
+        "'/ceo-registry'",
         "destination"
       ],
       "uxRiskCandidates": [],
@@ -38734,6 +39867,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-registry'",
         "destination"
       ],
       "apiCalls": [],
@@ -38757,7 +39891,7 @@
     {
       "elementId": "route.login.form-control.input",
       "source": "app/login/page.jsx",
-      "line": 70,
+      "line": 85,
       "column": 13,
       "surface": "route.login",
       "tag": "input",
@@ -38773,9 +39907,11 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "POST '/api/ceo/v1/identity/recover'",
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
+        "'/ceo-registry'",
         "destination"
       ],
       "uxRiskCandidates": [],
@@ -38788,6 +39924,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-registry'",
         "destination"
       ],
       "apiCalls": [],
@@ -38811,7 +39948,7 @@
     {
       "elementId": "route.login.form-control.000000",
       "source": "app/login/page.jsx",
-      "line": 74,
+      "line": 89,
       "column": 13,
       "surface": "route.login",
       "tag": "input",
@@ -38827,9 +39964,11 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "POST '/api/ceo/v1/identity/recover'",
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
+        "'/ceo-registry'",
         "destination"
       ],
       "uxRiskCandidates": [],
@@ -38842,6 +39981,121 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-registry'",
+        "destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.login.form-control.rr-xxxx-xxxx-xxxx",
+      "source": "app/login/page.jsx",
+      "line": 94,
+      "column": 15,
+      "surface": "route.login",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "RR-XXXX-XXXX-XXXX",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/ceo/v1/identity/recover'",
+        "GET '/api/realm-demo/pilot'"
+      ],
+      "routeCandidates": [
+        "'/ceo-registry'",
+        "destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "LoginPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "'/ceo-registry'",
+        "destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.login.form-control.devicelabel",
+      "source": "app/login/page.jsx",
+      "line": 98,
+      "column": 15,
+      "surface": "route.login",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "deviceLabel",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/ceo/v1/identity/recover'",
+        "GET '/api/realm-demo/pilot'"
+      ],
+      "routeCandidates": [
+        "'/ceo-registry'",
+        "destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "LoginPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "'/ceo-registry'",
         "destination"
       ],
       "apiCalls": [],
@@ -38865,7 +40119,7 @@
     {
       "elementId": "route.login.action.ang-khoi-tao",
       "source": "app/login/page.jsx",
-      "line": 76,
+      "line": 101,
       "column": 11,
       "surface": "route.login",
       "tag": "button",
@@ -38881,9 +40135,11 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "POST '/api/ceo/v1/identity/recover'",
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
+        "'/ceo-registry'",
         "destination"
       ],
       "uxRiskCandidates": [],
@@ -38898,15 +40154,22 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-registry'",
+        "/ceo-registry",
         "/dashboard",
         "destination"
       ],
       "apiCalls": [
-        "GET /api/realm-demo/pilot"
+        "GET /api/realm-demo/pilot",
+        "POST /api/ceo/v1/identity/recover"
       ],
       "resourceOperations": [],
       "contextResources": [],
       "prismaModels": [
+        "AuditLog",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode",
         "CollaborationPresenceSession",
         "Setting",
         "User"
@@ -38934,6 +40197,63 @@
         "destination",
         "event.preventDefault"
       ],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.login.action.quay-lai-ang-nhap-totp-ceo-mat-thiet-bi-totp-dung-recovery-code",
+      "source": "app/login/page.jsx",
+      "line": 104,
+      "column": 11,
+      "surface": "route.login",
+      "tag": "button",
+      "kind": "action",
+      "label": "Quay lại đăng nhập TOTP / CEO mất thiết bị TOTP? Dùng recovery code",
+      "handlerEvent": "onClick",
+      "handler": "() => { setRecoveryMode((value) => !value); setErr(''); }",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "busy",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/ceo/v1/identity/recover'",
+        "GET '/api/realm-demo/pilot'"
+      ],
+      "routeCandidates": [
+        "'/ceo-registry'",
+        "destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "LoginPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "'/ceo-registry'",
+        "destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
       "loadingState": "not-required",
       "successState": "not-required",
       "errorState": "not-required",
@@ -61663,9 +62983,10 @@
       ],
       "ownerComponent": "AsyncButton",
       "effectiveHandlerEvent": "onClick",
-      "actionType": "data-action",
+      "actionType": "navigation",
       "mappingConfidence": "medium",
       "handlerChain": [
+        "activateIdentity",
         "add",
         "addWebhook",
         "applyPayload",
@@ -61674,18 +62995,21 @@
         "clockIn",
         "clockOut",
         "convertToClient",
+        "copyRecoveryCodes",
         "create",
         "createKey",
         "delKey",
         "draftsFrom",
         "generate",
         "load",
+        "loadIdentity",
         "loadKeys",
         "markPaid",
         "mutate",
         "nextPeriod",
         "nowHM",
         "openEditor",
+        "openEntity",
         "openRound",
         "payNow",
         "postAction",
@@ -61693,11 +63017,14 @@
         "readAll",
         "regenerate",
         "requestExpansionApproval",
+        "revokeSession",
+        "rotateRecoveryCodes",
         "run",
         "runLaunchPreview",
         "save",
         "saveCommission",
         "sendCmt",
+        "stepUpIdentity",
         "submit",
         "submitLog",
         "submitRotation",
@@ -61813,7 +63140,93 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-registry/page.jsx",
-          "line": 239,
+          "line": 301,
+          "surface": "route:/ceo-registry",
+          "apiCalls": [
+            "GET /api/ceo/v1/identity/session",
+            "POST /api/ceo/v1/identity/session"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setIdentity",
+            "setIdentityError",
+            "setOtp"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-registry/page.jsx",
+          "line": 319,
+          "surface": "route:/ceo-registry",
+          "apiCalls": [
+            "GET /api/ceo/v1/identity/session",
+            "POST /api/ceo/v1/identity/session/step-up"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setIdentity",
+            "setIdentityError",
+            "setOtp"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-registry/page.jsx",
+          "line": 320,
+          "surface": "route:/ceo-registry",
+          "apiCalls": [
+            "GET /api/ceo/v1/identity/session",
+            "POST /api/ceo/v1/identity/recovery"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setIdentity",
+            "setIdentityError",
+            "setRecoveryCodes"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-registry/page.jsx",
+          "line": 327,
+          "surface": "route:/ceo-registry",
+          "apiCalls": [
+            "GET /api/ceo/v1/identity/session",
+            "POST /api/ceo/v1/identity/sessions/*/revoke"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setIdentity",
+            "setIdentityError"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-registry/page.jsx",
+          "line": 394,
+          "surface": "route:/ceo-registry",
+          "apiCalls": [
+            "POST /api/ceo/v1/sso/authorize"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [
+            "body.destination"
+          ],
+          "helperCalls": [],
+          "localState": []
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-registry/page.jsx",
+          "line": 403,
           "surface": "route:/ceo-registry",
           "apiCalls": [
             "PATCH /api/ceo/v1/registry/*"
@@ -61828,7 +63241,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-registry/page.jsx",
-          "line": 260,
+          "line": 425,
           "surface": "route:/ceo-registry",
           "apiCalls": [
             "POST /api/ceo/v1/registry/*/rotate"
@@ -61841,6 +63254,17 @@
             "setPayload",
             "setRotating"
           ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-registry/page.jsx",
+          "line": 447,
+          "surface": "route:/ceo-registry",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
         },
         {
           "callback": "onClick",
@@ -62731,11 +64155,14 @@
         "route:/tickets",
         "route:/vendors"
       ],
-      "routeTargets": [],
+      "routeTargets": [
+        "body.destination"
+      ],
       "apiCalls": [
         "DELETE /api/apikeys",
         "DYNAMIC /api/users/2fa",
         "GET /api/apikeys",
+        "GET /api/ceo/v1/identity/session",
         "GET /api/data/payouts",
         "GET /api/freelancer/home",
         "GET /api/notifications",
@@ -62747,7 +64174,12 @@
         "PATCH /api/realm-demo/feedback",
         "PATCH /api/realm-demo/pilot",
         "POST /api/apikeys",
+        "POST /api/ceo/v1/identity/recovery",
+        "POST /api/ceo/v1/identity/session",
+        "POST /api/ceo/v1/identity/session/step-up",
+        "POST /api/ceo/v1/identity/sessions/*/revoke",
         "POST /api/ceo/v1/registry/*/rotate",
+        "POST /api/ceo/v1/sso/authorize",
         "POST /api/chat",
         "POST /api/data/activities",
         "POST /api/data/attendance",
@@ -62808,7 +64240,12 @@
         "Approval",
         "Attendance",
         "AuditLog",
+        "CeoEntityMembership",
         "CeoEntityRegistry",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode",
+        "CeoSsoAuthorizationCode",
         "Client",
         "CollaborationPresenceSession",
         "Commission",
@@ -62861,7 +64298,9 @@
       "rowPolicy": true,
       "scopedRead": false,
       "browserActions": [
-        "window.dispatchEvent"
+        "navigator.clipboard.writeText",
+        "window.dispatchEvent",
+        "window.location.assign"
       ],
       "helperCalls": [
         "import:docGrand",
@@ -62879,9 +64318,9 @@
         "out.recurring",
         "pendingRef.current"
       ],
-      "loadingState": "disabled-binding",
-      "successState": "hook-refresh",
-      "errorState": "hook-error-toast",
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
       "confirmationState": "confirmed",
       "uxStateCandidates": []
     },
@@ -62973,7 +64412,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/ceo-registry/page.jsx",
-          "line": 258,
+          "line": 423,
           "surface": "route:/ceo-registry",
           "apiCalls": [],
           "resourceOperations": [],
@@ -62981,6 +64420,19 @@
           "helperCalls": [],
           "localState": [
             "setRotating"
+          ]
+        },
+        {
+          "callback": "onClose",
+          "source": "app/(app)/ceo-registry/page.jsx",
+          "line": 445,
+          "surface": "route:/ceo-registry",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setRecoveryCodes"
           ]
         },
         {
@@ -63482,7 +64934,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/ceo-registry/page.jsx",
-          "line": 258,
+          "line": 423,
           "surface": "route:/ceo-registry",
           "apiCalls": [],
           "resourceOperations": [],
@@ -63490,6 +64942,19 @@
           "helperCalls": [],
           "localState": [
             "setRotating"
+          ]
+        },
+        {
+          "callback": "onClose",
+          "source": "app/(app)/ceo-registry/page.jsx",
+          "line": 445,
+          "surface": "route:/ceo-registry",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setRecoveryCodes"
           ]
         },
         {
@@ -76862,31 +78327,31 @@
     }
   ],
   "summary": {
-    "elements": 799,
-    "apiContracts": 78,
+    "elements": 813,
+    "apiContracts": 86,
     "registryResources": 50,
     "byActionType": {
-      "local-state": 232,
-      "data-action": 132,
-      "form-control": 250,
+      "local-state": 234,
+      "data-action": 136,
+      "form-control": 255,
       "delegated-action": 84,
-      "navigation": 67,
-      "browser-action": 26,
+      "navigation": 69,
+      "browser-action": 27,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 561,
+      "classified-local": 569,
       "delegated-resolved": 46,
-      "handler-resolved": 108,
+      "handler-resolved": 114,
       "delegated": 84
     },
     "byConfidence": {
-      "high": 753,
+      "high": 767,
       "medium": 46
     },
     "uxStateCandidates": {},
-    "dataActions": 132,
-    "delegatedBindings": 1103,
+    "dataActions": 136,
+    "delegatedBindings": 1111,
     "actionableUnresolved": 0
   }
 }

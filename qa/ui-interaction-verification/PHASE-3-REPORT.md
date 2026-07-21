@@ -10,7 +10,7 @@ Phase 3 xác minh các candidate của Phase 2 trên clone staging; không thay 
 - Success feedback candidates ban đầu: **5**
 - Candidate elements còn lại: **0**
 - Candidate flags còn lại: **0**
-- Stateful actions có guard: **110** (57 AsyncButton, 49 disabled/busy binding, 4 local pending state)
+- Stateful actions có guard: **113** (61 AsyncButton, 48 disabled/busy binding, 4 local pending state)
 - Destructive flows có xác nhận: **6/6**
 
 ## Thay đổi nền tảng
