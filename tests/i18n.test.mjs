@@ -20,6 +20,21 @@ test('English UI copy translates shell vocabulary without touching unknown busin
   assert.equal(translateUiCopy('Bảng điều khiển', 'vi'), 'Bảng điều khiển');
 });
 
+test('English UI copy translates dynamic Realm status without translating record names', () => {
+  assert.equal(translateUiCopy('Chào mừng trở lại, Vũ Lương Sơn', 'en'), 'Welcome back, Vũ Lương Sơn');
+  assert.equal(translateUiCopy('0 đồng đội', 'en'), '0 teammates');
+  assert.equal(translateUiCopy('1 đồng đội', 'en'), '1 teammate');
+  assert.equal(translateUiCopy('1 nhiệm vụ', 'en'), '1 Quest');
+  assert.equal(translateUiCopy('3 người trong tầm thoại', 'en'), '3 people within voice range');
+  assert.equal(translateUiCopy('Đã mở Sổ Realm · personal.', 'en'), 'Opened Realm Ledger · personal.');
+  assert.equal(translateUiCopy('2 ngày có TimeLog', 'en'), '2 days with TimeLog');
+  assert.equal(translateUiCopy('4h ước lượng', 'en'), '4h estimated');
+  assert.equal(translateUiCopy('1 vật phẩm sở hữu', 'en'), '1 owned item');
+  assert.equal(translateUiCopy('2 yêu cầu đang chờ hội đồng', 'en'), '2 requests awaiting council');
+  assert.equal(translateUiCopy('Mở bản ghi Ghi giờ cho Rồng Xanh', 'en'), 'Open record Ghi giờ cho Rồng Xanh');
+  assert.equal(translateUiCopy('Khóa sổ chiến dịch Rồng Xanh', 'en'), 'Blue Dragon Operations Window');
+});
+
 test('every Vietnamese ERP navigation label has an English counterpart', () => {
   const vietnamese = /[À-ỹĐđ]/;
   const missing = ERP_NAV
