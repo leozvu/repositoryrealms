@@ -2518,8 +2518,8 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
         <PanelHeading eyebrow="Daily briefing" title={`Chào mừng trở lại, ${profile.name}`} text="Văn phòng là bản đồ sống của CRMegoric: người, công việc và cuộc trò chuyện cùng tồn tại trong một ngữ cảnh." />
         <div className={styles.briefGrid}>
           <div><span>Vị trí</span><strong>{currentRoom?.name || 'Hành lang lâu đài'}</strong></div>
-          <div><span>Trong tầm thoại</span><strong>{nearby.length} đồng đội</strong></div>
-          <div><span>Quest sẵn sàng</span><strong>{quests.filter((quest) => quest.status === 'ready').length} nhiệm vụ</strong></div>
+          <div><span>Trong tầm thoại</span><strong>{`${nearby.length} đồng đội`}</strong></div>
+          <div><span>Quest sẵn sàng</span><strong>{`${quests.filter((quest) => quest.status === 'ready').length} nhiệm vụ`}</strong></div>
           <div><span>Nhân vật</span><strong>Level {career.level} · {wallet} Gold</strong></div>
         </div>
         <div className={styles.notice}>
