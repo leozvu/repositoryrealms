@@ -62,6 +62,8 @@ export default function MessagesPage() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [showNew, setShowNew] = useState(false);
+  const [directoryProfile, setDirectoryProfile] = useState(null);
+  const [directorySaving, setDirectorySaving] = useState(false);
   const endRef = useRef(null);
   const lastAtRef = useRef(null);
   const toast = useToast();
@@ -76,6 +78,12 @@ export default function MessagesPage() {
   }, []);
 
   useEffect(() => { loadList(); const t = setInterval(loadList, 12000); return () => clearInterval(t); }, [loadList]);
+  useEffect(() => {
+    fetch('/api/ceo/v1/directory/profile', { cache: 'no-store' })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((body) => body?.profile && setDirectoryProfile(body.profile))
+      .catch(() => {});
+  }, []);
   useEffect(() => {
     const requested = searchParams.get('conversation');
     if (requested && convs.some((conversation) => conversation.id === requested)) setSel(requested);
@@ -117,6 +125,21 @@ export default function MessagesPage() {
     }
   };
 
+  const toggleDirectoryShare = async () => {
+    if (!directoryProfile || directorySaving) return;
+    setDirectorySaving(true);
+    try {
+      const response = await fetch('/api/ceo/v1/directory/profile', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sharedWithCeoPortal: !directoryProfile.sharedWithCeoPortal, sharePresence: false }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) return toast(body.error || 'Không thể cập nhật chia sẻ danh bạ', 'error');
+      setDirectoryProfile(body.profile);
+      toast(body.profile.sharedWithCeoPortal ? 'Đã chia sẻ hồ sơ danh bạ với CEO Portal' : 'Đã ngừng chia sẻ hồ sơ danh bạ');
+    } finally { setDirectorySaving(false); }
+  };
+
   return (
     <>
       <div className={`chat-wrap ${sel ? 'thread-open' : ''}`}>
@@ -124,8 +147,10 @@ export default function MessagesPage() {
         <div className="chat-list">
           <div className="chat-list-head">
             <b style={{ fontSize: '.9rem', flex: 1 }}>Tin nhắn</b>
+            {directoryProfile && <button type="button" className="btn btn-outline btn-sm" disabled={directorySaving} aria-pressed={directoryProfile.sharedWithCeoPortal} onClick={toggleDirectoryShare} title="Hồ sơ danh bạ chỉ gồm tên, email và chức danh; không gồm lương hay dữ liệu hiệu suất.">{directoryProfile.sharedWithCeoPortal ? 'Ngừng chia sẻ với CEO Portal' : 'Chia sẻ với CEO Portal'}</button>}
             <button className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}><Icon name="plus" size={13} /> Mới</button>
           </div>
+          {directoryProfile && <p style={{ margin: '0 12px 8px', color: 'var(--muted)', fontSize: '.72rem', lineHeight: 1.45 }}>Hồ sơ danh bạ chỉ gồm tên, email và chức danh; không gồm lương hay dữ liệu hiệu suất.</p>}
           <div className="chat-list-body">
             {convs.map(c => (
               <button key={c.id} className={`chat-item ${sel === c.id ? 'active' : ''}`} onClick={() => setSel(c.id)}>

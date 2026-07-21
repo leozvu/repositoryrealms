@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 53,
-    "mappedNavigationRoutes": 53,
-    "verifiedNavigationRoutes": 53,
+    "erpNavigationRoutes": 54,
+    "mappedNavigationRoutes": 54,
+    "verifiedNavigationRoutes": 54,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -775,6 +775,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/ceo-commands/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "ceo-inbox",
+      "erpLabel": "CEO · Hộp thư liên công ty",
+      "realmLabel": "Royal Courier",
+      "realmSurface": "Hộp thư liên công ty",
+      "group": "Công ty",
+      "href": "/ceo-inbox",
+      "icon": "mail",
+      "roles": "DIRECTOR only",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/ceo-inbox/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

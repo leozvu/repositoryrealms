@@ -252,6 +252,8 @@ Implementation status: code complete on `codex/realms-demo` with the four-action
 
 ### CEO-6 — Unified inbox and messaging
 
+Implementation status: code complete on `codex/realms-demo` with an explicitly shared directory, AES-256-GCM Portal inbox, target-owned ERP Conversation/Message adapters, Realm notification delivery, read receipts, reply import, export and incident/retention policy. Migration, secrets, deployment and the four-entity operational exit gate remain on HOLD behind CEO-0 and CEO-9. See `CEO-6-UNIFIED-INBOX-MESSAGING.md`.
+
 - Global directory composed from explicitly shared directory profiles.
 - One-to-one and entity channel conversations.
 - ERP and Realm delivery adapters.

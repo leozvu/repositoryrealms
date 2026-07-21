@@ -49,6 +49,7 @@ model User {
   collaborationPresence         CollaborationPresenceSession[]
   collaborationRequestsSent     CollaborationContactRequest[]  @relation("CollaborationRequester")
   collaborationRequestsReceived CollaborationContactRequest[]  @relation("CollaborationTarget")
+  ceoDirectoryProfile           CeoEntityDirectoryProfile?
 
   @@index([status, userType, workspacePreference])
 }
@@ -1047,6 +1048,8 @@ model CeoEntityRegistry {
   memberships          CeoEntityMembership[]
   snapshotCache        CeoEntitySnapshotCache?
   commandDeliveries    CeoCommandDelivery[]
+  directoryProfiles    CeoDirectoryProfileCache[]
+  unifiedConversations CeoUnifiedConversation[]
 
   @@index([enabled, status])
   @@index([circuitState, circuitRetryAt])
@@ -1092,6 +1095,8 @@ model CeoGlobalIdentity {
   recoveryCodes   CeoRecoveryCode[]
   authorizationCodes CeoSsoAuthorizationCode[]
   commandDeliveries  CeoCommandDelivery[]
+  directoryProfiles  CeoDirectoryProfileCache[]
+  unifiedConversations CeoUnifiedConversation[]
 
   @@index([status, email])
 }
@@ -1222,6 +1227,140 @@ model CeoEntityCommandReceipt {
   @@index([actorSubject, createdAt])
   @@index([targetEntityId, action, createdAt])
   @@index([resource, recordId])
+}
+
+// ===== CEO-6: federated directory and unified inbox =====
+// Directory sharing is opt-in per local employee. The Portal may cache only these
+// explicitly shared fields; salary, phone, performance and business records are excluded.
+model CeoEntityDirectoryProfile {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sharedWithCeoPortal Boolean  @default(false)
+  sharePresence       Boolean  @default(false)
+  displayName         String?
+  title               String?
+  policyVersion       String   @default("1.0.0")
+  consentedAt         DateTime?
+  revokedAt           DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([sharedWithCeoPortal, updatedAt])
+}
+
+// Portal-side cache of the explicit directory contract. It is not an HR master record.
+model CeoDirectoryProfileCache {
+  id              String            @id @default(cuid())
+  identityId      String
+  identity        CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  entityId        String
+  entity          CeoEntityRegistry @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  remoteUserId    String
+  email           String
+  displayName     String
+  title           String?
+  sharePresence   Boolean           @default(false)
+  sourceUpdatedAt DateTime
+  fetchedAt       DateTime
+  retentionUntil  DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([identityId, entityId, remoteUserId])
+  @@index([identityId, displayName])
+  @@index([retentionUntil])
+}
+
+// The Portal owns only the cross-entity inbox index and encrypted message copy. The
+// target ERP still creates its own canonical Conversation/Message records and receipts.
+model CeoUnifiedConversation {
+  id             String              @id @default(cuid())
+  identityId     String
+  identity       CeoGlobalIdentity   @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  entityId       String
+  entity         CeoEntityRegistry   @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  type           String              @default("dm") // dm | entity_channel
+  remoteUserId   String?
+  name           String
+  status         String              @default("active") // active | archived | incident_hold
+  lastMessageAt  DateTime?
+  retentionUntil DateTime
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  messages       CeoUnifiedMessage[]
+
+  @@unique([identityId, entityId, type, remoteUserId])
+  @@index([identityId, status, lastMessageAt])
+  @@index([retentionUntil])
+}
+
+model CeoUnifiedMessage {
+  id                    String                 @id @default(cuid())
+  conversationId        String
+  conversation          CeoUnifiedConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction             String                 // outbound | inbound
+  senderRef             String
+  senderName            String
+  bodyCiphertext        String
+  bodyIv                String
+  bodyTag               String
+  keyVersion            Int                    @default(1)
+  contentHash           String
+  mentionRefs           String                 @default("[]")
+  idempotencyKeyHash    String                 @unique
+  correlationId         String                 @unique
+  sourceMessageId       String?
+  targetReceiptId       String?
+  targetConversationId  String?
+  targetMessageId       String?
+  status                String                 @default("dispatching") // dispatching | delivered | pending_confirmation | failed | read | deleted
+  attemptCount          Int                    @default(1)
+  lastErrorCode         String?
+  sentAt                DateTime
+  deliveredAt           DateTime?
+  readAt                DateTime?
+  retentionUntil        DateTime
+  deletedAt             DateTime?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  @@unique([conversationId, sourceMessageId])
+  @@index([conversationId, sentAt])
+  @@index([status, updatedAt])
+  @@index([retentionUntil, deletedAt])
+}
+
+// Target-side mapping allows replies written in the existing ERP/Realm conversation to
+// be exported to the Portal without exposing unrelated local conversations.
+model CeoEntityConversationLink {
+  id                    String   @id @default(cuid())
+  portalConversationId  String   @unique
+  targetEntityId        String
+  localConversationId   String
+  participantUserId     String?
+  type                  String
+  lastExportedAt        DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([targetEntityId, localConversationId])
+}
+
+model CeoEntityMessageReceipt {
+  id                    String   @id @default(cuid())
+  idempotencyKey        String   @unique
+  correlationId         String   @unique
+  actorSubject          String
+  targetEntityId        String
+  portalConversationId  String
+  localConversationId   String
+  localMessageId        String
+  payloadHash           String
+  createdAt             DateTime @default(now())
+
+  @@index([actorSubject, createdAt])
+  @@index([targetEntityId, portalConversationId])
 }
 
 // ===== v3.19: XUẤT NHẬP KHẨU NÔNG SẢN (phân hệ 'export' — Fretas) =====

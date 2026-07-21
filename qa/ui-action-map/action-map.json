@@ -453,6 +453,79 @@
       }
     },
     {
+      "route": "/api/ceo/v1/directory",
+      "source": "app/api/ceo/v1/directory/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoEntityDirectoryProfile",
+            "Setting"
+          ],
+          "roles": [],
+          "guards": [
+            "apiUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/directory/profile",
+      "source": "app/api/ceo/v1/directory/profile/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoEntityDirectoryProfile",
+            "User"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isFreelancer"
+          ],
+          "statuses": [
+            401,
+            403,
+            404,
+            500
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "PUT": {
+          "models": [
+            "AuditLog",
+            "CeoEntityDirectoryProfile",
+            "User"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isFreelancer"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/ceo/v1/health",
       "source": "app/api/ceo/v1/health/route.js",
       "methods": {
@@ -640,6 +713,399 @@
             403,
             404,
             503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/conversations",
+      "source": "app/api/ceo/v1/messaging/conversations/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoPortalSession",
+            "CeoUnifiedConversation",
+            "CeoUnifiedMessage"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoDirectoryProfileCache",
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoPortalSession",
+            "CeoUnifiedConversation"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            422,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/conversations/[id]",
+      "source": "app/api/ceo/v1/messaging/conversations/[id]/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoPortalSession",
+            "CeoUnifiedConversation",
+            "CeoUnifiedMessage"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "PATCH": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoPortalSession",
+            "CeoUnifiedConversation",
+            "CeoUnifiedMessage"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/conversations/[id]/messages",
+      "source": "app/api/ceo/v1/messaging/conversations/[id]/messages/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoPortalSession",
+            "CeoUnifiedConversation",
+            "CeoUnifiedMessage"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            409,
+            422,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/conversations/[id]/refresh",
+      "source": "app/api/ceo/v1/messaging/conversations/[id]/refresh/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoPortalSession",
+            "CeoUnifiedConversation",
+            "CeoUnifiedMessage"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            409,
+            422,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/deliver",
+      "source": "app/api/ceo/v1/messaging/deliver/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityConversationLink",
+            "CeoEntityDirectoryProfile",
+            "CeoEntityMessageReceipt",
+            "ConvMember",
+            "Conversation",
+            "Message",
+            "Notification",
+            "RealmChangeEvent",
+            "Setting",
+            "User"
+          ],
+          "roles": [],
+          "guards": [
+            "apiUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            409,
+            422,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/directory",
+      "source": "app/api/ceo/v1/messaging/directory/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoDirectoryProfileCache",
+            "CeoEntityMembership",
+            "CeoPortalSession"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoDirectoryProfileCache",
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoPortalSession"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            409,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/export",
+      "source": "app/api/ceo/v1/messaging/export/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoPortalSession",
+            "CeoUnifiedMessage"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/feed",
+      "source": "app/api/ceo/v1/messaging/feed/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoEntityConversationLink",
+            "ConvMember",
+            "Message",
+            "Setting",
+            "User"
+          ],
+          "roles": [],
+          "guards": [
+            "apiUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            500
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/messages/[id]/reconcile",
+      "source": "app/api/ceo/v1/messaging/messages/[id]/reconcile/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoPortalSession",
+            "CeoUnifiedMessage"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            409,
+            422,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/messaging/receipts",
+      "source": "app/api/ceo/v1/messaging/receipts/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoEntityMessageReceipt",
+            "Setting"
+          ],
+          "roles": [],
+          "guards": [
+            "apiUser",
+            "isDirector"
+          ],
+          "statuses": [
+            401,
+            403,
+            404,
+            500
           ],
           "permissionPolicy": "explicit-rbac",
           "usesModuleGuard": false,
@@ -11197,6 +11663,1121 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "route.ceo-inbox.action.sync",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 145,
+      "column": 148,
+      "surface": "route.ceo-inbox",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "sync",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "sync"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "POST /api/ceo/v1/messaging/directory"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.navigation.api-ceo-v1-messaging-export",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 145,
+      "column": 283,
+      "surface": "route.ceo-inbox",
+      "tag": "a",
+      "kind": "navigation",
+      "label": "/api/ceo/v1/messaging/export",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/api/ceo/v1/messaging/export",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.navigation.ceo-overview",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 145,
+      "column": 43,
+      "surface": "route.ceo-inbox",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-overview",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-overview",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.navigation.ceo-registry",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 148,
+      "column": 119,
+      "surface": "route.ceo-inbox",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-registry",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.action.load",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 149,
+      "column": 78,
+      "surface": "route.ceo-inbox",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session",
+        "GET /api/ceo/v1/messaging/conversations",
+        "GET /api/ceo/v1/messaging/directory"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode",
+        "CeoUnifiedConversation",
+        "CeoUnifiedMessage"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.form-submit.form",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 153,
+      "column": 9,
+      "surface": "route.ceo-inbox",
+      "tag": "form",
+      "kind": "form-submit",
+      "label": "—",
+      "handlerEvent": "onSubmit",
+      "handler": "create",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "creating || undefined",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onSubmit",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "create"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "POST /api/ceo/v1/messaging/conversations"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoUnifiedConversation"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.form-control.select",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 155,
+      "column": 84,
+      "surface": "route.ceo-inbox",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "—",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.form-control.select.2",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 156,
+      "column": 78,
+      "surface": "route.ceo-inbox",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.form-control.select.3",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 157,
+      "column": 106,
+      "surface": "route.ceo-inbox",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "—",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "create"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "POST /api/ceo/v1/messaging/conversations"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoUnifiedConversation"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.action.button",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 158,
+      "column": 11,
+      "surface": "route.ceo-inbox",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "!ready || creating || !entityId || (type === 'dm' && !recipients.length)",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "create"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "POST /api/ceo/v1/messaging/conversations"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoUnifiedConversation"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.action.setselectedid-conversation-id",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 162,
+      "column": 87,
+      "surface": "route.ceo-inbox",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setSelectedId(conversation.id)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.action.refresh",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 170,
+      "column": 159,
+      "surface": "route.ceo-inbox",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "refresh",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load",
+        "refresh"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session",
+        "GET /api/ceo/v1/messaging/conversations",
+        "GET /api/ceo/v1/messaging/directory",
+        "POST /api/ceo/v1/messaging/conversations/*/refresh"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode",
+        "CeoUnifiedConversation",
+        "CeoUnifiedMessage"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.action.reconcile-message",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 173,
+      "column": 336,
+      "surface": "route.ceo-inbox",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => reconcile(message)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "loadThread",
+        "reconcile"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/messaging/conversations/*",
+        "POST /api/ceo/v1/messaging/messages/*/reconcile"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoUnifiedConversation",
+        "CeoUnifiedMessage"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.action.button.2",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 175,
+      "column": 312,
+      "surface": "route.ceo-inbox",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "!ready || sending || !content.trim()",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load",
+        "loadThread",
+        "newKeys",
+        "send"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session",
+        "GET /api/ceo/v1/messaging/conversations",
+        "GET /api/ceo/v1/messaging/conversations/*",
+        "GET /api/ceo/v1/messaging/directory",
+        "POST /api/ceo/v1/messaging/conversations/*/messages"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode",
+        "CeoUnifiedConversation",
+        "CeoUnifiedMessage"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.form-control.textarea",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 175,
+      "column": 144,
+      "surface": "route.ceo-inbox",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-inbox.form-submit.send",
+      "source": "app/(app)/ceo-inbox/page.jsx",
+      "line": 175,
+      "column": 11,
+      "surface": "route.ceo-inbox",
+      "tag": "form",
+      "kind": "form-submit",
+      "label": "",
+      "handlerEvent": "onSubmit",
+      "handler": "send",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "sending || undefined",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/messaging/conversations'",
+        "GET `/api/ceo/v1/messaging/conversations/${encodeURIComponent(id)}`",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/messaging/conversations'",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/messages`",
+        "POST `/api/ceo/v1/messaging/conversations/${encodeURIComponent(thread.id)}/refresh`",
+        "POST `/api/ceo/v1/messaging/messages/${encodeURIComponent(message.id)}/reconcile`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoInboxPage",
+      "effectiveHandlerEvent": "onSubmit",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load",
+        "loadThread",
+        "newKeys",
+        "send"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session",
+        "GET /api/ceo/v1/messaging/conversations",
+        "GET /api/ceo/v1/messaging/conversations/*",
+        "GET /api/ceo/v1/messaging/directory",
+        "POST /api/ceo/v1/messaging/conversations/*/messages"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode",
+        "CeoUnifiedConversation",
+        "CeoUnifiedMessage"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "route.ceo-overview.navigation.ceo-commands",
       "source": "app/(app)/ceo-overview/page.jsx",
       "line": 178,
@@ -11254,9 +12835,66 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.ceo-overview.action.refresh-filter",
+      "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
       "source": "app/(app)/ceo-overview/page.jsx",
       "line": 179,
+      "column": 11,
+      "surface": "route.ceo-overview",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "Unified inbox / Hộp thư liên công ty",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-inbox",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoOverviewPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-overview.action.refresh-filter",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 180,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -11323,7 +12961,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-all",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 192,
+      "line": 193,
       "column": 9,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -11382,7 +13020,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-entity-id",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 193,
+      "line": 194,
       "column": 40,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -11441,7 +13079,7 @@
     {
       "elementId": "route.ceo-overview.action.load-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 197,
+      "line": 198,
       "column": 111,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -11509,7 +13147,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-registry",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 209,
+      "line": 210,
       "column": 161,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -11566,7 +13204,7 @@
     {
       "elementId": "route.ceo-overview.action.opendetail-entity-domain",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 261,
+      "line": 262,
       "column": 216,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -23471,8 +25109,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -23488,7 +25128,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/messages/page.jsx",
-          "line": 191,
+          "line": 216,
           "surface": "route:/messages",
           "apiCalls": [],
           "resourceOperations": [],
@@ -23543,8 +25183,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -23564,7 +25206,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/messages/page.jsx",
-          "line": 191,
+          "line": 216,
           "surface": "route:/messages",
           "apiCalls": [],
           "resourceOperations": [],
@@ -23577,7 +25219,7 @@
         {
           "callback": "onCreated",
           "source": "app/(app)/messages/page.jsx",
-          "line": 191,
+          "line": 216,
           "surface": "route:/messages",
           "apiCalls": [
             "GET /api/chat"
@@ -23647,8 +25289,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -23701,8 +25345,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -23755,8 +25401,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -23811,8 +25459,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -23846,9 +25496,75 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "route.messages.action.ngung-chia-se-voi-ceo-portal-chia-se-voi-ceo-portal",
+      "source": "app/(app)/messages/page.jsx",
+      "line": 150,
+      "column": 34,
+      "surface": "route.messages",
+      "tag": "button",
+      "kind": "action",
+      "label": "Ngừng chia sẻ với CEO Portal / Chia sẻ với CEO Portal",
+      "handlerEvent": "onClick",
+      "handler": "toggleDirectoryShare",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "directorySaving",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/chat'",
+        "GET '/api/chat'",
+        "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
+        "GET url",
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "MessagesPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "toggleDirectoryShare"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "PUT /api/ceo/v1/directory/profile"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityDirectoryProfile",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "authenticated-custom"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "route.messages.action.moi",
       "source": "app/(app)/messages/page.jsx",
-      "line": 127,
+      "line": 151,
       "column": 13,
       "surface": "route.messages",
       "tag": "button",
@@ -23867,8 +25583,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -23902,7 +25620,7 @@
     {
       "elementId": "route.messages.action.button",
       "source": "app/(app)/messages/page.jsx",
-      "line": 131,
+      "line": 156,
       "column": 15,
       "surface": "route.messages",
       "tag": "button",
@@ -23921,8 +25639,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -23956,7 +25676,7 @@
     {
       "elementId": "route.messages.action.button.2",
       "source": "app/(app)/messages/page.jsx",
-      "line": 154,
+      "line": 179,
       "column": 17,
       "surface": "route.messages",
       "tag": "button",
@@ -23975,8 +25695,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -24010,7 +25732,7 @@
     {
       "elementId": "route.messages.action.ong",
       "source": "app/(app)/messages/page.jsx",
-      "line": 161,
+      "line": 186,
       "column": 17,
       "surface": "route.messages",
       "tag": "button",
@@ -24029,8 +25751,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -24064,7 +25788,7 @@
     {
       "elementId": "route.messages.form-submit.ang-gui-gui",
       "source": "app/(app)/messages/page.jsx",
-      "line": 183,
+      "line": 208,
       "column": 15,
       "surface": "route.messages",
       "tag": "form",
@@ -24083,8 +25807,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -24135,7 +25861,7 @@
     {
       "elementId": "route.messages.form-control.input",
       "source": "app/(app)/messages/page.jsx",
-      "line": 184,
+      "line": 209,
       "column": 17,
       "surface": "route.messages",
       "tag": "input",
@@ -24154,8 +25880,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -24191,7 +25919,7 @@
     {
       "elementId": "route.messages.action.ang-gui-gui",
       "source": "app/(app)/messages/page.jsx",
-      "line": 185,
+      "line": 210,
       "column": 17,
       "surface": "route.messages",
       "tag": "button",
@@ -24210,8 +25938,10 @@
         "POST '/api/chat'",
         "GET '/api/chat'",
         "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
         "GET url",
-        "POST `/api/chat/${sel}`"
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -65887,6 +67617,7 @@
         "load",
         "loadIdentity",
         "loadKeys",
+        "loadThread",
         "markPaid",
         "mutate",
         "nextPeriod",
@@ -65915,6 +67646,7 @@
         "submit",
         "submitLog",
         "submitRotation",
+        "sync",
         "toast",
         "toggle",
         "toggleKey",
@@ -66056,8 +67788,64 @@
         },
         {
           "callback": "onClick",
+          "source": "app/(app)/ceo-inbox/page.jsx",
+          "line": 145,
+          "surface": "route:/ceo-inbox",
+          "apiCalls": [
+            "POST /api/ceo/v1/messaging/directory"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setDirectory"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-inbox/page.jsx",
+          "line": 170,
+          "surface": "route:/ceo-inbox",
+          "apiCalls": [
+            "GET /api/ceo/v1/identity/session",
+            "GET /api/ceo/v1/messaging/conversations",
+            "GET /api/ceo/v1/messaging/directory",
+            "POST /api/ceo/v1/messaging/conversations/*/refresh"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setConversations",
+            "setDirectory",
+            "setError",
+            "setForbidden",
+            "setIdentity",
+            "setLoading",
+            "setThread"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-inbox/page.jsx",
+          "line": 173,
+          "surface": "route:/ceo-inbox",
+          "apiCalls": [
+            "GET /api/ceo/v1/messaging/conversations/*",
+            "POST /api/ceo/v1/messaging/messages/*/reconcile"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setError",
+            "setThread"
+          ]
+        },
+        {
+          "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 179,
+          "line": 180,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/dashboard/refresh"
@@ -66073,7 +67861,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 261,
+          "line": 262,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/sso/authorize"
@@ -67087,6 +68875,7 @@
         "route:/attendance",
         "route:/automation",
         "route:/ceo-commands",
+        "route:/ceo-inbox",
         "route:/ceo-overview",
         "route:/ceo-registry",
         "route:/commissions",
@@ -67113,6 +68902,9 @@
         "DYNAMIC /api/users/2fa",
         "GET /api/apikeys",
         "GET /api/ceo/v1/identity/session",
+        "GET /api/ceo/v1/messaging/conversations",
+        "GET /api/ceo/v1/messaging/conversations/*",
+        "GET /api/ceo/v1/messaging/directory",
         "GET /api/data/payouts",
         "GET /api/freelancer/home",
         "GET /api/notifications",
@@ -67130,6 +68922,9 @@
         "POST /api/ceo/v1/identity/session",
         "POST /api/ceo/v1/identity/session/step-up",
         "POST /api/ceo/v1/identity/sessions/*/revoke",
+        "POST /api/ceo/v1/messaging/conversations/*/refresh",
+        "POST /api/ceo/v1/messaging/directory",
+        "POST /api/ceo/v1/messaging/messages/*/reconcile",
         "POST /api/ceo/v1/registry/*/rotate",
         "POST /api/ceo/v1/sso/authorize",
         "POST /api/chat",
@@ -67193,6 +68988,7 @@
         "Attendance",
         "AuditLog",
         "CeoCommandDelivery",
+        "CeoDirectoryProfileCache",
         "CeoEntityMembership",
         "CeoEntityRegistry",
         "CeoEntitySnapshotCache",
@@ -67200,6 +68996,8 @@
         "CeoPortalSession",
         "CeoRecoveryCode",
         "CeoSsoAuthorizationCode",
+        "CeoUnifiedConversation",
+        "CeoUnifiedMessage",
         "Client",
         "CollaborationPresenceSession",
         "Commission",
@@ -81281,31 +83079,31 @@
     }
   ],
   "summary": {
-    "elements": 850,
-    "apiContracts": 92,
+    "elements": 868,
+    "apiContracts": 104,
     "registryResources": 50,
     "byActionType": {
-      "local-state": 236,
-      "data-action": 143,
-      "form-control": 277,
+      "local-state": 237,
+      "data-action": 152,
+      "form-control": 281,
       "delegated-action": 84,
-      "navigation": 75,
+      "navigation": 79,
       "browser-action": 27,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 578,
+      "classified-local": 586,
       "delegated-resolved": 46,
-      "handler-resolved": 142,
+      "handler-resolved": 152,
       "delegated": 84
     },
     "byConfidence": {
-      "high": 804,
+      "high": 822,
       "medium": 46
     },
     "uxStateCandidates": {},
-    "dataActions": 143,
-    "delegatedBindings": 1115,
+    "dataActions": 152,
+    "delegatedBindings": 1118,
     "actionableUnresolved": 0
   }
 }

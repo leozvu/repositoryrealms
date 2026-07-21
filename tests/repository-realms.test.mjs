@@ -10,7 +10,7 @@ import {
 const USER = { id: 'staff-1', name: 'Mai Anh', roles: ['STAFF'] };
 
 test('Phase 21 parity catalog measures business invariants instead of matching buttons or API shapes', () => {
-  assert.equal(REPOSITORY_REALMS_ACTION_CONTRACTS.length, 16);
+  assert.equal(REPOSITORY_REALMS_ACTION_CONTRACTS.length, 17);
   for (const contract of REPOSITORY_REALMS_ACTION_CONTRACTS) {
     assert.equal(contract.parity.presentationIndependent, true);
     assert.equal(contract.parity.buttonMatchingRequired, false);

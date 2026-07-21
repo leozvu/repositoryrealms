@@ -4,9 +4,9 @@ Phase 4 giữ ERP/CRM làm nguồn sự thật duy nhất và biến lớp medie
 
 ## Kết quả
 
-- Primary ERP navigation routes: **53**
-- Routes có medieval mapping: **53/53**
-- Route files được xác minh: **53/53**
+- Primary ERP navigation routes: **54**
+- Routes có medieval mapping: **54/54**
+- Route files được xác minh: **54/54**
 - Record-level bridge flows: **10/10**
 - Link contracts: **5/5**
 - Unresolved mappings: **0**

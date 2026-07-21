@@ -44,7 +44,7 @@ function buildScenarios(root) {
   const facade = fs.readFileSync(path.join(root, 'lib/repository-realms.js'), 'utf8');
   const dialogs = `${fs.readFileSync(path.join(root, 'components/realm/RealmActionDialog.jsx'), 'utf8')}\n${fs.readFileSync(path.join(root, 'components/realm/RealmCreateActionDialog.jsx'), 'utf8')}`;
   const rows = [
-    { id: 'canonical-intents-registered', expected: '16', actual: String(REPOSITORY_REALMS_ACTION_CONTRACTS.length) },
+    { id: 'canonical-intents-registered', expected: '17', actual: String(REPOSITORY_REALMS_ACTION_CONTRACTS.length) },
     { id: 'all-intents-have-four-invariants', expected: 'true', actual: String(REPOSITORY_REALMS_ACTION_CONTRACTS.every((item) => item.authorization.length && item.businessRules.length && item.receipt && item.audit)) },
     { id: 'button-matching-not-required', expected: 'true', actual: String(REPOSITORY_REALMS_ACTION_CONTRACTS.every((item) => item.parity.buttonMatchingRequired === false)) },
     { id: 'api-shape-matching-not-required', expected: 'true', actual: String(REPOSITORY_REALMS_ACTION_CONTRACTS.every((item) => item.parity.apiShapeMatchingRequired === false)) },

@@ -176,6 +176,7 @@ export default function CeoOverviewPage() {
         <div><p className={styles.eyebrow}>{c.eyebrow}</p><h1>{c.title}</h1><p>{c.intro}</p></div>
         <div className={styles.heroActions}>
           <Link className="btn btn-outline" href="/ceo-commands"><Icon name="link" size={16} />{c.commandCenter}</Link>
+          <Link className="btn btn-outline" href="/ceo-inbox"><Icon name="mail" size={16} />{locale === 'en' ? 'Unified inbox' : 'Hộp thư liên công ty'}</Link>
           <AsyncButton type="button" className="btn btn-primary" pendingLabel={c.refreshing} onClick={() => refresh(filter)}>
             <Icon name="repeat" size={16} />{c.refresh}
           </AsyncButton>
