@@ -283,6 +283,8 @@ Implementation status: code complete on `codex/realms-demo` with endpoint-specif
 
 ### CEO-9 — Pilot and rollout
 
+Implementation status: code complete on `codex/realms-demo` as an evidence-backed, fail-closed rollout control plane with five ordered rings, per-entity CAS state, immutable receipts, production change-window approval, independent maker/checker and server-side enforcement across every outbound Portal adapter. The migration, evidence population, CEO-0 GO decision, production credentials and deployment remain on HOLD. See `CEO-9-PILOT-ROLLOUT.md`.
+
 - Local/staging adapters first; no production write access.
 - Read-only pilot across all four entities.
 - Enable SSO for CEO only.

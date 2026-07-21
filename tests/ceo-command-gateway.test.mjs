@@ -103,6 +103,7 @@ function portalFixture() {
       updateMany: async ({ data }) => { applyData(state.entity, data); return { count: 1 }; },
     },
     ceoEntityMembership: { findUnique: async () => membership },
+    ceoRolloutState: { findUnique: async ({ where }) => ({ entityId: where.entityId, currentRing: 'commands', status: 'active', recordVersion: 5 }) },
     ceoCommandDelivery: {
       findUnique: async ({ where }) => state.deliveries.find((row) => row.idempotencyKeyHash === where.idempotencyKeyHash || row.correlationId === where.correlationId) || null,
       findFirst: async ({ where }) => state.deliveries.find((row) => row.id === where.id && row.identityId === where.identityId) || null,

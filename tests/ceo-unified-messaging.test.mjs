@@ -124,6 +124,7 @@ function portalFixture() {
     ceoPortalSession: { findUnique: async ({ where }) => where.tokenHash === session.tokenHash ? session : null, updateMany: async () => ({ count: 1 }) },
     ceoEntityMembership: { findMany: async () => [membership], findUnique: async () => membership },
     ceoEntityRegistry: { findUnique: async () => entity, update: async ({ data }) => apply(entity, data), updateMany: async ({ data }) => { apply(entity, data); return { count: 1 }; } },
+    ceoRolloutState: { findUnique: async ({ where }) => ({ entityId: where.entityId, currentRing: 'messaging', status: 'active', recordVersion: 4 }) },
     ceoUnifiedConversation: { findFirst: async () => conversation, update: async ({ data }) => apply(conversation, data) },
     ceoUnifiedMessage: {
       findFirst: async ({ where }) => {

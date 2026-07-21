@@ -308,6 +308,27 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/ceo-rollout",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "dynamic": false,
+      "auth": "authenticated",
+      "inNavigation": true,
+      "navLabel": "CEO · Pilot & phát hành",
+      "navSection": "Công ty",
+      "roles": [
+        "DIRECTOR"
+      ],
+      "module": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/ceo-security",
       "source": "app/(app)/ceo-security/page.jsx",
       "dynamic": false,
@@ -1992,6 +2013,33 @@
       "route": "/api/ceo/v1/registry/[id]/service-credential",
       "source": "app/api/ceo/v1/registry/[id]/service-credential/route.js",
       "dynamic": true,
+      "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/rollout",
+      "source": "app/api/ceo/v1/rollout/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/rollout/[entityId]/transition",
+      "source": "app/api/ceo/v1/rollout/[entityId]/transition/route.js",
+      "dynamic": true,
+      "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/rollout/evidence",
+      "source": "app/api/ceo/v1/rollout/evidence/route.js",
+      "dynamic": false,
       "methods": [
         "POST"
       ],
@@ -6506,6 +6554,506 @@
         "body.destination"
       ],
       "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.load",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 145,
+      "column": 7,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.action.openevidence-entity",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 173,
+      "column": 259,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openEvidence(entity)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "migrationRequired",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.action.opentransition-entity-activate",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 179,
+      "column": 52,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openTransition(entity, 'activate')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "migrationRequired || !currentEvidence?.complete",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.action.opentransition-entity-promote",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 180,
+      "column": 71,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openTransition(entity, 'promote')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!currentEvidence?.complete || (!approval.active && entity.nextRing !== 'local_staging')",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.action.opentransition-entity-pause",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 181,
+      "column": 52,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openTransition(entity, 'pause')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.action.opentransition-entity-rollback",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 182,
+      "column": 63,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openTransition(entity, 'rollback')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.action.setevidencetarget-null",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 190,
+      "column": 105,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setEvidenceTarget(null)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.action.submitevidence",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 190,
+      "column": 214,
+      "surface": "route.ceo-rollout",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "submitEvidence",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!evidenceForm.reference || !evidenceForm.checksum",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.input",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 192,
+      "column": 24,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.select",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 193,
+      "column": 24,
+      "surface": "route.ceo-rollout",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.artifact-backup-manifest-json",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 194,
+      "column": 29,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "artifact://backup/manifest.json",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.sha256",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 195,
+      "column": 28,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "sha256:…",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.input.2",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 196,
+      "column": 64,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.input.3",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 196,
+      "column": 262,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.action.settransitiontarget-null",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 200,
+      "column": 111,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setTransitionTarget(null)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.action.submittransition",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 200,
+      "column": 222,
+      "surface": "route.ceo-rollout",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "submitTransition",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "transitionForm.reason.trim().length < 8 || transitionForm.confirmation !== transitionTarget.phrase",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.input.4",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 201,
+      "column": 484,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.textarea",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 201,
+      "column": 249,
+      "surface": "route.ceo-rollout",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
     },
     {
       "elementId": "route.ceo-security.action.load",
@@ -28805,23 +29353,23 @@
     }
   ],
   "summary": {
-    "uiRoutes": 63,
-    "apiRoutes": 111,
-    "interactiveElements": 890,
-    "sourceFilesWithInteractions": 92,
-    "routesInPrimaryNavigation": 59,
+    "uiRoutes": 64,
+    "apiRoutes": 114,
+    "interactiveElements": 908,
+    "sourceFilesWithInteractions": 93,
+    "routesInPrimaryNavigation": 60,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 525,
-      "form-control": 285,
+      "action": 535,
+      "form-control": 293,
       "form-submit": 14,
       "navigation": 66
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 17,
-      "control_binding_unverified": 241,
+      "control_binding_unverified": 249,
       "keyboard_path_unverified": 17,
-      "unlabelled_button_candidate": 41
+      "unlabelled_button_candidate": 49
     },
     "topInteractiveSources": [
       {
@@ -28877,12 +29425,12 @@
         "count": 19
       },
       {
-        "source": "components/realm/RealmPilotOperations.jsx",
+        "source": "app/(app)/ceo-rollout/page.jsx",
         "count": 18
       },
       {
-        "source": "components/DocEditor.jsx",
-        "count": 17
+        "source": "components/realm/RealmPilotOperations.jsx",
+        "count": 18
       }
     ]
   }

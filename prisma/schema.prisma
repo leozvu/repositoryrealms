@@ -1080,10 +1080,71 @@ model CeoEntityRegistry {
   commandDeliveries        CeoCommandDelivery[]
   directoryProfiles        CeoDirectoryProfileCache[]
   unifiedConversations     CeoUnifiedConversation[]
+  rolloutState             CeoRolloutState?
 
   @@index([enabled, status])
   @@index([circuitState, circuitRetryAt])
   @@index([environment])
+}
+
+// ===== CEO-9: staged rollout control plane =====
+// Rollout state and evidence live only in the CEO Portal database. A transition changes
+// Portal authorization gates; it never deploys code or writes an entity business database.
+model CeoRolloutState {
+  entityId         String               @id
+  entity           CeoEntityRegistry    @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  currentRing      String               @default("local_staging")
+  status           String               @default("hold")
+  recordVersion    Int                  @default(1)
+  lastTransitionAt DateTime?
+  lastReconciledAt DateTime?
+  lastRollbackAt   DateTime?
+  lastReceiptId    String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  evidence         CeoRolloutEvidence[]
+  receipts         CeoRolloutReceipt[]
+
+  @@index([status, currentRing])
+}
+
+model CeoRolloutEvidence {
+  id             String          @id @default(cuid())
+  entityId       String
+  state          CeoRolloutState @relation(fields: [entityId], references: [entityId], onDelete: Restrict)
+  ring           String
+  kind           String
+  reference      String
+  checksum       String
+  observedAt     DateTime
+  expiresAt      DateTime
+  recordedById   String
+  recordedByName String
+  createdAt      DateTime        @default(now())
+
+  @@unique([entityId, ring, kind, checksum])
+  @@index([entityId, ring, expiresAt])
+  @@index([expiresAt])
+}
+
+model CeoRolloutReceipt {
+  id             String          @id @default(cuid())
+  entityId       String
+  state          CeoRolloutState @relation(fields: [entityId], references: [entityId], onDelete: Restrict)
+  action         String
+  fromRing       String
+  toRing         String
+  decision       String
+  reason         String
+  evidenceDigest String
+  approvalId     String?
+  correlationId  String          @unique
+  createdById    String
+  createdByName  String
+  createdAt      DateTime        @default(now())
+
+  @@index([entityId, createdAt])
+  @@index([decision, createdAt])
 }
 
 // ===== CEO-4: sanitized aggregate read cache =====

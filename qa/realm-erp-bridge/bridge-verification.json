@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 56,
-    "mappedNavigationRoutes": 56,
-    "verifiedNavigationRoutes": 56,
+    "erpNavigationRoutes": 57,
+    "mappedNavigationRoutes": 57,
+    "verifiedNavigationRoutes": 57,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -835,6 +835,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/ceo-security/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "ceo-rollout",
+      "erpLabel": "CEO · Pilot & phát hành",
+      "realmLabel": "Realm Rollout Keep",
+      "realmSurface": "Pilot & phát hành CEO",
+      "group": "Công ty",
+      "href": "/ceo-rollout",
+      "icon": "repeat",
+      "roles": "DIRECTOR only",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/ceo-rollout/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

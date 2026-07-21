@@ -98,6 +98,7 @@ function fixture(initialCaches = []) {
         return { ...row };
       },
     },
+    ceoRolloutState: { findUnique: async ({ where }) => ({ entityId: where.entityId, currentRing: 'read_only', status: 'active', recordVersion: 2 }) },
     auditLog: { create: async ({ data }) => { state.audits.push(data); return data; } },
   };
   return { db: { ...tx, $transaction: async (operation) => operation(tx) }, state };

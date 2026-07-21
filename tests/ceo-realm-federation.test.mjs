@@ -112,6 +112,7 @@ test('CEO-7 portal reads a target with audience-bound headers and stores no remo
       findUnique: async ({ where }) => where.id === entity.id ? entity : null,
       update: async ({ data }) => { state.registryUpdates.push(data); return { ...entity, ...data }; },
     },
+    ceoRolloutState: { findUnique: async ({ where }) => ({ entityId: where.entityId, currentRing: 'ceo_sso', status: 'active', recordVersion: 3 }) },
     auditLog: { create: async ({ data }) => { state.audits.push(data); return data; } },
   };
   let outbound;

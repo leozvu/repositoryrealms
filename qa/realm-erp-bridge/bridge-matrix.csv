@@ -54,4 +54,5 @@ ceo-commands,Công ty,Royal Dispatch,Phòng điều hành CEO,CEO · Điều ph�
 ceo-inbox,Công ty,Royal Courier,Hộp thư liên công ty,CEO · Hộp thư liên công ty,/ceo-inbox,DIRECTOR only,,app/(app)/ceo-inbox/page.jsx,verified
 ceo-registry,Công ty,Realm Registry,Phòng điều hành CEO,CEO · Danh bạ công ty,/ceo-registry,DIRECTOR only,,app/(app)/ceo-registry/page.jsx,verified
 ceo-security,Công ty,Realm Security Vault,An toàn & khôi phục CEO,CEO · An toàn & khôi phục,/ceo-security,DIRECTOR only,,app/(app)/ceo-security/page.jsx,verified
+ceo-rollout,Công ty,Realm Rollout Keep,Pilot & phát hành CEO,CEO · Pilot & phát hành,/ceo-rollout,DIRECTOR only,,app/(app)/ceo-rollout/page.jsx,verified
 settings,Công ty,Realm Governance,Phòng quản trị,Cài đặt,/settings,DIRECTOR only,,app/(app)/settings/page.jsx,verified

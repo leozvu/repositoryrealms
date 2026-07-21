@@ -271,7 +271,8 @@
             "CeoCommandDelivery",
             "CeoEntityMembership",
             "CeoEntityRegistry",
-            "CeoPortalSession"
+            "CeoPortalSession",
+            "CeoRolloutState"
           ],
           "roles": [
             "DIRECTOR"
@@ -442,7 +443,8 @@
           "models": [
             "AuditLog",
             "CeoEntityRegistry",
-            "CeoEntitySnapshotCache"
+            "CeoEntitySnapshotCache",
+            "CeoRolloutState"
           ],
           "roles": [],
           "guards": [
@@ -455,6 +457,7 @@
             403,
             404,
             409,
+            500,
             503
           ],
           "permissionPolicy": "explicit-rbac",
@@ -628,7 +631,8 @@
             "AuditLog",
             "CeoEntityMembership",
             "CeoEntityRegistry",
-            "CeoPortalSession"
+            "CeoPortalSession",
+            "CeoRolloutState"
           ],
           "roles": [
             "DIRECTOR"
@@ -971,6 +975,7 @@
             "CeoEntityMembership",
             "CeoEntityRegistry",
             "CeoPortalSession",
+            "CeoRolloutState",
             "CeoUnifiedConversation",
             "CeoUnifiedMessage"
           ],
@@ -1007,6 +1012,7 @@
             "CeoEntityMembership",
             "CeoEntityRegistry",
             "CeoPortalSession",
+            "CeoRolloutState",
             "CeoUnifiedConversation",
             "CeoUnifiedMessage"
           ],
@@ -1106,7 +1112,8 @@
             "CeoDirectoryProfileCache",
             "CeoEntityMembership",
             "CeoEntityRegistry",
-            "CeoPortalSession"
+            "CeoPortalSession",
+            "CeoRolloutState"
           ],
           "roles": [],
           "guards": [
@@ -1372,6 +1379,97 @@
       }
     },
     {
+      "route": "/api/ceo/v1/rollout",
+      "source": "app/api/ceo/v1/rollout/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoEntityRegistry",
+            "CeoRolloutEvidence",
+            "CeoRolloutReceipt",
+            "CeoRolloutState"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/rollout/[entityId]/transition",
+      "source": "app/api/ceo/v1/rollout/[entityId]/transition/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityRegistry",
+            "CeoPortalSession",
+            "CeoRolloutEvidence",
+            "CeoRolloutReceipt",
+            "CeoRolloutState"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            409,
+            422,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/rollout/evidence",
+      "source": "app/api/ceo/v1/rollout/evidence/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoPortalSession",
+            "CeoRolloutEvidence",
+            "CeoRolloutState"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            409,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/ceo/v1/security/control-plane",
       "source": "app/api/ceo/v1/security/control-plane/route.js",
       "methods": {
@@ -1563,6 +1661,7 @@
             "CeoEntityMembership",
             "CeoEntityRegistry",
             "CeoPortalSession",
+            "CeoRolloutState",
             "CeoSsoAuthorizationCode"
           ],
           "roles": [
@@ -1576,6 +1675,7 @@
             400,
             401,
             403,
+            500,
             503
           ],
           "permissionPolicy": "explicit-rbac",
@@ -10000,7 +10100,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10078,7 +10179,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10215,7 +10317,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10293,7 +10396,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10371,7 +10475,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10449,7 +10554,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10527,7 +10633,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10605,7 +10712,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10683,7 +10791,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10761,7 +10870,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10839,7 +10949,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10917,7 +11028,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -10995,7 +11107,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -11073,7 +11186,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -11151,7 +11265,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -11229,7 +11344,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -11366,7 +11482,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -11444,7 +11561,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -11522,7 +11640,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -11600,7 +11719,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -11737,7 +11857,8 @@
         "CeoCommandDelivery",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -11887,6 +12008,7 @@
         "CeoEntityMembership",
         "CeoEntityRegistry",
         "CeoPortalSession",
+        "CeoRolloutState",
         "CeoSsoAuthorizationCode"
       ],
       "contextModels": [],
@@ -12034,7 +12156,8 @@
         "CeoDirectoryProfileCache",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -12769,6 +12892,7 @@
         "CeoGlobalIdentity",
         "CeoPortalSession",
         "CeoRecoveryCode",
+        "CeoRolloutState",
         "CeoUnifiedConversation",
         "CeoUnifiedMessage"
       ],
@@ -12929,6 +13053,7 @@
         "CeoGlobalIdentity",
         "CeoPortalSession",
         "CeoRecoveryCode",
+        "CeoRolloutState",
         "CeoUnifiedConversation",
         "CeoUnifiedMessage"
       ],
@@ -13074,6 +13199,7 @@
         "CeoGlobalIdentity",
         "CeoPortalSession",
         "CeoRecoveryCode",
+        "CeoRolloutState",
         "CeoUnifiedConversation",
         "CeoUnifiedMessage"
       ],
@@ -13317,7 +13443,8 @@
       "prismaModels": [
         "AuditLog",
         "CeoEntityRegistry",
-        "CeoEntitySnapshotCache"
+        "CeoEntitySnapshotCache",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -13629,6 +13756,7 @@
         "CeoEntityMembership",
         "CeoEntityRegistry",
         "CeoPortalSession",
+        "CeoRolloutState",
         "CeoSsoAuthorizationCode"
       ],
       "contextModels": [],
@@ -14489,6 +14617,7 @@
         "CeoEntityMembership",
         "CeoEntityRegistry",
         "CeoPortalSession",
+        "CeoRolloutState",
         "CeoSsoAuthorizationCode"
       ],
       "contextModels": [],
@@ -14968,6 +15097,1029 @@
       "browserActions": [
         "navigator.clipboard.writeText"
       ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.load",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 145,
+      "column": 7,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/rollout"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "CeoEntityRegistry",
+        "CeoRolloutEvidence",
+        "CeoRolloutReceipt",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.openevidence-entity",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 173,
+      "column": 259,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openEvidence(entity)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "migrationRequired",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "openEvidence"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.opentransition-entity-activate",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 179,
+      "column": 52,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openTransition(entity, 'activate')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "migrationRequired || !currentEvidence?.complete",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "expectedConfirmation",
+        "openTransition"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.opentransition-entity-promote",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 180,
+      "column": 71,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openTransition(entity, 'promote')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!currentEvidence?.complete || (!approval.active && entity.nextRing !== 'local_staging')",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "expectedConfirmation",
+        "openTransition"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.opentransition-entity-pause",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 181,
+      "column": 52,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openTransition(entity, 'pause')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "expectedConfirmation",
+        "openTransition"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.opentransition-entity-rollback",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 182,
+      "column": 63,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openTransition(entity, 'rollback')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "expectedConfirmation",
+        "openTransition"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.setevidencetarget-null",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 190,
+      "column": 105,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setEvidenceTarget(null)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.submitevidence",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 190,
+      "column": 214,
+      "surface": "route.ceo-rollout",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "submitEvidence",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!evidenceForm.reference || !evidenceForm.checksum",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load",
+        "submitEvidence"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/rollout",
+        "POST /api/ceo/v1/rollout/evidence"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutEvidence",
+        "CeoRolloutReceipt",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.input",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 192,
+      "column": 24,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.select",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 193,
+      "column": 24,
+      "surface": "route.ceo-rollout",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.artifact-backup-manifest-json",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 194,
+      "column": 29,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "artifact://backup/manifest.json",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.sha256",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 195,
+      "column": 28,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "sha256:…",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.input.2",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 196,
+      "column": 64,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.input.3",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 196,
+      "column": 262,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.settransitiontarget-null",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 200,
+      "column": 111,
+      "surface": "route.ceo-rollout",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setTransitionTarget(null)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.action.submittransition",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 200,
+      "column": 222,
+      "surface": "route.ceo-rollout",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "submitTransition",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "transitionForm.reason.trim().length < 8 || transitionForm.confirmation !== transitionTarget.phrase",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load",
+        "submitTransition"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/rollout",
+        "POST /api/ceo/v1/rollout/*/transition"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutEvidence",
+        "CeoRolloutReceipt",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.input.4",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 201,
+      "column": 484,
+      "surface": "route.ceo-rollout",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-rollout.form-control.textarea",
+      "source": "app/(app)/ceo-rollout/page.jsx",
+      "line": 201,
+      "column": 249,
+      "surface": "route.ceo-rollout",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/rollout'",
+        "POST '/api/ceo/v1/rollout/evidence'",
+        "POST `/api/ceo/v1/rollout/${encodeURIComponent(entity.id)}/transition`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoRolloutPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
       "helperCalls": [],
       "localMutations": [],
       "loadingState": "not-required",
@@ -15731,7 +16883,8 @@
         "AuditLog",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -15856,7 +17009,8 @@
         "AuditLog",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -15925,6 +17079,7 @@
         "CeoEntityMembership",
         "CeoEntityRegistry",
         "CeoPortalSession",
+        "CeoRolloutState",
         "CeoSsoAuthorizationCode"
       ],
       "contextModels": [],
@@ -16050,7 +17205,8 @@
         "AuditLog",
         "CeoEntityMembership",
         "CeoEntityRegistry",
-        "CeoPortalSession"
+        "CeoPortalSession",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -69322,8 +70478,10 @@
         "sendCmt",
         "stepUpIdentity",
         "submit",
+        "submitEvidence",
         "submitLog",
         "submitRotation",
+        "submitTransition",
         "suspend",
         "sync",
         "toast",
@@ -69680,6 +70838,45 @@
           "routeTargets": [],
           "helperCalls": [],
           "localState": []
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-rollout/page.jsx",
+          "line": 190,
+          "surface": "route:/ceo-rollout",
+          "apiCalls": [
+            "GET /api/ceo/v1/rollout",
+            "POST /api/ceo/v1/rollout/evidence"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setData",
+            "setError",
+            "setEvidenceForm",
+            "setEvidenceTarget",
+            "setForbidden"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-rollout/page.jsx",
+          "line": 200,
+          "surface": "route:/ceo-rollout",
+          "apiCalls": [
+            "GET /api/ceo/v1/rollout",
+            "POST /api/ceo/v1/rollout/*/transition"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setData",
+            "setError",
+            "setForbidden",
+            "setTransitionTarget"
+          ]
         },
         {
           "callback": "onClick",
@@ -70679,6 +71876,7 @@
         "route:/ceo-inbox",
         "route:/ceo-overview",
         "route:/ceo-registry",
+        "route:/ceo-rollout",
         "route:/ceo-security",
         "route:/ceo-world",
         "route:/commissions",
@@ -70709,6 +71907,7 @@
         "GET /api/ceo/v1/messaging/conversations",
         "GET /api/ceo/v1/messaging/conversations/*",
         "GET /api/ceo/v1/messaging/directory",
+        "GET /api/ceo/v1/rollout",
         "GET /api/ceo/v1/security/control-plane",
         "GET /api/data/payouts",
         "GET /api/freelancer/home",
@@ -70731,6 +71930,8 @@
         "POST /api/ceo/v1/messaging/directory",
         "POST /api/ceo/v1/messaging/messages/*/reconcile",
         "POST /api/ceo/v1/registry/*/rotate",
+        "POST /api/ceo/v1/rollout/*/transition",
+        "POST /api/ceo/v1/rollout/evidence",
         "POST /api/ceo/v1/security/control-plane",
         "POST /api/ceo/v1/security/rehearsal",
         "POST /api/ceo/v1/security/service-credential",
@@ -70804,6 +72005,9 @@
         "CeoGlobalIdentity",
         "CeoPortalSession",
         "CeoRecoveryCode",
+        "CeoRolloutEvidence",
+        "CeoRolloutReceipt",
+        "CeoRolloutState",
         "CeoSsoAuthorizationCode",
         "CeoUnifiedConversation",
         "CeoUnifiedMessage",
@@ -70998,6 +72202,32 @@
         },
         {
           "callback": "onClose",
+          "source": "app/(app)/ceo-rollout/page.jsx",
+          "line": 190,
+          "surface": "route:/ceo-rollout",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setEvidenceTarget"
+          ]
+        },
+        {
+          "callback": "onClose",
+          "source": "app/(app)/ceo-rollout/page.jsx",
+          "line": 200,
+          "surface": "route:/ceo-rollout",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setTransitionTarget"
+          ]
+        },
+        {
+          "callback": "onClose",
           "source": "app/(app)/ceo-security/page.jsx",
           "line": 176,
           "surface": "route:/ceo-security",
@@ -71398,6 +72628,7 @@
         "route:/automation",
         "route:/calendar",
         "route:/ceo-registry",
+        "route:/ceo-rollout",
         "route:/ceo-security",
         "route:/commissions",
         "route:/freelancers",
@@ -71547,6 +72778,32 @@
         },
         {
           "callback": "onClose",
+          "source": "app/(app)/ceo-rollout/page.jsx",
+          "line": 190,
+          "surface": "route:/ceo-rollout",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setEvidenceTarget"
+          ]
+        },
+        {
+          "callback": "onClose",
+          "source": "app/(app)/ceo-rollout/page.jsx",
+          "line": 200,
+          "surface": "route:/ceo-rollout",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setTransitionTarget"
+          ]
+        },
+        {
+          "callback": "onClose",
           "source": "app/(app)/ceo-security/page.jsx",
           "line": 176,
           "surface": "route:/ceo-security",
@@ -71947,6 +73204,7 @@
         "route:/automation",
         "route:/calendar",
         "route:/ceo-registry",
+        "route:/ceo-rollout",
         "route:/ceo-security",
         "route:/commissions",
         "route:/freelancers",
@@ -84942,31 +86200,31 @@
     }
   ],
   "summary": {
-    "elements": 890,
-    "apiContracts": 111,
+    "elements": 908,
+    "apiContracts": 114,
     "registryResources": 50,
     "byActionType": {
-      "local-state": 239,
-      "data-action": 161,
-      "form-control": 285,
+      "local-state": 246,
+      "data-action": 164,
+      "form-control": 293,
       "delegated-action": 84,
       "navigation": 85,
       "browser-action": 28,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 597,
+      "classified-local": 612,
       "delegated-resolved": 46,
-      "handler-resolved": 163,
+      "handler-resolved": 166,
       "delegated": 84
     },
     "byConfidence": {
-      "high": 844,
+      "high": 862,
       "medium": 46
     },
     "uxStateCandidates": {},
-    "dataActions": 161,
-    "delegatedBindings": 1129,
+    "dataActions": 164,
+    "delegatedBindings": 1135,
     "actionableUnresolved": 0
   }
 }

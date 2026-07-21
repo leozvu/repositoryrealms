@@ -74,6 +74,7 @@ function fixture() {
       findMany: async () => state.entities.map((row) => ({ ...row })),
       findUnique: async ({ where }) => state.entities.find((row) => row.id === where.id) || null,
     },
+    ceoRolloutState: { findUnique: async ({ where }) => ({ entityId: where.entityId, currentRing: 'ceo_sso', status: 'active', recordVersion: 3 }) },
     ceoEntityMembership: {
       findMany: async ({ where }) => state.memberships.filter((row) => row.identityId === where.identityId).map((row) => ({ ...row })),
       findUnique: async ({ where }) => {

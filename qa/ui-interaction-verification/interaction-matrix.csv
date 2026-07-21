@@ -24,6 +24,8 @@ route.ceo-registry.action.rotaterecoverycodes,app/(app)/ceo-registry/page.jsx,32
 route.ceo-registry.action.revokesession-item-id,app/(app)/ceo-registry/page.jsx,327,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.toggle-entity,app/(app)/ceo-registry/page.jsx,404,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.submitrotation,app/(app)/ceo-registry/page.jsx,427,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-rollout.action.submitevidence,app/(app)/ceo-rollout/page.jsx,190,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-rollout.action.submittransition,app/(app)/ceo-rollout/page.jsx,200,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-security.action.runrehearsal,app/(app)/ceo-security/page.jsx,162,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-security.action.rotate,app/(app)/ceo-security/page.jsx,167,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-security.action.suspend,app/(app)/ceo-security/page.jsx,178,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified

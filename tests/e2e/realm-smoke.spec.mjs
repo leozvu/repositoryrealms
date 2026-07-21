@@ -90,6 +90,22 @@ test('CEO Security console and recovery controls preserve the local ERP authenti
   }
 });
 
+test('CEO Rollout control plane preserves ERP auth and keeps mutation routes private', async ({ request }) => {
+  const page = await request.get('/ceo-rollout', { maxRedirects: 0 });
+  expect(page.status()).toBe(307);
+  expect(page.headers().location).toBe('/login');
+
+  const read = await request.get('/api/ceo/v1/rollout');
+  expect(read.status()).toBe(401);
+  expect(read.headers()['cache-control']).toContain('no-store');
+  expect((await read.json()).code).toBe('unauthorized');
+
+  const write = await request.post('/api/ceo/v1/rollout/evidence', { data: {} });
+  expect(write.status()).toBe(401);
+  expect(write.headers()['cache-control']).toContain('no-store');
+  expect((await write.json()).code).toBe('unauthorized');
+});
+
 test('cross-surface collaboration APIs preserve the ERP authentication boundary', async ({ request }) => {
   for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle', '/api/realm-demo/pilot', '/api/realm-demo/feedback', '/api/realm-demo/readiness', '/api/realm-demo/experience', '/api/realm-demo/release-candidate']) {
     const response = await request.get(route);
