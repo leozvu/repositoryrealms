@@ -308,6 +308,28 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/ceo-security",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "dynamic": false,
+      "auth": "authenticated",
+      "inNavigation": true,
+      "navLabel": "CEO · An toàn & khôi phục",
+      "navSection": "Công ty",
+      "roles": [
+        "DIRECTOR"
+      ],
+      "module": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/ceo-world",
       "source": "app/(app)/ceo-world/page.jsx",
       "dynamic": false,
@@ -902,7 +924,7 @@
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
-        "'/ceo-registry'",
+        "'/ceo-security'",
         "destination"
       ],
       "mappingStatus": "unreviewed"
@@ -1962,6 +1984,45 @@
       "source": "app/api/ceo/v1/registry/[id]/rotate/route.js",
       "dynamic": true,
       "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/registry/[id]/service-credential",
+      "source": "app/api/ceo/v1/registry/[id]/service-credential/route.js",
+      "dynamic": true,
+      "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/security/control-plane",
+      "source": "app/api/ceo/v1/security/control-plane/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/security/rehearsal",
+      "source": "app/api/ceo/v1/security/rehearsal/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/security/service-credential",
+      "source": "app/api/ceo/v1/security/service-credential/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
         "POST"
       ],
       "mappingStatus": "unreviewed"
@@ -6169,7 +6230,7 @@
     {
       "elementId": "route.ceo-registry.action.openentity-entity",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 394,
+      "line": 395,
       "column": 19,
       "surface": "route.ceo-registry",
       "tag": "AsyncButton",
@@ -6203,7 +6264,7 @@
     {
       "elementId": "route.ceo-registry.action.toggle-entity",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 403,
+      "line": 404,
       "column": 19,
       "surface": "route.ceo-registry",
       "tag": "AsyncButton",
@@ -6213,7 +6274,7 @@
       "handler": "() => toggle(entity)",
       "target": "",
       "insideForm": false,
-      "disabledBinding": "",
+      "disabledBinding": "!entity.enabled && (!entity.credential.configured || !entity.serviceCredential?.configured)",
       "actionStatus": "handler-candidate",
       "mappingStatus": "unreviewed",
       "businessFeature": "",
@@ -6237,7 +6298,7 @@
     {
       "elementId": "route.ceo-registry.action.setrotating-entity-setcredentialref",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 411,
+      "line": 413,
       "column": 19,
       "surface": "route.ceo-registry",
       "tag": "button",
@@ -6273,7 +6334,7 @@
     {
       "elementId": "route.ceo-registry.action.setrotating-null",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 424,
+      "line": 426,
       "column": 11,
       "surface": "route.ceo-registry",
       "tag": "button",
@@ -6309,7 +6370,7 @@
     {
       "elementId": "route.ceo-registry.action.submitrotation",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 425,
+      "line": 427,
       "column": 11,
       "surface": "route.ceo-registry",
       "tag": "AsyncButton",
@@ -6343,7 +6404,7 @@
     {
       "elementId": "route.ceo-registry.form-control.input.4",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 430,
+      "line": 432,
       "column": 13,
       "surface": "route.ceo-registry",
       "tag": "input",
@@ -6379,7 +6440,7 @@
     {
       "elementId": "route.ceo-registry.action.setrecoverycodes-null",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 446,
+      "line": 448,
       "column": 11,
       "surface": "route.ceo-registry",
       "tag": "button",
@@ -6415,7 +6476,7 @@
     {
       "elementId": "route.ceo-registry.action.copyrecoverycodes",
       "source": "app/(app)/ceo-registry/page.jsx",
-      "line": 447,
+      "line": 449,
       "column": 11,
       "surface": "route.ceo-registry",
       "tag": "AsyncButton",
@@ -6445,6 +6506,290 @@
         "body.destination"
       ],
       "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-security.action.load",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 131,
+      "column": 9,
+      "surface": "route.ceo-security",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-security.action.runrehearsal",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 162,
+      "column": 11,
+      "surface": "route.ceo-security",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "runRehearsal",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "suspended",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-security.action.rotate",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 167,
+      "column": 216,
+      "surface": "route.ceo-security",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "rotate",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "suspended || Number(ttlDays) < 1 || Number(ttlDays) > 180",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-security.form-control.input",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 167,
+      "column": 89,
+      "surface": "route.ceo-security",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-security.action.setsuspendopen-true",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 172,
+      "column": 11,
+      "surface": "route.ceo-security",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setSuspendOpen(true)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!posture.controlPlane.killSwitchAvailable",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-security.action.copyraw",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 176,
+      "column": 98,
+      "surface": "route.ceo-security",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "copyRaw",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-security.action.setsuspendopen-false",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 178,
+      "column": 101,
+      "surface": "route.ceo-security",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setSuspendOpen(false)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-security.action.suspend",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 178,
+      "column": 208,
+      "surface": "route.ceo-security",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "suspend",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "confirmation !== 'SUSPEND CEO PORTAL' || reason.trim().length < 8",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-security.form-control.input.2",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 178,
+      "column": 533,
+      "surface": "route.ceo-security",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-security.form-control.input.3",
+      "source": "app/(app)/ceo-security/page.jsx",
+      "line": 178,
+      "column": 737,
+      "surface": "route.ceo-security",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/security/control-plane'",
+        "POST '/api/ceo/v1/security/rehearsal'",
+        "POST '/api/ceo/v1/security/service-credential'",
+        "POST '/api/ceo/v1/security/control-plane'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
     },
     {
       "elementId": "route.ceo-world.navigation.ceo-overview",
@@ -18952,7 +19297,7 @@
     {
       "elementId": "route.login.form-submit.email-mat-khau-ma-2fa-bo-trong-neu-chua-bat-ang-khoi-tao-quay-la",
       "source": "app/login/page.jsx",
-      "line": 78,
+      "line": 85,
       "column": 9,
       "surface": "route.login",
       "tag": "form",
@@ -18972,7 +19317,7 @@
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
-        "'/ceo-registry'",
+        "'/ceo-security'",
         "destination"
       ],
       "uxRiskCandidates": []
@@ -18980,7 +19325,7 @@
     {
       "elementId": "route.login.form-control.ban-congty-vn",
       "source": "app/login/page.jsx",
-      "line": 81,
+      "line": 88,
       "column": 13,
       "surface": "route.login",
       "tag": "input",
@@ -19000,7 +19345,7 @@
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
-        "'/ceo-registry'",
+        "'/ceo-security'",
         "destination"
       ],
       "uxRiskCandidates": []
@@ -19008,7 +19353,7 @@
     {
       "elementId": "route.login.form-control.input",
       "source": "app/login/page.jsx",
-      "line": 85,
+      "line": 92,
       "column": 13,
       "surface": "route.login",
       "tag": "input",
@@ -19028,7 +19373,7 @@
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
-        "'/ceo-registry'",
+        "'/ceo-security'",
         "destination"
       ],
       "uxRiskCandidates": []
@@ -19036,7 +19381,7 @@
     {
       "elementId": "route.login.form-control.000000",
       "source": "app/login/page.jsx",
-      "line": 89,
+      "line": 96,
       "column": 13,
       "surface": "route.login",
       "tag": "input",
@@ -19056,7 +19401,7 @@
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
-        "'/ceo-registry'",
+        "'/ceo-security'",
         "destination"
       ],
       "uxRiskCandidates": []
@@ -19064,7 +19409,7 @@
     {
       "elementId": "route.login.form-control.rr-xxxx-xxxx-xxxx",
       "source": "app/login/page.jsx",
-      "line": 94,
+      "line": 101,
       "column": 15,
       "surface": "route.login",
       "tag": "input",
@@ -19084,7 +19429,7 @@
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
-        "'/ceo-registry'",
+        "'/ceo-security'",
         "destination"
       ],
       "uxRiskCandidates": []
@@ -19092,7 +19437,7 @@
     {
       "elementId": "route.login.form-control.devicelabel",
       "source": "app/login/page.jsx",
-      "line": 98,
+      "line": 105,
       "column": 15,
       "surface": "route.login",
       "tag": "input",
@@ -19112,7 +19457,7 @@
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
-        "'/ceo-registry'",
+        "'/ceo-security'",
         "destination"
       ],
       "uxRiskCandidates": []
@@ -19120,7 +19465,7 @@
     {
       "elementId": "route.login.action.ang-khoi-tao",
       "source": "app/login/page.jsx",
-      "line": 101,
+      "line": 108,
       "column": 11,
       "surface": "route.login",
       "tag": "button",
@@ -19140,7 +19485,7 @@
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
-        "'/ceo-registry'",
+        "'/ceo-security'",
         "destination"
       ],
       "uxRiskCandidates": []
@@ -19148,7 +19493,7 @@
     {
       "elementId": "route.login.action.quay-lai-ang-nhap-totp-ceo-mat-thiet-bi-totp-dung-recovery-code",
       "source": "app/login/page.jsx",
-      "line": 104,
+      "line": 111,
       "column": 11,
       "surface": "route.login",
       "tag": "button",
@@ -19168,7 +19513,7 @@
         "GET '/api/realm-demo/pilot'"
       ],
       "routeCandidates": [
-        "'/ceo-registry'",
+        "'/ceo-security'",
         "destination"
       ],
       "uxRiskCandidates": []
@@ -28460,23 +28805,23 @@
     }
   ],
   "summary": {
-    "uiRoutes": 62,
-    "apiRoutes": 107,
-    "interactiveElements": 880,
-    "sourceFilesWithInteractions": 91,
-    "routesInPrimaryNavigation": 58,
+    "uiRoutes": 63,
+    "apiRoutes": 111,
+    "interactiveElements": 890,
+    "sourceFilesWithInteractions": 92,
+    "routesInPrimaryNavigation": 59,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 518,
-      "form-control": 282,
+      "action": 525,
+      "form-control": 285,
       "form-submit": 14,
       "navigation": 66
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 17,
-      "control_binding_unverified": 238,
+      "control_binding_unverified": 241,
       "keyboard_path_unverified": 17,
-      "unlabelled_button_candidate": 37
+      "unlabelled_button_candidate": 41
     },
     "topInteractiveSources": [
       {

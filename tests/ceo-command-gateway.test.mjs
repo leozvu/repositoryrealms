@@ -234,7 +234,7 @@ test('CEO-5 routes, schema and UI expose the constrained gateway without a direc
   const migration = fs.readFileSync(path.join(root, 'prisma/migrations/20260722010000_add_ceo_command_gateway/migration.sql'), 'utf8');
   assert.match(portalRoute, /ceoRequestIsSameOrigin/);
   assert.match(portalRoute, /readCeoPortalSessionCookie/);
-  assert.match(targetRoute, /apiUser\(request\)/);
+  assert.match(targetRoute, /ceoServiceGuard\(request, CEO_SERVICE_SCOPES\.COMMAND_DISPATCH/);
   assert.match(targetRoute, /executeRepositoryRealmsAction/);
   assert.match(reconcileRoute, /reconcileCeoCommand/);
   assert.match(page, /DELIVERY METADATA ONLY/);

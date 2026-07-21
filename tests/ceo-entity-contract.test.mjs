@@ -134,11 +134,10 @@ test('CEO health contract is versioned and fail-closed when settings are absent'
   assert.equal(degraded.latencyMs.database, null);
 });
 
-test('CEO v1 routes require API auth, Director scope and private no-store responses', () => {
+test('CEO v1 routes require audience-bound service scopes and private no-store responses', () => {
   for (const endpoint of ['snapshot', 'capabilities', 'health']) {
     const source = fs.readFileSync(path.join(root, `app/api/ceo/v1/${endpoint}/route.js`), 'utf8');
-    assert.match(source, /apiUser\(req\)/, `${endpoint} authenticates an API key`);
-    assert.match(source, /includes\('DIRECTOR'\)/, `${endpoint} requires Director scope`);
+    assert.match(source, /ceoServiceGuard\(req, CEO_SERVICE_SCOPES\./, `${endpoint} authenticates a scoped service credential`);
     assert.match(source, /private, no-store/, `${endpoint} disables shared caching`);
     assert.match(source, /X-CEO-Contract-Version/, `${endpoint} publishes the contract version`);
     assert.doesNotMatch(source, /export async function (POST|PUT|PATCH|DELETE)/, `${endpoint} is read-only`);

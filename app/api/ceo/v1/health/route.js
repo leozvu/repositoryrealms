@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { apiUser } from '@/lib/apiauth';
 import { loadCeoHealth } from '@/lib/ceo-entity-admin';
 import { CEO_CONTRACT_VERSION } from '@/lib/ceo-entity-contract';
+import { CEO_SERVICE_SCOPES } from '@/lib/ceo-service-auth';
+import { ceoServiceGuard } from '@/lib/ceo-service-http';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,17 +13,14 @@ const headers = {
 };
 
 export async function GET(req) {
-  const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401, headers });
-  if (!(user.roles || []).includes('DIRECTOR')) {
-    return NextResponse.json({ error: 'forbidden', code: 'ceo_director_scope_required' }, { status: 403, headers });
-  }
+  const service = await ceoServiceGuard(req, CEO_SERVICE_SCOPES.HEALTH_READ, headers);
+  if (service.response) return service.response;
 
   try {
     const payload = await loadCeoHealth();
-    return NextResponse.json(payload, { status: payload.status === 'ready' ? 200 : 503, headers });
+    return NextResponse.json(payload, { status: payload.status === 'ready' ? 200 : 503, headers: service.responseHeaders });
   } catch (error) {
     console.error('ceo_health_failed', error);
-    return NextResponse.json({ error: 'CEO entity health unavailable', code: 'ceo_health_unavailable' }, { status: 503, headers });
+    return NextResponse.json({ error: 'CEO entity health unavailable', code: 'ceo_health_unavailable' }, { status: 503, headers: service.responseHeaders });
   }
 }

@@ -11,17 +11,17 @@ const COPY = {
   vi: {
     eyebrow: 'CEO CONTROL PLANE · ENTITY REGISTRY',
     title: 'Danh bạ bốn công ty',
-    intro: 'Một nơi kiểm soát kết nối tới AIm, Egoric, Vnecom và Egolive. Registry chỉ giữ tham chiếu secret; API key thật không nằm trong database hoặc trình duyệt.',
+    intro: 'Một nơi kiểm soát kết nối tới AIm, Egoric, Vnecom và Egolive. SSO trust secret và service key dùng hai tham chiếu riêng; giá trị thật không nằm trong database hoặc trình duyệt.',
     refresh: 'Tải lại trạng thái',
     loading: 'Đang tải danh bạ công ty…',
     loadError: 'Không thể tải Entity Registry.',
     retry: 'Thử lại',
     registered: 'Đã đăng ký', enabled: 'Đang bật', ready: 'Sẵn sàng', openCircuit: 'Circuit đang mở',
-    environment: 'Môi trường', profile: 'Mô hình', contract: 'Contract', credential: 'Server secret',
+    environment: 'Môi trường', profile: 'Mô hình', contract: 'Contract', credential: 'SSO trust secret', serviceCredential: 'Service API key',
     configured: 'Đã cấu hình', missing: 'Chưa cấu hình',
     circuit: 'Circuit breaker', errors: 'Lỗi liên tiếp', lastSuccess: 'Đồng bộ thành công gần nhất', never: 'Chưa từng',
     capabilities: 'Phạm vi dữ liệu', enable: 'Bật kết nối', disable: 'Tắt kết nối',
-    enabling: 'Đang bật…', disabling: 'Đang tắt…', rotate: 'Đổi secret reference',
+    enabling: 'Đang bật…', disabling: 'Đang tắt…', rotate: 'Đổi SSO secret reference',
     enabledToast: 'Đã bật kết nối entity.', disabledToast: 'Đã tắt kết nối entity.',
     rotatedToast: 'Đã chuyển sang server secret mới.',
     updateError: 'Không thể cập nhật entity.',
@@ -34,7 +34,7 @@ const COPY = {
     disabledStatus: 'Tắt chủ động', unverified: 'Chưa xác minh', degraded: 'Suy giảm', unreachable: 'Không kết nối', readyStatus: 'Sẵn sàng',
     closed: 'Đóng · hoạt động bình thường', open: 'Mở · tạm ngừng gọi', half_open: 'Thử phục hồi',
     securityTitle: 'Nguyên tắc an toàn',
-    securityText: 'Không xóa entity, không hiển thị key, không bật khi secret còn thiếu. Mọi thay đổi dùng version check và được ghi AuditLog.',
+    securityText: 'Không xóa entity, không hiển thị key và không dùng chung SSO trust với service credential. Mọi thay đổi dùng version check và được ghi AuditLog.',
     noDelete: 'Không có thao tác xóa',
     ssoTitle: 'Danh tính CEO & đăng nhập một lần',
     ssoIntro: 'Lớp bảo mật riêng cho Vũ Lương Sơn. Mật khẩu + TOTP mở Portal; code 45 giây chỉ mở đúng công ty đã cấp quyền.',
@@ -52,17 +52,17 @@ const COPY = {
   en: {
     eyebrow: 'CEO CONTROL PLANE · ENTITY REGISTRY',
     title: 'Four-company registry',
-    intro: 'A single control point for AIm, Egoric, Vnecom, and Egolive connections. The registry stores secret references only; raw API keys never enter the database or browser.',
+    intro: 'A single control point for AIm, Egoric, Vnecom, and Egolive. SSO trust and service keys use separate references; raw values never enter the database or browser.',
     refresh: 'Refresh status',
     loading: 'Loading company registry…',
     loadError: 'Unable to load the Entity Registry.',
     retry: 'Try again',
     registered: 'Registered', enabled: 'Enabled', ready: 'Ready', openCircuit: 'Open circuits',
-    environment: 'Environment', profile: 'Profile', contract: 'Contract', credential: 'Server secret',
+    environment: 'Environment', profile: 'Profile', contract: 'Contract', credential: 'SSO trust secret', serviceCredential: 'Service API key',
     configured: 'Configured', missing: 'Missing',
     circuit: 'Circuit breaker', errors: 'Consecutive errors', lastSuccess: 'Last successful sync', never: 'Never',
     capabilities: 'Data scopes', enable: 'Enable connection', disable: 'Disable connection',
-    enabling: 'Enabling…', disabling: 'Disabling…', rotate: 'Rotate secret reference',
+    enabling: 'Enabling…', disabling: 'Disabling…', rotate: 'Rotate SSO secret reference',
     enabledToast: 'Entity connection enabled.', disabledToast: 'Entity connection disabled.',
     rotatedToast: 'Switched to the new server secret.',
     updateError: 'Unable to update the entity.',
@@ -75,7 +75,7 @@ const COPY = {
     disabledStatus: 'Manually disabled', unverified: 'Unverified', degraded: 'Degraded', unreachable: 'Unreachable', readyStatus: 'Ready',
     closed: 'Closed · operating normally', open: 'Open · calls paused', half_open: 'Recovery probe',
     securityTitle: 'Safety policy',
-    securityText: 'No entity deletion, no key exposure, and no enablement while a secret is missing. Every change uses version checks and is written to AuditLog.',
+    securityText: 'No entity deletion, no key exposure, and no reuse of SSO trust as a service credential. Every change uses version checks and is written to AuditLog.',
     noDelete: 'No delete operation',
     ssoTitle: 'CEO identity & single sign-on',
     ssoIntro: 'A dedicated security layer for Vũ Lương Sơn. Password + TOTP opens the Portal; a 45-second code opens only the authorized company.',
@@ -377,6 +377,7 @@ export default function CeoRegistryPage() {
                   <div><dt>{c.profile}</dt><dd>{entity.businessProfile}</dd></div>
                   <div><dt>{c.contract}</dt><dd>v{entity.contractVersion} · schema {entity.schemaVersion}</dd></div>
                   <div><dt>{c.credential}</dt><dd className={entity.credential.configured ? styles.textGood : styles.textBad}>{entity.credential.configured ? c.configured : c.missing}</dd></div>
+                  <div><dt>{c.serviceCredential}</dt><dd className={entity.serviceCredential?.configured ? styles.textGood : styles.textBad}>{entity.serviceCredential?.configured ? c.configured : c.missing}</dd></div>
                 </dl>
 
                 <div className={styles.capabilityBlock}>
@@ -404,6 +405,7 @@ export default function CeoRegistryPage() {
                     type="button"
                     className={entity.enabled ? 'btn btn-outline' : 'btn btn-primary'}
                     pendingLabel={entity.enabled ? c.disabling : c.enabling}
+                    disabled={!entity.enabled && (!entity.credential.configured || !entity.serviceCredential?.configured)}
                     onClick={() => toggle(entity)}
                   >
                     <Icon name={entity.enabled ? 'x' : 'check'} size={15} /> {entity.enabled ? c.disable : c.enable}

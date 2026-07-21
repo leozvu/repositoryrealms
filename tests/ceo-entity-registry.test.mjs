@@ -7,6 +7,7 @@ import {
   CEO_ENTITY_REGISTRY_SEED,
   ceoCircuitAvailability,
   normalizeCeoCredentialRef,
+  normalizeCeoServiceCredentialRef,
   normalizeCeoRegistryBaseUrl,
   normalizeCeoRegistryUpdate,
   parseCeoRegistryCapabilities,
@@ -19,6 +20,7 @@ import {
   recordCeoRegistrySyncFailure,
   recordCeoRegistrySyncSuccess,
   rotateCeoRegistryCredential,
+  rotateCeoRegistryServiceCredential,
   updateCeoRegistryEntity,
 } from '../lib/ceo-entity-registry-admin.js';
 
@@ -33,6 +35,7 @@ function entity(overrides = {}) {
     id: 'aim', displayName: 'AIm Agency', baseUrl: 'https://agency-erp-mu.vercel.app',
     businessProfile: 'agency', capabilities: '["finance","crm","people"]', environment: 'production',
     enabled: false, status: 'disabled', credentialRef: 'CEO_ENTITY_AIM_API_KEY', credentialVersion: 1,
+    serviceCredentialRef: 'CEO_ENTITY_AIM_SERVICE_KEY', serviceCredentialVersion: 1, serviceRotatedAt: null,
     contractVersion: '1.0.0', schemaVersion: 1, recordVersion: 1,
     lastSyncAttemptAt: null, lastSuccessfulSyncAt: null, consecutiveErrors: 0, lastErrorCode: null,
     circuitState: 'closed', circuitOpenedAt: null, circuitRetryAt: null, rotatedAt: null,
@@ -83,6 +86,7 @@ test('CEO-2 seeds exactly four stable entities with server-secret references onl
   for (const item of CEO_ENTITY_REGISTRY_SEED) {
     assert.equal(item.baseUrl.startsWith('https://'), true);
     assert.match(item.credentialRef, /^CEO_ENTITY_[A-Z0-9_]+_API_KEY$/);
+    assert.match(item.serviceCredentialRef, /^CEO_ENTITY_[A-Z0-9_]+_SERVICE_KEY$/);
     assert.equal(JSON.stringify(item).includes('ak_'), false);
     assert.equal(item.capabilities.includes('finance'), true);
   }
@@ -91,8 +95,10 @@ test('CEO-2 seeds exactly four stable entities with server-secret references onl
 
 test('Registry validation rejects raw keys, unsafe URLs, unknown fields and unknown capabilities', () => {
   assert.equal(normalizeCeoCredentialRef('CEO_ENTITY_AIM_V2_API_KEY'), 'CEO_ENTITY_AIM_V2_API_KEY');
+  assert.equal(normalizeCeoServiceCredentialRef('CEO_ENTITY_AIM_V2_SERVICE_KEY'), 'CEO_ENTITY_AIM_V2_SERVICE_KEY');
   assert.equal(normalizeCeoRegistryBaseUrl('https://erp-egoric.vercel.app'), 'https://erp-egoric.vercel.app');
   assert.throws(() => normalizeCeoCredentialRef(RAW_KEY), (error) => error.code === 'ceo_registry_credential_ref_invalid');
+  assert.throws(() => normalizeCeoServiceCredentialRef('CEO_ENTITY_AIM_API_KEY'), (error) => error.code === 'ceo_registry_service_credential_ref_invalid');
   assert.throws(() => normalizeCeoRegistryBaseUrl('http://127.0.0.1:3300'), (error) => error.code === 'ceo_registry_base_url_invalid');
   assert.throws(() => normalizeCeoRegistryBaseUrl('https://erp-egoric.vercel.app/api'), (error) => error.code === 'ceo_registry_base_url_invalid');
   assert.throws(() => normalizeCeoRegistryUpdate({ expectedVersion: 1, credentialRef: RAW_KEY, enabled: true }), (error) => error.code === 'ceo_registry_update_field_unsupported');
@@ -105,12 +111,31 @@ test('Registry read is Director-only and never serializes the credential referen
   await assert.rejects(() => listCeoRegistryEntities(fixture.db, STAFF), (error) => error.code === 'ceo_registry_director_required');
   const result = await listCeoRegistryEntities(fixture.db, DIRECTOR, { secretResolver: () => RAW_KEY });
   assert.equal(result.entities[0].credential.configured, true);
+  assert.equal(result.entities[0].serviceCredential.configured, true);
   assert.deepEqual(result.destructiveCommands, []);
   const serialized = JSON.stringify(result);
   assert.equal(serialized.includes('credentialRef'), false);
   assert.equal(serialized.includes('CEO_ENTITY_AIM_API_KEY'), false);
   assert.equal(serialized.includes(RAW_KEY), false);
   assert.equal(serializeCeoRegistryEntity(entity(), { secretResolver: () => '' }).credential.configured, false);
+});
+
+test('CEO-8 rotates a separately provisioned service reference without exposing either secret name', async () => {
+  const fixture = database(entity({ enabled: true, status: 'ready' }));
+  const updated = await rotateCeoRegistryServiceCredential(
+    fixture.db,
+    DIRECTOR,
+    'aim',
+    { expectedVersion: 1, serviceCredentialRef: 'CEO_ENTITY_AIM_V2_SERVICE_KEY' },
+    { now: NOW, secretResolver: () => RAW_KEY },
+  );
+  assert.equal(updated.serviceCredential.version, 2);
+  assert.equal(updated.serviceCredential.separated, true);
+  assert.equal(updated.recordVersion, 2);
+  assert.equal(updated.status, 'unverified');
+  assert.equal(JSON.stringify(updated).includes('CEO_ENTITY_AIM_V2_SERVICE_KEY'), false);
+  assert.equal(fixture.audits[0].action, 'ceo_registry_service_credential_rotated');
+  assert.equal(fixture.audits[0].detail.includes('SERVICE_KEY'), false);
 });
 
 test('Enablement fails closed without a provisioned secret and uses CAS plus AuditLog', async () => {
@@ -202,6 +227,7 @@ test('CEO Registry routes and UI are Director-only, no-store, versioned and non-
     'app/api/ceo/v1/registry/route.js',
     'app/api/ceo/v1/registry/[id]/route.js',
     'app/api/ceo/v1/registry/[id]/rotate/route.js',
+    'app/api/ceo/v1/registry/[id]/service-credential/route.js',
   ];
   const sources = files.map((file) => fs.readFileSync(path.join(root, file), 'utf8'));
   for (const source of sources) {
@@ -213,6 +239,7 @@ test('CEO Registry routes and UI are Director-only, no-store, versioned and non-
   assert.match(sources[0], /export async function GET/);
   assert.match(sources[1], /export async function PATCH/);
   assert.match(sources[2], /export async function POST/);
+  assert.match(sources[3], /export async function POST/);
   const page = fs.readFileSync(path.join(root, 'app/(app)/ceo-registry/page.jsx'), 'utf8');
   const nav = fs.readFileSync(path.join(root, 'lib/erp-navigation.js'), 'utf8');
   assert.match(page, /rolesOf\(session\?\.user\)\.includes\('DIRECTOR'\)/);

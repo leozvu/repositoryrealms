@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { apiUser } from '@/lib/apiauth';
 import { prisma } from '@/lib/prisma';
 import { loadCeoCapabilities } from '@/lib/ceo-entity-admin';
 import { executeRepositoryRealmsAction } from '@/lib/repository-realms';
@@ -13,6 +12,8 @@ import {
   assertCeoCommandRequestHeaders,
   ceoCommandRepositoryExecutor,
 } from '@/lib/ceo-command-target-admin';
+import { CEO_SERVICE_SCOPES } from '@/lib/ceo-service-auth';
+import { ceoServiceGuard } from '@/lib/ceo-service-http';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -24,21 +25,22 @@ const headers = {
   'X-Content-Type-Options': 'nosniff',
 };
 
-function errorResponse(error) {
+function errorResponse(error, responseHeaders = headers) {
   const known = error instanceof CeoCommandError || error?.name === 'RealmOperationError';
   if (!known) console.error('ceo_target_command_failed', { name: error?.name, code: error?.code });
   return NextResponse.json({
     error: known ? error.message : 'Target command service is unavailable.',
     code: known ? error.code : 'ceo_target_command_unavailable',
-  }, { status: known ? error.status : 503, headers });
+  }, { status: known ? error.status : 503, headers: responseHeaders });
 }
 
 export async function POST(request) {
-  const user = await apiUser(request);
-  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401, headers });
+  const service = await ceoServiceGuard(request, CEO_SERVICE_SCOPES.COMMAND_DISPATCH, headers);
+  if (service.response) return service.response;
+  const user = service.user;
   const length = Number(request.headers.get('content-length') || 0);
   if (length > CEO_COMMAND_MAX_BODY_BYTES) {
-    return NextResponse.json({ error: 'payload too large', code: 'ceo_command_payload_too_large' }, { status: 413, headers });
+    return NextResponse.json({ error: 'payload too large', code: 'ceo_command_payload_too_large' }, { status: 413, headers: service.responseHeaders });
   }
   try {
     const raw = await request.text();
@@ -61,8 +63,8 @@ export async function POST(request) {
       version: result.version,
       receipt: result.receipt,
       repository: result.repository,
-    }, { status: result.idempotent ? 200 : 201, headers });
+    }, { status: result.idempotent ? 200 : 201, headers: service.responseHeaders });
   } catch (error) {
-    return errorResponse(error);
+    return errorResponse(error, service.responseHeaders);
   }
 }

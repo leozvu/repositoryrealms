@@ -272,6 +272,8 @@ Implementation status: code complete on `codex/realms-demo` with a four-kingdom 
 
 ### CEO-8 — Security, chaos and recovery
 
+Implementation status: code complete on `codex/realms-demo` with endpoint-specific scopes, entity audiences, expiry, durable rate limits, SSO/service secret separation, one-time credential rotation, a Portal-only kill switch, break-glass recovery and seven deterministic dry-run chaos scenarios. Migration, secret provisioning and deployment remain on HOLD behind CEO-0 and CEO-9. See `CEO-8-SECURITY-CHAOS-RECOVERY.md`.
+
 - Least-privilege portal scopes instead of unrestricted Director API keys.
 - Secret rotation and secret scanning.
 - Entity circuit breakers and per-entity rate limits.

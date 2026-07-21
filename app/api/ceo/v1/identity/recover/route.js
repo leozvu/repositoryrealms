@@ -34,7 +34,7 @@ export async function POST(request) {
         ceoRecovery: true,
       },
     });
-    const response = ceoIdentityJson({ ok: true, destination: '/ceo-registry', assurance: 'recovery' });
+    const response = ceoIdentityJson({ ok: true, destination: '/ceo-security', assurance: 'recovery', stepUpRequired: true });
     response.cookies.set(realmDemoSessionCookieName(secure), sessionToken, {
       httpOnly: true,
       sameSite: 'lax',

@@ -862,14 +862,41 @@ model Commission {
 
 // ===== v3.3: API mở — key hoạt động như "user ảo" với vai trò riêng =====
 model ApiKey {
-  id        String    @id @default(cuid())
-  name      String
-  prefix    String // 10 ký tự đầu của key để nhận diện trong danh sách
-  keyHash   String    @unique // sha256(key) — key thô chỉ hiển thị 1 lần lúc tạo
-  roles     String    @default("[\"PM\"]") // quyền của key, dùng chung RBAC registry
-  active    Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  lastUsed  DateTime?
+  id               String                  @id @default(cuid())
+  name             String
+  prefix           String // 10 ký tự đầu của key để nhận diện trong danh sách
+  keyHash          String                  @unique // sha256(key) — key thô chỉ hiển thị 1 lần lúc tạo
+  roles            String                  @default("[\"PM\"]") // quyền của key, dùng chung RBAC registry
+  scopes           String                  @default("[]") // [] = legacy ERP key; CEO service keys use an explicit allowlist
+  audience         String? // Entity-bound service credential, e.g. aim / egoric / vnecom / egolive
+  active           Boolean                 @default(true)
+  expiresAt        DateTime?
+  rotatedAt        DateTime?
+  createdAt        DateTime                @default(now())
+  lastUsed         DateTime?
+  rateLimitBuckets CeoApiRateLimitBucket[]
+
+  @@index([audience, active])
+  @@index([expiresAt])
+}
+
+// CEO-8: durable fixed-window counters keep service limits consistent across serverless
+// instances. Buckets contain no request payload, business record or raw credential.
+model CeoApiRateLimitBucket {
+  bucketKey       String   @id
+  apiKeyId        String
+  apiKey          ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  audience        String
+  scope           String
+  windowStartedAt DateTime
+  expiresAt       DateTime
+  requestCount    Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([apiKeyId, expiresAt])
+  @@index([audience, scope, windowStartedAt])
+  @@index([expiresAt])
 }
 
 // ===== v3.3: Webhook — bắn sự kiện ra ngoài (n8n/Zapier/hệ thống khác) =====
@@ -1022,34 +1049,37 @@ model AuditLog {
 // Only an environment-variable REFERENCE is persisted in credentialRef. The API key value
 // stays in the server secret store and is never serialized to the browser.
 model CeoEntityRegistry {
-  id                   String    @id
-  displayName          String
-  baseUrl              String    @unique
-  businessProfile      String
-  capabilities         String    @default("[]")
-  environment          String    @default("production")
-  enabled              Boolean   @default(false)
-  status               String    @default("unverified")
-  credentialRef        String
-  credentialVersion    Int       @default(1)
-  contractVersion      String    @default("1.0.0")
-  schemaVersion        Int       @default(1)
-  recordVersion        Int       @default(1)
-  lastSyncAttemptAt    DateTime?
-  lastSuccessfulSyncAt DateTime?
-  consecutiveErrors    Int       @default(0)
-  lastErrorCode        String?
-  circuitState         String    @default("closed")
-  circuitOpenedAt      DateTime?
-  circuitRetryAt       DateTime?
-  rotatedAt            DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  memberships          CeoEntityMembership[]
-  snapshotCache        CeoEntitySnapshotCache?
-  commandDeliveries    CeoCommandDelivery[]
-  directoryProfiles    CeoDirectoryProfileCache[]
-  unifiedConversations CeoUnifiedConversation[]
+  id                       String                     @id
+  displayName              String
+  baseUrl                  String                     @unique
+  businessProfile          String
+  capabilities             String                     @default("[]")
+  environment              String                     @default("production")
+  enabled                  Boolean                    @default(false)
+  status                   String                     @default("unverified")
+  credentialRef            String // SSO trust secret reference; never used as a generic ERP credential
+  credentialVersion        Int                        @default(1)
+  serviceCredentialRef     String? // scoped CEO service API key reference, separate from SSO trust
+  serviceCredentialVersion Int                        @default(1)
+  serviceRotatedAt         DateTime?
+  contractVersion          String                     @default("1.0.0")
+  schemaVersion            Int                        @default(1)
+  recordVersion            Int                        @default(1)
+  lastSyncAttemptAt        DateTime?
+  lastSuccessfulSyncAt     DateTime?
+  consecutiveErrors        Int                        @default(0)
+  lastErrorCode            String?
+  circuitState             String                     @default("closed")
+  circuitOpenedAt          DateTime?
+  circuitRetryAt           DateTime?
+  rotatedAt                DateTime?
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  memberships              CeoEntityMembership[]
+  snapshotCache            CeoEntitySnapshotCache?
+  commandDeliveries        CeoCommandDelivery[]
+  directoryProfiles        CeoDirectoryProfileCache[]
+  unifiedConversations     CeoUnifiedConversation[]
 
   @@index([enabled, status])
   @@index([circuitState, circuitRetryAt])
@@ -1081,39 +1111,39 @@ model CeoEntitySnapshotCache {
 // These tables hold identity/control metadata only. Entity business records stay in the
 // owning ERP database, and all browser/session/code secrets are persisted as keyed hashes.
 model CeoGlobalIdentity {
-  id              String                         @id @default(cuid())
-  subject         String                         @unique
-  userId          String                         @unique
-  email           String
-  displayName     String
-  status          String                         @default("active")
-  recoveryVersion Int                            @default(0)
-  createdAt       DateTime                       @default(now())
-  updatedAt       DateTime                       @updatedAt
-  memberships     CeoEntityMembership[]
-  sessions        CeoPortalSession[]
-  recoveryCodes   CeoRecoveryCode[]
-  authorizationCodes CeoSsoAuthorizationCode[]
-  commandDeliveries  CeoCommandDelivery[]
-  directoryProfiles  CeoDirectoryProfileCache[]
+  id                   String                     @id @default(cuid())
+  subject              String                     @unique
+  userId               String                     @unique
+  email                String
+  displayName          String
+  status               String                     @default("active")
+  recoveryVersion      Int                        @default(0)
+  createdAt            DateTime                   @default(now())
+  updatedAt            DateTime                   @updatedAt
+  memberships          CeoEntityMembership[]
+  sessions             CeoPortalSession[]
+  recoveryCodes        CeoRecoveryCode[]
+  authorizationCodes   CeoSsoAuthorizationCode[]
+  commandDeliveries    CeoCommandDelivery[]
+  directoryProfiles    CeoDirectoryProfileCache[]
   unifiedConversations CeoUnifiedConversation[]
 
   @@index([status, email])
 }
 
 model CeoEntityMembership {
-  id             String                  @id @default(cuid())
+  id             String            @id @default(cuid())
   identityId     String
-  identity       CeoGlobalIdentity       @relation(fields: [identityId], references: [id], onDelete: Restrict)
+  identity       CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Restrict)
   entityId       String
-  entity         CeoEntityRegistry       @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  entity         CeoEntityRegistry @relation(fields: [entityId], references: [id], onDelete: Restrict)
   localUserEmail String
-  localRole      String                  @default("DIRECTOR")
-  scopes         String                  @default("[]")
-  status         String                  @default("active")
-  recordVersion  Int                     @default(1)
-  createdAt      DateTime                @default(now())
-  updatedAt      DateTime                @updatedAt
+  localRole      String            @default("DIRECTOR")
+  scopes         String            @default("[]")
+  status         String            @default("active")
+  recordVersion  Int               @default(1)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 
   @@unique([identityId, entityId])
   @@index([entityId, status])
@@ -1121,21 +1151,21 @@ model CeoEntityMembership {
 }
 
 model CeoPortalSession {
-  id             String                         @id @default(cuid())
-  identityId     String
-  identity       CeoGlobalIdentity              @relation(fields: [identityId], references: [id], onDelete: Cascade)
-  tokenHash      String                         @unique
-  deviceLabel    String
-  userAgentHash  String?
-  ipHash         String?
-  assuranceLevel String                         @default("mfa")
-  stepUpAt       DateTime?
-  lastSeenAt     DateTime                       @default(now())
-  idleExpiresAt  DateTime
-  expiresAt      DateTime
-  revokedAt      DateTime?
-  revokeReason   String?
-  createdAt      DateTime                       @default(now())
+  id                 String                    @id @default(cuid())
+  identityId         String
+  identity           CeoGlobalIdentity         @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  tokenHash          String                    @unique
+  deviceLabel        String
+  userAgentHash      String?
+  ipHash             String?
+  assuranceLevel     String                    @default("mfa")
+  stepUpAt           DateTime?
+  lastSeenAt         DateTime                  @default(now())
+  idleExpiresAt      DateTime
+  expiresAt          DateTime
+  revokedAt          DateTime?
+  revokeReason       String?
+  createdAt          DateTime                  @default(now())
   authorizationCodes CeoSsoAuthorizationCode[]
 
   @@index([identityId, revokedAt, expiresAt])
@@ -1233,18 +1263,18 @@ model CeoEntityCommandReceipt {
 // Directory sharing is opt-in per local employee. The Portal may cache only these
 // explicitly shared fields; salary, phone, performance and business records are excluded.
 model CeoEntityDirectoryProfile {
-  id                  String   @id @default(cuid())
-  userId              String   @unique
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sharedWithCeoPortal Boolean  @default(false)
-  sharePresence       Boolean  @default(false)
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sharedWithCeoPortal Boolean   @default(false)
+  sharePresence       Boolean   @default(false)
   displayName         String?
   title               String?
-  policyVersion       String   @default("1.0.0")
+  policyVersion       String    @default("1.0.0")
   consentedAt         DateTime?
   revokedAt           DateTime?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   @@index([sharedWithCeoPortal, updatedAt])
 }
@@ -1296,34 +1326,34 @@ model CeoUnifiedConversation {
 }
 
 model CeoUnifiedMessage {
-  id                    String                 @id @default(cuid())
-  conversationId        String
-  conversation          CeoUnifiedConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  direction             String                 // outbound | inbound
-  senderRef             String
-  senderName            String
-  bodyCiphertext        String
-  bodyIv                String
-  bodyTag               String
-  keyVersion            Int                    @default(1)
-  contentHash           String
-  mentionRefs           String                 @default("[]")
-  idempotencyKeyHash    String                 @unique
-  correlationId         String                 @unique
-  sourceMessageId       String?
-  targetReceiptId       String?
-  targetConversationId  String?
-  targetMessageId       String?
-  status                String                 @default("dispatching") // dispatching | delivered | pending_confirmation | failed | read | deleted
-  attemptCount          Int                    @default(1)
-  lastErrorCode         String?
-  sentAt                DateTime
-  deliveredAt           DateTime?
-  readAt                DateTime?
-  retentionUntil        DateTime
-  deletedAt             DateTime?
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
+  id                   String                 @id @default(cuid())
+  conversationId       String
+  conversation         CeoUnifiedConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction            String // outbound | inbound
+  senderRef            String
+  senderName           String
+  bodyCiphertext       String
+  bodyIv               String
+  bodyTag              String
+  keyVersion           Int                    @default(1)
+  contentHash          String
+  mentionRefs          String                 @default("[]")
+  idempotencyKeyHash   String                 @unique
+  correlationId        String                 @unique
+  sourceMessageId      String?
+  targetReceiptId      String?
+  targetConversationId String?
+  targetMessageId      String?
+  status               String                 @default("dispatching") // dispatching | delivered | pending_confirmation | failed | read | deleted
+  attemptCount         Int                    @default(1)
+  lastErrorCode        String?
+  sentAt               DateTime
+  deliveredAt          DateTime?
+  readAt               DateTime?
+  retentionUntil       DateTime
+  deletedAt            DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
 
   @@unique([conversationId, sourceMessageId])
   @@index([conversationId, sentAt])
@@ -1334,30 +1364,30 @@ model CeoUnifiedMessage {
 // Target-side mapping allows replies written in the existing ERP/Realm conversation to
 // be exported to the Portal without exposing unrelated local conversations.
 model CeoEntityConversationLink {
-  id                    String   @id @default(cuid())
-  portalConversationId  String   @unique
-  targetEntityId        String
-  localConversationId   String
-  participantUserId     String?
-  type                  String
-  lastExportedAt        DateTime?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                   String    @id @default(cuid())
+  portalConversationId String    @unique
+  targetEntityId       String
+  localConversationId  String
+  participantUserId    String?
+  type                 String
+  lastExportedAt       DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   @@index([targetEntityId, localConversationId])
 }
 
 model CeoEntityMessageReceipt {
-  id                    String   @id @default(cuid())
-  idempotencyKey        String   @unique
-  correlationId         String   @unique
-  actorSubject          String
-  targetEntityId        String
-  portalConversationId  String
-  localConversationId   String
-  localMessageId        String
-  payloadHash           String
-  createdAt             DateTime @default(now())
+  id                   String   @id @default(cuid())
+  idempotencyKey       String   @unique
+  correlationId        String   @unique
+  actorSubject         String
+  targetEntityId       String
+  portalConversationId String
+  localConversationId  String
+  localMessageId       String
+  payloadHash          String
+  createdAt            DateTime @default(now())
 
   @@index([actorSubject, createdAt])
   @@index([targetEntityId, portalConversationId])

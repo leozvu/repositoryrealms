@@ -17,6 +17,8 @@ import {
   verifyCeoEntityAssertion,
 } from '../lib/ceo-identity.js';
 import {
+  CEO_CONTROL_PLANE_RESTORE_CONFIRMATION,
+  CEO_CONTROL_PLANE_SUSPEND_CONFIRMATION,
   bootstrapCeoPortalSession,
   exchangeCeoAuthorizationCode,
   issueCeoAuthorizationCode,
@@ -24,6 +26,7 @@ import {
   recoverCeoPortalAccount,
   revokeCeoPortalSession,
   rotateCeoRecoveryCodes,
+  suspendCeoPortalControlPlane,
 } from '../lib/ceo-identity-admin.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -61,6 +64,11 @@ function fixture() {
       findUnique: async ({ where }) => (state.identity && (where.userId === state.identity.userId || where.id === state.identity.id)) ? { ...state.identity } : null,
       create: async ({ data }) => { state.identity = { id: id('identity'), recoveryVersion: 0, updatedAt: data.createdAt, ...data }; return { ...state.identity }; },
       update: async ({ where, data }) => { assert.equal(where.id, state.identity.id); Object.assign(state.identity, data); return { ...state.identity }; },
+      updateMany: async ({ where, data }) => {
+        if (!state.identity || (where.id && where.id !== state.identity.id) || (where.status && where.status !== state.identity.status)) return { count: 0 };
+        Object.assign(state.identity, data);
+        return { count: 1 };
+      },
     },
     ceoEntityRegistry: {
       findMany: async () => state.entities.map((row) => ({ ...row })),
@@ -79,10 +87,9 @@ function fixture() {
       findUnique: async ({ where }) => includeIdentity(state.sessions.find((row) => row.tokenHash === where.tokenHash)),
       findMany: async ({ where }) => state.sessions.filter((row) => row.identityId === where.identityId).map((row) => ({ ...row })),
       updateMany: async ({ where, data }) => {
-        const row = state.sessions.find((item) => item.id === where.id && (!where.identityId || item.identityId === where.identityId) && (where.revokedAt === undefined || item.revokedAt === where.revokedAt));
-        if (!row) return { count: 0 };
-        Object.assign(row, data);
-        return { count: 1 };
+        const rows = state.sessions.filter((item) => (!where.id || item.id === where.id) && (!where.identityId || item.identityId === where.identityId) && (where.revokedAt === undefined || item.revokedAt === where.revokedAt));
+        for (const row of rows) Object.assign(row, data);
+        return { count: rows.length };
       },
     },
     ceoRecoveryCode: {
@@ -99,6 +106,11 @@ function fixture() {
         return { ...row, identity: { ...state.identity }, session: includeIdentity(state.sessions.find((item) => item.id === row.sessionId)) };
       },
       updateMany: async ({ where, data }) => {
+        if (where.identityId) {
+          const rows = state.authCodes.filter((item) => item.identityId === where.identityId && (where.consumedAt === undefined || item.consumedAt === where.consumedAt));
+          for (const row of rows) Object.assign(row, data);
+          return { count: rows.length };
+        }
         const row = state.authCodes.find((item) => item.id === where.id && item.consumedAt === where.consumedAt && new Date(item.expiresAt) > where.expiresAt.gt);
         if (!row) return { count: 0 };
         Object.assign(row, data);
@@ -166,6 +178,33 @@ test('a recovery code is single-use, creates recovery assurance and clears login
   assert.equal(result.session.stepUpAt, null);
   assert.equal(state.user.loginFails, 0);
   await assert.rejects(() => recoverCeoPortalAccount(db, { email: DIRECTOR.email, password: 'Strong recovery password', recoveryCode: recovery.codes[0] }, { now: new Date(NOW.getTime() + 2_000), hashSecret: HASH_SECRET }), (error) => error.code === 'ceo_recovery_invalid');
+});
+
+test('CEO-8 kill switch revokes the Portal only and break-glass recovery restores it without touching local ERP login', async () => {
+  const { db, state } = fixture();
+  state.user.passwordHash = await bcrypt.hash('Strong recovery password', 4);
+  const created = await bootstrapCeoPortalSession(db, DIRECTOR, { otp: totp(TOTP_SECRET) }, { now: NOW, hashSecret: HASH_SECRET });
+  const recovery = await rotateCeoRecoveryCodes(db, DIRECTOR, created.token, { now: NOW, hashSecret: HASH_SECRET });
+  const result = await suspendCeoPortalControlPlane(db, DIRECTOR, created.token, {
+    confirmation: CEO_CONTROL_PLANE_SUSPEND_CONFIRMATION,
+    reason: 'Suspected service credential exposure',
+  }, { now: new Date(NOW.getTime() + 1_000), hashSecret: HASH_SECRET });
+  assert.equal(result.localErpLoginPreserved, true);
+  assert.equal(result.entityBusinessDatabasesTouched, false);
+  assert.equal(state.identity.status, 'suspended');
+  assert.equal(state.user.status, 'active');
+  assert.ok(state.sessions.every((session) => session.revokedAt));
+  const restored = await recoverCeoPortalAccount(db, {
+    email: DIRECTOR.email,
+    password: 'Strong recovery password',
+    recoveryCode: recovery.codes[0],
+    reactivate: true,
+    confirmation: CEO_CONTROL_PLANE_RESTORE_CONFIRMATION,
+  }, { now: new Date(NOW.getTime() + 2_000), hashSecret: HASH_SECRET });
+  assert.equal(restored.identity.status, 'active');
+  assert.equal(restored.session.assuranceLevel, 'recovery');
+  assert.equal(restored.session.stepUpAt, null);
+  assert.equal(state.user.status, 'active');
 });
 
 test('one-time authorization code is opaque, expires in 45 seconds and replay is rejected', async () => {

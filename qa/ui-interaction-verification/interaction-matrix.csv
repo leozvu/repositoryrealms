@@ -22,8 +22,11 @@ route.ceo-registry.action.activateidentity,app/(app)/ceo-registry/page.jsx,301,,
 route.ceo-registry.action.stepupidentity,app/(app)/ceo-registry/page.jsx,319,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.rotaterecoverycodes,app/(app)/ceo-registry/page.jsx,320,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.revokesession-item-id,app/(app)/ceo-registry/page.jsx,327,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.ceo-registry.action.toggle-entity,app/(app)/ceo-registry/page.jsx,403,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.ceo-registry.action.submitrotation,app/(app)/ceo-registry/page.jsx,425,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-registry.action.toggle-entity,app/(app)/ceo-registry/page.jsx,404,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-registry.action.submitrotation,app/(app)/ceo-registry/page.jsx,427,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-security.action.runrehearsal,app/(app)/ceo-security/page.jsx,162,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-security.action.rotate,app/(app)/ceo-security/page.jsx,167,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-security.action.suspend,app/(app)/ceo-security/page.jsx,178,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.commissions.action.a-tra,app/(app)/commissions/page.jsx,156,Đã trả,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.commissions.action.luu,app/(app)/commissions/page.jsx,180,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.copilot.action.s,app/(app)/copilot/page.jsx,58,💬 / {s},data-action,local-state,toast-or-state,handled-candidate,not-required,verified

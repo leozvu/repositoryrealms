@@ -63,7 +63,26 @@ test('CEO Realm federation preserves the ERP and Director authentication boundar
   expect(page.status()).toBe(307);
   expect(page.headers().location).toBe('/login');
 
-  for (const route of ['/api/ceo/v1/federation/world', '/api/ceo/v1/federation/presence', '/api/ceo/v1/federation/policy']) {
+  const anonymousContracts = [
+    ['/api/ceo/v1/federation/world', 'unauthorized'],
+    ['/api/ceo/v1/federation/presence', 'ceo_service_credential_required'],
+    ['/api/ceo/v1/federation/policy', 'unauthorized'],
+  ];
+
+  for (const [route, expectedCode] of anonymousContracts) {
+    const response = await request.get(route);
+    expect(response.status()).toBe(401);
+    expect(response.headers()['cache-control']).toContain('no-store');
+    expect((await response.json()).code).toBe(expectedCode);
+  }
+});
+
+test('CEO Security console and recovery controls preserve the local ERP authentication boundary', async ({ request }) => {
+  const page = await request.get('/ceo-security', { maxRedirects: 0 });
+  expect(page.status()).toBe(307);
+  expect(page.headers().location).toBe('/login');
+
+  for (const route of ['/api/ceo/v1/security/control-plane', '/api/ceo/v1/security/rehearsal', '/api/ceo/v1/security/service-credential']) {
     const response = await request.get(route);
     expect(response.status()).toBe(401);
     expect(response.headers()['cache-control']).toContain('no-store');

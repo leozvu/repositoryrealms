@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 55,
-    "mappedNavigationRoutes": 55,
-    "verifiedNavigationRoutes": 55,
+    "erpNavigationRoutes": 56,
+    "mappedNavigationRoutes": 56,
+    "verifiedNavigationRoutes": 56,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -820,6 +820,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/ceo-registry/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "ceo-security",
+      "erpLabel": "CEO · An toàn & khôi phục",
+      "realmLabel": "Realm Security Vault",
+      "realmSurface": "An toàn & khôi phục CEO",
+      "group": "Công ty",
+      "href": "/ceo-security",
+      "icon": "alert",
+      "roles": "DIRECTOR only",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/ceo-security/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

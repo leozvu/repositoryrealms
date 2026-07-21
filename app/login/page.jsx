@@ -39,12 +39,19 @@ export default function LoginPage() {
       const response = await fetch('/api/ceo/v1/identity/recover', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, recoveryCode, deviceLabel }),
+        body: JSON.stringify({
+          email,
+          password,
+          recoveryCode,
+          deviceLabel,
+          reactivate: true,
+          confirmation: 'RESTORE CEO PORTAL',
+        }),
       }).catch(() => null);
       const body = response ? await response.json().catch(() => ({})) : {};
       setBusy(false);
       if (!response?.ok) { setErr(body.error || 'Không thể khôi phục phiên CEO'); return; }
-      window.location.assign('/ceo-registry');
+      window.location.assign('/ceo-security');
       return;
     }
     const res = await signIn('credentials', { email, password, otp, redirect: false });
