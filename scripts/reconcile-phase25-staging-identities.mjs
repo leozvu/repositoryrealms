@@ -9,7 +9,7 @@ import { assertFullStagingTarget } from '../lib/staging-clone-deployment.js';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIRMATION = 'RECONCILE_REALMS_PHASE25_STAGING_IDENTITIES';
 const USERS = Object.freeze([
-  { email: 'giamdoc@agency.vn', name: 'Vũ Lương Sơn', role: 'DIRECTOR', title: 'Founder / CEO', userType: 'employee' },
+  { email: 'giamdoc@agency.vn', name: 'Phạm Minh Quân', role: 'DIRECTOR', title: 'Founder / CEO', userType: 'employee' },
   { email: 'director.checker@agency.vn', name: 'Nguyễn Minh Quân', role: 'DIRECTOR', title: 'Director / Independent Checker', userType: 'employee' },
   { email: 'ketoan@agency.vn', name: 'Phạm Thu Hà', role: 'ACCOUNTANT', title: 'Kế toán trưởng', userType: 'employee' },
   { email: 'am@agency.vn', name: 'Trần Khánh Linh', role: 'AM', title: 'Account Manager', userType: 'employee' },

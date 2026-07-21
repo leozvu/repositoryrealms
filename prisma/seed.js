@@ -61,7 +61,7 @@ async function main() {
   const DEMO_PW = process.env.SEED_PASSWORD || crypto.randomBytes(9).toString('base64').replace(/[+/=]/g, '').slice(0, 10);
   const mk = pw => bcrypt.hashSync(pw, 10);
   const mkUser = d => prisma.user.create({ data: d });
-  const giamdoc = await mkUser({ email: 'giamdoc@agency.vn', name: 'Vũ Lương Sơn', passwordHash: mk(DEMO_PW), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Founder / CEO', salary: 40000000, phone: '0901111222' });
+  const giamdoc = await mkUser({ email: 'giamdoc@agency.vn', name: 'Phạm Minh Quân', passwordHash: mk(DEMO_PW), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Founder / CEO', salary: 40000000, phone: '0901111222' });
   await mkUser({ email: 'director.checker@agency.vn', name: 'Nguyễn Minh Quân', passwordHash: mk(DEMO_PW), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Director / Independent Checker', salary: 0 });
   const ketoan = await mkUser({ email: 'ketoan@agency.vn', name: 'Phạm Thu Hà', passwordHash: mk(DEMO_PW), role: 'ACCOUNTANT', roles: J(['ACCOUNTANT']), title: 'Kế toán trưởng', salary: 18000000 });
   const am = await mkUser({ email: 'am@agency.vn', name: 'Trần Khánh Linh', passwordHash: mk(DEMO_PW), role: 'AM', roles: J(['AM']), title: 'Account Manager', salary: 20000000, phone: '0903334455' });
