@@ -37,7 +37,7 @@ test('Agency capabilities expose legacy agency domains but not specialist vertic
   assert.equal(payload.capabilities.domains.livestream, false);
   assert.equal(payload.capabilities.domains.export, false);
   assert.deepEqual(payload.capabilities.commands.map((command) => command.action), [
-    'task.create', 'status.request', 'announcement.send', 'approval.request',
+    'task.create', 'status.request', 'announcement.send', 'approval.request', 'group_workforce.request',
   ]);
   assert.equal(payload.capabilities.modes.snapshotReadOnly, true);
   assert.equal(payload.capabilities.modes.crossEntityWrites, true);

@@ -4,10 +4,10 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 ## Phạm vi
 
-- UI routes: **64**
+- UI routes: **65**
 - API routes: **114**
-- Interactive element definitions: **908**
-- Source files có interaction: **93**
+- Interactive element definitions: **927**
+- Source files có interaction: **94**
 - Routes có ERP resource candidate: **42**
 - Parse errors: **0**
 
@@ -15,19 +15,19 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 | Loại | Số lượng |
 | --- | --- |
-| action | 535 |
-| form-control | 293 |
-| form-submit | 14 |
-| navigation | 66 |
+| action | 540 |
+| form-control | 303 |
+| form-submit | 15 |
+| navigation | 69 |
 
 ## UX risk candidates cần review thủ công
 
 | Candidate | Số lượng |
 | --- | --- |
 | clickable_non_semantic | 17 |
-| control_binding_unverified | 249 |
+| control_binding_unverified | 253 |
 | keyboard_path_unverified | 17 |
-| unlabelled_button_candidate | 49 |
+| unlabelled_button_candidate | 52 |
 
 Các candidate ưu tiên accessibility, keyboard, semantic control và possible no-op theo checklist UI/UX. Danh sách đầy đủ nằm trong `inventory.json` và `elements.csv`.
 
@@ -67,9 +67,9 @@ Các candidate ưu tiên accessibility, keyboard, semantic control và possible 
 | route.ceo-inbox.action.setselectedid-conversation-id | app/(app)/ceo-inbox/page.jsx:166 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-inbox.action.button.2 | app/(app)/ceo-inbox/page.jsx:179 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-inbox.form-control.textarea | app/(app)/ceo-inbox/page.jsx:179 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.ceo-overview.action.setfilter-all | app/(app)/ceo-overview/page.jsx:194 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-overview.action.setfilter-entity-id | app/(app)/ceo-overview/page.jsx:195 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-overview.action.load-filter | app/(app)/ceo-overview/page.jsx:199 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-overview.action.setfilter-all | app/(app)/ceo-overview/page.jsx:195 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-overview.action.setfilter-entity-id | app/(app)/ceo-overview/page.jsx:196 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-overview.action.load-filter | app/(app)/ceo-overview/page.jsx:200 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-registry.action.load | app/(app)/ceo-registry/page.jsx:265 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-registry.action.loadidentity | app/(app)/ceo-registry/page.jsx:288 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-registry.form-control.input | app/(app)/ceo-registry/page.jsx:294 | (không có nhãn tĩnh) | control_binding_unverified |

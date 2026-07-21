@@ -10,8 +10,8 @@
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.js",
     "migration:ci": "prisma migrate deploy && prisma migrate diff --from-schema-datasource prisma/schema.prisma --to-schema-datamodel prisma/schema.prisma --exit-code",
-    "test": "node --test \"tests/**/*.test.mjs\"",
-    "test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=90 --test-coverage-functions=85 --test-coverage-branches=75 \"tests/**/*.test.mjs\"",
+    "test": "node --test --test-concurrency=1 \"tests/**/*.test.mjs\"",
+    "test:coverage": "node --test --test-concurrency=1 --experimental-test-coverage --test-coverage-lines=90 --test-coverage-functions=85 --test-coverage-branches=75 \"tests/**/*.test.mjs\"",
     "test:e2e": "playwright test",
     "audit:evidence:governance": "node scripts/audit-work-evidence-governance.mjs",
     "audit:evidence:governance:check": "node scripts/audit-work-evidence-governance.mjs --check",
@@ -138,6 +138,7 @@
     "prisma": "^5.17.0"
   },
   "overrides": {
+    "sharp": "0.35.3",
     "next": {
       "postcss": "8.5.10"
     },

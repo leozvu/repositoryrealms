@@ -275,7 +275,8 @@
             "CeoRolloutState"
           ],
           "roles": [
-            "DIRECTOR"
+            "DIRECTOR",
+            "HR"
           ],
           "guards": [
             "currentUser",
@@ -342,6 +343,7 @@
             "AuditLog",
             "CeoApiRateLimitBucket",
             "CeoEntityCommandReceipt",
+            "CeoEntityDirectoryProfile",
             "Notification",
             "Project",
             "RealmChangeEvent",
@@ -353,6 +355,7 @@
             "ACCOUNTANT",
             "AM",
             "DIRECTOR",
+            "HR",
             "PM",
             "STAFF"
           ],
@@ -10108,7 +10111,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10187,7 +10191,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10325,7 +10330,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10404,7 +10410,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10483,7 +10490,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10562,7 +10570,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10641,7 +10650,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10720,7 +10730,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10799,7 +10810,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10878,7 +10890,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -10957,7 +10970,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11036,7 +11050,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11115,7 +11130,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11194,7 +11210,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11273,7 +11290,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11352,7 +11370,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11490,7 +11509,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11569,7 +11589,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11648,7 +11669,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11727,7 +11749,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -11865,7 +11888,8 @@
         "explicit-rbac"
       ],
       "allowedRoles": [
-        "DIRECTOR"
+        "DIRECTOR",
+        "HR"
       ],
       "rowPolicy": false,
       "scopedRead": false,
@@ -13338,9 +13362,66 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
+      "elementId": "route.ceo-overview.navigation.ceo-workforce",
       "source": "app/(app)/ceo-overview/page.jsx",
       "line": 180,
+      "column": 67,
+      "surface": "route.ceo-overview",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-workforce",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-workforce",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoOverviewPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 181,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13397,7 +13478,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 181,
+      "line": 182,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -13465,7 +13546,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-all",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 194,
+      "line": 195,
       "column": 9,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -13524,7 +13605,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-entity-id",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 195,
+      "line": 196,
       "column": 40,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -13583,7 +13664,7 @@
     {
       "elementId": "route.ceo-overview.action.load-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 199,
+      "line": 200,
       "column": 111,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -13651,7 +13732,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-registry",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 211,
+      "line": 212,
       "column": 161,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13708,7 +13789,7 @@
     {
       "elementId": "route.ceo-overview.action.opendetail-entity-domain",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 263,
+      "line": 264,
       "column": 216,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -16717,6 +16798,1316 @@
       "rowPolicy": false,
       "scopedRead": false,
       "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.navigation.ceo-overview",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 204,
+      "column": 9,
+      "surface": "route.ceo-workforce",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-overview",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-overview",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.action.sync",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 205,
+      "column": 9,
+      "surface": "route.ceo-workforce",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "sync",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "sync"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/messaging/directory"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.navigation.ceo-registry",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 213,
+      "column": 119,
+      "surface": "route.ceo-workforce",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-registry",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.action.load",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 214,
+      "column": 82,
+      "surface": "route.ceo-workforce",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/command-gateway?limit=100",
+        "GET /api/ceo/v1/identity/session",
+        "GET /api/ceo/v1/messaging/directory",
+        "GET /api/ceo/v1/registry"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "CeoCommandDelivery",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-submit.form",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 220,
+      "column": 5,
+      "surface": "route.ceo-workforce",
+      "tag": "form",
+      "kind": "form-submit",
+      "label": "* / — / — / * / — / — / * / — / — / * / * / * / * / *",
+      "handlerEvent": "onSubmit",
+      "handler": "submit",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "submitting || undefined",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "onSubmit",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "newIds",
+        "submit"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/command-gateway"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoCommandDelivery",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR",
+        "HR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.select",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 223,
+      "column": 115,
+      "surface": "route.ceo-workforce",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "— / —",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.select.2",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 228,
+      "column": 117,
+      "surface": "route.ceo-workforce",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "— / —",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.select.3",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 229,
+      "column": 117,
+      "surface": "route.ceo-workforce",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "— / —",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "!employerId || !profiles.length",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.title",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 237,
+      "column": 135,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "title",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "newIds",
+        "submit"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/command-gateway"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoCommandDelivery",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR",
+        "HR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.note",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 238,
+      "column": 126,
+      "surface": "route.ceo-workforce",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "note",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "newIds",
+        "submit"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/command-gateway"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoCommandDelivery",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR",
+        "HR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.startdate",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 239,
+      "column": 111,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "startDate",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "newIds",
+        "submit"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/command-gateway"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoCommandDelivery",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR",
+        "HR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.enddate",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 240,
+      "column": 107,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "endDate",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "newIds",
+        "submit"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/command-gateway"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoCommandDelivery",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR",
+        "HR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.hoursperweek",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 241,
+      "column": 111,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "hoursPerWeek",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "newIds",
+        "submit"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/command-gateway"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoCommandDelivery",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR",
+        "HR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.approverrole",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 242,
+      "column": 86,
+      "surface": "route.ceo-workforce",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "approverRole",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "newIds",
+        "submit"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/command-gateway"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoCommandDelivery",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR",
+        "HR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.input",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 245,
+      "column": 65,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.action.button",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 246,
+      "column": 7,
+      "surface": "route.ceo-workforce",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "!ready || submitting || !borrowerId || !employerId || !profileId || !confirmed",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "form:onSubmit",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "newIds",
+        "submit"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/command-gateway"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoCommandDelivery",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR",
+        "HR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [
+        "event.preventDefault"
+      ],
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.action.load.2",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 250,
+      "column": 125,
+      "surface": "route.ceo-workforce",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/command-gateway?limit=100",
+        "GET /api/ceo/v1/identity/session",
+        "GET /api/ceo/v1/messaging/directory",
+        "GET /api/ceo/v1/registry"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "CeoCommandDelivery",
+        "CeoDirectoryProfileCache",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.action.openapproval-delivery",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 251,
+      "column": 781,
+      "surface": "route.ceo-workforce",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openApproval(delivery)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorkforcePage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "openApproval"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/sso/authorize"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState",
+        "CeoSsoAuthorizationCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.location.assign"
+      ],
       "helperCalls": [],
       "localMutations": [],
       "loadingState": "not-required",
@@ -69078,7 +70469,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 368,
+          "line": 371,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69171,7 +70562,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 369,
+          "line": 372,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -69290,7 +70681,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 369,
+          "line": 372,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69383,7 +70774,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 369,
+          "line": 372,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -69403,7 +70794,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 369,
+          "line": 372,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69515,7 +70906,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 367,
+          "line": 370,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69606,7 +70997,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 367,
+          "line": 370,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69704,7 +71095,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 367,
+          "line": 370,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69899,7 +71290,7 @@
     {
       "elementId": "component.components-shell.navigation.item-href-item-key",
       "source": "components/Shell.jsx",
-      "line": 345,
+      "line": 348,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -69970,7 +71361,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 359,
+      "line": 362,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -70041,7 +71432,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 362,
+      "line": 365,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -70115,7 +71506,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 371,
+      "line": 374,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -70189,7 +71580,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 374,
+      "line": 377,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -70260,7 +71651,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 379,
+      "line": 382,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -70331,7 +71722,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 382,
+      "line": 385,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -70453,6 +71844,7 @@
         "mutate",
         "nextPeriod",
         "nowHM",
+        "openApproval",
         "openDetail",
         "openEditor",
         "openEntity",
@@ -70682,7 +72074,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 181,
+          "line": 182,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/dashboard/refresh"
@@ -70698,7 +72090,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 263,
+          "line": 264,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/sso/authorize"
@@ -70929,6 +72321,36 @@
             "setReason",
             "setSuspendOpen"
           ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-workforce/page.jsx",
+          "line": 205,
+          "surface": "route:/ceo-workforce",
+          "apiCalls": [
+            "POST /api/ceo/v1/messaging/directory"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setDirectory"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-workforce/page.jsx",
+          "line": 251,
+          "surface": "route:/ceo-workforce",
+          "apiCalls": [
+            "POST /api/ceo/v1/sso/authorize"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [
+            "body.destination"
+          ],
+          "helperCalls": [],
+          "localState": []
         },
         {
           "callback": "onClick",
@@ -71878,6 +73300,7 @@
         "route:/ceo-registry",
         "route:/ceo-rollout",
         "route:/ceo-security",
+        "route:/ceo-workforce",
         "route:/ceo-world",
         "route:/commissions",
         "route:/freelancer",
@@ -86200,31 +87623,31 @@
     }
   ],
   "summary": {
-    "elements": 908,
+    "elements": 927,
     "apiContracts": 114,
     "registryResources": 50,
     "byActionType": {
       "local-state": 246,
-      "data-action": 164,
-      "form-control": 293,
+      "data-action": 169,
+      "form-control": 303,
       "delegated-action": 84,
-      "navigation": 85,
+      "navigation": 89,
       "browser-action": 28,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 612,
+      "classified-local": 619,
       "delegated-resolved": 46,
-      "handler-resolved": 166,
+      "handler-resolved": 178,
       "delegated": 84
     },
     "byConfidence": {
-      "high": 862,
+      "high": 881,
       "medium": 46
     },
     "uxStateCandidates": {},
-    "dataActions": 164,
-    "delegatedBindings": 1135,
+    "dataActions": 169,
+    "delegatedBindings": 1137,
     "actionableUnresolved": 0
   }
 }

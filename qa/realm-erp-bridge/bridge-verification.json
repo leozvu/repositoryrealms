@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 57,
-    "mappedNavigationRoutes": 57,
-    "verifiedNavigationRoutes": 57,
+    "erpNavigationRoutes": 58,
+    "mappedNavigationRoutes": 58,
+    "verifiedNavigationRoutes": 58,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -790,6 +790,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/ceo-commands/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "ceo-workforce",
+      "erpLabel": "CEO · Nhân sự trong group",
+      "realmLabel": "Guild Workforce Exchange",
+      "realmSurface": "Phòng điều hành CEO",
+      "group": "Công ty",
+      "href": "/ceo-workforce",
+      "icon": "staff",
+      "roles": "DIRECTOR only",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/ceo-workforce/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

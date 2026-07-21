@@ -4,7 +4,7 @@ Parity được đo tại RepositoryRealms, không đo bằng số button giốn
 
 - Contracts: **20/20**
 - Deterministic scenarios: **7/7**
-- Registered business actions: **17**
+- Registered business actions: **18**
 - Button parity required: **false**
 - Business invariant parity required: **true**
 - Additive migrations: **0**

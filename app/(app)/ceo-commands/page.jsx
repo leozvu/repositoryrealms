@@ -125,7 +125,7 @@ export default function CeoCommandsPage() {
     if (!registryResponse?.ok) setError(registryBody.error || c.loadError);
     else setRegistry(registryBody);
     if (identityResponse?.ok) setIdentity(identityBody);
-    if (deliveryResponse?.ok) setDeliveries(deliveryBody.deliveries || []);
+    if (deliveryResponse?.ok) setDeliveries((deliveryBody.deliveries || []).filter((item) => ACTIONS.includes(item.action)));
     setLoading(false);
   }, [c.loadError]);
 

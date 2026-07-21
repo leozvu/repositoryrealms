@@ -51,6 +51,7 @@ audit,Công ty,Royal Chronicle,Kho lưu trữ,Nhật ký hệ thống,/audit,DIR
 ceo-overview,Công ty,Royal Realm Overview,Phòng điều hành CEO,CEO · Tổng quan 4 công ty,/ceo-overview,DIRECTOR only,,app/(app)/ceo-overview/page.jsx,verified
 ceo-world,Công ty,Realm Federation Atlas,Bản đồ bốn vương quốc,CEO · Bản đồ 4 vương quốc,/ceo-world,DIRECTOR only,,app/(app)/ceo-world/page.jsx,verified
 ceo-commands,Công ty,Royal Dispatch,Phòng điều hành CEO,CEO · Điều phối liên công ty,/ceo-commands,DIRECTOR only,,app/(app)/ceo-commands/page.jsx,verified
+ceo-workforce,Công ty,Guild Workforce Exchange,Phòng điều hành CEO,CEO · Nhân sự trong group,/ceo-workforce,DIRECTOR only,,app/(app)/ceo-workforce/page.jsx,verified
 ceo-inbox,Công ty,Royal Courier,Hộp thư liên công ty,CEO · Hộp thư liên công ty,/ceo-inbox,DIRECTOR only,,app/(app)/ceo-inbox/page.jsx,verified
 ceo-registry,Công ty,Realm Registry,Phòng điều hành CEO,CEO · Danh bạ công ty,/ceo-registry,DIRECTOR only,,app/(app)/ceo-registry/page.jsx,verified
 ceo-security,Công ty,Realm Security Vault,An toàn & khôi phục CEO,CEO · An toàn & khôi phục,/ceo-security,DIRECTOR only,,app/(app)/ceo-security/page.jsx,verified

@@ -351,6 +351,33 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/ceo-workforce",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "dynamic": false,
+      "auth": "authenticated",
+      "inNavigation": true,
+      "navLabel": "CEO · Nhân sự trong group",
+      "navSection": "Công ty",
+      "roles": [
+        "DIRECTOR"
+      ],
+      "module": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/ceo-world",
       "source": "app/(app)/ceo-world/page.jsx",
       "dynamic": false,
@@ -5681,9 +5708,38 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
+      "elementId": "route.ceo-overview.navigation.ceo-workforce",
       "source": "app/(app)/ceo-overview/page.jsx",
       "line": 180,
+      "column": 67,
+      "surface": "route.ceo-overview",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-workforce",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-workforce",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 181,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -5712,7 +5768,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 181,
+      "line": 182,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -5741,7 +5797,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-all",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 194,
+      "line": 195,
       "column": 9,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -5772,7 +5828,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-entity-id",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 195,
+      "line": 196,
       "column": 40,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -5803,7 +5859,7 @@
     {
       "elementId": "route.ceo-overview.action.load-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 199,
+      "line": 200,
       "column": 111,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -5834,7 +5890,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-registry",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 211,
+      "line": 212,
       "column": 161,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -5863,7 +5919,7 @@
     {
       "elementId": "route.ceo-overview.action.opendetail-entity-domain",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 263,
+      "line": 264,
       "column": 216,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -7338,6 +7394,596 @@
       "uxRiskCandidates": [
         "control_binding_unverified"
       ]
+    },
+    {
+      "elementId": "route.ceo-workforce.navigation.ceo-overview",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 204,
+      "column": 9,
+      "surface": "route.ceo-workforce",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-overview",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-overview",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.action.sync",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 205,
+      "column": 9,
+      "surface": "route.ceo-workforce",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "sync",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.navigation.ceo-registry",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 213,
+      "column": 119,
+      "surface": "route.ceo-workforce",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-registry",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.action.load",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 214,
+      "column": 82,
+      "surface": "route.ceo-workforce",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-workforce.form-submit.form",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 220,
+      "column": 5,
+      "surface": "route.ceo-workforce",
+      "tag": "form",
+      "kind": "form-submit",
+      "label": "* / — / — / * / — / — / * / — / — / * / * / * / * / *",
+      "handlerEvent": "onSubmit",
+      "handler": "submit",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "submitting || undefined",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.select",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 223,
+      "column": 115,
+      "surface": "route.ceo-workforce",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "— / —",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.select.2",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 228,
+      "column": 117,
+      "surface": "route.ceo-workforce",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "— / —",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.select.3",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 229,
+      "column": 117,
+      "surface": "route.ceo-workforce",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "— / —",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "!employerId || !profiles.length",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.title",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 237,
+      "column": 135,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "title",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.note",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 238,
+      "column": 126,
+      "surface": "route.ceo-workforce",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "note",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.startdate",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 239,
+      "column": 111,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "startDate",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.enddate",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 240,
+      "column": 107,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "endDate",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.hoursperweek",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 241,
+      "column": 111,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "hoursPerWeek",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.approverrole",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 242,
+      "column": 86,
+      "surface": "route.ceo-workforce",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "approverRole",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-workforce.form-control.input",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 245,
+      "column": 65,
+      "surface": "route.ceo-workforce",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-workforce.action.button",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 246,
+      "column": 7,
+      "surface": "route.ceo-workforce",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "!ready || submitting || !borrowerId || !employerId || !profileId || !confirmed",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-workforce.action.load.2",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 250,
+      "column": 125,
+      "surface": "route.ceo-workforce",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-workforce.action.openapproval-delivery",
+      "source": "app/(app)/ceo-workforce/page.jsx",
+      "line": 251,
+      "column": 781,
+      "surface": "route.ceo-workforce",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openApproval(delivery)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/messaging/directory'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=100'",
+        "POST '/api/ceo/v1/messaging/directory'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
     },
     {
       "elementId": "route.ceo-world.navigation.ceo-overview",
@@ -28748,7 +29394,7 @@
     {
       "elementId": "component.components-shell.navigation.item-href-item-key",
       "source": "components/Shell.jsx",
-      "line": 345,
+      "line": 348,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -28787,7 +29433,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 359,
+      "line": 362,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -28826,7 +29472,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 362,
+      "line": 365,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -28865,7 +29511,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 371,
+      "line": 374,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -28907,7 +29553,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 374,
+      "line": 377,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -28946,7 +29592,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 379,
+      "line": 382,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -28985,7 +29631,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 382,
+      "line": 385,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -29353,23 +29999,23 @@
     }
   ],
   "summary": {
-    "uiRoutes": 64,
+    "uiRoutes": 65,
     "apiRoutes": 114,
-    "interactiveElements": 908,
-    "sourceFilesWithInteractions": 93,
-    "routesInPrimaryNavigation": 60,
+    "interactiveElements": 927,
+    "sourceFilesWithInteractions": 94,
+    "routesInPrimaryNavigation": 61,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 535,
-      "form-control": 293,
-      "form-submit": 14,
-      "navigation": 66
+      "action": 540,
+      "form-control": 303,
+      "form-submit": 15,
+      "navigation": 69
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 17,
-      "control_binding_unverified": 249,
+      "control_binding_unverified": 253,
       "keyboard_path_unverified": 17,
-      "unlabelled_button_candidate": 49
+      "unlabelled_button_candidate": 52
     },
     "topInteractiveSources": [
       {
@@ -29429,7 +30075,7 @@
         "count": 18
       },
       {
-        "source": "components/realm/RealmPilotOperations.jsx",
+        "source": "app/(app)/ceo-workforce/page.jsx",
         "count": 18
       }
     ]

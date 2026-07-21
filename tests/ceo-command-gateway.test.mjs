@@ -54,6 +54,11 @@ function targetFixture() {
       findUnique: async ({ where }) => users.find((row) => row.email === where.email) || null,
       findMany: async () => users,
     },
+    ceoEntityDirectoryProfile: {
+      findUnique: async ({ where }) => where.userId === 'staff-1'
+        ? { sharedWithCeoPortal: true, consentedAt: NOW, revokedAt: null }
+        : null,
+    },
     project: { findUnique: async ({ where }) => where.id === 'project-1' ? { id: 'project-1' } : null },
     task: { create: async ({ data }) => { const row = { id: `task-${++id}`, ...data }; state.tasks.push(row); return row; } },
     approval: { create: async ({ data }) => { const row = { id: `approval-${++id}`, ...data }; state.approvals.push(row); return row; } },
@@ -132,7 +137,9 @@ function canonicalReceipt(command, id = 'target-receipt-1') {
     receipt: {
       id, targetEntityId: command.targetEntityId, actorSubject: command.actorSubject,
       action: command.action, scope: command.scope, correlationId: command.correlationId,
-      resource: command.action === 'approval.request' ? 'approvals' : command.action === 'announcement.send' ? 'notifications' : 'tasks',
+      resource: ['approval.request', 'group_workforce.request'].includes(command.action)
+        ? 'approvals'
+        : command.action === 'announcement.send' ? 'notifications' : 'tasks',
       recordId: command.action === 'announcement.send' ? null : 'record-1', resultCount: 1,
       committedAt: NOW.toISOString(), replayed: false,
     },
@@ -144,11 +151,88 @@ function canonicalReceipt(command, id = 'target-receipt-1') {
 }
 
 test('CEO-5 command contract rejects unknown actions, unknown payload fields and scope confusion', () => {
-  assert.equal(CEO_COMMAND_DEFINITIONS.length, 4);
+  assert.equal(CEO_COMMAND_DEFINITIONS.length, 5);
   assert.throws(() => normalizeCeoCommandEnvelope(envelope('task.create', { title: 'Create report', amount: 10 })), (error) => error.code === 'ceo_command_payload_unknown_field');
   assert.throws(() => normalizeCeoCommandEnvelope({ ...envelope('task.create', { title: 'Create report' }), scope: 'command.approval.request' }), (error) => error.code === 'ceo_command_scope_mismatch');
   assert.throws(() => normalizeCeoCommandEnvelope({ ...envelope('task.create', { title: 'Create report' }), action: 'payroll.write' }), (error) => error.code === 'ceo_command_unsupported');
   assert.equal(hashCeoCommandPayload({ b: 2, a: 1 }), hashCeoCommandPayload({ a: 1, b: 2 }));
+});
+
+test('group workforce request is consent-bound, cross-entity and owned by the employing entity', async () => {
+  const fixture = targetFixture();
+  const input = envelope('group_workforce.request', {
+    requestingEntityId: 'egolive',
+    employeeEmail: 'staff@aim.test',
+    title: 'Support livestream launch week',
+    note: 'Assist the launch checklist without changing employment or payroll ownership.',
+    startDate: '2026-07-27',
+    endDate: '2026-07-31',
+    hoursPerWeek: 12,
+    approverRole: 'PM',
+  });
+  assert.throws(
+    () => normalizeCeoCommandEnvelope(input),
+    (error) => error.code === 'ceo_command_approver_role_invalid',
+  );
+  input.payload.approverRole = 'DIRECTOR';
+  await assert.rejects(
+    executeCeoEntityCommand(
+      fixture.db,
+      DIRECTOR,
+      input,
+      NOW,
+      { entityId: 'aim', enabledCapabilities: ['people'], emitImpl: null },
+    ),
+    (error) => error.code === 'ceo_command_group_workforce_approver_unavailable',
+  );
+
+  input.payload.approverRole = 'HR';
+  await assert.rejects(
+    executeCeoEntityCommand(
+      fixture.db,
+      DIRECTOR,
+      input,
+      NOW,
+      { entityId: 'aim', enabledCapabilities: ['people'], emitImpl: null },
+    ),
+    (error) => error.code === 'ceo_command_group_workforce_approver_unavailable',
+  );
+
+  input.payload.approverRole = 'DIRECTOR';
+  fixture.db.user.findMany = async () => [
+    { id: 'director-1', name: 'Director', role: 'DIRECTOR', roles: '["DIRECTOR"]', status: 'active', userType: 'employee' },
+  ];
+  const result = await executeCeoEntityCommand(
+    fixture.db,
+    DIRECTOR,
+    input,
+    NOW,
+    { entityId: 'aim', enabledCapabilities: ['people'], emitImpl: null },
+  );
+  assert.equal(result.receipt.resource, 'approvals');
+  assert.equal(fixture.state.approvals.length, 1);
+  assert.equal(fixture.state.approvals[0].type, 'ceo_group_workforce_request');
+  assert.equal(fixture.state.approvals[0].amount, 0);
+  const stored = JSON.parse(fixture.state.approvals[0].payload);
+  assert.equal(stored.requestingEntityId, 'egolive');
+  assert.equal(stored.employeeId, 'staff-1');
+  assert.equal(Object.hasOwn(stored, 'salary'), false);
+  assert.doesNotMatch(fixture.state.audits[0].detail, /staff@aim\.test|livestream launch/i);
+
+  const sameEntity = envelope('group_workforce.request', {
+    ...input.payload,
+    requestingEntityId: 'aim',
+  });
+  await assert.rejects(
+    executeCeoEntityCommand(
+      targetFixture().db,
+      DIRECTOR,
+      sameEntity,
+      NOW,
+      { entityId: 'aim', enabledCapabilities: ['people'], emitImpl: null },
+    ),
+    (error) => error.code === 'ceo_command_group_workforce_same_entity',
+  );
 });
 
 test('target entity atomically creates a task, canonical receipt and payload-free audit; replay is idempotent', async () => {

@@ -272,7 +272,10 @@ export default function Shell({ user, company, realmPilot, children }) {
   // luôn qua modOn. Freelancer đi lối riêng.
   const visible = item => isFL
     ? true
-    : (!item.realmSurface || realmPilot?.allowed) && hasAny(user, item.roles) && modOn(item.mod, modules);
+    : (!item.ceoPortalOnly || process.env.NEXT_PUBLIC_CEO_GROUP_WORKFORCE === '1')
+      && (!item.realmSurface || realmPilot?.allowed)
+      && hasAny(user, item.roles)
+      && modOn(item.mod, modules);
 
   const loadShellCounters = useCallback(() => {
     fetch('/api/approvals').then(r => r.ok ? r.json() : null)

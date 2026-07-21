@@ -2,7 +2,7 @@
   "phase": "CEO-8",
   "generatedBy": "scripts/audit-ceo-security.mjs",
   "summary": {
-    "scannedFiles": 699,
+    "scannedFiles": 703,
     "secretFindings": 0,
     "scopedTargetRoutes": 10,
     "targetRoutes": 10,
