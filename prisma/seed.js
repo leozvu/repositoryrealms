@@ -1,4 +1,4 @@
-/* Seed v3.2: 8 tài khoản (7 vai trò nội bộ + freelancer) + bộ dữ liệu demo phủ toàn bộ module.
+/* Seed v3.2: 9 tài khoản (7 vai trò nội bộ, Director checker + freelancer) + bộ dữ liệu demo phủ toàn bộ module.
    Chạy: npm run db:seed
    ⚠ CHỈ DÙNG CHO DEV/DEMO — xóa toàn bộ dữ liệu hiện có rồi seed lại từ đầu.
    Ngày tháng sinh tương đối so với hôm nay để dashboard/AI Summary/aging luôn "sống". */
@@ -62,6 +62,7 @@ async function main() {
   const mk = pw => bcrypt.hashSync(pw, 10);
   const mkUser = d => prisma.user.create({ data: d });
   const giamdoc = await mkUser({ email: 'giamdoc@agency.vn', name: 'Vũ Lương Sơn', passwordHash: mk(DEMO_PW), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Founder / CEO', salary: 40000000, phone: '0901111222' });
+  await mkUser({ email: 'director.checker@agency.vn', name: 'Nguyễn Minh Quân', passwordHash: mk(DEMO_PW), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Director / Independent Checker', salary: 0 });
   const ketoan = await mkUser({ email: 'ketoan@agency.vn', name: 'Phạm Thu Hà', passwordHash: mk(DEMO_PW), role: 'ACCOUNTANT', roles: J(['ACCOUNTANT']), title: 'Kế toán trưởng', salary: 18000000 });
   const am = await mkUser({ email: 'am@agency.vn', name: 'Trần Khánh Linh', passwordHash: mk(DEMO_PW), role: 'AM', roles: J(['AM']), title: 'Account Manager', salary: 20000000, phone: '0903334455' });
   const pm = await mkUser({ email: 'pm@agency.vn', name: 'Nguyễn Minh An', passwordHash: mk(DEMO_PW), role: 'PM', roles: J(['PM']), title: 'Project Manager', salary: 22000000 });
@@ -557,6 +558,7 @@ async function main() {
   }
   console.log('');
   console.log('  Giám đốc   : giamdoc@agency.vn');
+  console.log('  Duyệt độc lập: director.checker@agency.vn');
   console.log('  Kế toán    : ketoan@agency.vn');
   console.log('  Account/AM : am@agency.vn');
   console.log('  Quản lý DA : pm@agency.vn');

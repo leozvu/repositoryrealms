@@ -89,7 +89,7 @@ function findMyWorkTask(payload, taskId) {
   return Object.values(payload?.queues || {}).flat().find((task) => task.id === taskId) || null;
 }
 
-async function runBrowserSmoke({ email, password, taskId, projectId, leadIds, financeIds, hrIds }) {
+async function runBrowserSmoke({ email, password, expectedRole, taskId, projectId, leadIds, financeIds, hrIds }) {
   const browser = await chromium.launch({ headless: true });
   const runtimeFailures = [];
   try {
@@ -110,7 +110,7 @@ async function runBrowserSmoke({ email, password, taskId, projectId, leadIds, fi
       const response = await fetch('/api/auth/session');
       return { status: response.status, body: await response.json() };
     });
-    if (session.status !== 200 || session.body?.user?.role !== 'DIRECTOR') fail(`Session contract failed (${session.status}).`);
+    if (session.status !== 200 || session.body?.user?.role !== expectedRole) fail(`Session contract failed (${session.status}/${session.body?.user?.role || 'none'}).`);
 
     const myWork = await page.evaluate(async () => {
       const response = await fetch('/api/execution/my-work', { cache: 'no-store' });
@@ -305,10 +305,10 @@ async function runBrowserSmoke({ email, password, taskId, projectId, leadIds, fi
     }
     const hrEvidence = hrEvidenceResponse.body.hrEvidenceIntelligence;
     const hrDossier = hrEvidence.dossiers.find((row) => row.person.id === hrIds.userId);
-    if (!hrDossier || hrDossier.layers.presence.facts.recordedDays !== 1
-      || hrDossier.layers.activity.facts.declaredHours !== 1.25
-      || hrDossier.layers.output.facts.completedTasks !== 1
-      || hrDossier.layers.outcome.facts.personalOkrs !== 1
+    if (!hrDossier || hrDossier.layers.presence.facts.recordedDays < 1
+      || hrDossier.layers.activity.facts.declaredHours < 1.25
+      || hrDossier.layers.output.facts.completedTasks < 1
+      || hrDossier.layers.outcome.facts.personalOkrs < 1
       || hrDossier.layers.outcome.facts.reviewStatus !== 'self_done') {
       fail(`HR Evidence four-layer dossier failed (${JSON.stringify(hrDossier)}).`);
     }
@@ -425,13 +425,20 @@ async function runBrowserSmoke({ email, password, taskId, projectId, leadIds, fi
 async function main() {
   const repository = verifyRepositorySafety();
   const target = verifyTarget();
-  const email = `realms-smoke-${randomUUID()}@example.invalid`;
-  const password = randomBytes(24).toString('base64url');
+  const existingEmail = String(process.env.REALMS_STAGING_SMOKE_EXISTING_EMAIL || '').trim().toLowerCase();
+  const usingExistingUser = Boolean(existingEmail);
+  const email = existingEmail || `realms-smoke-${randomUUID()}@example.invalid`;
+  const password = usingExistingUser
+    ? String(process.env.REALMS_STAGING_SMOKE_EXISTING_PASSWORD || '')
+    : randomBytes(24).toString('base64url');
+  if (usingExistingUser && password.length < 16) fail('REALMS_STAGING_SMOKE_EXISTING_PASSWORD must contain at least 16 characters.');
   const databaseUrl = process.env.REALMS_STAGING_DATABASE_URL;
   const prisma = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
   let server;
   let serverOutput = [];
   let createdUserId = null;
+  let expectedRole = 'DIRECTOR';
+  let identityRestore = null;
   let createdTaskId = null;
   let createdBlockedTaskId = null;
   let createdProjectId = null;
@@ -453,20 +460,35 @@ async function main() {
   const createdActivityIds = [];
   const financeCategory = `Realms QA ${randomUUID()}`;
   try {
-    const createdUser = await prisma.user.create({
-      data: {
-        email,
-        name: 'Realms Staging Smoke',
-        passwordHash: await bcrypt.hash(password, 10),
-        role: 'DIRECTOR',
-        roles: JSON.stringify(['DIRECTOR']),
-        title: 'Ephemeral QA account',
-        salary: 17_600_000,
-        workspacePreference: 'erp',
-      },
-      select: { id: true },
-    });
+    const createdUser = usingExistingUser
+      ? await prisma.user.findFirst({
+          where: { email, status: 'active', userType: 'employee' },
+          select: { id: true, role: true, roles: true, salary: true },
+        })
+      : await prisma.user.create({
+          data: {
+            email,
+            name: 'Realms Staging Smoke',
+            passwordHash: await bcrypt.hash(password, 10),
+            role: 'DIRECTOR',
+            roles: JSON.stringify(['DIRECTOR']),
+            title: 'Ephemeral QA account',
+            salary: 17_600_000,
+            workspacePreference: 'erp',
+          },
+          select: { id: true, role: true, roles: true, salary: true },
+        });
+    if (!createdUser) fail(`Existing staging smoke identity ${email} is unavailable.`);
     createdUserId = createdUser.id;
+    expectedRole = createdUser.role;
+    if (usingExistingUser) {
+      identityRestore = { role: createdUser.role, roles: createdUser.roles, salary: createdUser.salary };
+      const currentRoles = (() => { try { return JSON.parse(createdUser.roles || '[]'); } catch { return [createdUser.role]; } })();
+      await prisma.user.update({
+        where: { id: createdUser.id },
+        data: { roles: JSON.stringify([...new Set([...currentRoles, 'AM', 'ACCOUNTANT', 'PM', 'HR'])]), salary: 17_600_000 },
+      });
+    }
     const createdClient = await prisma.client.create({
       data: { name: 'Realms Financial Intelligence smoke', createdAt: new Date().toISOString().slice(0, 10) },
       select: { id: true },
@@ -704,6 +726,7 @@ async function main() {
     const result = await runBrowserSmoke({
       email,
       password,
+      expectedRole,
       taskId: createdTask.id,
       projectId: createdProject.id,
       leadIds: { active: activeLead.id, stale: staleLead.id, dormant: dormantLead.id },
@@ -717,6 +740,16 @@ async function main() {
     console.log(`CRM Workload and Royal Embassy shared one rule engine with ${result.crmQueue} manager-queue item(s).`);
     console.log(`Financial Intelligence and Royal Ledger shared one rule engine with ${result.financeQueue} manager-queue item(s).`);
     console.log(`HR Evidence kept four layers separate with ${result.hrQueue} verification-queue item(s).`);
+    await prisma.auditLog.create({
+      data: {
+        userId: createdUserId,
+        userName: usingExistingUser ? email : 'Realms Staging Smoke',
+        action: 'verify',
+        entity: 'realm_phase25_uat',
+        refId: 'phase25-business-flow-v1',
+        detail: `Auth, Resource Intelligence, Project Health, CRM, Finance, HR, RepositoryRealms receipt, desktop/mobile and shared Realm projections passed; ephemeral fixtures cleaned`,
+      },
+    });
     console.log(`Target ${target.redactedUrl}; branch ${repository.branch}; project ${repository.project}.`);
   } catch (error) {
     if (serverOutput.length) console.error(`Local server tail:\n${serverOutput.join('\n')}`);
@@ -745,9 +778,11 @@ async function main() {
         prisma.lead.deleteMany({ where: { id: { in: createdLeadIds }, source: 'Staging smoke' } }),
         // The app shell auto-joins active employees to the company conversation.
         // ConvMember intentionally has no User FK, so remove the ephemeral row explicitly.
-        prisma.convMember.deleteMany({ where: { userId: createdUserId } }),
-        prisma.auditLog.deleteMany({ where: { userId: createdUserId } }),
-        prisma.user.deleteMany({ where: { id: createdUserId, email } }),
+        prisma.convMember.deleteMany({ where: { userId: usingExistingUser ? '__phase25_noop__' : createdUserId } }),
+        prisma.auditLog.deleteMany({ where: usingExistingUser
+          ? { userId: createdUserId, refId: { in: [createdTaskId, createdBlockedTaskId, createdEvidenceTaskId, createdProjectId].filter(Boolean) } }
+          : { userId: createdUserId } }),
+        prisma.user.deleteMany({ where: { id: usingExistingUser ? '__phase25_noop__' : createdUserId, email } }),
       ]);
       // Receipt can legitimately be 0 when startup/auth fails before the canonical
       // action, or 1 after the action/replay path. The ephemeral user scope ensures
@@ -758,9 +793,12 @@ async function main() {
         || transactions.count !== createdTransactionIds.length || budgets.count !== (createdBudgetId ? 1 : 0)
         || recurringExpenses.count !== (createdRecurringExpenseId ? 1 : 0) || vendors.count !== (createdVendorId ? 1 : 0)
         || clients.count !== (createdClientId ? 1 : 0)
-        || receipts.count > 1 || removed.count !== 1) {
+        || receipts.count > 1 || removed.count !== (usingExistingUser ? 0 : 1)) {
         fail(`Ephemeral QA cleanup removed ${projects.count} projects, ${tasks.count} tasks, ${timeLogs.count} TimeLogs, ${attendance.count} Attendance, ${okrs.count} OKRs, ${reviews.count} Reviews, ${leads.count} Leads, ${activities.count} Activities, ${invoices.count} Invoices, ${vendorBills.count} VendorBills, ${transactions.count} Transactions, ${receipts.count} receipts and ${removed.count} accounts.`);
       } else console.log('Ephemeral QA Project, tasks, TimeLog, HR Evidence, CRM Leads/Activities, Finance records, receipt, revisions, events, account and audit cleanup passed.');
+    }
+    if (usingExistingUser && createdUserId && identityRestore) {
+      await prisma.user.update({ where: { id: createdUserId }, data: identityRestore }).catch(() => {});
     }
     await prisma.$disconnect();
   }

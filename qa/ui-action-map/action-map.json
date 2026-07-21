@@ -38052,7 +38052,9 @@
       ],
       "rowPolicy": false,
       "scopedRead": false,
-      "browserActions": [],
+      "browserActions": [
+        "window.location.assign"
+      ],
       "helperCalls": [
         "import:preferredWorkspaceSurface",
         "import:signIn"
@@ -38290,7 +38292,9 @@
       ],
       "rowPolicy": false,
       "scopedRead": false,
-      "browserActions": [],
+      "browserActions": [
+        "window.location.assign"
+      ],
       "helperCalls": [
         "import:preferredWorkspaceSurface",
         "import:signIn"

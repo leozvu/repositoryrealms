@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { preferredWorkspaceSurface } from '@/lib/collaboration';
 import { LanguageSwitch } from '@/components/LanguageProvider';
 
@@ -23,7 +22,6 @@ export default function LoginPage() {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const router = useRouter();
 
   useEffect(() => { setHydrated(true); }, []);
   useEffect(() => {
@@ -47,8 +45,10 @@ export default function LoginPage() {
           : pilot.user?.resolvedSurface;
         if (pilotResponse.ok && pilot.user?.allowed && resolvedSurface === 'realm') destination = '/realm';
       } catch {}
-      router.push(destination);
-      router.refresh();
+      // A credentials callback can legitimately resolve to /login even after the
+      // secure session cookie was issued. A hard same-origin navigation guarantees
+      // every browser leaves the credential form with that shared ERP/Realm session.
+      window.location.assign(destination);
     }
   };
 
