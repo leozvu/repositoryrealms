@@ -297,7 +297,7 @@ export default function TasksPage() {
   const Columns = items => (
     <div className="kanban">
       {TASK_COLS.map(c => {
-        const list = items.filter(t => t.status === c.key);
+        const list = items.filter(t => (c.states || [c.key]).includes(t.status));
         return (
           <div key={c.key} className={`kan-col ${overCol === c.key ? 'drag-over' : ''}`}
             onDragOver={e => { if (!selMode) { e.preventDefault(); setOverCol(c.key); } }}

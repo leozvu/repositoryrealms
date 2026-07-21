@@ -1,0 +1,254 @@
+{
+  "version": 1,
+  "mode": "grid",
+  "source": "public/realms/assets/generated/phase-22/erp-ui/realm-erp-ui-atlas-v1.png",
+  "sourceWidth": 1448,
+  "sourceHeight": 1086,
+  "alphaThreshold": 16,
+  "padding": 10,
+  "largestComponent": false,
+  "outputFormat": "webp",
+  "assetCount": 12,
+  "assets": [
+    {
+      "file": "erp-ui-header-crest.webp",
+      "sourceBbox": [
+        24,
+        108,
+        362,
+        271
+      ],
+      "cropBbox": [
+        14,
+        98,
+        372,
+        281
+      ],
+      "width": 358,
+      "height": 183,
+      "row": 0,
+      "column": 0,
+      "label": "header-crest"
+    },
+    {
+      "file": "erp-ui-title-plaque.webp",
+      "sourceBbox": [
+        362,
+        142,
+        724,
+        255
+      ],
+      "cropBbox": [
+        352,
+        132,
+        734,
+        265
+      ],
+      "width": 382,
+      "height": 133,
+      "row": 0,
+      "column": 1,
+      "label": "title-plaque"
+    },
+    {
+      "file": "erp-ui-manuscript-divider.webp",
+      "sourceBbox": [
+        724,
+        153,
+        1086,
+        255
+      ],
+      "cropBbox": [
+        714,
+        143,
+        1096,
+        265
+      ],
+      "width": 382,
+      "height": 122,
+      "row": 0,
+      "column": 2,
+      "label": "manuscript-divider"
+    },
+    {
+      "file": "erp-ui-table-finials.webp",
+      "sourceBbox": [
+        1086,
+        104,
+        1387,
+        298
+      ],
+      "cropBbox": [
+        1076,
+        94,
+        1397,
+        308
+      ],
+      "width": 321,
+      "height": 214,
+      "row": 0,
+      "column": 3,
+      "label": "table-finials"
+    },
+    {
+      "file": "erp-ui-card-corners.webp",
+      "sourceBbox": [
+        74,
+        409,
+        350,
+        657
+      ],
+      "cropBbox": [
+        64,
+        399,
+        360,
+        667
+      ],
+      "width": 296,
+      "height": 268,
+      "row": 1,
+      "column": 0,
+      "label": "card-corners"
+    },
+    {
+      "file": "erp-ui-kpi-medallion.webp",
+      "sourceBbox": [
+        446,
+        401,
+        698,
+        657
+      ],
+      "cropBbox": [
+        436,
+        391,
+        708,
+        667
+      ],
+      "width": 272,
+      "height": 276,
+      "row": 1,
+      "column": 1,
+      "label": "kpi-medallion"
+    },
+    {
+      "file": "erp-ui-approval-seal.webp",
+      "sourceBbox": [
+        820,
+        413,
+        1008,
+        654
+      ],
+      "cropBbox": [
+        810,
+        403,
+        1018,
+        664
+      ],
+      "width": 208,
+      "height": 261,
+      "row": 1,
+      "column": 2,
+      "label": "approval-seal"
+    },
+    {
+      "file": "erp-ui-quest-ribbon.webp",
+      "sourceBbox": [
+        1100,
+        506,
+        1412,
+        553
+      ],
+      "cropBbox": [
+        1090,
+        496,
+        1422,
+        563
+      ],
+      "width": 332,
+      "height": 67,
+      "row": 1,
+      "column": 3,
+      "label": "quest-ribbon"
+    },
+    {
+      "file": "erp-ui-tab-endcaps.webp",
+      "sourceBbox": [
+        67,
+        816,
+        355,
+        897
+      ],
+      "cropBbox": [
+        57,
+        806,
+        365,
+        907
+      ],
+      "width": 308,
+      "height": 101,
+      "row": 2,
+      "column": 0,
+      "label": "tab-endcaps"
+    },
+    {
+      "file": "erp-ui-ledger-flourish.webp",
+      "sourceBbox": [
+        423,
+        795,
+        700,
+        931
+      ],
+      "cropBbox": [
+        413,
+        785,
+        710,
+        941
+      ],
+      "width": 297,
+      "height": 156,
+      "row": 2,
+      "column": 1,
+      "label": "ledger-flourish"
+    },
+    {
+      "file": "erp-ui-status-ornaments.webp",
+      "sourceBbox": [
+        776,
+        817,
+        1058,
+        903
+      ],
+      "cropBbox": [
+        766,
+        807,
+        1068,
+        913
+      ],
+      "width": 302,
+      "height": 106,
+      "row": 2,
+      "column": 2,
+      "label": "status-ornaments"
+    },
+    {
+      "file": "erp-ui-footer-flourish.webp",
+      "sourceBbox": [
+        1113,
+        835,
+        1408,
+        888
+      ],
+      "cropBbox": [
+        1103,
+        825,
+        1418,
+        898
+      ],
+      "width": 315,
+      "height": 73,
+      "row": 2,
+      "column": 3,
+      "label": "footer-flourish"
+    }
+  ]
+}

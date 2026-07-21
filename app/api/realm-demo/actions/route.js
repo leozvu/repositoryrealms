@@ -2,9 +2,9 @@ import { currentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { isFreelancer } from '@/lib/perm';
 import { emitEvent } from '@/lib/events';
-import { executeRealmRecordAction } from '@/lib/realm-action-admin';
 import { loadRealmCompanyModules, realmSurfaceDecision } from '@/lib/realm-access';
 import { RealmOperationError } from '@/lib/realm-operation';
+import { executeRepositoryRealmsAction, repositoryRealmsSurface } from '@/lib/repository-realms';
 import { realmErrorResponse, realmJsonResponse } from '@/lib/realm-api-response';
 import { startRealmApiRequest } from '@/lib/realm-observability';
 
@@ -25,13 +25,6 @@ async function authorizedUser() {
   return user;
 }
 
-function surfaceFor(action) {
-  if (action === 'task.transition' || action === 'task.comment.create') return 'campaigns';
-  if (action === 'task.assign') return 'command';
-  if (action === 'lead.transition' || action === 'lead.followup.create') return 'embassy';
-  throw new RealmOperationError('Realm action chưa được cho phép.', 400, 'realm_action_unsupported');
-}
-
 export async function POST(request) {
   const trace = startRealmApiRequest(request, { route: 'realm.actions', operation: 'record.action' });
   if (process.env.REALM_ERP_SYNC_ENABLED !== '1') return integrationDisabled(trace);
@@ -45,9 +38,9 @@ export async function POST(request) {
     } catch {
       throw new RealmOperationError('Payload JSON không hợp lệ.', 400, 'invalid_json');
     }
-    const access = realmSurfaceDecision(user, surfaceFor(body?.action), await loadRealmCompanyModules(prisma));
+    const access = realmSurfaceDecision(user, repositoryRealmsSurface(body?.action), await loadRealmCompanyModules(prisma));
     if (!access.allowed) throw new RealmOperationError(access.reason, 403, access.code);
-    const result = await executeRealmRecordAction(prisma, user, {
+    const result = await executeRepositoryRealmsAction(prisma, user, {
       ...body,
       idempotencyKey: request.headers.get('Idempotency-Key') || body?.idempotencyKey,
     });
@@ -58,6 +51,7 @@ export async function POST(request) {
       source: 'erp',
       idempotent: result.idempotent,
       action: result.action,
+      repository: result.repository,
       generatedAt: new Date().toISOString(),
     }, { code: result.idempotent ? 'realm_action_replayed' : 'realm_action_applied' });
   } catch (error) {

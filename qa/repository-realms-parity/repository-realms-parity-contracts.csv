@@ -1,0 +1,21 @@
+id,layer,source,signals,missingSignals,status
+parity-is-business-invariants,product,docs/realms/PHASE-21-ERP-REALM-PARITY.md,Parity không phải button parity | authorization → business rules → receipt → audit | RepositoryRealms,,verified
+canonical-action-catalog,domain,lib/repository-realms.js,REPOSITORY_REALMS_ACTION_CONTRACTS | action: 'task.transition' | action: 'lead.followup.create',,verified
+presentation-independent-contract,domain,lib/repository-realms.js,presentationIndependent: true | buttonMatchingRequired: false | apiShapeMatchingRequired: false | sharedBusinessInvariantsRequired: true,,verified
+presentation-metadata-stripped,domain,lib/repository-realms.js,presentation: _presentation | uiLabel: _uiLabel | sourceControl: _sourceControl,,verified
+repository-route-delegation,api,app/api/realm-demo/actions/route.js,executeRepositoryRealmsAction | repositoryRealmsSurface | repository: result.repository,,verified
+surface-is-availability-gate,api,app/api/realm-demo/actions/route.js,realmSurfaceDecision | loadRealmCompanyModules | repositoryRealmsSurface(body?.action),,verified
+canonical-task-authorization,authorization,lib/realm-action-admin.js,"canWrite('tasks', user) | RESOURCES.tasks.canWriteRow | taskInScope(before, user)",,verified
+canonical-lead-authorization,authorization,lib/realm-action-admin.js,"canWrite('leads', user) | leadInScope(before, user)",,verified
+canonical-business-rules,rules,lib/realm-action-admin.js,requireAllowedTransition | realmTaskTransitions | realmLeadTransitions | RESOURCES.tasks.validate,,verified
+optimistic-concurrency,rules,lib/realm-action-admin.js,requireExpected | updateMany({ | realm_action_stale,,verified
+idempotent-receipts,receipt,lib/realm-action-admin.js,existingReceipt | realmActionReceipt.create | realm_action_idempotency_conflict,,verified
+atomic-receipt-audit,audit,lib/realm-action-admin.js,db.$transaction | auditLog.create | action: 'realm_action',,verified
+receipt-evidence-required,safety,lib/repository-realms.js,repository_realms_receipt_missing | receiptId: result.action.id | receipt: 'verified',,verified
+safe-repository-response,api,lib/repository-realms.js,authorization: 'enforced' | businessRules: 'enforced' | audit: 'atomic',,verified
+suggested-action-ui,client,components/realm/RealmActionDialog.jsx,Suggested Action: | RepositoryRealms | business rules | receipt,,verified
+distinct-create-action-ui,client,components/realm/RealmCreateActionDialog.jsx,Gửi War Council note | Lập Diplomatic follow-up | UI Realm không cần giống ERP,,verified
+unregistered-intent-fails-closed,safety,lib/repository-realms.js,repository_realms_action_unsupported | repositoryRealmsContract(input?.action),,verified
+no-parallel-business-store,data,lib/repository-realms.js,resource: 'tasks' | resource: 'leads' | resource: 'activities',,verified
+phase21-domain-tests,test,tests/repository-realms.test.mjs,business invariants instead of matching buttons | strips presentation metadata | receipt evidence is missing,,verified
+phase21-runbook,operations,docs/realms/PHASE-21-ERP-REALM-PARITY.md,crmegoric-realms-demo | Suggested Action | Invoice | không tự động tạo action `invoice.approve`,,verified

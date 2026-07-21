@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "mode": "grid",
+  "source": "public/realms/assets/generated/phase-22/maps/realm-environment-material-atlas-v1.png",
+  "sourceWidth": 1536,
+  "sourceHeight": 1024,
+  "alphaThreshold": 16,
+  "padding": 0,
+  "outputFormat": "webp",
+  "assetCount": 8,
+  "assets": [
+    {
+      "file": "material-guild.webp",
+      "sourceBbox": [
+        0,
+        0,
+        384,
+        512
+      ],
+      "cropBbox": [
+        0,
+        0,
+        384,
+        512
+      ],
+      "width": 384,
+      "height": 512,
+      "row": 0,
+      "column": 0,
+      "label": "guild"
+    },
+    {
+      "file": "material-war.webp",
+      "sourceBbox": [
+        384,
+        0,
+        768,
+        512
+      ],
+      "cropBbox": [
+        384,
+        0,
+        768,
+        512
+      ],
+      "width": 384,
+      "height": 512,
+      "row": 0,
+      "column": 1,
+      "label": "war"
+    },
+    {
+      "file": "material-treasury.webp",
+      "sourceBbox": [
+        768,
+        0,
+        1152,
+        512
+      ],
+      "cropBbox": [
+        768,
+        0,
+        1152,
+        512
+      ],
+      "width": 384,
+      "height": 512,
+      "row": 0,
+      "column": 2,
+      "label": "treasury"
+    },
+    {
+      "file": "material-tavern.webp",
+      "sourceBbox": [
+        1152,
+        0,
+        1536,
+        512
+      ],
+      "cropBbox": [
+        1152,
+        0,
+        1536,
+        512
+      ],
+      "width": 384,
+      "height": 512,
+      "row": 0,
+      "column": 3,
+      "label": "tavern"
+    },
+    {
+      "file": "material-hall.webp",
+      "sourceBbox": [
+        0,
+        512,
+        384,
+        1024
+      ],
+      "cropBbox": [
+        0,
+        512,
+        384,
+        1024
+      ],
+      "width": 384,
+      "height": 512,
+      "row": 1,
+      "column": 0,
+      "label": "hall"
+    },
+    {
+      "file": "material-forge.webp",
+      "sourceBbox": [
+        384,
+        512,
+        768,
+        1024
+      ],
+      "cropBbox": [
+        384,
+        512,
+        768,
+        1024
+      ],
+      "width": 384,
+      "height": 512,
+      "row": 1,
+      "column": 1,
+      "label": "forge"
+    },
+    {
+      "file": "material-wall.webp",
+      "sourceBbox": [
+        768,
+        512,
+        1152,
+        1024
+      ],
+      "cropBbox": [
+        768,
+        512,
+        1152,
+        1024
+      ],
+      "width": 384,
+      "height": 512,
+      "row": 1,
+      "column": 2,
+      "label": "wall"
+    },
+    {
+      "file": "material-threshold.webp",
+      "sourceBbox": [
+        1152,
+        512,
+        1536,
+        1024
+      ],
+      "cropBbox": [
+        1152,
+        512,
+        1536,
+        1024
+      ],
+      "width": 384,
+      "height": 512,
+      "row": 1,
+      "column": 3,
+      "label": "threshold"
+    }
+  ]
+}

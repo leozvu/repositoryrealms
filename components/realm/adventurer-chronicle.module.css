@@ -59,7 +59,7 @@
   letter-spacing: .11em;
   text-transform: uppercase;
 }
-.hero h2 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(24px, 3vw, 34px); line-height: 1.15; }
+.hero h2 { margin: 0; font-family: var(--font-display); font-size: clamp(24px, 3vw, 34px); line-height: 1.15; }
 .hero p { margin: 5px 0 0; color: var(--chronicle-muted); line-height: 1.5; }
 .sourceBadge {
   display: inline-flex;
@@ -92,7 +92,7 @@
 .sideStack { display: grid; gap: 16px; }
 .panel { min-width: 0; padding: 18px; border-radius: 15px; }
 .sectionHead { display: flex; gap: 14px; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
-.sectionHead h3 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; line-height: 1.25; }
+.sectionHead h3 { margin: 0; font-family: var(--font-display); font-size: 20px; line-height: 1.25; }
 .sectionHead > small { color: var(--chronicle-muted); text-align: right; line-height: 1.4; }
 .attentionToggle { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; color: var(--chronicle-muted); cursor: pointer; font-size: 12px; }
 .attentionToggle input { width: 18px; height: 18px; accent-color: var(--chronicle-green); }

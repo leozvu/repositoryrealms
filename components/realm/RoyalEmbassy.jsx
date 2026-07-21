@@ -46,13 +46,17 @@ function Metric({ icon, label, value, detail, tone = '' }) {
   );
 }
 
-function LeadCard({ lead, onOpen, onTransition, onFollowUp }) {
+function LeadCard({ lead, intelligence, onOpen, onTransition, onFollowUp }) {
   const transitions = lead.canTransition ? realmLeadTransitions(lead.stage) : [];
   return (
     <article className={`${styles.leadCard} ${lead.overdue ? styles.leadOverdue : ''}`}>
       <header><span>{lead.source}</span>{lead.overdue && <strong><Icon name="alert" size={13} />Quá ngày dự kiến</strong>}</header>
       <h4>{lead.company}</h4>
       <p>{lead.name}</p>
+      {intelligence && <div className={styles.workloadMeta}>
+        <span data-band={intelligence.lifecycle.band}>{intelligence.lifecycle.label}</span>
+        <small>{intelligence.lastTouch.date ? `Last recorded touch ${dateLabel(intelligence.lastTouch.date)}` : 'Chưa có evidence ngày'} · confidence {intelligence.confidence.band}</small>
+      </div>}
       <div className={styles.leadValue}>{moneyShort(lead.value)}</div>
       <footer>
         <span><Icon name="staff" size={13} />{lead.owner?.name || 'Chưa phân công'}</span>
@@ -154,7 +158,8 @@ export default function RoyalEmbassy({
 
   if (loading) return <StateCard loading onBack={onBack} />;
   if (error) return <StateCard error={error} onRetry={retry} onBack={onBack} />;
-  const { embassy, metrics, stages, clients, focus, source, permissions } = dashboard;
+  const { embassy, metrics, stages, clients, focus, source, permissions, workloadIntelligence } = dashboard;
+  const workloadByLead = new Map((workloadIntelligence?.leads || []).map((lead) => [lead.id, lead]));
   return (
     <section className={`${styles.embassy} ${compact ? styles.compact : ''}`} aria-labelledby={titleId}>
       <header className={styles.hero}>
@@ -168,12 +173,30 @@ export default function RoyalEmbassy({
 
       <aside className={styles.focus}><Icon name={metrics.overdueLeads ? 'alert' : 'leads'} size={18} /><div><span>Ưu tiên ngoại giao</span><strong>{focus}</strong></div>{source === 'erp' && onOpenLeads && <button type="button" onClick={onOpenLeads}>Mở CRM pipeline<Icon name="leads" size={15} /></button>}</aside>
 
-      <div className={styles.metrics} aria-label="Tổng quan CRM pipeline">
-        <Metric icon="leads" label="Cơ hội đang mở" value={metrics.openLeads} detail={moneyShort(metrics.openValue)} />
+      <div className={styles.metrics} aria-label="Tổng quan CRM workload">
+        <Metric icon="leads" label="Active Lead" value={workloadIntelligence?.summary.activeLeads ?? metrics.openLeads} detail={`${workloadIntelligence?.summary.openLeads ?? metrics.openLeads} cơ hội đang mở`} />
+        <Metric icon="alert" label="Stale / Dormant" value={`${workloadIntelligence?.summary.staleLeads ?? 0} / ${workloadIntelligence?.summary.dormantLeads ?? 0}`} detail={`${workloadIntelligence?.summary.overdueFollowups ?? metrics.overdueLeads} follow-up quá hạn`} tone={(workloadIntelligence?.summary.staleLeads || workloadIntelligence?.summary.dormantLeads) ? 'warning' : ''} />
         <Metric icon="trendUp" label="Forecast trọng số" value={moneyShort(metrics.weightedForecast)} detail="Theo xác suất stage chuẩn" />
-        <Metric icon="percent" label="Tỷ lệ thắng" value={`${metrics.winRate}%`} detail={`${moneyShort(metrics.wonValue)} đã chốt`} />
-        <Metric icon="alert" label="Cần chú ý" value={metrics.overdueLeads + metrics.unassignedLeads} detail={`${metrics.overdueLeads} quá ngày · ${metrics.unassignedLeads} chưa gán`} tone={(metrics.overdueLeads || metrics.unassignedLeads) ? 'warning' : ''} />
+        <Metric icon="shield" label="Manager Queue" value={workloadIntelligence?.summary.managerQueueItems ?? (metrics.overdueLeads + metrics.unassignedLeads)} detail={`${workloadIntelligence?.summary.unassignedLeads ?? metrics.unassignedLeads} chưa gán · advisory only`} tone={(workloadIntelligence?.summary.managerQueueItems || metrics.unassignedLeads) ? 'warning' : ''} />
       </div>
+
+      {workloadIntelligence && <section className={styles.workloadPanel} aria-labelledby={`${titleId}-workload`}>
+        <header className={styles.panelHead}><div><span>CRM Workload Intelligence</span><h3 id={`${titleId}-workload`}>Sứ giả đang dùng năng lực đúng chỗ chưa?</h3></div><small>Recorded CRM activity · không phải employee ranking</small></header>
+        <div className={styles.workloadGrid}>
+          <div className={styles.managerQueue}><h4>Manager Queue</h4>
+            {workloadIntelligence.managerQueue.slice(0, 8).map((item) => {
+              const record = item.kind === 'lead_review' ? workloadIntelligence.leads.find((lead) => lead.id === item.entityId) : null;
+              return <article key={item.id} data-level={item.level}><div><span>{item.kind === 'owner_capacity' ? 'Owner capacity' : item.lifecycle?.label}</span><strong>{item.title}</strong><small>{item.signals[0]?.label} · {item.source}</small></div>
+                {record && source === 'erp' && onOpenLead && <button type="button" onClick={() => onOpenLead(record)}><Icon name="leads" size={14} />Mở Lead ERP</button>}</article>;
+            })}
+            {!workloadIntelligence.managerQueue.length && <p className={styles.empty}>Không có hồ sơ cần manager review theo rule hiện tại.</p>}
+          </div>
+          <div className={styles.ownerWorkload}><h4>Owner WIP · alphabet</h4>
+            {workloadIntelligence.owners.map((owner) => <article key={owner.ownerId} data-band={owner.band}><div><strong>{owner.name}</strong><small>{owner.label}</small></div><b>{owner.openLeads}/{owner.wipLimit}</b><span>{owner.activeLeads} active · {owner.staleLeads} stale · {owner.dormantLeads} dormant</span></article>)}
+            {!workloadIntelligence.owners.length && <p className={styles.empty}>Chưa có Account/Sales owner trong scope.</p>}
+          </div>
+        </div>
+      </section>}
 
       <section className={styles.pipelinePanel} aria-labelledby={`${titleId}-pipeline`}>
         <header className={styles.panelHead}><div><span>Diplomatic pipeline</span><h3 id={`${titleId}-pipeline`}>Hành trình từ tân thư đến minh ước</h3></div><small>Giá trị CRM, không phải điểm nhân sự</small></header>
@@ -181,7 +204,7 @@ export default function RoyalEmbassy({
           {stages.map((stage) => <section className={styles.stage} key={stage.id} aria-label={`${stage.businessLabel}: ${stage.count} cơ hội`} style={{ '--stage-color': stage.color }}>
             <header><i /><div><strong>{stage.label}</strong><small>{stage.businessLabel} · xác suất {stage.probability}%</small></div><span>{stage.count}</span></header>
             <div className={styles.stageValue}>{moneyShort(stage.value)}</div>
-            <div className={styles.leads}>{stage.leads.length ? stage.leads.map((lead) => <LeadCard lead={lead} key={lead.id} onOpen={source === 'erp' ? onOpenLead : undefined} onTransition={source === 'erp' ? transitionLead : undefined} onFollowUp={source === 'erp' ? followupLead : undefined} />) : <p className={styles.empty}>Chưa có cơ hội ở giai đoạn này.</p>}</div>
+            <div className={styles.leads}>{stage.leads.length ? stage.leads.map((lead) => <LeadCard lead={lead} intelligence={workloadByLead.get(lead.id)} key={lead.id} onOpen={source === 'erp' ? onOpenLead : undefined} onTransition={source === 'erp' ? transitionLead : undefined} onFollowUp={source === 'erp' ? followupLead : undefined} />) : <p className={styles.empty}>Chưa có cơ hội ở giai đoạn này.</p>}</div>
           </section>)}
         </div>
       </section>
@@ -191,7 +214,7 @@ export default function RoyalEmbassy({
         <div className={styles.clients}>{clients.length ? clients.map((client) => <ClientCard client={client} key={client.id} onOpen={source === 'erp' ? onOpenClient : undefined} />) : <p className={styles.empty}>Chưa có Client trong sổ quan hệ.</p>}</div>
       </section>
 
-      {!compact && <aside className={styles.governance}><Icon name="shield" size={18} /><div><strong>Embassy bảo vệ dữ liệu quan hệ và quyền CRM</strong><p>Dashboard không trả email, số điện thoại hay ghi chú. Chuyển stage và Diplomatic follow-up đều dùng dữ liệu CRM thật; ERP kiểm tra scope và ghi audit. Director có company scope, AM chỉ thao tác lead của mình hoặc chưa gán.</p></div></aside>}
+      {!compact && <aside className={styles.governance}><Icon name="shield" size={18} /><div><strong>Embassy bảo vệ dữ liệu quan hệ và quyền CRM</strong><p>Dashboard không trả email, số điện thoại hay ghi chú. Activity được ghi rõ là CRM record, chưa phải observed truth. Manager Queue không tự chia Lead, đổi stage hay xếp hạng nhân viên; mọi command vẫn đi qua RepositoryRealms receipt và authorization hiện hữu.</p></div></aside>}
       <RealmActionDialog command={pendingAction} onClose={() => setPendingAction(null)} onComplete={() => { setPendingAction(null); retry(); }} />
       <RealmCreateActionDialog command={pendingCreate} onClose={() => setPendingCreate(null)} onComplete={() => { setPendingCreate(null); retry(); }} />
     </section>

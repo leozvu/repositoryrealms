@@ -60,6 +60,7 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
 
   useEffect(() => {
     let cancelled = false;
+    let fallbackStarted = false;
 
     const handleMessage = (message) => {
       if (message?.type === 'gateway-ready') {
@@ -139,9 +140,17 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
     };
 
     const startLocalTransport = async () => {
+      if (cancelled || fallbackStarted) return;
+      fallbackStarted = true;
       const local = createBroadcastTransport({ onMessage: handleMessage });
-      await local.connect();
+      try {
+        await local.connect();
+      } catch (error) {
+        fallbackStarted = false;
+        throw error;
+      }
       if (cancelled) return local.close();
+      transportRef.current?.close();
       transportRef.current = local;
       setTransportState('local-ready');
       setNetworkInfo({
@@ -176,6 +185,12 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
             setIceServers(Array.isArray(tokenInfo.iceServers) ? tokenInfo.iceServers : []);
           },
           onOpen: publishPresence,
+          onExhausted: () => {
+            if (cancelled) return;
+            startLocalTransport().catch(() => {
+              if (!cancelled) setTransportState('unsupported');
+            });
+          },
         });
         try {
           await gateway.connect();

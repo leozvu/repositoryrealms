@@ -1,0 +1,19 @@
+id,layer,source,signals,missingSignals,status
+canonical-finance-records,data,prisma/schema.prisma,model TimeLog { | model Invoice { | model Transaction { | model VendorBill { | model Budget {,,verified
+finance-rule-version,domain,lib/financial-operating-intelligence.js,FINANCIAL_INTELLIGENCE_RULE_VERSION = 'financial-operating-intelligence-v1' | buildFinancialOperatingIntelligence,,verified
+invoice-fail-closed,data-quality,lib/financial-operating-intelligence.js,strictArray | malformedInvoices | Financial Intelligence không đoán số tiền,,verified
+cash-from-transaction-ledger,accounting,lib/financial-operating-intelligence.js,cashBalance: 'recorded_transactions_vnd' | ledgerIncome - ledgerExpense,,verified
+operating-margin-proxy,economics,lib/financial-operating-intelligence.js,operatingCostProxy | operatingMarginProxy | isAccountingProfit: false,,verified
+three-month-schedule,forecast,lib/financial-operating-intelligence.js,cashForecast | futureRecurringTemplates | schedule_view_excludes_payroll_and_unrecorded_costs,,verified
+manager-finance-queue,operations,lib/financial-operating-intelligence.js,managerQueue | review_receivable | review_payable | review_unbilled_hours | review_budget,,verified
+anti-ranking-advisory-policy,governance,lib/financial-operating-intelligence.js,advisoryOnly: true | accountingProfit: false | automaticPayment: false | employeeRanking: false | individualProfitability: false,,verified
+finance-authorization,authorization,lib/financial-operating-intelligence-admin.js,"financialIntelligenceScope | hasAny(user, ['ACCOUNTANT']) | financial_intelligence_scope_missing",,verified
+salary-rate-does-not-leak,privacy,tests/financial-operating-intelligence-admin.test.mjs,"includes('salary'), false | includes('hourlyRate'), false | includes('17600000'), false",,verified
+private-finance-api,api,app/api/finance/intelligence/route.js,"currentUser() | loadFinancialOperatingIntelligence | 'Cache-Control': 'private, no-store'",,verified
+erp-financial-intelligence-first,ui,app/(app)/finance/page.jsx,FinancialIntelligencePanel | Sổ quỹ &amp; giao dịch | fetch('/api/finance/intelligence',,verified
+realm-shares-canonical-loader,parity,lib/realm-treasury-admin.js,import { loadFinancialOperatingIntelligence } | financialIntelligence: finance?.financialIntelligence,,verified
+royal-ledger-ui,ui,components/realm/RoyalTreasuryExchange.jsx,The Steward&apos;s Margin Table | Steward Queue | Không phải accounting profit | không phải ranking,,verified
+responsive-accessible-finance,ux,components/finance/financial-intelligence.module.css,min-height: 44px | @media (max-width: 700px) | @media (prefers-reduced-motion: reduce),,verified
+phase5-domain-tests,test,tests/financial-operating-intelligence.test.mjs,không nhận là accounting profit | fail-closed | không tạo employee ranking,,verified
+phase5-server-tests,test,tests/financial-operating-intelligence-admin.test.mjs,chỉ mở company scope | response không leak salary/rate | bị chặn trước mọi database query,,verified
+phase5-runbook,operations,docs/realms/PHASE-5-FINANCIAL-OPERATING-INTELLIGENCE.md,Task → TimeLog → Cost proxy → Invoice → Cash | canonical ERP finance records | crmegoric-realms-demo,,verified

@@ -9,9 +9,11 @@ import {
 } from '../lib/realm-action-contract.js';
 
 test('Quest transition graph chỉ cho luồng vận hành an toàn và khóa trạng thái done', () => {
-  assert.deepEqual(realmTaskTransitions('todo'), ['in_progress', 'blocked']);
-  assert.deepEqual(realmTaskTransitions('review'), ['done', 'in_progress', 'blocked']);
+  assert.deepEqual(realmTaskTransitions('todo'), ['doing', 'in_progress', 'waiting', 'blocked']);
+  assert.deepEqual(realmTaskTransitions('review'), ['done', 'doing', 'in_progress', 'waiting', 'blocked']);
+  assert.deepEqual(realmTaskTransitions('waiting'), ['doing', 'in_progress', 'blocked', 'todo']);
   assert.deepEqual(realmTaskTransitions('done'), []);
+  assert.deepEqual(realmTaskTransitions('merged'), []);
   assert.deepEqual(realmTaskTransitions('unknown'), []);
 });
 

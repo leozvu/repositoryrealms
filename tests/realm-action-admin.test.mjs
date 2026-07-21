@@ -5,7 +5,7 @@ import { executeRealmRecordAction } from '../lib/realm-action-admin.js';
 const KEY = 'realm-action:123456789abc';
 
 function taskDb(overrides = {}) {
-  const calls = { update: null, receipt: null, audit: null, taskReads: 0 };
+  const calls = { update: null, receipt: null, event: null, audit: null, taskReads: 0 };
   const before = overrides.before || {
     id: 'task-1', title: 'Build bridge', assigneeId: 'staff-1', status: 'todo',
     dueDate: '2026-07-22', priority: 'medium', dependsOn: '[]', assignee: { id: 'staff-1', teamId: 'delivery' },
@@ -17,6 +17,7 @@ function taskDb(overrides = {}) {
       findUnique: async () => updated,
     },
     realmActionReceipt: { create: async ({ data }) => { calls.receipt = data; return { id: 'receipt-1', ...data }; } },
+    workItemEvent: { create: async ({ data }) => { calls.event = data; return { id: 'event-1', ...data }; } },
     auditLog: { create: async ({ data }) => { calls.audit = data; return data; } },
   };
   const db = {
@@ -58,8 +59,9 @@ test('Task assignee chuyển Quest bằng compare-and-swap, receipt và audit tr
   }, new Date('2026-07-18T21:00:00.000Z'));
   assert.equal(result.idempotent, false);
   assert.deepEqual(calls.update.where, { id: 'task-1', status: 'todo' });
-  assert.deepEqual(calls.update.data, { status: 'in_progress', statusSince: '2026-07-18' });
+  assert.deepEqual(calls.update.data, { status: 'in_progress', statusSince: '2026-07-18', workVersion: { increment: 1 } });
   assert.equal(calls.receipt.idempotencyKey, KEY);
+  assert.equal(calls.event.receiptId, 'receipt-1');
   assert.equal(calls.audit.action, 'realm_action');
   assert.equal(calls.audit.entity, 'tasks');
 });
@@ -92,8 +94,9 @@ test('PM phân công Task bằng compare-and-swap và giữ Task ERP làm nguồ
   assert.deepEqual(calls.update.where, {
     id: 'task-1', assigneeId: 'staff-1', dueDate: '2026-07-22', priority: 'medium',
   });
-  assert.deepEqual(calls.update.data, { assigneeId: 'staff-2', dueDate: '2026-07-24', priority: 'high' });
+  assert.deepEqual(calls.update.data, { assigneeId: 'staff-2', dueDate: '2026-07-24', priority: 'high', workVersion: { increment: 1 } });
   assert.equal(calls.receipt.action, 'task.assign');
+  assert.match(calls.event.metadata, /staff-2/);
   assert.equal(calls.audit.entity, 'tasks');
 });
 

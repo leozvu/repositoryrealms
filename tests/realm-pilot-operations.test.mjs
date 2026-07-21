@@ -20,7 +20,7 @@ const MAKER = { id: 'director-maker', name: 'Maker', role: 'DIRECTOR', roles: '[
 const CHECKER = { id: 'director-checker', name: 'Checker', role: 'DIRECTOR', roles: '["DIRECTOR"]', status: 'active', userType: 'employee', workspacePreference: 'erp' };
 const STAFF = { id: 'staff-private-id', name: 'Staff', role: 'STAFF', roles: '["STAFF"]', status: 'active', userType: 'employee', workspacePreference: 'auto' };
 
-function database() {
+function database({ notificationFails = false } = {}) {
   let setting = {
     company: 'Keep ERP',
     realmPilot: normalizeRealmPilotConfig({
@@ -56,7 +56,11 @@ function database() {
     collaborationPresenceSession: { findMany: async () => [] },
     ticket: { count: async () => 0 },
     approval: { count: async () => 0 },
-    notification: { createMany: async ({ data }) => { notifications.push(...data); return { count: data.length }; } },
+    notification: { createMany: async ({ data }) => {
+      if (notificationFails) throw new Error('notification provider down');
+      notifications.push(...data);
+      return { count: data.length };
+    } },
     auditLog: { create: async ({ data }) => { audits.push(data); return data; } },
     $queryRaw: async () => {
       rawCall += 1;
@@ -144,6 +148,22 @@ test('Phase 16 requires a different Director and revalidates readiness before ac
   assert.equal(fixture.notifications.at(-1).userId, STAFF.id);
   assert.equal(fixture.notifications.at(-1).route, '/realm');
   assert.equal(approved.operations.version, 3);
+});
+
+test('Phase 20 notification failure cannot rollback a committed pilot transition', async () => {
+  const fixture = database({ notificationFails: true });
+  await createRealmPilotWave(fixture.db, MAKER, {
+    expectedVersion: 0, name: 'Chaos notification', durationDays: 7,
+  }, { now: NOW, idFactory: () => 'chaos-notification' });
+  const submitted = await transitionRealmPilotWave(fixture.db, MAKER, {
+    action: 'submit', waveId: 'rpw_chaos-notification', expectedVersion: 1,
+  }, { now: new Date(NOW.getTime() + 60_000) });
+  assert.equal(submitted.wave.status, 'awaiting_approval');
+  assert.equal(fixture.setting().realmPilotOperations.waves[0].status, 'awaiting_approval');
+  assert.deepEqual(submitted.notificationDelivery, {
+    state: 'degraded', attempted: 1, delivered: 0, code: 'realm_notification_delivery_failed',
+  });
+  assert.equal(submitted.notificationCount, 0);
 });
 
 test('Phase 16 pause atomically activates the existing kill switch and preserves wave evidence', async () => {

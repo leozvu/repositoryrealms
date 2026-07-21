@@ -1,0 +1,16 @@
+id,layer,source,signals,missingSignals,status
+canonical-sha256-digest,integrity,lib/realm-release-candidate.js,createHash | stableValue | algorithm: REALM_RELEASE_CANDIDATE_DIGEST_ALGORITHM | excludesVolatileGenerationTime: true,,verified
+five-source-evidence-pack,composition,lib/realm-release-candidate.js,section('readiness' | section('rehearsal' | section('pilot-operations' | section('chaos' | section('experience',,verified
+not-a-launch-gate,governance,lib/realm-release-candidate.js,authoritativeLaunchGate: false | advisoryOnly: true | launchWorkflow: 'Controlled Launch',,verified
+repository-realms-invariants,parity,lib/realm-release-candidate.js,businessActionContract: 'RepositoryRealms' | authorization: 'shared' | businessRules: 'shared' | receipts: 'required' | audit: 'atomic',,verified
+privacy-safe-projection,privacy,lib/realm-release-candidate.js,rosterIncluded: false | userIdsIncluded: false | businessRecordIdsIncluded: false | contentIncluded: false | performanceTracking: false | durationTracking: false,,verified
+authoritative-loader-reuse,server,lib/realm-release-candidate-admin.js,loadRealmPilotOperationsDashboard | loadRealmExperienceTelemetry | evaluateRealmExperiencePilot | buildRealmReleaseCandidateDossier,,verified
+director-only-api,authorization,app/api/realm-demo/release-candidate/route.js,currentUser | isFreelancer | isDirector | realm_release_candidate_forbidden,,verified
+api-observability,observability,app/api/realm-demo/release-candidate/route.js,startRealmApiRequest | realmJsonResponse | realmErrorResponse,,verified
+read-only-dossier-ui,ui,components/realm/RealmReleaseCandidateDossier.jsx,Release Candidate Dossier · Phase 24 | Dossier không phải approval | không được gộp thành một cổng GO/NO-GO mới,,verified
+local-evidence-export,ui,components/realm/RealmReleaseCandidateDossier.jsx,navigator.clipboard | new Blob | Tải JSON evidence,,verified
+accessible-responsive-dossier,style,components/realm/realm-release-candidate-dossier.module.css,min-height: 44px | @media (max-width: 680px) | @media (max-width: 420px) | @media (prefers-reduced-motion: reduce),,verified
+deterministic-unit-tests,test,tests/realm-release-candidate.test.mjs,digest ignores volatile generation time | privacy-safe Release Candidate dossier | without inventing a go/no-go decision,,verified
+authentication-boundary-e2e,e2e,tests/e2e/realm-smoke.spec.mjs,'/api/realm-demo/release-candidate' | Release Candidate Dossier · Phase 24,,verified
+phase24-runbook,operations,docs/realms/PHASE-24-RELEASE-CANDIDATE-DOSSIER.md,Evidence completeness không phải launch readiness | Không deploy | SHA-256 | Controlled Launch,,verified
+qa-pipeline-gate,quality,package.json,audit:realm:release-candidate | audit:realm:release-candidate:check,,verified

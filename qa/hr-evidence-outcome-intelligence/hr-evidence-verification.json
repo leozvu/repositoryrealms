@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 21,
+    "verifiedContracts": 21,
+    "scenarios": 7,
+    "verifiedScenarios": 7,
+    "canonicalStores": 7,
+    "evidenceLayers": 4,
+    "compositePerformanceScoreEnabled": false,
+    "employeeRankingEnabled": false,
+    "automaticHrDecisionEnabled": false,
+    "phase0LedgerReadEnabled": false,
+    "schemaMigrationRequired": false
+  },
+  "contracts": [
+    {
+      "id": "canonical-hr-records",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model User {",
+        "model Attendance {",
+        "model TimeLog {",
+        "model Task {",
+        "model WorkItemEvent {",
+        "model Okr {",
+        "model Review {"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "hr-evidence-rule-version",
+      "layer": "domain",
+      "source": "lib/hr-evidence-outcome-intelligence.js",
+      "signals": [
+        "HR_EVIDENCE_RULE_VERSION = 'hr-evidence-outcome-v1.0.0'",
+        "buildHrEvidenceOutcomeIntelligence"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "four-independent-layers",
+      "layer": "evidence",
+      "source": "lib/hr-evidence-outcome-intelligence.js",
+      "signals": [
+        "presence: layer({",
+        "activity: layer({",
+        "output: layer({",
+        "outcome: layer({"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "provenance-separated",
+      "layer": "governance",
+      "source": "lib/hr-evidence-outcome-intelligence.js",
+      "signals": [
+        "sourceClasses: [personTimeLogs.length ? 'declared'",
+        "sourceClasses: [personTasks.length ? 'observed'",
+        "finalReviews ? 'validated' : 'declared'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "verification-not-accusation",
+      "layer": "operations",
+      "source": "lib/hr-evidence-outcome-intelligence.js",
+      "signals": [
+        "evidenceQueue",
+        "manager_validation",
+        "data_quality",
+        "provenance_gap",
+        "context_gap"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "anti-ranking-advisory-policy",
+      "layer": "governance",
+      "source": "lib/hr-evidence-outcome-intelligence.js",
+      "signals": [
+        "advisoryOnly: true",
+        "compositePerformanceScore: false",
+        "employeeRanking: false",
+        "presenceAsProductivity: false",
+        "automaticHrDecision: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "no-automatic-people-action",
+      "layer": "governance",
+      "source": "lib/hr-evidence-outcome-intelligence.js",
+      "signals": [
+        "automaticGold: false",
+        "automaticPayroll: false",
+        "automaticDiscipline: false",
+        "automaticTermination: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase0-ledger-remains-disabled",
+      "layer": "privacy",
+      "source": "lib/hr-evidence-outcome-intelligence.js",
+      "signals": [
+        "evidenceLedgerUsed: false",
+        "Phase 0 collection remains disabled"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "minimum-necessary-scope",
+      "layer": "authorization",
+      "source": "lib/hr-evidence-outcome-intelligence-admin.js",
+      "signals": [
+        "hrEvidenceIntelligenceScope",
+        "hasAny(user, ['HR'])",
+        "['PM', 'LEAD']",
+        "kind: 'self'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-review-fields-omitted",
+      "layer": "privacy",
+      "source": "tests/hr-evidence-outcome-intelligence-admin.test.mjs",
+      "signals": [
+        "reviewQuery.select.scores, undefined",
+        "reviewQuery.select.selfNote, undefined",
+        "reviewQuery.select.mgrNote, undefined"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "presence-detail-minimized",
+      "layer": "privacy",
+      "source": "tests/hr-evidence-outcome-intelligence-admin.test.mjs",
+      "signals": [
+        "attendanceQuery.select.checkIn, undefined",
+        "attendanceQuery.select.checkOut, undefined"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-no-store-api",
+      "layer": "api",
+      "source": "app/api/hr/evidence-intelligence/route.js",
+      "signals": [
+        "currentUser()",
+        "loadHrEvidenceOutcomeIntelligence",
+        "'Cache-Control': 'private, no-store'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-evidence-before-review",
+      "layer": "ui",
+      "source": "app/(app)/reviews/page.jsx",
+      "signals": [
+        "<HrEvidenceIntelligence />",
+        "Điểm review tham khảo",
+        "Điểm review không được dùng một mình"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realm-shares-workspace-api",
+      "layer": "parity",
+      "source": "components/realm/GuildHall.jsx",
+      "signals": [
+        "HrEvidenceIntelligence",
+        "variant=\"realm\"",
+        "source === 'erp'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "single-cross-surface-read-path",
+      "layer": "parity",
+      "source": "components/hr/HrEvidenceIntelligence.jsx",
+      "signals": [
+        "fetch('/api/hr/evidence-intelligence'",
+        "variant = 'erp'",
+        "variant === 'realm'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "graceful-independent-error",
+      "layer": "resilience",
+      "source": "components/hr/HrEvidenceIntelligence.jsx",
+      "signals": [
+        "Phần đánh giá gốc vẫn hoạt động",
+        "onRetry={retry}",
+        "AbortController"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-accessible-evidence",
+      "layer": "ux",
+      "source": "components/hr/hr-evidence-intelligence.module.css",
+      "signals": [
+        "min-height: 44px",
+        "@media (max-width: 700px)",
+        "@media (prefers-reduced-motion: reduce)",
+        ":focus-visible"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase6-domain-tests",
+      "layer": "test",
+      "source": "tests/hr-evidence-outcome-intelligence.test.mjs",
+      "signals": [
+        "không tạo performance score hoặc ranking",
+        "không biến thiếu dữ liệu thành kết luận tiêu cực",
+        "không thay policy hay sinh productivity field"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase6-server-tests",
+      "layer": "test",
+      "source": "tests/hr-evidence-outcome-intelligence-admin.test.mjs",
+      "signals": [
+        "team manager bị khóa bằng teamId",
+        "không chọn private notes/scores",
+        "bị chặn trước database query"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase6-staging-smoke",
+      "layer": "test",
+      "source": "scripts/staging-execution-smoke.mjs",
+      "signals": [
+        "HR Evidence four-layer dossier failed",
+        "HR Evidence governance/provenance contract failed",
+        "Mobile HR Evidence layout failed",
+        "HR Evidence staging fixture"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase6-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-6-HR-EVIDENCE-OUTCOME-INTELLIGENCE.md",
+      "signals": [
+        "Presence → Activity → Output → Outcome",
+        "canonical ERP records",
+        "crmegoric-realms-demo"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "one-canonical-store-per-evidence-record",
+      "expected": "1:1:1:1:1:1:1",
+      "actual": "1:1:1:1:1:1:1",
+      "status": "verified"
+    },
+    {
+      "id": "four-layers-do-not-form-score",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "presence-is-not-productivity",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "phase0-ledger-not-queried",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "minimum-scope-is-company-team-self",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "erp-and-realm-use-one-client-read-path",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "no-automatic-hr-or-reward-decision",
+      "expected": "true:true:true:true",
+      "actual": "true:true:true:true",
+      "status": "verified"
+    }
+  ]
+}

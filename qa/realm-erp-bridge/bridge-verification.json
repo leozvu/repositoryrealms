@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 49,
-    "mappedNavigationRoutes": 49,
-    "verifiedNavigationRoutes": 49,
+    "erpNavigationRoutes": 50,
+    "mappedNavigationRoutes": 50,
+    "verifiedNavigationRoutes": 50,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -265,6 +265,21 @@
       "module": "tasks",
       "mapped": true,
       "routeFile": "app/(app)/tasks/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "teamwork",
+      "erpLabel": "Điều phối công việc",
+      "realmLabel": "Guild Orchestrator",
+      "realmSurface": "Phòng điều phối",
+      "group": "Vận hành",
+      "href": "/teamwork",
+      "icon": "staff",
+      "roles": "PM | LEAD",
+      "module": "tasks",
+      "mapped": true,
+      "routeFile": "app/(app)/teamwork/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

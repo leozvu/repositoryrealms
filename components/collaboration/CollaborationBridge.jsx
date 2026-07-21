@@ -43,7 +43,7 @@ export function WorkspaceSurfaceSwitch({ realm = false, pilot = null }) {
   const href = realm ? '/dashboard' : '/realm';
   const surface = realm ? 'erp' : 'realm';
   const unavailable = !realm && pilot && !pilot.allowed;
-  const label = realm ? 'ERP · CRM' : 'Realm';
+  const label = realm ? 'ERP · CRM' : 'Mở Realm';
   if (unavailable) {
     return (
       <span
@@ -67,7 +67,7 @@ export function WorkspaceSurfaceSwitch({ realm = false, pilot = null }) {
       className={realm ? styles.realmToErp : 'btn btn-outline btn-sm'}
       href={href}
       onClick={rememberPreference}
-      aria-label={realm ? 'Chuyển sang giao diện ERP CRM' : 'Chuyển sang văn phòng Realm'}
+      aria-label={realm ? 'Trở về workspace ERP CRM gốc' : 'Mở văn phòng Realm tùy chọn'}
     >
       <Icon name={realm ? 'reports' : 'shield'} size={15} />
       <span>{label}</span>

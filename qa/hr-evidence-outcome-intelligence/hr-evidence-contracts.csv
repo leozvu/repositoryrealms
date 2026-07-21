@@ -1,0 +1,22 @@
+id,layer,source,signals,missingSignals,status
+canonical-hr-records,data,prisma/schema.prisma,model User { | model Attendance { | model TimeLog { | model Task { | model WorkItemEvent { | model Okr { | model Review {,,verified
+hr-evidence-rule-version,domain,lib/hr-evidence-outcome-intelligence.js,HR_EVIDENCE_RULE_VERSION = 'hr-evidence-outcome-v1.0.0' | buildHrEvidenceOutcomeIntelligence,,verified
+four-independent-layers,evidence,lib/hr-evidence-outcome-intelligence.js,presence: layer({ | activity: layer({ | output: layer({ | outcome: layer({,,verified
+provenance-separated,governance,lib/hr-evidence-outcome-intelligence.js,sourceClasses: [personTimeLogs.length ? 'declared' | sourceClasses: [personTasks.length ? 'observed' | finalReviews ? 'validated' : 'declared',,verified
+verification-not-accusation,operations,lib/hr-evidence-outcome-intelligence.js,evidenceQueue | manager_validation | data_quality | provenance_gap | context_gap,,verified
+anti-ranking-advisory-policy,governance,lib/hr-evidence-outcome-intelligence.js,advisoryOnly: true | compositePerformanceScore: false | employeeRanking: false | presenceAsProductivity: false | automaticHrDecision: false,,verified
+no-automatic-people-action,governance,lib/hr-evidence-outcome-intelligence.js,automaticGold: false | automaticPayroll: false | automaticDiscipline: false | automaticTermination: false,,verified
+phase0-ledger-remains-disabled,privacy,lib/hr-evidence-outcome-intelligence.js,evidenceLedgerUsed: false | Phase 0 collection remains disabled,,verified
+minimum-necessary-scope,authorization,lib/hr-evidence-outcome-intelligence-admin.js,"hrEvidenceIntelligenceScope | hasAny(user, ['HR']) | ['PM', 'LEAD'] | kind: 'self'",,verified
+private-review-fields-omitted,privacy,tests/hr-evidence-outcome-intelligence-admin.test.mjs,"reviewQuery.select.scores, undefined | reviewQuery.select.selfNote, undefined | reviewQuery.select.mgrNote, undefined",,verified
+presence-detail-minimized,privacy,tests/hr-evidence-outcome-intelligence-admin.test.mjs,"attendanceQuery.select.checkIn, undefined | attendanceQuery.select.checkOut, undefined",,verified
+private-no-store-api,api,app/api/hr/evidence-intelligence/route.js,"currentUser() | loadHrEvidenceOutcomeIntelligence | 'Cache-Control': 'private, no-store'",,verified
+erp-evidence-before-review,ui,app/(app)/reviews/page.jsx,<HrEvidenceIntelligence /> | Điểm review tham khảo | Điểm review không được dùng một mình,,verified
+realm-shares-workspace-api,parity,components/realm/GuildHall.jsx,"HrEvidenceIntelligence | variant=""realm"" | source === 'erp'",,verified
+single-cross-surface-read-path,parity,components/hr/HrEvidenceIntelligence.jsx,fetch('/api/hr/evidence-intelligence' | variant = 'erp' | variant === 'realm',,verified
+graceful-independent-error,resilience,components/hr/HrEvidenceIntelligence.jsx,Phần đánh giá gốc vẫn hoạt động | onRetry={retry} | AbortController,,verified
+responsive-accessible-evidence,ux,components/hr/hr-evidence-intelligence.module.css,min-height: 44px | @media (max-width: 700px) | @media (prefers-reduced-motion: reduce) | :focus-visible,,verified
+phase6-domain-tests,test,tests/hr-evidence-outcome-intelligence.test.mjs,không tạo performance score hoặc ranking | không biến thiếu dữ liệu thành kết luận tiêu cực | không thay policy hay sinh productivity field,,verified
+phase6-server-tests,test,tests/hr-evidence-outcome-intelligence-admin.test.mjs,team manager bị khóa bằng teamId | không chọn private notes/scores | bị chặn trước database query,,verified
+phase6-staging-smoke,test,scripts/staging-execution-smoke.mjs,HR Evidence four-layer dossier failed | HR Evidence governance/provenance contract failed | Mobile HR Evidence layout failed | HR Evidence staging fixture,,verified
+phase6-runbook,operations,docs/realms/PHASE-6-HR-EVIDENCE-OUTCOME-INTELLIGENCE.md,Presence → Activity → Output → Outcome | canonical ERP records | crmegoric-realms-demo,,verified

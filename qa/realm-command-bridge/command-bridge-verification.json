@@ -140,8 +140,10 @@
       "signals": [
         "ConfirmDialog",
         "Idempotency-Key",
-        "ERP vẫn là nguồn dữ liệu chính",
-        "nhật ký kiểm toán"
+        "Suggested Action:",
+        "RepositoryRealms",
+        "receipt",
+        "audit"
       ],
       "missingSignals": [],
       "status": "verified"
@@ -188,8 +190,8 @@
   "scenarios": [
     {
       "id": "task-forward",
-      "expected": "in_progress,blocked",
-      "actual": "in_progress,blocked",
+      "expected": "doing,in_progress,waiting,blocked",
+      "actual": "doing,in_progress,waiting,blocked",
       "status": "verified"
     },
     {

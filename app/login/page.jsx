@@ -3,6 +3,18 @@ import { useEffect, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { preferredWorkspaceSurface } from '@/lib/collaboration';
+import { LanguageSwitch } from '@/components/LanguageProvider';
+
+const DEMO_ROLE_EMAILS = Object.freeze({
+  director: 'giamdoc@agency.vn',
+  pm: 'pm@agency.vn',
+  am: 'am@agency.vn',
+  accountant: 'ketoan@agency.vn',
+  hr: 'hr@agency.vn',
+  lead: 'truongnhom@agency.vn',
+  staff: 'nhanvien@agency.vn',
+  freelancer: 'freelancer@agency.vn',
+});
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -14,6 +26,10 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => { setHydrated(true); }, []);
+  useEffect(() => {
+    const selectedRole = new URLSearchParams(window.location.search).get('role')?.trim().toLowerCase();
+    if (selectedRole && DEMO_ROLE_EMAILS[selectedRole]) setEmail(DEMO_ROLE_EMAILS[selectedRole]);
+  }, []);
 
   const submit = async e => {
     e.preventDefault();
@@ -38,6 +54,7 @@ export default function LoginPage() {
 
   return (
     <div className="login-wrap">
+      <div className="login-language-switch"><LanguageSwitch /></div>
       <div className="login-card">
         <div className="login-logo">A</div>
         <div className="login-title">Agency ERP</div>

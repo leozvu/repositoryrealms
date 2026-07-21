@@ -35,6 +35,8 @@ test('AM chỉ query lead của mình hoặc chưa gán', async () => {
   assert.equal(lead.activities[0].author, 'Quang Võ');
   assert.equal('note' in lead.activities[0], false);
   assert.deepEqual(calls.activities.where, { refType: 'lead', refId: { in: ['lead-1'] } });
+  assert.equal(dashboard.workloadIntelligence.ruleVersion, 'crm-workload-intelligence-v1');
+  assert.equal(dashboard.workloadIntelligence.policy.employeeRanking, false);
 });
 
 test('Director đọc pipeline company scope', async () => {

@@ -34,6 +34,16 @@ export async function PUT(req, { params }) {
     const icp = await interceptWrite(params.resource, row, data, user);
     if (icp?.block) return NextResponse.json({ _blocked: true, _notice: icp.block });
     if (icp?.data) data = icp.data;
+    // Mọi chỉnh sửa Task từ ERP cổ điển cũng làm snapshot Team Work cũ hết hạn.
+    // Client không được tự gửi workVersion; registry đã strip field nội bộ này.
+    if (params.resource === 'tasks') {
+      data.workVersion = { increment: 1 };
+      if (Object.hasOwn(data, 'status')) {
+        if (data.status !== 'blocked') { data.blockReason = null; data.blockedAt = null; }
+        if (data.status !== 'waiting') data.waitingReason = null;
+        data.completedAt = data.status === 'done' ? new Date() : null;
+      }
+    }
     const updated = await prisma[cfg.model].update({ where: { id: params.id }, data });
     await audit(user, 'update', params.resource, params.id, updated.name || updated.title || updated.code || null);
     await emitEvent(params.resource, 'update', updated, row, user); // v3.3 + Realm change feed

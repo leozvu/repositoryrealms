@@ -6,6 +6,12 @@
 .body { display: grid; gap: 14px; }
 .loading { min-height: 120px; display: grid; place-items: center; color: var(--muted); }
 .error { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--danger); }
+.degraded { min-height: 58px; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 9px 10px; border: 1px solid #dfcda7; border-radius: 8px; color: #75510a; background: #fff9e9; }
+.degraded > span { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: #f5e9c9; }
+.degraded p, .degraded strong, .degraded small { min-width: 0; display: block; margin: 0; }
+.degraded strong { font-size: .72rem; }
+.degraded small { margin-top: 2px; color: #725f37; font-size: .65rem; line-height: 1.4; }
+.degraded button { min-height: 44px; }
 
 .alerts { display: grid; gap: 7px; }
 .alerts > div { min-height: 56px; display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: start; gap: 8px; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
@@ -128,6 +134,32 @@
 .incidentTimeline time { color: var(--muted); font-size: .62rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .incidentEmpty { color: var(--muted); }
 
+.chaos { display: grid; gap: 11px; padding: 13px; border: 1px solid #b8c8c0; border-radius: 10px; background: color-mix(in srgb, #edf4ef 62%, var(--card)); }
+.chaosHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.chaosHead > div { min-width: 0; }
+.chaosHead > div > span { color: #6f5630; font-size: .62rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.chaosHead h3 { margin: 2px 0 0; color: var(--fg); font-size: .9rem; }
+.chaosHead p { max-width: 76ch; margin: 3px 0 0; color: var(--muted); font-size: .68rem; line-height: 1.5; }
+.chaosHead > span { display: inline-flex; width: max-content; min-height: 30px; align-items: center; gap: 5px; padding: 0 9px; border: 1px solid currentColor; border-radius: 999px; color: #21613d; background: #eaf6ef; font-size: .64rem; font-weight: 800; white-space: nowrap; }
+.chaosHead > span[data-posture="degraded"] { color: #75510a; background: #fff7df; }
+.chaosHead > span[data-posture="critical"] { color: var(--danger); background: color-mix(in srgb, var(--danger) 7%, var(--card)); }
+.chaosGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.chaosGrid article { min-width: 0; display: grid; gap: 7px; padding: 10px; border: 1px solid #c9d8ce; border-radius: 9px; background: var(--card); }
+.chaosGrid article[data-state="contained"] { border-color: #dfcda7; background: #fff9e9; }
+.chaosGrid article[data-state="critical"] { border-color: #e3c9c9; background: color-mix(in srgb, var(--danger) 5%, var(--card)); }
+.chaosGrid article > div:first-child { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 7px; }
+.chaosGrid article > div:first-child > span { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: #21613d; background: #deece2; }
+.chaosGrid article[data-state="contained"] > div:first-child > span { color: #75510a; background: #f5e9c9; }
+.chaosGrid article[data-state="critical"] > div:first-child > span { color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, var(--card)); }
+.chaosGrid article strong { min-width: 0; font-size: .7rem; }
+.chaosGrid article > div:first-child > small { color: var(--muted); font-size: .61rem; font-weight: 750; white-space: nowrap; }
+.chaosGrid article > p { margin: 0; color: var(--fg); font-size: .65rem; line-height: 1.4; }
+.chaosGrid dl { display: grid; gap: 4px; margin: 0; }
+.chaosGrid dl > div { min-width: 0; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 6px; }
+.chaosGrid dt { color: #6f5630; font-size: .58rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; }
+.chaosGrid dd { min-width: 0; margin: 0; color: var(--muted); font-size: .61rem; line-height: 1.4; overflow-wrap: anywhere; }
+.chaosRule { display: flex; align-items: flex-start; gap: 6px; margin: 0; color: var(--muted); font-size: .65rem; line-height: 1.45; }
+
 .report { border-color: #d8c9ac; background: color-mix(in srgb, #fff7df 50%, var(--card)); }
 .report_go, .report_hold, .report_noGo { min-width: 62px; display: inline-flex; align-items: center; justify-content: center; min-height: 30px; padding: 0 9px; border: 1px solid currentColor; border-radius: 999px; font-size: .68rem; font-weight: 800; }
 .report_go { color: #21613d; background: #eaf6ef; }
@@ -159,7 +191,8 @@
   .header button { grid-column: 2; width: 44px; justify-content: center; }
   .header button span { display: none; }
   .metrics, .waveFacts, .activationFacts, .activationCriteria, .incidentMetrics, .criteria { grid-template-columns: 1fr; }
-  .waveHead, .activationHead, .incidentHead, .reportHead, .waveActions, .activationActions { align-items: stretch; flex-direction: column; }
+  .chaosGrid { grid-template-columns: 1fr; }
+  .waveHead, .activationHead, .incidentHead, .chaosHead, .reportHead, .waveActions, .activationActions { align-items: stretch; flex-direction: column; }
   .timeline { grid-template-columns: 1fr; gap: 7px; }
   .timeline li:not(:last-child)::after { width: 2px; height: auto; top: 26px; bottom: -7px; left: 12px; right: auto; }
   .createForm, .incidentForm { grid-template-columns: 1fr; }
@@ -172,8 +205,10 @@
   .waveActions button, .activationActions button, .createForm button { width: 100%; justify-content: center; }
   .history p { grid-template-columns: auto minmax(0, 1fr); }
   .history small { grid-column: 2; white-space: normal; }
+  .degraded { grid-template-columns: 28px minmax(0, 1fr); }
+  .degraded button { grid-column: 2; width: 100%; justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wave, .activation, .incident, .creator, .report, .alerts > div { transition: none; }
+  .wave, .activation, .incident, .chaos, .creator, .report, .alerts > div { transition: none; }
 }

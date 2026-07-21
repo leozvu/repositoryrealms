@@ -1,120 +1,263 @@
 'use client';
-// v3.7: Việc của tôi — mở lên là biết hôm nay làm gì: việc quá hạn/hôm nay/tuần này,
-// yêu cầu chờ mình duyệt, lịch hẹn CRM, giờ đã log tuần này. Mark done ngay tại chỗ.
-import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Badge, EmptyState, AsyncButton, useToast } from '@/components/ui';
-import { fmtDate, todayISO, daysFromNow, localISO, parseItems } from '@/lib/format';
+import { Icon, useToast } from '@/components/ui';
+import styles from './my-work.module.css';
+
+const QUEUES = [
+  ['doing', 'Đang làm', 'Giữ ít việc đang làm để hoàn tất nhanh hơn.'],
+  ['blocked', 'Bị chặn', 'Cần hỗ trợ hoặc quyết định từ người điều phối.'],
+  ['waiting', 'Đang chờ', 'Đang chờ review, phản hồi hoặc đầu vào.'],
+  ['planned', 'Tiếp theo', 'Các việc đã được sắp theo ưu tiên.'],
+  ['inbox', 'Inbox', 'Việc mới cần đọc và sắp xếp.'],
+  ['completed', 'Đã xong', 'Những việc hoàn tất hoặc đã hợp nhất.'],
+];
+
+const STATUS = {
+  todo: 'Chờ thực hiện', doing: 'Đang làm', in_progress: 'Đang làm', review: 'Chờ review',
+  waiting: 'Đang chờ', blocked: 'Bị chặn', done: 'Hoàn tất', merged: 'Đã hợp nhất',
+};
+
+const WORK_TYPES = [
+  ['design', 'Thiết kế'], ['content', 'Nội dung'], ['campaign', 'Chiến dịch'], ['development', 'Phát triển'],
+  ['operations', 'Vận hành'], ['sales', 'Kinh doanh'], ['finance', 'Tài chính'], ['other', 'Khác'],
+];
+const COMPLEXITIES = [['small', 'Nhỏ'], ['medium', 'Vừa'], ['large', 'Lớn'], ['unknown', 'Chưa rõ']];
+
+function hours(value) {
+  return Number.isFinite(Number(value)) ? `${Number(value).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}h` : '—';
+}
+
+function ResourceIntelligence({ value }) {
+  if (!value) return null;
+  return (
+    <div className={styles.intelligence} data-level={value.signal.level}>
+      <div className={styles.intelligenceHead}>
+        <strong>{value.signal.label}</strong>
+        <span>Confidence: {value.confidence.label}</span>
+      </div>
+      <dl>
+        <div><dt>Estimate</dt><dd>{value.estimate.hours ? hours(value.estimate.hours) : 'Chưa có'}</dd></div>
+        <div><dt>TimeLog</dt><dd>{hours(value.actual.hours)}</dd></div>
+        <div><dt>Historical</dt><dd>{value.historical.medianHours == null ? 'Chưa đủ mẫu' : `${hours(value.historical.medianHours)} · ${value.historical.sampleSize} mẫu`}</dd></div>
+        <div><dt>Đã dùng</dt><dd>{value.variance.consumedPercent == null ? '—' : `${value.variance.consumedPercent}%`}</dd></div>
+      </dl>
+      <p>{value.signal.explanation} TimeLog hiện là dữ liệu tự khai báo, không phải quan sát tuyệt đối.</p>
+    </div>
+  );
+}
+
+function nextTransition(task) {
+  if (task.status === 'todo') return { nextState: 'doing', label: 'Bắt đầu' };
+  if (['doing', 'in_progress'].includes(task.status)) return { nextState: 'review', label: 'Gửi review' };
+  if (task.status === 'review') return { nextState: 'done', label: 'Hoàn tất' };
+  if (task.status === 'waiting') return { nextState: 'doing', label: 'Tiếp tục làm' };
+  return null;
+}
+
+function dueLabel(dueDate) {
+  if (!dueDate) return 'Không có hạn';
+  return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(`${dueDate}T00:00:00`));
+}
+
+function WorkCard({ task, busy, onTransition, onEstimate }) {
+  const transition = nextTransition(task);
+  const overdue = task.dueDate && task.dueDate < new Date().toISOString().slice(0, 10) && !['done', 'merged'].includes(task.status);
+  return (
+    <article className={styles.workCard} data-state={task.status}>
+      <div className={styles.workMain}>
+        <div className={styles.workHeading}>
+          <h3>{task.title}</h3>
+          <span className={styles.status}>{STATUS[task.status] || task.status}</span>
+        </div>
+        <p className={styles.meta}>
+          <span>{task.project?.name || 'Việc chung'}</span>
+          <span className={overdue ? styles.overdue : ''}>{overdue ? 'Quá hạn: ' : 'Hạn: '}{dueLabel(task.dueDate)}</span>
+          <span>Ưu tiên: {task.priority}</span>
+          {task.escalationLevel > 0 && <span>Escalation L{task.escalationLevel}</span>}
+        </p>
+        {task.blockReason && <p className={styles.reason}><strong>Lý do bị chặn:</strong> {task.blockReason}</p>}
+        <ResourceIntelligence value={task.intelligence} />
+      </div>
+      <div className={styles.workActions}>
+        <Link className="btn btn-outline" href="/tasks">Mở chi tiết</Link>
+        {!['done', 'merged'].includes(task.status) && <button className="btn btn-outline" disabled={busy} onClick={() => onEstimate(task)}>Cập nhật estimate</button>}
+        {transition && (
+          <button className="btn btn-primary" disabled={busy} onClick={() => onTransition(task, transition.nextState)}>
+            <Icon name={transition.nextState === 'done' ? 'check' : 'tasks'} size={16} />
+            {busy ? 'Đang cập nhật…' : transition.label}
+          </button>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function EstimatePanel({ task, busy, onClose, onSave }) {
+  const [estimateHours, setEstimateHours] = useState(task.estHours || 1);
+  const [workType, setWorkType] = useState(task.workType || 'other');
+  const [complexity, setComplexity] = useState(task.complexity || 'unknown');
+  const [note, setNote] = useState('');
+  const validHours = Number(estimateHours) >= 0.25 && Number(estimateHours) <= 10000;
+  return (
+    <section className={styles.estimatePanel} aria-labelledby="my-estimate-title">
+      <div className={styles.panelHead}>
+        <div><p className={styles.eyebrow}>Declared estimate</p><h2 id="my-estimate-title">Ước lượng: {task.title}</h2></div>
+        <button className="icon-btn" onClick={onClose} aria-label="Đóng form estimate"><Icon name="x" size={18} /></button>
+      </div>
+      <p>Estimate là khai báo phạm vi, không phải cam kết hiệu suất. Hệ thống giữ riêng estimate, TimeLog và historical để manager xem đúng ngữ cảnh.</p>
+      <form onSubmit={(event) => { event.preventDefault(); if (validHours) onSave({
+        action: 'task.estimate', entityId: task.id, expectedVersion: task.workVersion, estimateKind: 'declared',
+        estimateHours: Number(estimateHours), workType, complexity, note,
+      }); }}>
+        <div><label htmlFor="my-estimate-hours">Số giờ ước lượng</label><input id="my-estimate-hours" type="number" min="0.25" max="10000" step="0.25" value={estimateHours} onChange={(event) => setEstimateHours(event.target.value)} required /></div>
+        <div><label htmlFor="my-estimate-type">Nhóm công việc</label><select id="my-estimate-type" value={workType} onChange={(event) => setWorkType(event.target.value)}>{WORK_TYPES.map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div>
+        <div><label htmlFor="my-estimate-complexity">Độ phức tạp</label><select id="my-estimate-complexity" value={complexity} onChange={(event) => setComplexity(event.target.value)}>{COMPLEXITIES.map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div>
+        <div className={styles.estimateNote}><label htmlFor="my-estimate-note">Ghi chú phạm vi (không bắt buộc)</label><input id="my-estimate-note" maxLength={500} value={note} onChange={(event) => setNote(event.target.value)} /></div>
+        <div className={styles.formActions}><button type="button" className="btn btn-outline" onClick={onClose}>Hủy</button><button className="btn btn-primary" disabled={busy || !validHours}>{busy ? 'Đang lưu…' : 'Lưu estimate có receipt'}</button></div>
+      </form>
+    </section>
+  );
+}
 
 export default function MyDayPage() {
   const { data: session } = useSession();
-  const me = session?.user;
-  const tasks = useResource('tasks');
-  const activities = useResource('activities');
-  const timelogs = useResource('timelogs');
-  const [approvals, setApprovals] = useState(null);
   const toast = useToast();
-  useEffect(() => { fetch('/api/approvals').then(r => r.ok ? r.json() : null).then(setApprovals).catch(() => {}); }, []);
+  const [model, setModel] = useState(null);
+  const [approvals, setApprovals] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [busyId, setBusyId] = useState('');
+  const [estimateTask, setEstimateTask] = useState(null);
 
-  const today = todayISO(), week = daysFromNow(7);
-  const mine = tasks.rows.filter(t => t.assigneeId === me?.id && t.status !== 'done');
-  const late = mine.filter(t => t.dueDate && t.dueDate < today);
-  const dueToday = mine.filter(t => t.dueDate === today);
-  const dueWeek = mine.filter(t => t.dueDate && t.dueDate > today && t.dueDate <= week);
-  const noDue = mine.filter(t => !t.dueDate);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch('/api/execution/my-work', { cache: 'no-store' });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || 'Không thể tải công việc.');
+      setModel(body);
+    } catch (requestError) {
+      setError(requestError.message || 'Không thể tải công việc.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+    fetch('/api/approvals', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null).then(setApprovals).catch(() => {});
+  }, [load]);
+
+  const transition = async (task, nextState) => {
+    setBusyId(task.id);
+    try {
+      const key = `my-work:${task.id}:${task.status}:${nextState}:${crypto.randomUUID()}`;
+      const response = await fetch('/api/execution/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key },
+        body: JSON.stringify({ action: 'task.transition', entityId: task.id, expectedState: task.status, nextState }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || 'Không thể cập nhật Task.');
+      toast('Task ERP đã được cập nhật.');
+      await load();
+    } catch (requestError) {
+      toast(requestError.message || 'Không thể cập nhật Task.', 'error');
+    } finally {
+      setBusyId('');
+    }
+  };
+
+  const saveEstimate = async (command) => {
+    setBusyId(command.entityId);
+    try {
+      const response = await fetch('/api/execution/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': `my-estimate:${command.entityId}:${crypto.randomUUID()}` },
+        body: JSON.stringify(command),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || 'Không thể lưu estimate.');
+      toast('Estimate đã cập nhật trên Task ERP và có receipt.');
+      setEstimateTask(null);
+      await load();
+    } catch (requestError) {
+      toast(requestError.message || 'Không thể lưu estimate.', 'error');
+    } finally {
+      setBusyId('');
+    }
+  };
+
   const toApprove = approvals?.toApprove || [];
-
-  // Giờ log tuần này (từ thứ Hai)
-  const monday = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return localISO(d); })();
-  const weekHours = timelogs.rows.filter(l => l.userId === me?.id && l.date >= monday).reduce((s, l) => s + l.hours, 0);
-  const actsToday = activities.rows.filter(a => !a.done && a.date === today);
-
-  const markDone = async t => {
-    const r = await tasks.update(t.id, { status: 'done' });
-    if (r) toast(`✔ Xong: ${t.title}`);
-  };
-
-  const Row = ({ t, danger }) => {
-    const cl = parseItems(t.checklist);
-    return (
-      <div className="act-item" style={{ alignItems: 'center' }}>
-        <AsyncButton className="icon-btn" pendingLabel="…" disabled={tasks.mutating} title="Đánh dấu hoàn thành" style={{ color: 'var(--accent)', flex: 'none' }} onClick={() => markDone(t)}>
-          <Icon name="check" size={17} /></AsyncButton>
-        <div style={{ flex: 1 }}>
-          <div className="act-title">{t.recur && '🔁 '}{t.title}</div>
-          <div className="act-sub">{cl.length > 0 && <>☑ {cl.filter(x => x.done).length}/{cl.length} · </>}
-            <span style={danger ? { color: 'var(--danger)', fontWeight: 700 } : {}}>{t.dueDate ? 'hạn ' + fmtDate(t.dueDate) : 'không hạn'}</span></div>
-        </div>
-        <Badge map="priority" k={t.priority} />
-      </div>
-    );
-  };
-  const Section = ({ title, items, danger, empty }) => (
-    <div className="card">
-      <div className="card-head"><span className="card-title" style={danger && items.length ? { color: 'var(--danger)' } : {}}>{title} ({items.length})</span></div>
-      <div className="card-body" style={{ paddingTop: 6 }}>
-        {items.map(t => <Row key={t.id} t={t} danger={danger} />)}
-        {!items.length && <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>{empty}</p>}
-      </div>
-    </div>
-  );
+  const metrics = model?.metrics || { open: 0, doing: 0, blocked: 0, overdue: 0 };
+  const intelligence = model?.resourceIntelligence || { estimateMissing: 0, baselineReady: 0, attention: 0, declaredLoggedHours: 0 };
+  const visibleQueues = useMemo(() => QUEUES.map(([key, label, description]) => ({ key, label, description, tasks: model?.queues?.[key] || [] })), [model]);
 
   return (
-    <>
-      <div className="grid kpi-grid" style={{ marginBottom: 16 }}>
-        <div className="card kpi"><span className="kpi-label">Quá hạn</span>
-          <div className="kpi-value" style={{ color: late.length ? 'var(--danger)' : 'var(--accent)' }}>{late.length}</div></div>
-        <div className="card kpi"><span className="kpi-label">Hôm nay + 7 ngày</span>
-          <div className="kpi-value">{dueToday.length + dueWeek.length}</div></div>
-        <div className="card kpi"><span className="kpi-label">Chờ tôi duyệt</span>
-          <div className="kpi-value" style={{ color: toApprove.length ? 'var(--warn, #D97706)' : 'inherit' }}>{toApprove.length}</div>
-          <div className="kpi-sub"><Link href="/approvals" style={{ color: 'var(--primary)' }}>Mở Phê duyệt →</Link></div></div>
-        <div className="card kpi"><span className="kpi-label">Giờ log tuần này</span>
-          <div className="kpi-value">{Math.round(weekHours * 10) / 10}h</div>
-          <div className="kpi-sub"><Link href="/timesheet" style={{ color: 'var(--primary)' }}>Ghi giờ →</Link></div></div>
+    <div className={styles.page}>
+      <header className={styles.hero}>
+        <div>
+          <p className={styles.eyebrow}>Personal execution cockpit</p>
+          <h1>{session?.user?.name ? `${session.user.name}, đây là nhịp làm việc của bạn` : 'Việc của tôi'}</h1>
+          <p>Task bên dưới là dữ liệu ERP gốc. Realm và giao diện ERP cùng nhìn vào một nguồn duy nhất.</p>
+        </div>
+        <div className={styles.heroActions}>
+          <button className="btn btn-outline" onClick={load} disabled={loading}><Icon name="repeat" size={16} /> Làm mới</button>
+          <Link className="btn btn-primary" href="/tasks"><Icon name="tasks" size={16} /> Mở bảng công việc</Link>
+        </div>
+      </header>
+
+      <section className={styles.metrics} aria-label="Tóm tắt công việc">
+        {[
+          ['Việc đang mở', metrics.open],
+          ['Đang làm', metrics.doing],
+          ['Bị chặn', metrics.blocked],
+          ['Quá hạn', metrics.overdue],
+          ['Chờ tôi duyệt', toApprove.length],
+        ].map(([label, value]) => <div key={label} className={styles.metric}><span>{label}</span><strong>{value}</strong></div>)}
+      </section>
+
+      <div className={styles.notice} role="note">
+        <Icon name="shield" size={18} />
+        <span>Không dùng thời gian online để chấm năng suất. Tiến độ được phản ánh bằng trạng thái và kết quả công việc.</span>
       </div>
 
-      <div className="grid two-col" style={{ alignItems: 'start' }}>
-        <div style={{ display: 'grid', gap: 16 }}>
-          <Section title="🔥 Quá hạn" items={late} danger empty="Không có việc quá hạn — tuyệt!" />
-          <Section title="📌 Hôm nay" items={dueToday} empty="Hôm nay không có việc đến hạn." />
-          <Section title="📅 7 ngày tới" items={dueWeek} empty="Tuần tới đang trống." />
-          {noDue.length > 0 && <Section title="Không có hạn" items={noDue} empty="" />}
-        </div>
-        <div style={{ display: 'grid', gap: 16 }}>
-          <div className="card">
-            <div className="card-head"><span className="card-title">✋ Chờ tôi duyệt ({toApprove.length})</span></div>
-            <div className="card-body" style={{ paddingTop: 6 }}>
-              {toApprove.slice(0, 6).map(a => (
-                <Link key={a.id} href="/approvals" className="act-item" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <span style={{ flex: 'none' }}>📋</span>
-                  <div style={{ flex: 1 }}>
-                    <div className="act-title">{a.title}</div>
-                    <div className="act-sub">từ {a.requesterName}</div>
-                  </div>
-                </Link>
-              ))}
-              {!toApprove.length && <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Không có yêu cầu nào chờ bạn.</p>}
-            </div>
+      <section className={styles.intelligenceSummary} aria-labelledby="resource-intelligence-summary">
+        <div><p className={styles.eyebrow}>Resource Intelligence · shadow mode</p><h2 id="resource-intelligence-summary">Estimate ≠ TimeLog ≠ Historical</h2><p>Chỉ đưa cảnh báo có giải thích; không dùng làm Gold, payroll hay điểm hiệu suất.</p></div>
+        <dl>
+          <div><dt>Thiếu estimate</dt><dd>{intelligence.estimateMissing}</dd></div>
+          <div><dt>Cần xem lại</dt><dd>{intelligence.attention}</dd></div>
+          <div><dt>Baseline đủ mẫu</dt><dd>{intelligence.baselineReady}</dd></div>
+          <div><dt>TimeLog tự khai báo</dt><dd>{hours(intelligence.declaredLoggedHours)}</dd></div>
+        </dl>
+      </section>
+
+      {estimateTask && <EstimatePanel key={`${estimateTask.id}:${estimateTask.workVersion}`} task={estimateTask} busy={busyId === estimateTask.id} onClose={() => setEstimateTask(null)} onSave={saveEstimate} />}
+
+      <div className={styles.live} aria-live="polite">{loading ? 'Đang đồng bộ từ ERP…' : error || `Đã đồng bộ ${metrics.open} việc đang mở.`}</div>
+      {error && <div className={styles.error} role="alert"><span>{error}</span><button className="btn btn-outline" onClick={load}>Thử lại</button></div>}
+
+      {!error && visibleQueues.map((queue) => (
+        <section key={queue.key} className={styles.queue} aria-labelledby={`queue-${queue.key}`}>
+          <div className={styles.queueHead}>
+            <div><h2 id={`queue-${queue.key}`}>{queue.label} <span>{queue.tasks.length}</span></h2><p>{queue.description}</p></div>
           </div>
-          <div className="card">
-            <div className="card-head"><span className="card-title">📞 Lịch hẹn hôm nay ({actsToday.length})</span></div>
-            <div className="card-body" style={{ paddingTop: 6 }}>
-              {actsToday.map(a => (
-                <div key={a.id} className="act-item">
-                  <span style={{ flex: 'none' }}>🕐</span>
-                  <div style={{ flex: 1 }}><div className="act-title">{a.title}</div><div className="act-sub">Hoạt động CRM</div></div>
-                </div>
-              ))}
-              {!actsToday.length && <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Không có lịch hẹn nào hôm nay.</p>}
-            </div>
+          <div className={styles.queueList}>
+            {queue.tasks.slice(0, queue.key === 'completed' ? 8 : 100).map((task) => <WorkCard key={task.id} task={task} busy={busyId === task.id} onTransition={transition} onEstimate={setEstimateTask} />)}
+            {!loading && !queue.tasks.length && <p className={styles.empty}>Không có công việc trong nhóm này.</p>}
           </div>
-        </div>
-      </div>
-      {!mine.length && !toApprove.length && (
-        <div style={{ marginTop: 16 }}><EmptyState title="Hôm nay bạn rảnh 🎉" sub="Không có việc được gán và không có gì chờ duyệt." /></div>
-      )}
-    </>
+        </section>
+      ))}
+
+      <section className={styles.approvals} aria-labelledby="my-approvals-title">
+        <div><h2 id="my-approvals-title">Phê duyệt cần xử lý</h2><p>Luồng phê duyệt vẫn dùng nguyên module ERP hiện có.</p></div>
+        <strong>{toApprove.length}</strong>
+        <Link className="btn btn-outline" href="/approvals">Mở phê duyệt</Link>
+      </section>
+    </div>
   );
 }

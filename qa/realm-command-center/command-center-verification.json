@@ -113,7 +113,8 @@
       "layer": "api",
       "source": "app/api/realm-demo/actions/route.js",
       "signals": [
-        "if (action === 'task.assign') return 'command'",
+        "repositoryRealmsSurface(body?.action)",
+        "executeRepositoryRealmsAction",
         "await emitEvent(result.resource",
         "if (!result.idempotent)"
       ],

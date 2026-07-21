@@ -16,6 +16,9 @@ test('Royal Embassy demo tổng hợp pipeline và client portfolio nhưng khôn
   assert.equal(dashboard.clients.length, 3);
   assert.equal(dashboard.permissions.contactDetails, false);
   assert.equal(dashboard.permissions.performanceRanking, false);
+  assert.equal(dashboard.workloadIntelligence.ruleVersion, 'crm-workload-intelligence-v1');
+  assert.equal(dashboard.workloadIntelligence.policy.employeeRanking, false);
+  assert.equal(dashboard.workloadIntelligence.policy.activityIsObservedTruth, false);
 });
 
 test('Lead quá ngày, chưa gán và forecast được suy ra từ stage chuẩn', () => {
@@ -37,6 +40,8 @@ test('Lead quá ngày, chưa gán và forecast được suy ra từ stage chuẩ
   assert.equal(proposal.overdue, true);
   assert.equal('email' in proposal, false);
   assert.deepEqual(proposal.activities[0], { id: 'activity-1', kind: 'call', title: 'Gọi xác nhận', date: '2026-07-18', done: false, author: 'Quang Võ' });
+  assert.equal(JSON.stringify(dashboard.workloadIntelligence).includes('must-not-leak@example.com'), false);
+  assert.equal(dashboard.workloadIntelligence.provenance.lead, 'canonical_erp_lead');
 });
 
 test('Client registry chỉ trả nhịp Project, không trả contact details', () => {

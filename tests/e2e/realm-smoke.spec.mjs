@@ -59,7 +59,7 @@ test('the product Realm uses the original ERP authentication boundary', async ({
 });
 
 test('cross-surface collaboration APIs preserve the ERP authentication boundary', async ({ request }) => {
-  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle', '/api/realm-demo/pilot', '/api/realm-demo/feedback', '/api/realm-demo/readiness']) {
+  for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle', '/api/realm-demo/pilot', '/api/realm-demo/feedback', '/api/realm-demo/readiness', '/api/realm-demo/experience', '/api/realm-demo/release-candidate']) {
     const response = await request.get(route);
     expect([401, 503]).toContain(response.status());
     expect(response.headers()['cache-control']).toContain('no-store');
@@ -153,6 +153,7 @@ test('director can inspect the pilot policy and switch between the same ERP data
 
   const onboarding = page.getByRole('dialog', { name: 'Realm Pilot · Khởi hành an toàn' });
   await expect(onboarding).toBeVisible();
+  await expect(onboarding.getByRole('img', { name: /Chân dung Realm/ })).toBeVisible();
   await expect(onboarding).toContainText('Một dữ liệu, hai giao diện');
   await expect(onboarding).toContainText('không đo thời lượng');
   for (let step = 0; step < 3; step += 1) await onboarding.getByRole('button', { name: 'Tiếp tục' }).click();
@@ -187,6 +188,15 @@ test('director can inspect the pilot policy and switch between the same ERP data
   const feedbackOperations = page.getByRole('region', { name: 'Guild Support · Pilot Operations' });
   await expect(feedbackOperations).toBeVisible();
   await expect(feedbackOperations).toContainText('Không dùng số phản hồi để đánh giá cá nhân');
+  const experienceScorecard = page.getByRole('region', { name: 'Experience Pilot · Phase 23' });
+  await expect(experienceScorecard).toBeVisible();
+  await expect(experienceScorecard).toContainText('advisory scorecard');
+  await expect(experienceScorecard).toContainText('không lưu user ID, record ID, nội dung, thời lượng hay điểm hiệu suất');
+  const releaseCandidate = page.getByRole('region', { name: 'Release Candidate Dossier · Phase 24' });
+  await expect(releaseCandidate).toBeVisible();
+  await expect(releaseCandidate).toContainText('Dossier không phải approval');
+  await expect(releaseCandidate).toContainText('Launch authority vẫn ở Controlled Launch');
+  await expect(releaseCandidate.getByRole('button', { name: 'Tải JSON evidence' })).toBeVisible();
 
   const readinessResponse = await page.evaluate(async () => {
     const response = await fetch('/api/realm-demo/readiness', { cache: 'no-store' });
@@ -217,6 +227,7 @@ test('pilot onboarding remains usable on mobile', async ({ page, isMobile }) => 
 
   const onboarding = page.getByRole('dialog', { name: 'Realm Pilot · Khởi hành an toàn' });
   await expect(onboarding).toBeVisible();
+  await expect(onboarding.getByRole('img', { name: /Chân dung Realm/ })).toBeVisible();
   const metrics = await onboarding.evaluate((element) => ({
     width: element.getBoundingClientRect().width,
     viewport: window.visualViewport?.width || document.documentElement.clientWidth,
@@ -238,9 +249,10 @@ test('pilot onboarding remains usable on mobile', async ({ page, isMobile }) => 
   expect(launcherMetrics.height).toBeGreaterThanOrEqual(44);
 });
 
-test('Realm and ERP views expose the same live character status', async ({ page }) => {
+test('Realm and its optional Realm ledger expose the same live character status', async ({ page }) => {
   await page.goto('/realm-demo');
-  await page.getByRole('button', { name: 'ERP · CRM', exact: true }).click();
+  await expect(page.getByRole('link', { name: 'Mở workspace ERP CRM gốc' })).toHaveAttribute('href', '/dashboard');
+  await page.getByRole('button', { name: 'Sổ Realm', exact: true }).click();
   await expect(page.getByRole('region', { name: 'Hồ sơ nhân sự kết nối nhân vật' })).toContainText(/Adventurer [A-Z0-9]{4}/);
   await expect(page.getByRole('region', { name: /Adventurer [A-Z0-9]{4}/ })).toContainText('Gold');
   await expect(page.getByText('Quest ↔ công việc ERP/CRM', { exact: true })).toBeVisible();
@@ -272,17 +284,91 @@ test('Realm and ERP views expose the same live character status', async ({ page 
   await expect(taskLinks.first()).toHaveAttribute('href', /^\/tasks\?focus=/);
 });
 
-test('all Realm navigation surfaces open without runtime errors or horizontal overflow', async ({ page }) => {
+test('all Realm navigation surfaces open without runtime errors or horizontal overflow', async ({ page, isMobile }) => {
   await page.goto('/realm-demo');
-  const destinations = [
-    'Đại sảnh', 'Quest Board', 'Royal Command', 'Chiến dịch', 'Guild',
-    'Royal Treasury', 'Arcane Forge', 'Lantern Chat', 'Party Voice',
-    'Hồ sơ nhân vật', 'Điều hành ERP · CRM',
-  ];
+  if (isMobile) {
+    const destinations = [
+      'world:briefing', 'world:quests', 'world:command', 'world:campaigns', 'world:guild',
+      'world:treasury', 'world:shop', 'world:chat', 'world:party', 'world:profile',
+      'ledger:personal', 'ledger:guild', 'ledger:treasury',
+    ];
+    const navigator = page.getByRole('combobox', { name: 'Khu vực', exact: true });
+    await expect(navigator).toBeVisible();
+    for (const value of destinations) {
+      await navigator.selectOption(value);
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+    }
+  } else {
+    const destinations = [
+      'Đại sảnh', 'Quest Board', 'Royal Command', 'Chiến dịch', 'Guild',
+      'Royal Treasury', 'Arcane Forge', 'Lantern Chat', 'Party Voice',
+      'Hồ sơ nhân vật', 'Sổ Realm & Tavern',
+    ];
+    for (const name of destinations) {
+      await page.getByRole('button', { name, exact: name !== 'Quest Board' }).click();
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+    }
+  }
+});
+
+test('desktop Realm inspector contains every compact surface inside its own frame', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The narrow desktop inspector is a three-column layout contract; mobile uses the full-width stacked panel.');
+  await page.goto('/realm-demo');
+  const destinations = ['Đại sảnh', 'Quest Board', 'Royal Command', 'Chiến dịch', 'Guild', 'Royal Treasury', 'Arcane Forge', 'Lantern Chat', 'Party Voice'];
   for (const name of destinations) {
     await page.getByRole('button', { name, exact: name !== 'Quest Board' }).click();
-    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+    const metrics = await page.getByRole('complementary', { name: 'Bảng thông tin CRMegoric' }).evaluate((inspector) => {
+      const visibleOverflow = [...inspector.querySelectorAll('*')].filter((element) => {
+        if (!(element.clientWidth > 0 && element.scrollWidth > element.clientWidth + 1)) return false;
+        return getComputedStyle(element).overflowX === 'visible';
+      });
+      const content = inspector.firstElementChild?.firstElementChild;
+      return {
+        inspectorClient: inspector.clientWidth,
+        inspectorScroll: inspector.scrollWidth,
+        contentClient: content?.clientWidth || 0,
+        contentScroll: content?.scrollWidth || 0,
+        visibleOverflow: visibleOverflow.length,
+      };
+    });
+    expect(metrics.inspectorScroll).toBeLessThanOrEqual(metrics.inspectorClient + 1);
+    expect(metrics.contentScroll).toBeLessThanOrEqual(metrics.contentClient + 1);
+    expect(metrics.visibleOverflow).toBe(0);
   }
+});
+
+test('map style switcher reuses presentation assets without adding business data to local storage', async ({ page }) => {
+  await page.goto('/realm-demo');
+  const picker = page.getByLabel('Đổi phong cách bản đồ lâu đài', { exact: true });
+  const canvas = page.getByLabel(/Bản đồ văn phòng ảo/);
+  await expect(canvas).toHaveAttribute('data-realm-world-size', '58x36');
+  for (const value of ['royal-office', 'emerald-court', 'lantern-festival']) {
+    await picker.selectOption(value);
+    await expect(canvas).toHaveAttribute('data-realm-map-style', value);
+    await expect(canvas).toHaveAttribute('data-realm-prop-art', 'ready');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('crmegoric-realm-map-style-v1'))).toBe(value);
+  }
+  const stored = await page.evaluate(() => ({
+    value: localStorage.getItem('crmegoric-realm-map-style-v1'),
+    keys: Object.keys(localStorage).filter((key) => key.includes('map-style')),
+  }));
+  expect(stored).toEqual({ value: 'lantern-festival', keys: ['crmegoric-realm-map-style-v1'] });
+});
+
+test('Realm presentation context restores without persisting business identifiers', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Continuity is profile-scoped and covered once on desktop; mobile navigation is covered separately.');
+  await page.goto('/realm-demo');
+  await page.evaluate(() => localStorage.removeItem('crmegoric-realm-experience:v1'));
+  await page.reload();
+  await page.getByRole('button', { name: 'Sổ Realm', exact: true }).click();
+  await page.getByRole('button', { name: 'Tavern', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => {
+    const context = JSON.parse(localStorage.getItem('crmegoric-realm-experience:v1') || '{}');
+    return { mode: context.mode, ledgerView: context.ledgerView, keys: Object.keys(context).sort() };
+  })).toEqual({ mode: 'ledger', ledgerView: 'treasury', keys: ['ledgerView', 'mode', 'panel', 'position', 'version'] });
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Sổ Realm', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Tavern', exact: true })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('demo Realm stays an explicit local sandbox when product ERP sync is enabled', async ({ page }) => {
@@ -292,7 +378,7 @@ test('demo Realm stays an explicit local sandbox when product ERP sync is enable
     if (new URL(request.url()).pathname === '/api/realm-demo/operations') operationsRequests += 1;
   });
   await page.goto('/realm-demo');
-  await page.getByRole('button', { name: 'ERP · CRM', exact: true }).click();
+  await page.getByRole('button', { name: 'Sổ Realm', exact: true }).click();
   const sync = page.getByRole('region', { name: 'Tình trạng đồng bộ Realm với ERP' }).first();
   await expect(sync).toContainText('Demo cục bộ · không ghi DB');
   await expect(sync).toContainText('Đang hiển thị dữ liệu demo cục bộ; mọi thay đổi tại đây không được ghi vào ERP.');
@@ -309,14 +395,15 @@ test('anonymous clients cannot write to the client error audit endpoint', async 
   expect(response.headers()['cache-control']).toContain('no-store');
 });
 
-test('Realm and ERP views remain usable without horizontal overflow', async ({ page, isMobile }) => {
+test('Realm stays separate from ERP while the optional Realm ledger remains responsive', async ({ page, isMobile }) => {
   await page.goto('/realm-demo');
   await expect(page.getByText('CRMegoric Realms', { exact: true })).toBeVisible();
-  const erpMode = page.getByRole('button', { name: 'ERP · CRM', exact: true });
-  await expect(erpMode).toBeVisible();
+  const erpGateway = page.getByRole('link', { name: 'Mở workspace ERP CRM gốc' });
+  await expect(erpGateway).toBeVisible();
+  await expect(erpGateway).toHaveAttribute('href', '/dashboard');
   await expect(page.getByLabel(/Bản đồ văn phòng ảo/)).toBeVisible();
 
-  await erpMode.click();
+  await page.getByRole('button', { name: 'Sổ Realm', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Sổ điều hành CRMegoric' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Chọn khu vực điều hành ERP' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Adventurer Chronicle từ dữ liệu ERP cá nhân' })).toBeVisible();
@@ -343,7 +430,7 @@ test('Tavern request lifecycle survives a full page reload', async ({ page, isMo
   await page.goto('/realm-demo');
   await page.evaluate(() => localStorage.clear());
   await page.reload();
-  await page.getByRole('button', { name: 'ERP · CRM', exact: true }).click();
+  await page.getByRole('button', { name: 'Sổ Realm', exact: true }).click();
   await page.getByRole('button', { name: 'Tavern', exact: true }).click();
   await page.getByRole('button', { name: 'Gửi duyệt Mentor Session chuyên môn với giá 16 Gold' }).click();
   await page.getByRole('button', { name: 'Xác nhận gửi duyệt' }).click();
@@ -356,7 +443,7 @@ test('Tavern request lifecycle survives a full page reload', async ({ page, isMo
   })).toBe('fulfilled');
 
   await page.reload();
-  await page.getByRole('button', { name: 'ERP · CRM', exact: true }).click();
+  await page.getByRole('button', { name: 'Sổ Realm', exact: true }).click();
   await page.getByRole('button', { name: 'Tavern', exact: true }).click();
   await expect(page.getByText('Mentor Session chuyên môn', { exact: true }).last()).toBeVisible();
   await expect(page.getByText('Đã nhận thưởng', { exact: true })).toBeVisible();
@@ -367,9 +454,12 @@ test('opening another tab for the same profile does not inflate online headcount
   await page.goto('/realm-demo');
   await page.evaluate(() => localStorage.clear());
   await page.reload();
+  const firstSummary = page.getByText(/^\d+ online$/, { exact: true });
+  await expect(firstSummary).toBeVisible();
+  const baseline = await firstSummary.textContent();
   const secondTab = await context.newPage();
   await secondTab.goto('/realm-demo');
-  await expect(page.getByText('6 online', { exact: true })).toBeVisible();
-  await expect(secondTab.getByText('6 online', { exact: true })).toBeVisible();
+  await expect(firstSummary).toHaveText(baseline);
+  await expect(secondTab.getByText(/^\d+ online$/, { exact: true })).toHaveText(baseline);
   await secondTab.close();
 });

@@ -1,7 +1,7 @@
 .warRoom {
   --war-ink: #f7ecd3;
-  --war-muted: #b9b3a4;
-  --war-border: rgba(218, 190, 121, .2);
+  --war-muted: #beb5aa;
+  --war-border: rgba(196, 163, 106, .24);
   display: grid;
   gap: 18px;
   min-width: 0;
@@ -16,17 +16,42 @@
 .governance,
 .stateCard {
   border: 1px solid var(--war-border);
-  background: linear-gradient(145deg, rgba(43, 55, 45, .98), rgba(24, 32, 28, .98));
-  box-shadow: 0 18px 48px rgba(8, 13, 10, .22);
+  background: linear-gradient(145deg, rgba(48, 47, 45, .98), rgba(27, 30, 31, .98));
+  box-shadow: 0 18px 48px rgba(10, 9, 10, .26);
 }
 
 .hero {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
   padding: 20px 22px;
+  overflow: hidden;
   border-radius: 18px;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(126, 52, 55, .2), transparent 15rem),
+    linear-gradient(145deg, rgba(58, 49, 47, .99), rgba(27, 30, 31, .99));
+}
+
+:global([data-realm-ui-art='ready']) .hero::before {
+  position: absolute;
+  inset: 4px;
+  z-index: 0;
+  pointer-events: none;
+  content: '';
+  background-image: var(--realm-ui-notice-corner-tl), var(--realm-ui-notice-corner-tr);
+  background-position: left top, right top;
+  background-repeat: no-repeat;
+  background-size: 42px 42px;
+  filter: sepia(.25) saturate(.72);
+  opacity: .64;
+}
+
+:global([data-realm-ui-art='ready']) .hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 .heroActions { display: grid; gap: 8px; justify-items: center; }
@@ -87,7 +112,20 @@
 .workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(270px, .33fr); gap: 14px; align-items: start; }
 .board,
 .sidePanel { overflow: hidden; border-radius: 16px; }
-.panelHead { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; padding: 16px 17px 13px; border-bottom: 1px solid var(--war-border); }
+.panelHead { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; padding: 16px 17px 13px; border-bottom: 1px solid var(--war-border); }
+.panelHead::after {
+  position: absolute;
+  right: 17px;
+  bottom: -5px;
+  left: 17px;
+  height: 10px;
+  pointer-events: none;
+  content: '';
+  background: var(--realm-ui-panel-divider) center/100% 100% no-repeat;
+  filter: sepia(.3) saturate(.7);
+  opacity: 0;
+}
+:global([data-realm-ui-art='ready']) .panelHead::after { opacity: .52; }
 .panelHead h3 { margin: 4px 0 0; color: #fff8e8; font-size: 18px; }
 .panelHead small { color: #999f96; text-align: right; }
 .phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; padding: 12px; }
@@ -179,9 +217,27 @@
 .timeline li time { color: #8e9994; font-size: 9px; white-space: nowrap; }
 .timeline li p { margin: 5px 0 0; color: #b8bdb7; font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; }
 .compact { gap: 13px; }
-.compact .hero { padding: 14px; }
+.compact .hero { grid-template-columns: minmax(0, 1fr); align-items: start; padding: 16px; }
+.compact .crest { width: 46px; height: 50px; }
+.compact .heroCopy { min-width: 0; }
+.compact .heroCopy h2 { font-size: 1.28rem; overflow-wrap: anywhere; }
+.compact .heroCopy p { font-size: .76rem; overflow-wrap: anywhere; }
+.compact .heroActions,
+.compact .heroBadges { width: 100%; justify-items: start; }
+.compact .heroActions button { width: 100%; }
+.compact .health,
+.compact .source { width: auto; max-width: 100%; white-space: normal; }
 .compact .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.compact .metric { min-width: 0; grid-template-columns: 34px minmax(0, 1fr); padding: 11px; }
+.compact .progressPanel > div:first-child { align-items: flex-start; flex-wrap: wrap; }
+.compact .progressPanel p { align-items: flex-start; font-size: .75rem; }
 .compact .workspace { grid-template-columns: 1fr; }
+
+@container realm-inspector (max-width: 310px) {
+  .compact .metrics { grid-template-columns: 1fr; }
+  .compact .panelHead { align-items: flex-start; flex-direction: column; }
+  .compact .panelHead small { text-align: left; }
+}
 
 @media (max-width: 1050px) {
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }

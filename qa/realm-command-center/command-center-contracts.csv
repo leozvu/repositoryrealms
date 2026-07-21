@@ -7,7 +7,7 @@ workload-planning-not-ranking,contract,lib/realm-command-center.js,capacityBasis
 assignment-rbac-and-team-scope,server,lib/realm-action-admin.js,"hasAny(user, ['PM', 'LEAD']) | realm_assignment_target_outside_scope | action === 'task.assign'",,verified
 assignment-optimistic-concurrency,server,lib/realm-action-admin.js,assigneeId: command.expectedAssigneeId | dueDate: command.expectedDueDate | priority: command.expectedPriority | 'realm_action_stale',,verified
 assignment-idempotency-and-audit,server,lib/realm-action-admin.js,"tx.realmActionReceipt.create | payloadHash: command.payloadHash | tx.auditLog.create({ data: auditData(user, command, 'tasks')",,verified
-assignment-event-raven-bridge,api,app/api/realm-demo/actions/route.js,if (action === 'task.assign') return 'command' | await emitEvent(result.resource | if (!result.idempotent),,verified
+assignment-event-raven-bridge,api,app/api/realm-demo/actions/route.js,repositoryRealmsSurface(body?.action) | executeRepositoryRealmsAction | await emitEvent(result.resource | if (!result.idempotent),,verified
 handoff-owner-team-and-dedup,server,lib/realm-command-center-admin.js,"task.assigneeId !== user.id | realm_handoff_target_outside_team | type: 'task_handoff', refId: task.id, requesterId: user.id, status: 'pending'",,verified
 handoff-maker-checker,api,app/api/approvals/[id]/decide/route.js,"['realm_redemption', 'task_handoff'].includes(ap.type) | ap.requesterId === user.id | 'self_approval_forbidden'",,verified
 handoff-approval-claim-transaction,api,app/api/approvals/[id]/decide/route.js,"prisma.$transaction(async (tx) | where: { id: ap.id, status: 'pending', steps: ap.steps } | 'approval_decision_stale'",,verified

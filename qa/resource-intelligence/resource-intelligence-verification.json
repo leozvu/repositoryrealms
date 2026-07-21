@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 19,
+    "verifiedContracts": 19,
+    "scenarios": 5,
+    "verifiedScenarios": 5,
+    "canonicalTaskStores": 1,
+    "canonicalEstimateActions": 1,
+    "confidenceCeiling": "medium",
+    "employeeRankingEnabled": false,
+    "migrationAppliedByAudit": false
+  },
+  "contracts": [
+    {
+      "id": "canonical-task-estimate",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model Task {",
+        "estHours",
+        "workType",
+        "complexity",
+        "estimateRevisions"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "immutable-estimate-revision",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model WorkEstimateRevision",
+        "kind",
+        "previousHours",
+        "receiptId"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "additive-migration",
+      "layer": "migration",
+      "source": "prisma/migrations/20260720230000_add_resource_intelligence/migration.sql",
+      "signals": [
+        "CREATE TABLE \"WorkEstimateRevision\"",
+        "ON DELETE CASCADE",
+        "WorkEstimateRevision_receiptId_key"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "source-separation",
+      "layer": "domain",
+      "source": "lib/resource-intelligence.js",
+      "signals": [
+        "estimate:",
+        "actual:",
+        "historical:",
+        "source: 'declared_timelog'",
+        "isObservedTruth: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "historical-taxonomy",
+      "layer": "domain",
+      "source": "lib/resource-intelligence.js",
+      "signals": [
+        "historicalPool",
+        "normalizedResourceWorkType",
+        "normalizedResourceComplexity",
+        "exact.length >= 3"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "confidence-ceiling",
+      "layer": "governance",
+      "source": "lib/resource-intelligence.js",
+      "signals": [
+        "band: 'medium'",
+        "confidence bị giới hạn ở medium",
+        "confidenceCeiling: 'medium'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "anti-ranking-policy",
+      "layer": "governance",
+      "source": "lib/resource-intelligence.js",
+      "signals": [
+        "employeeRanking: false",
+        "presenceAsProductivity: false",
+        "payrollUse: false",
+        "goldUse: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "advisory-signals",
+      "layer": "domain",
+      "source": "lib/resource-intelligence.js",
+      "signals": [
+        "estimate_outlier",
+        "estimate_consumed",
+        "actual_variance",
+        "không tự động bác bỏ"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canonical-estimate-action",
+      "layer": "domain",
+      "source": "lib/resource-intelligence-admin.js",
+      "signals": [
+        "RESOURCE_INTELLIGENCE_ACTIONS",
+        "'task.estimate'",
+        "normalizeResourceEstimateCommand"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "employee-self-scope",
+      "layer": "authorization",
+      "source": "lib/resource-intelligence-admin.js",
+      "signals": [
+        "task.assigneeId !== user.id",
+        "resource_intelligence_declaration_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "manager-scope-and-reason",
+      "layer": "authorization",
+      "source": "lib/resource-intelligence-admin.js",
+      "signals": [
+        "hasAny(user, ['PM', 'LEAD'])",
+        "managerScope",
+        "resource_intelligence_manager_reason_required"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "cas-idempotency",
+      "layer": "safety",
+      "source": "lib/resource-intelligence-admin.js",
+      "signals": [
+        "workVersion: command.expectedVersion",
+        "idempotencyKey",
+        "resource_intelligence_work_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "atomic-receipt-revision-audit",
+      "layer": "audit",
+      "source": "lib/resource-intelligence-admin.js",
+      "signals": [
+        "realmActionReceipt.create",
+        "workEstimateRevision.create",
+        "workItemEvent.create",
+        "auditLog.create"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "repository-realms-dispatch",
+      "layer": "parity",
+      "source": "lib/repository-realms.js",
+      "signals": [
+        "action: 'task.estimate'",
+        "RESOURCE_INTELLIGENCE_ACTIONS.includes",
+        "executeResourceEstimateAction"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "my-work-intelligence",
+      "layer": "ui",
+      "source": "app/(app)/myday/page.jsx",
+      "signals": [
+        "Resource Intelligence · shadow mode",
+        "TimeLog hiện là dữ liệu tự khai báo",
+        "Cập nhật estimate"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "team-work-intelligence",
+      "layer": "ui",
+      "source": "app/(app)/teamwork/page.jsx",
+      "signals": [
+        "Nguồn lực theo bằng chứng có provenance",
+        "Manager adjustment",
+        "Lưu hiệu chỉnh có receipt"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-accessible-intelligence",
+      "layer": "ux",
+      "source": "app/(app)/teamwork/team-work.module.css",
+      "signals": [
+        "min-height:44px",
+        "@media(max-width:720px)",
+        "@media(prefers-reduced-motion:reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase2-tests",
+      "layer": "test",
+      "source": "tests/resource-intelligence-admin.test.mjs",
+      "signals": [
+        "CAS, receipt, revision, WorkItemEvent và audit atomically",
+        "Manager adjustment cần manager scope",
+        "Idempotent replay"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase2-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-2-RESOURCE-INTELLIGENCE.md",
+      "signals": [
+        "Estimate không phải Actual",
+        "confidence ceiling",
+        "crmegoric-realms-demo"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "three-source-model",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "declared-timelog-not-observed",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "confidence-max-medium",
+      "expected": "true:false",
+      "actual": "true:false",
+      "status": "verified"
+    },
+    {
+      "id": "manager-reason-and-cas",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "migration-additive-only",
+      "expected": "false:false:false",
+      "actual": "false:false:false",
+      "status": "verified"
+    }
+  ]
+}

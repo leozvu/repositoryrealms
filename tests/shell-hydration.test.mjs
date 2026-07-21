@@ -6,7 +6,7 @@ const source = await readFile(new URL('../components/Shell.jsx', import.meta.url
 
 test('topbar date is resolved after hydration in the employee timezone', () => {
   assert.match(source, /const \[todayLabel, setTodayLabel\] = useState\(''\)/);
-  assert.match(source, /setTodayLabel\(new Date\(\)\.toLocaleDateString\('vi-VN'/);
+  assert.match(source, /toLocaleDateString\(locale === 'en' \? 'en-US' : 'vi-VN'/);
   assert.match(source, /<span id="today-label">\{todayLabel\}<\/span>/);
   assert.doesNotMatch(
     source,

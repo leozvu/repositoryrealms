@@ -1,0 +1,313 @@
+{
+  "version": 2,
+  "mode": "named-regions",
+  "source": "public/realms/assets/generated/phase-22/erp-ui/realm-erp-ui-atlas-v1.png",
+  "sourceWidth": 1448,
+  "sourceHeight": 1086,
+  "alphaThreshold": 16,
+  "padding": 10,
+  "outputFormat": "webp",
+  "assetCount": 12,
+  "assets": [
+    {
+      "index": 1,
+      "label": "header-crest",
+      "file": "erp-ui-header-crest.webp",
+      "region": [
+        0,
+        0,
+        550,
+        360
+      ],
+      "sourceBbox": [
+        24,
+        108,
+        528,
+        271
+      ],
+      "cropBbox": [
+        14,
+        98,
+        538,
+        281
+      ],
+      "width": 524,
+      "height": 183
+    },
+    {
+      "index": 2,
+      "label": "title-plaque",
+      "file": "erp-ui-title-plaque.webp",
+      "region": [
+        550,
+        0,
+        870,
+        360
+      ],
+      "sourceBbox": [
+        578,
+        142,
+        852,
+        255
+      ],
+      "cropBbox": [
+        568,
+        132,
+        862,
+        265
+      ],
+      "width": 294,
+      "height": 133
+    },
+    {
+      "index": 3,
+      "label": "manuscript-divider",
+      "file": "erp-ui-manuscript-divider.webp",
+      "region": [
+        870,
+        0,
+        1180,
+        360
+      ],
+      "sourceBbox": [
+        893,
+        185,
+        1156,
+        234
+      ],
+      "cropBbox": [
+        883,
+        175,
+        1166,
+        244
+      ],
+      "width": 283,
+      "height": 69
+    },
+    {
+      "index": 4,
+      "label": "table-finials",
+      "file": "erp-ui-table-finials.webp",
+      "region": [
+        1180,
+        0,
+        1448,
+        360
+      ],
+      "sourceBbox": [
+        1215,
+        104,
+        1387,
+        298
+      ],
+      "cropBbox": [
+        1205,
+        94,
+        1397,
+        308
+      ],
+      "width": 192,
+      "height": 214
+    },
+    {
+      "index": 5,
+      "label": "card-corners",
+      "file": "erp-ui-card-corners.webp",
+      "region": [
+        0,
+        360,
+        400,
+        724
+      ],
+      "sourceBbox": [
+        74,
+        409,
+        350,
+        657
+      ],
+      "cropBbox": [
+        64,
+        399,
+        360,
+        667
+      ],
+      "width": 296,
+      "height": 268
+    },
+    {
+      "index": 6,
+      "label": "kpi-medallion",
+      "file": "erp-ui-kpi-medallion.webp",
+      "region": [
+        400,
+        360,
+        770,
+        724
+      ],
+      "sourceBbox": [
+        446,
+        401,
+        698,
+        657
+      ],
+      "cropBbox": [
+        436,
+        391,
+        708,
+        667
+      ],
+      "width": 272,
+      "height": 276
+    },
+    {
+      "index": 7,
+      "label": "approval-seal",
+      "file": "erp-ui-approval-seal.webp",
+      "region": [
+        770,
+        360,
+        1070,
+        724
+      ],
+      "sourceBbox": [
+        820,
+        413,
+        1008,
+        654
+      ],
+      "cropBbox": [
+        810,
+        403,
+        1018,
+        664
+      ],
+      "width": 208,
+      "height": 261
+    },
+    {
+      "index": 8,
+      "label": "quest-ribbon",
+      "file": "erp-ui-quest-ribbon.webp",
+      "region": [
+        1070,
+        360,
+        1448,
+        724
+      ],
+      "sourceBbox": [
+        1100,
+        506,
+        1412,
+        553
+      ],
+      "cropBbox": [
+        1090,
+        496,
+        1422,
+        563
+      ],
+      "width": 332,
+      "height": 67
+    },
+    {
+      "index": 9,
+      "label": "tab-endcaps",
+      "file": "erp-ui-tab-endcaps.webp",
+      "region": [
+        0,
+        724,
+        400,
+        1086
+      ],
+      "sourceBbox": [
+        67,
+        816,
+        355,
+        897
+      ],
+      "cropBbox": [
+        57,
+        806,
+        365,
+        907
+      ],
+      "width": 308,
+      "height": 101
+    },
+    {
+      "index": 10,
+      "label": "ledger-flourish",
+      "file": "erp-ui-ledger-flourish.webp",
+      "region": [
+        400,
+        724,
+        750,
+        1086
+      ],
+      "sourceBbox": [
+        423,
+        795,
+        700,
+        931
+      ],
+      "cropBbox": [
+        413,
+        785,
+        710,
+        941
+      ],
+      "width": 297,
+      "height": 156
+    },
+    {
+      "index": 11,
+      "label": "status-ornaments",
+      "file": "erp-ui-status-ornaments.webp",
+      "region": [
+        750,
+        724,
+        1080,
+        1086
+      ],
+      "sourceBbox": [
+        776,
+        817,
+        1058,
+        903
+      ],
+      "cropBbox": [
+        766,
+        807,
+        1068,
+        913
+      ],
+      "width": 302,
+      "height": 106
+    },
+    {
+      "index": 12,
+      "label": "footer-flourish",
+      "file": "erp-ui-footer-flourish.webp",
+      "region": [
+        1080,
+        724,
+        1448,
+        1086
+      ],
+      "sourceBbox": [
+        1113,
+        835,
+        1408,
+        888
+      ],
+      "cropBbox": [
+        1103,
+        825,
+        1418,
+        898
+      ],
+      "width": 315,
+      "height": 73
+    }
+  ]
+}

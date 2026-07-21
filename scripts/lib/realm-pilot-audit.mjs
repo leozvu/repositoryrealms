@@ -19,7 +19,7 @@ const CONTRACTS = [
   { id: 'aggregate-private-metrics', layer: 'server', source: 'lib/realm-pilot.js', signals: ['eligibleUsers', 'aggregateOnly: true', 'performanceTracking: false', 'durationTracking: false', 'lastSeen: { gte: activeAfter }'] },
   { id: 'policy-aware-login', layer: 'client', source: 'app/login/page.jsx', signals: ["fetch('/api/realm-demo/pilot'", 'pilot.user?.allowed', "destination = '/realm'"] },
   { id: 'cross-surface-preference', layer: 'client', source: 'lib/collaboration.js', signals: ['persistWorkspaceSurface', "window.fetch('/api/realm-demo/pilot'", 'preference: normalized', 'keepalive: true'] },
-  { id: 'both-surfaces-persist-choice', layer: 'client', source: 'components/realm/RealmOffice.jsx', signals: ["persistWorkspaceSurface('erp')", 'Chuyển sang giao diện ERP CRM', 'Mở ERP · CRM'] },
+  { id: 'both-surfaces-persist-choice', layer: 'client', source: 'components/realm/RealmOffice.jsx', signals: ["persistWorkspaceSurface('erp')", 'Mở workspace ERP CRM gốc', 'Mở ERP · CRM gốc'] },
   { id: 'pilot-admin-control', layer: 'client', source: 'components/realm/RealmPilotControl.jsx', signals: ['Realm Pilot Control', 'Pilot theo cohort', 'Lưu chính sách pilot', 'không thay thế ERP'] },
   { id: 'accessible-responsive-control', layer: 'style', source: 'components/realm/realm-pilot-control.module.css', signals: ['min-height: 44px', ':focus-within', '@media (max-width: 680px)', '@media (prefers-reduced-motion: reduce)'] },
   { id: 'classic-erp-always-reachable', layer: 'client', source: 'components/collaboration/CollaborationBridge.jsx', signals: ["realm ? '/dashboard'", "surface = realm ? 'erp'", 'ERP · CRM'] },

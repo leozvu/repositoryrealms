@@ -1,0 +1,21 @@
+id,layer,source,signals,missingSignals,status
+canonical-task-store,data,prisma/schema.prisma,model Task { | Phase 1 — Unified Work Graph | workVersion | queuePosition,,verified
+queue-cas-model,data,prisma/schema.prisma,model WorkQueueState | ownerId   String   @unique | version   Int,,verified
+structured-work-ledger,data,prisma/schema.prisma,model WorkItemEvent | receiptId | relatedTaskId,,verified
+additive-migration,migration,prisma/migrations/20260720190000_add_execution_engine/migration.sql,"ALTER TABLE ""Task"" | ADD COLUMN ""workVersion"" | CREATE TABLE ""WorkQueueState"" | CREATE TABLE ""WorkItemEvent""",,verified
+my-work-read-model,domain,lib/execution-engine.js,buildMyWorkReadModel | myWorkQueueFor | normalizedExecutionStatus,,verified
+team-work-read-model,domain,lib/execution-engine.js,buildTeamWorkReadModel | capacityBand | employeeRanking: false | presenceAsProductivity: false,,verified
+manager-actions,domain,lib/execution-engine-admin.js,'task.reprioritize' | 'task.block' | 'task.unblock' | 'task.escalate' | 'task.split' | 'task.merge',,verified
+manager-auth-scope,authorization,lib/execution-engine-admin.js,"requireManager | hasAny(user, ['PM', 'LEAD']) | managerTaskScope",,verified
+optimistic-concurrency,safety,lib/execution-engine-admin.js,workVersion: command.expectedVersion | expectedQueueVersion | execution_work_stale | execution_queue_stale,,verified
+atomic-receipt-event-audit,audit,lib/execution-engine-admin.js,realmActionReceipt.create | workItemEvent.create | auditLog.create | appendReceipt,,verified
+repository-realms-canonical-route,parity,lib/repository-realms.js,executeExecutionAction | EXECUTION_ACTIONS.includes | action: 'task.merge',,verified
+my-work-api,api,app/api/execution/my-work/route.js,"loadMyWork | private, no-store",,verified
+team-work-api,api,app/api/execution/team-work/route.js,"loadTeamWork | private, no-store",,verified
+canonical-action-api,api,app/api/execution/actions/route.js,executeRepositoryRealmsAction | Idempotency-Key | emitEvent,,verified
+personal-cockpit,ui,app/(app)/myday/page.jsx,Personal execution cockpit | /api/execution/my-work | Task ERP,,verified
+manager-orchestrator,ui,app/(app)/teamwork/page.jsx,Team work orchestrator | /api/execution/team-work | Canonical manager actions,,verified
+parallel-experience-nav,ui,lib/erp-navigation.js,"key: 'myday' | key: 'teamwork' | roles: ['PM', 'LEAD']",,verified
+responsive-accessible-controls,ux,app/(app)/teamwork/team-work.module.css,min-height:44px | @media(max-width:720px) | @media(prefers-reduced-motion:reduce),,verified
+execution-tests,test,tests/execution-engine-admin.test.mjs,work-version CAS | Reprioritize CAS queue version | Split tạo lineage,,verified
+phase1-runbook,operations,docs/realms/PHASE-1-EXECUTION-ENGINE.md,Task ERP là source of truth | Không xếp hạng nhân sự | crmegoric-realms-demo,,verified

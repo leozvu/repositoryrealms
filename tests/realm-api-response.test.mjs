@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { RealmOperationError } from '../lib/realm-operation.js';
 import { realmEmptyResponse, realmErrorResponse, realmJsonResponse } from '../lib/realm-api-response.js';
+import { RealmDependencyError } from '../lib/realm-resilience.js';
 
 const trace = () => ({
   requestId: 'realm_response-12345678',
@@ -42,4 +43,16 @@ test('Known business error giữ status/message và conditional response không 
   assert.equal(notModified.status, 304);
   assert.equal(notModified.headers.get('X-Realm-Outcome'), 'not_modified');
   assert.equal(await notModified.text(), '');
+});
+
+test('Dependency timeout degrades with 503, Retry-After and a safe public message', async () => {
+  const response = realmErrorResponse(trace(), new RealmDependencyError('ERP vẫn chạy; thử lại sau.', {
+    dependency: 'database', code: 'realm_database_timeout', retryAfter: 7,
+  }), { fallbackMessage: 'Fallback', fallbackCode: 'realm_error', observation });
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get('Retry-After'), '7');
+  assert.equal(response.headers.get('X-Realm-Outcome'), 'degraded');
+  assert.deepEqual(await response.json(), {
+    error: 'ERP vẫn chạy; thử lại sau.', code: 'realm_database_timeout', requestId: 'realm_response-12345678',
+  });
 });

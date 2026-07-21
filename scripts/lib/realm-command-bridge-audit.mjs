@@ -13,7 +13,7 @@ const CONTRACTS = [
   { id: 'event-bus-feedback-loop', layer: 'api', source: 'app/api/realm-demo/actions/route.js', signals: ["await emitEvent(result.resource, result.event || 'update'", '!result.idempotent', "route: 'realm.actions'"] },
   { id: 'surface-and-session-gate', layer: 'api', source: 'app/api/realm-demo/actions/route.js', signals: ['authorizedUser()', 'realmSurfaceDecision', "isFreelancer(user)", 'loadRealmCompanyModules'] },
   { id: 'safe-response-shape', layer: 'api', source: 'app/api/realm-demo/actions/route.js', signals: ["source: 'erp'", 'idempotent: result.idempotent', 'action: result.action', 'generatedAt: new Date().toISOString()'] },
-  { id: 'explicit-user-confirmation', layer: 'client', source: 'components/realm/RealmActionDialog.jsx', signals: ['ConfirmDialog', 'Idempotency-Key', 'ERP vẫn là nguồn dữ liệu chính', 'nhật ký kiểm toán'] },
+  { id: 'explicit-user-confirmation', layer: 'client', source: 'components/realm/RealmActionDialog.jsx', signals: ['ConfirmDialog', 'Idempotency-Key', 'Suggested Action:', 'RepositoryRealms', 'receipt', 'audit'] },
   { id: 'war-room-command-ui', layer: 'client', source: 'components/realm/WarRoom.jsx', signals: ['realmTaskTransitions', "action: 'task.transition'", 'RealmActionDialog', 'command bridge'] },
   { id: 'embassy-command-ui', layer: 'client', source: 'components/realm/RoyalEmbassy.jsx', signals: ['realmLeadTransitions', "action: 'lead.transition'", 'RealmActionDialog', 'command bridge'] },
   { id: 'schema-readiness-current', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 8', '20260719133000_add_realm_pilot_feedback', "missing.push('action_receipts')"] },
@@ -35,7 +35,7 @@ function markdownTable(rows, columns) {
 
 function buildScenarios() {
   const rows = [
-    { id: 'task-forward', expected: 'in_progress,blocked', actual: realmTaskTransitions('todo').join(',') },
+    { id: 'task-forward', expected: 'doing,in_progress,waiting,blocked', actual: realmTaskTransitions('todo').join(',') },
     { id: 'task-terminal', expected: '', actual: realmTaskTransitions('done').join(',') },
     { id: 'lead-forward', expected: 'won,lost', actual: realmLeadTransitions('negotiation').join(',') },
     { id: 'lead-terminal', expected: '', actual: realmLeadTransitions('won').join(',') },

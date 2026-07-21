@@ -12,7 +12,7 @@ cross-surface-event,server,lib/realm-change-feed.js,"activities: ['embassy'] | t
 erp-notification,server,lib/events.js,resource === 'taskcomments' | bình luận việc | await notify(task.assigneeId | resource === 'activities' | lên lịch follow-up,,verified
 war-room-permission,server,lib/realm-war-room-admin.js,"canWrite('taskcomments', user) | canComment: commentWriteAllowed",,verified
 embassy-permission,server,lib/realm-embassy-admin.js,"canWrite('activities', user) | canFollowUp: followupWriteAllowed",,verified
-action-composer,client,components/realm/RealmCreateActionDialog.jsx,War Council note | Diplomatic follow-up | Idempotency-Key | Gửi tới Task ERP | Lưu vào CRM ERP,,verified
+action-composer,client,components/realm/RealmCreateActionDialog.jsx,War Council note | Diplomatic follow-up | Idempotency-Key | Gửi War Council note | Lập Diplomatic follow-up | RepositoryRealms,,verified
 war-room-entrypoint,client,components/realm/WarRoom.jsx,action: 'task.comment.create' | Ghi chú War Council | RealmCreateActionDialog,,verified
 embassy-entrypoint,client,components/realm/RoyalEmbassy.jsx,action: 'lead.followup.create' | Lên lịch follow-up | RealmCreateActionDialog,,verified
 schema-readiness-v8,health,lib/realm-health.js,REALM_SCHEMA_VERSION = 8 | 20260719133000_add_realm_pilot_feedback,,verified

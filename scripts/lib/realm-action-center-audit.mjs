@@ -20,7 +20,7 @@ const CONTRACTS = [
   { id: 'erp-notification', layer: 'server', source: 'lib/events.js', signals: ["resource === 'taskcomments'", 'bình luận việc', 'await notify(task.assigneeId', "resource === 'activities'", 'lên lịch follow-up'] },
   { id: 'war-room-permission', layer: 'server', source: 'lib/realm-war-room-admin.js', signals: ["canWrite('taskcomments', user)", 'canComment: commentWriteAllowed'] },
   { id: 'embassy-permission', layer: 'server', source: 'lib/realm-embassy-admin.js', signals: ["canWrite('activities', user)", 'canFollowUp: followupWriteAllowed'] },
-  { id: 'action-composer', layer: 'client', source: 'components/realm/RealmCreateActionDialog.jsx', signals: ['War Council note', 'Diplomatic follow-up', 'Idempotency-Key', 'Gửi tới Task ERP', 'Lưu vào CRM ERP'] },
+  { id: 'action-composer', layer: 'client', source: 'components/realm/RealmCreateActionDialog.jsx', signals: ['War Council note', 'Diplomatic follow-up', 'Idempotency-Key', 'Gửi War Council note', 'Lập Diplomatic follow-up', 'RepositoryRealms'] },
   { id: 'war-room-entrypoint', layer: 'client', source: 'components/realm/WarRoom.jsx', signals: ["action: 'task.comment.create'", 'Ghi chú War Council', 'RealmCreateActionDialog'] },
   { id: 'embassy-entrypoint', layer: 'client', source: 'components/realm/RoyalEmbassy.jsx', signals: ["action: 'lead.followup.create'", 'Lên lịch follow-up', 'RealmCreateActionDialog'] },
   { id: 'schema-readiness-v8', layer: 'health', source: 'lib/realm-health.js', signals: ['REALM_SCHEMA_VERSION = 8', '20260719133000_add_realm_pilot_feedback'] },

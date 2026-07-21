@@ -11,7 +11,7 @@ export const metadata = {
   description: 'Không gian làm việc medieval dùng chung tài khoản, dữ liệu và phân quyền với CRMegoric ERP · CRM.',
 };
 
-export default async function RealmPage() {
+export default async function RealmPage({ searchParams }) {
   const user = await currentUser();
   // App Router có thể render layout và page song song. Không chạm Prisma từ
   // page con khi layout sắp redirect anonymous request về /login.
@@ -21,6 +21,8 @@ export default async function RealmPage() {
     loadRealmPilotDecision(prisma, user),
   ]);
   if (!pilot.allowed) redirect(`/dashboard?realm=${encodeURIComponent(pilot.code)}`);
+  const query = await searchParams;
+  const initialMode = query?.view === 'ledger' ? 'ledger' : 'world';
   const initialBridge = createRealmErpBridge({
     user,
     modules,
@@ -33,6 +35,7 @@ export default async function RealmPage() {
       workspaceLabel="ERP · CRM companion"
       initialBridge={initialBridge}
       pilotFeatures={pilot.config.features}
+      initialMode={initialMode}
     />
   );
 }

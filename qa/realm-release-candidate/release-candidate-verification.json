@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 15,
+    "verifiedContracts": 15,
+    "evidenceSources": 5,
+    "deterministicDigest": true,
+    "authoritativeLaunchGate": false,
+    "aggregateOnly": true,
+    "userIdsIncluded": false,
+    "businessRecordIdsIncluded": false,
+    "additiveMigrations": 0
+  },
+  "contracts": [
+    {
+      "id": "canonical-sha256-digest",
+      "layer": "integrity",
+      "source": "lib/realm-release-candidate.js",
+      "signals": [
+        "createHash",
+        "stableValue",
+        "algorithm: REALM_RELEASE_CANDIDATE_DIGEST_ALGORITHM",
+        "excludesVolatileGenerationTime: true"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "five-source-evidence-pack",
+      "layer": "composition",
+      "source": "lib/realm-release-candidate.js",
+      "signals": [
+        "section('readiness'",
+        "section('rehearsal'",
+        "section('pilot-operations'",
+        "section('chaos'",
+        "section('experience'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "not-a-launch-gate",
+      "layer": "governance",
+      "source": "lib/realm-release-candidate.js",
+      "signals": [
+        "authoritativeLaunchGate: false",
+        "advisoryOnly: true",
+        "launchWorkflow: 'Controlled Launch'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "repository-realms-invariants",
+      "layer": "parity",
+      "source": "lib/realm-release-candidate.js",
+      "signals": [
+        "businessActionContract: 'RepositoryRealms'",
+        "authorization: 'shared'",
+        "businessRules: 'shared'",
+        "receipts: 'required'",
+        "audit: 'atomic'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "privacy-safe-projection",
+      "layer": "privacy",
+      "source": "lib/realm-release-candidate.js",
+      "signals": [
+        "rosterIncluded: false",
+        "userIdsIncluded: false",
+        "businessRecordIdsIncluded: false",
+        "contentIncluded: false",
+        "performanceTracking: false",
+        "durationTracking: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authoritative-loader-reuse",
+      "layer": "server",
+      "source": "lib/realm-release-candidate-admin.js",
+      "signals": [
+        "loadRealmPilotOperationsDashboard",
+        "loadRealmExperienceTelemetry",
+        "evaluateRealmExperiencePilot",
+        "buildRealmReleaseCandidateDossier"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-only-api",
+      "layer": "authorization",
+      "source": "app/api/realm-demo/release-candidate/route.js",
+      "signals": [
+        "currentUser",
+        "isFreelancer",
+        "isDirector",
+        "realm_release_candidate_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "api-observability",
+      "layer": "observability",
+      "source": "app/api/realm-demo/release-candidate/route.js",
+      "signals": [
+        "startRealmApiRequest",
+        "realmJsonResponse",
+        "realmErrorResponse"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "read-only-dossier-ui",
+      "layer": "ui",
+      "source": "components/realm/RealmReleaseCandidateDossier.jsx",
+      "signals": [
+        "Release Candidate Dossier · Phase 24",
+        "Dossier không phải approval",
+        "không được gộp thành một cổng GO/NO-GO mới"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "local-evidence-export",
+      "layer": "ui",
+      "source": "components/realm/RealmReleaseCandidateDossier.jsx",
+      "signals": [
+        "navigator.clipboard",
+        "new Blob",
+        "Tải JSON evidence"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-dossier",
+      "layer": "style",
+      "source": "components/realm/realm-release-candidate-dossier.module.css",
+      "signals": [
+        "min-height: 44px",
+        "@media (max-width: 680px)",
+        "@media (max-width: 420px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "deterministic-unit-tests",
+      "layer": "test",
+      "source": "tests/realm-release-candidate.test.mjs",
+      "signals": [
+        "digest ignores volatile generation time",
+        "privacy-safe Release Candidate dossier",
+        "without inventing a go/no-go decision"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authentication-boundary-e2e",
+      "layer": "e2e",
+      "source": "tests/e2e/realm-smoke.spec.mjs",
+      "signals": [
+        "'/api/realm-demo/release-candidate'",
+        "Release Candidate Dossier · Phase 24"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase24-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-24-RELEASE-CANDIDATE-DOSSIER.md",
+      "signals": [
+        "Evidence completeness không phải launch readiness",
+        "Không deploy",
+        "SHA-256",
+        "Controlled Launch"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "qa-pipeline-gate",
+      "layer": "quality",
+      "source": "package.json",
+      "signals": [
+        "audit:realm:release-candidate",
+        "audit:realm:release-candidate:check"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ]
+}

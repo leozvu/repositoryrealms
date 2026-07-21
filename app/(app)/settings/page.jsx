@@ -8,6 +8,8 @@ import RealmPilotControl from '@/components/realm/RealmPilotControl';
 import RealmPilotRehearsal from '@/components/realm/RealmPilotRehearsal';
 import RealmPilotOperations from '@/components/realm/RealmPilotOperations';
 import RealmFeedbackOperations from '@/components/realm/RealmFeedbackOperations';
+import RealmExperienceScorecard from '@/components/realm/RealmExperienceScorecard';
+import RealmReleaseCandidateDossier from '@/components/realm/RealmReleaseCandidateDossier';
 
 /* ---------- v3.3: API key + Webhook (chỉ Giám đốc) ---------- */
 function ApiSection() {
@@ -252,8 +254,8 @@ export default function SettingsPage() {
               }}>Lưu &amp; gửi email thử tới chính hộp thư này</AsyncButton>
             </div>
             <div className="field full">
-              <label>Claude API key (bật AI Copilot)</label>
-              <input type="password" value={s.anthropicKey ?? ''} onChange={e => setS({ ...s, anthropicKey: e.target.value })} placeholder="sk-ant-…  (tạo tại console.anthropic.com)" />
+              <label>OpenRouter API key (bật AI Copilot)</label>
+              <input type="password" value={s.openRouterKey ?? ''} onChange={e => setS({ ...s, openRouterKey: e.target.value })} placeholder="sk-or-v1-…  (tạo tại openrouter.ai/keys)" autoComplete="off" />
               <div className="hint">Dùng cho menu AI Copilot — chat với dữ liệu công ty, viết email/proposal. Không có key thì các tính năng AI rule-based (AI Summary, Lead Score) vẫn chạy bình thường.</div>
             </div>
           </div>
@@ -265,6 +267,8 @@ export default function SettingsPage() {
         <RealmPilotRehearsal />
         <RealmPilotOperations />
         <RealmFeedbackOperations />
+        <RealmExperienceScorecard />
+        <RealmReleaseCandidateDossier />
         <div className="card">
           <div className="card-head"><span className="card-title">Import dữ liệu từ bản offline (v1)</span></div>
           <div className="card-body">

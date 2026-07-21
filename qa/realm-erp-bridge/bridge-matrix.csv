@@ -16,6 +16,7 @@ tickets,CRM,Petition Board,Trạm hỗ trợ,Ticket hỗ trợ,/tickets,PM | AM 
 portfolio,Vận hành,Campaign Command,War Room,Sở chỉ huy DA,/portfolio,PM | LEAD | ACCOUNTANT,delivery,app/(app)/portfolio/page.jsx,verified
 projects,Vận hành,War Room,Phòng chiến dịch,Dự án,/projects,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,delivery,app/(app)/projects/page.jsx,verified
 tasks,Vận hành,Quest Board,Đại sảnh,Công việc,/tasks,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,tasks,app/(app)/tasks/page.jsx,verified
+teamwork,Vận hành,Guild Orchestrator,Phòng điều phối,Điều phối công việc,/teamwork,PM | LEAD,tasks,app/(app)/teamwork/page.jsx,verified
 timesheet,Vận hành,Chronicle,Đài thời gian,Chấm công giờ,/timesheet,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,delivery,app/(app)/timesheet/page.jsx,verified
 gantt,Vận hành,Campaign Map,War Room,Gantt tiến độ,/gantt,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,delivery,app/(app)/gantt/page.jsx,verified
 templates,Vận hành,Campaign Blueprints,Xưởng kế hoạch,Mẫu dự án,/templates,PM | LEAD,delivery,app/(app)/templates/page.jsx,verified

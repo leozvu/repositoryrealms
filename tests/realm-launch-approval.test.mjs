@@ -107,6 +107,13 @@ test('Phase 15 stores expansion policy encrypted and exposes aggregate-only appr
   assert.equal(board.toReview.length, 1);
   assert.equal(board.toReview[0].payloadReadable, true);
   assert.equal(JSON.stringify(board).includes(STAFF.id), false);
+
+  const timedOutBoard = await listRealmLaunchApprovals(fixture.db, CHECKER, {
+    secret: SECRET,
+    now: new Date(NOW.getTime() + 24 * 60 * 60 * 1000 + 1),
+  });
+  assert.equal(timedOutBoard.toReview[0].timedOut, true);
+  assert.equal(timedOutBoard.toReview[0].deadlineState, 'timed_out');
 });
 
 test('Phase 15 forbids self approval and a different Director atomically applies the ERP Setting', async () => {

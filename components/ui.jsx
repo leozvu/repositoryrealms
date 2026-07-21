@@ -132,7 +132,7 @@ export function AsyncButton({ onClick, pendingLabel = 'Đang xử lý…', disab
 }
 
 /* ---------- Modal ---------- */
-export function Modal({ title, children, footer, large, onClose }) {
+export function Modal({ title, children, footer, large, className = '', onClose }) {
   useEffect(() => {
     const h = e => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', h);
@@ -140,7 +140,7 @@ export function Modal({ title, children, footer, large, onClose }) {
   }, [onClose]);
   return (
     <div className="modal-overlay" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className={`modal ${large ? 'modal-lg' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
+      <div className={`modal ${large ? 'modal-lg' : ''} ${className}`.trim()} role="dialog" aria-modal="true" aria-label={title}>
         <div className="modal-head">
           <div className="modal-title">{title}</div>
           <button className="icon-btn" onClick={onClose} aria-label="Đóng"><Icon name="x" size={16} /></button>
@@ -152,7 +152,7 @@ export function Modal({ title, children, footer, large, onClose }) {
   );
 }
 
-export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa' }) {
+export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa', modalClassName = '' }) {
   const [submitting, setSubmitting] = useState(false);
   const submittingRef = useRef(false);
   const toast = useToast();
@@ -172,7 +172,7 @@ export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa' }) {
     }
   };
   return (
-    <Modal title="Xác nhận" onClose={close}
+    <Modal title="Xác nhận" className={modalClassName} onClose={close}
       footer={<>
         <button className="btn btn-outline" onClick={close} disabled={submitting}>Hủy</button>
         <button className="btn btn-danger" onClick={confirm} disabled={submitting} aria-busy={submitting || undefined}>

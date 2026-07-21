@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 18,
+    "verifiedContracts": 18,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "canonicalFinanceStores": 5,
+    "confidenceCeiling": "low",
+    "accountingProfitClaimed": false,
+    "employeeRankingEnabled": false,
+    "automaticMoneyActionEnabled": false,
+    "schemaMigrationRequired": false
+  },
+  "contracts": [
+    {
+      "id": "canonical-finance-records",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model TimeLog {",
+        "model Invoice {",
+        "model Transaction {",
+        "model VendorBill {",
+        "model Budget {"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "finance-rule-version",
+      "layer": "domain",
+      "source": "lib/financial-operating-intelligence.js",
+      "signals": [
+        "FINANCIAL_INTELLIGENCE_RULE_VERSION = 'financial-operating-intelligence-v1'",
+        "buildFinancialOperatingIntelligence"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "invoice-fail-closed",
+      "layer": "data-quality",
+      "source": "lib/financial-operating-intelligence.js",
+      "signals": [
+        "strictArray",
+        "malformedInvoices",
+        "Financial Intelligence không đoán số tiền"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "cash-from-transaction-ledger",
+      "layer": "accounting",
+      "source": "lib/financial-operating-intelligence.js",
+      "signals": [
+        "cashBalance: 'recorded_transactions_vnd'",
+        "ledgerIncome - ledgerExpense"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "operating-margin-proxy",
+      "layer": "economics",
+      "source": "lib/financial-operating-intelligence.js",
+      "signals": [
+        "operatingCostProxy",
+        "operatingMarginProxy",
+        "isAccountingProfit: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "three-month-schedule",
+      "layer": "forecast",
+      "source": "lib/financial-operating-intelligence.js",
+      "signals": [
+        "cashForecast",
+        "futureRecurringTemplates",
+        "schedule_view_excludes_payroll_and_unrecorded_costs"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "manager-finance-queue",
+      "layer": "operations",
+      "source": "lib/financial-operating-intelligence.js",
+      "signals": [
+        "managerQueue",
+        "review_receivable",
+        "review_payable",
+        "review_unbilled_hours",
+        "review_budget"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "anti-ranking-advisory-policy",
+      "layer": "governance",
+      "source": "lib/financial-operating-intelligence.js",
+      "signals": [
+        "advisoryOnly: true",
+        "accountingProfit: false",
+        "automaticPayment: false",
+        "employeeRanking: false",
+        "individualProfitability: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "finance-authorization",
+      "layer": "authorization",
+      "source": "lib/financial-operating-intelligence-admin.js",
+      "signals": [
+        "financialIntelligenceScope",
+        "hasAny(user, ['ACCOUNTANT'])",
+        "financial_intelligence_scope_missing"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "salary-rate-does-not-leak",
+      "layer": "privacy",
+      "source": "tests/financial-operating-intelligence-admin.test.mjs",
+      "signals": [
+        "includes('salary'), false",
+        "includes('hourlyRate'), false",
+        "includes('17600000'), false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-finance-api",
+      "layer": "api",
+      "source": "app/api/finance/intelligence/route.js",
+      "signals": [
+        "currentUser()",
+        "loadFinancialOperatingIntelligence",
+        "'Cache-Control': 'private, no-store'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-financial-intelligence-first",
+      "layer": "ui",
+      "source": "app/(app)/finance/page.jsx",
+      "signals": [
+        "FinancialIntelligencePanel",
+        "Sổ quỹ &amp; giao dịch",
+        "fetch('/api/finance/intelligence'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realm-shares-canonical-loader",
+      "layer": "parity",
+      "source": "lib/realm-treasury-admin.js",
+      "signals": [
+        "import { loadFinancialOperatingIntelligence }",
+        "financialIntelligence: finance?.financialIntelligence"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "royal-ledger-ui",
+      "layer": "ui",
+      "source": "components/realm/RoyalTreasuryExchange.jsx",
+      "signals": [
+        "The Steward&apos;s Margin Table",
+        "Steward Queue",
+        "Không phải accounting profit",
+        "không phải ranking"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-accessible-finance",
+      "layer": "ux",
+      "source": "components/finance/financial-intelligence.module.css",
+      "signals": [
+        "min-height: 44px",
+        "@media (max-width: 700px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase5-domain-tests",
+      "layer": "test",
+      "source": "tests/financial-operating-intelligence.test.mjs",
+      "signals": [
+        "không nhận là accounting profit",
+        "fail-closed",
+        "không tạo employee ranking"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase5-server-tests",
+      "layer": "test",
+      "source": "tests/financial-operating-intelligence-admin.test.mjs",
+      "signals": [
+        "chỉ mở company scope",
+        "response không leak salary/rate",
+        "bị chặn trước mọi database query"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase5-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-5-FINANCIAL-OPERATING-INTELLIGENCE.md",
+      "signals": [
+        "Task → TimeLog → Cost proxy → Invoice → Cash",
+        "canonical ERP finance records",
+        "crmegoric-realms-demo"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "one-canonical-store-per-finance-record",
+      "expected": "1:1:1:1:1",
+      "actual": "1:1:1:1:1",
+      "status": "verified"
+    },
+    {
+      "id": "cash-and-margin-have-distinct-sources",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "fail-closed-financial-json",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "advisory-no-ranking-no-auto-money-action",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "financial-intelligence-precedes-ledger-crud",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "realm-and-erp-share-server-loader",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    }
+  ]
+}

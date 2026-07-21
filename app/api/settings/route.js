@@ -21,7 +21,7 @@ const DEFAULTS = {
 };
 
 // Các trường bí mật — chỉ Giám đốc đọc được (trang Cài đặt); route server đọc thẳng DB
-const SECRET_KEYS = ['anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPort', 'smtpFrom'];
+const SECRET_KEYS = ['openRouterKey', 'anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPort', 'smtpFrom'];
 
 export async function GET() {
   const user = await currentUser();
@@ -35,6 +35,7 @@ export async function GET() {
     delete data.realmPilot;
     delete data.realmPilotOperations;
     delete data.realmPilotRehearsal;
+    delete data.realmExperienceTelemetry;
   }
   return NextResponse.json(data);
 }
@@ -48,9 +49,9 @@ export async function PUT(req) {
     const row = await tx.setting.findUnique({ where: { id: 1 }, select: { json: true } });
     let current = {};
     try { current = JSON.parse(row?.json || '{}'); } catch { current = {}; }
-    // Realm pilot, Pilot Operations và Launch Rehearsal có endpoint riêng để validate
-    // cohort, wave, four-eyes seal và kill switch. Form công ty dùng snapshot cũ nên
-    // không được ghi đè các control-plane này.
+    // Realm pilot, Pilot Operations, Launch Rehearsal và Experience Pilot có endpoint
+    // riêng để validate control plane / privacy contract. Form công ty dùng snapshot
+    // cũ nên không được ghi đè các trường được bảo vệ này.
     const next = { ...DEFAULTS, ...data };
     if (current.realmPilot) next.realmPilot = current.realmPilot;
     else delete next.realmPilot;
@@ -58,6 +59,8 @@ export async function PUT(req) {
     else delete next.realmPilotOperations;
     if (current.realmPilotRehearsal) next.realmPilotRehearsal = current.realmPilotRehearsal;
     else delete next.realmPilotRehearsal;
+    if (current.realmExperienceTelemetry) next.realmExperienceTelemetry = current.realmExperienceTelemetry;
+    else delete next.realmExperienceTelemetry;
     const json = JSON.stringify(next);
     await tx.setting.upsert({ where: { id: 1 }, create: { id: 1, json }, update: { json } });
     await tx.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'settings', detail: 'Cập nhật cài đặt công ty' } });

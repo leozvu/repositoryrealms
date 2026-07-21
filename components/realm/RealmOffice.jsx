@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Icon, ToastProvider, useToast } from '@/components/ui';
 import {
+  DEFAULT_WORLD_POSITION,
   INITIAL_LEDGER,
   PRIVATE_ZONES,
   QUESTS,
@@ -14,6 +15,8 @@ import {
   WORLD,
   WORLD_OBJECTS,
   distance,
+  isWorldPositionWalkable,
+  normalizeWorldPosition,
   privateZoneAt,
   roomAt,
 } from './world';
@@ -43,6 +46,27 @@ import { normalizeRealmText, realmEmote, REALM_EMOTES } from '@/lib/realm-social
 import { REALM_CORE_PORTALS, createRealmErpBridge, realmRecordHref } from '@/lib/realm-business-bridge';
 import { realmAccessForPanel, realmAccessForSurface } from '@/lib/realm-access';
 import { realmDataSourceMode, realmInitialMessages, realmInitialOperations, realmLocalFixture } from '@/lib/realm-data-source';
+import {
+  realmArtDirectionFromDelta,
+  realmGeneratedArtEnabled,
+  realmGeneratedCharacterAssets,
+  realmGeneratedCharacterKey,
+  realmGeneratedCharacterPortraitUrl,
+  realmGeneratedDecorAssets,
+  realmGeneratedEnvironmentAssets,
+  realmGeneratedEnvironmentEnabled,
+  realmGeneratedErpUiAssets,
+  realmGeneratedPropAssets,
+  realmGeneratedPropBinding,
+  realmGeneratedPropEnabled,
+  realmGeneratedUiAssets,
+  realmGeneratedUiEnabled,
+  realmMapStyle,
+  normalizeRealmMapStyle,
+  REALM_MAP_STYLES,
+  REALM_MAP_STYLE_DEFAULT,
+  REALM_MAP_STYLE_STORAGE_KEY,
+} from '@/lib/realm-generated-art';
 import RewardControlCenter from './RewardControlCenter';
 import GoldEconomyObservatory from './GoldEconomyObservatory';
 import RoyalTreasuryExchange from './RoyalTreasuryExchange';
@@ -58,17 +82,42 @@ import { useRealmPresence } from './useRealmPresence';
 import { useRealmChangeFeed } from './useRealmChangeFeed';
 import RealmNotificationBell from './RealmNotificationBell';
 import { useCollaborationDirectory } from '@/components/collaboration/useCollaborationDirectory';
+import { LanguageSwitch } from '@/components/LanguageProvider';
 import {
   preferredCollaborationAvailability,
   persistWorkspaceSurface,
   rememberCollaborationAvailability,
 } from '@/lib/collaboration';
+import {
+  REALM_EXPERIENCE_STORAGE_KEY,
+  normalizeRealmExperienceContext,
+  parseRealmExperienceContext,
+  realmJourneyForContext,
+} from '@/lib/realm-experience';
 import styles from './realm-office.module.css';
 
 const PROFILE_STORAGE_KEY = 'crmegoric-realms-profile-v1';
 const GUEST_ID_STORAGE_KEY = 'crmegoric-realms-guest-id-v1';
 const PROFILE_ROLES = ['Realm Builder', 'Questsmith', 'Guild Master', 'Alchemist', 'Scout'];
 const ERP_SYNC_REQUESTED = process.env.NEXT_PUBLIC_REALM_ERP_SYNC === '1';
+const GENERATED_ART_REQUESTED = realmGeneratedArtEnabled();
+const ENVIRONMENT_ART_REQUESTED = realmGeneratedEnvironmentEnabled();
+const PROP_ART_REQUESTED = realmGeneratedPropEnabled();
+const UI_ART_REQUESTED = realmGeneratedUiEnabled();
+const GENERATED_UI_ART_ASSETS = Object.freeze([
+  ...realmGeneratedUiAssets(),
+  ...realmGeneratedErpUiAssets(),
+]);
+const GENERATED_UI_ART_STYLE = Object.freeze(Object.fromEntries([
+  ...realmGeneratedUiAssets().map((asset) => [
+    `--realm-ui-${asset.surface}`,
+    `url("${asset.url}")`,
+  ]),
+  ...realmGeneratedErpUiAssets().map((asset) => [
+    `--realm-erp-ui-${asset.surface}`,
+    `url("${asset.url}")`,
+  ]),
+]));
 const REALM_REMOTE_REFRESH_MS = 60_000;
 const EMPTY_SYNC_META = {
   revision: null,
@@ -81,6 +130,16 @@ const EMPTY_SYNC_META = {
   outcome: null,
   error: null,
 };
+
+function sendRealmExperienceSignal(enabled, event, surface = 'realm', journey = null) {
+  if (!enabled || typeof window === 'undefined') return;
+  window.fetch('/api/realm-demo/experience', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event, surface, journey }),
+    keepalive: true,
+  }).catch(() => null);
+}
 
 function realmTraceFromResponse(response, payload = {}) {
   const requestId = response?.headers?.get('X-Realm-Request-Id') || payload?.requestId || null;
@@ -96,6 +155,7 @@ const TRANSPORT = {
   'gateway-ready': { label: 'Gateway đa máy · token xác thực', short: 'Gateway online' },
   'gateway-connecting': { label: 'Đang xác thực gateway…', short: 'Đang kết nối' },
   'gateway-reconnecting': { label: 'Mất kết nối · đang tự thử lại', short: 'Đang reconnect' },
+  'gateway-degraded': { label: 'Gateway mất · đang chuyển local fallback', short: 'Đang fallback' },
   'local-ready': { label: 'P2P demo · signaling nội bộ', short: 'Local fallback' },
   unsupported: { label: 'Trình duyệt không hỗ trợ signaling', short: 'Solo mode' },
   connecting: { label: 'Đang chuẩn bị kênh signaling…', short: 'Đang kết nối' },
@@ -121,16 +181,16 @@ const NAV = [
 ];
 
 const CAMPAIGNS = [
-  { id: 'campaign-1', name: 'Campaign Rồng Xanh', owner: 'Minh Quân', progress: 78, health: 'Ổn định', color: '#64c48d' },
-  { id: 'campaign-2', name: 'Website Nhà Giả Kim', owner: 'Nghĩa Nguyễn', progress: 46, health: 'Cần chú ý', color: '#e7ad58' },
-  { id: 'campaign-3', name: 'Hội chợ phương Bắc', owner: 'Quang Võ', progress: 63, health: 'Ổn định', color: '#64c48d' },
+  { id: 'campaign-1', name: 'Campaign Rồng Xanh', owner: 'Nguyễn Minh An', progress: 78, health: 'Ổn định', color: '#64c48d' },
+  { id: 'campaign-2', name: 'Website Nhà Giả Kim', owner: 'Đỗ Quốc Anh', progress: 46, health: 'Cần chú ý', color: '#e7ad58' },
+  { id: 'campaign-3', name: 'Hội chợ phương Bắc', owner: 'Trần Khánh Linh', progress: 63, health: 'Ổn định', color: '#64c48d' },
 ];
 
 const ERP_DESK_POSITIONS = [
   ...STAFF.map(({ x, y }) => ({ x, y })),
-  { x: 4.5, y: 3.5 }, { x: 9, y: 3.5 }, { x: 15.5, y: 6.5 }, { x: 22, y: 6.5 },
-  { x: 29, y: 3.5 }, { x: 34, y: 3.5 }, { x: 4.5, y: 20 }, { x: 9, y: 20 },
-  { x: 15.5, y: 18.5 }, { x: 22, y: 18.5 }, { x: 29, y: 20 }, { x: 34, y: 20 },
+  { x: 5, y: 4 }, { x: 15, y: 4 }, { x: 23, y: 12 }, { x: 37, y: 12 },
+  { x: 44, y: 4 }, { x: 54, y: 4 }, { x: 5, y: 32 }, { x: 15, y: 32 },
+  { x: 23, y: 29 }, { x: 36, y: 29 }, { x: 43, y: 32 }, { x: 54, y: 32 },
 ];
 const ERP_AVATAR_COLORS = ['#4f9f73', '#b7686b', '#6e8ec7', '#946fc7', '#c58a4c', '#4c8f91', '#8b6d53'];
 
@@ -153,22 +213,47 @@ function collaborationPeopleForRealm(people = []) {
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const initials = (name) => name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
-const keyOf = (x, y) => `${Math.floor(x)},${Math.floor(y)}`;
 
-function canStand(x, y) {
-  const radius = 0.24;
-  return ![
-    [x - radius, y - radius], [x + radius, y - radius],
-    [x - radius, y + radius], [x + radius, y + radius],
-  ].some(([px, py]) => WALLS.has(keyOf(px, py)));
+function loadRealmImage(url) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.decoding = 'async';
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error(`realm_generated_art_unavailable:${url}`));
+    image.src = url;
+  });
 }
 
-function drawFloor(ctx, x, y, tile, room) {
+function canStand(x, y) {
+  return isWorldPositionWalkable({ x, y });
+}
+
+function generatedMaterialPattern(ctx, image, tile, material, cache) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return null;
+  const key = `${material}:${tile}`;
+  if (cache.has(key)) return cache.get(key);
+  const pattern = ctx.createPattern(image, 'repeat');
+  if (!pattern) return null;
+  if (typeof pattern.setTransform === 'function' && typeof DOMMatrix !== 'undefined') {
+    const scale = tile * 9 / image.naturalWidth;
+    pattern.setTransform(new DOMMatrix().scale(scale));
+  }
+  cache.set(key, pattern);
+  return pattern;
+}
+
+function drawFloor(ctx, x, y, tile, room, materials, patternCache, materialOverride = null) {
   const px = x * tile;
   const py = y * tile;
-  ctx.fillStyle = room?.floor || '#26362f';
+  const material = materialOverride || room?.id || 'threshold';
+  const pattern = generatedMaterialPattern(ctx, materials.get(material), tile, material, patternCache);
+  ctx.fillStyle = pattern || room?.floor || '#26362f';
   ctx.fillRect(px, py, tile, tile);
-  ctx.strokeStyle = 'rgba(245, 222, 154, .055)';
+  if (pattern) {
+    ctx.fillStyle = 'rgba(4, 11, 8, .12)';
+    ctx.fillRect(px, py, tile, tile);
+  }
+  ctx.strokeStyle = pattern ? 'rgba(245, 222, 154, .035)' : 'rgba(245, 222, 154, .055)';
   ctx.lineWidth = 1;
   ctx.beginPath();
   if ((x + y) % 2 === 0) {
@@ -179,20 +264,21 @@ function drawFloor(ctx, x, y, tile, room) {
     ctx.lineTo(px + tile - 4, py + tile - 3);
   }
   ctx.stroke();
-  if ((x * 7 + y * 11) % 13 === 0) {
+  if (!pattern && (x * 7 + y * 11) % 13 === 0) {
     ctx.fillStyle = 'rgba(255,255,255,.035)';
     ctx.fillRect(px + 6, py + 7, 2, 2);
   }
 }
 
-function drawWall(ctx, x, y, tile) {
+function drawWall(ctx, x, y, tile, materials, patternCache) {
   const px = x * tile;
   const py = y * tile;
+  const pattern = generatedMaterialPattern(ctx, materials.get('wall'), tile, 'wall', patternCache);
   ctx.fillStyle = '#182720';
   ctx.fillRect(px, py, tile, tile);
-  ctx.fillStyle = (x + y) % 2 === 0 ? '#405147' : '#35483e';
+  ctx.fillStyle = pattern || ((x + y) % 2 === 0 ? '#405147' : '#35483e');
   ctx.fillRect(px + 2, py + 2, tile - 4, tile - 5);
-  ctx.fillStyle = '#53665a';
+  ctx.fillStyle = pattern ? 'rgba(201, 191, 153, .18)' : '#53665a';
   ctx.fillRect(px + 3, py + 3, tile - 6, Math.max(3, tile * 0.12));
   ctx.strokeStyle = '#22352c';
   ctx.lineWidth = 2;
@@ -223,7 +309,11 @@ function drawRoomDecor(ctx, tile) {
     ctx.fillText(room.name.toUpperCase(), (room.x + 0.78) * tile, (room.y + 0.86) * tile);
   }
 
-  const torchSpots = [[1.45, 10.5], [11.55, 10.5], [25.45, 10.5], [36.55, 10.5]];
+  const torchSpots = [
+    [2.2, 16.5], [15.8, 16.5], [20.2, 16.5], [37.8, 16.5], [41.2, 16.5], [55.8, 16.5],
+    [18.5, 2.3], [18.5, 14.5], [18.5, 18.5], [18.5, 33.4],
+    [39.5, 2.3], [39.5, 14.5], [39.5, 18.5], [39.5, 33.4],
+  ];
   for (const [x, y] of torchSpots) {
     const gradient = ctx.createRadialGradient(x * tile, y * tile, 0, x * tile, y * tile, tile * 2.2);
     gradient.addColorStop(0, 'rgba(255, 190, 77, .28)');
@@ -237,18 +327,7 @@ function drawRoomDecor(ctx, tile) {
   }
 }
 
-function drawObject(ctx, object, tile, active, time) {
-  const x = object.x * tile;
-  const y = object.y * tile;
-  const pulse = 0.5 + Math.sin(time / 420) * 0.18;
-  if (active) {
-    ctx.strokeStyle = `rgba(245, 196, 76, ${pulse})`;
-    ctx.lineWidth = 3;
-    ctx.strokeRect(x - tile * 0.72, y - tile * 0.72, tile * 1.44, tile * 1.44);
-  }
-
-  ctx.save();
-  ctx.translate(x, y);
+function drawProceduralObject(ctx, object, tile, pulse) {
   if (object.kind === 'board' || object.kind === 'roster' || object.kind === 'tavern') {
     ctx.fillStyle = '#3a271d';
     ctx.fillRect(-tile * 0.48, -tile * 0.48, tile * 0.96, tile * 0.84);
@@ -297,69 +376,179 @@ function drawObject(ctx, object, tile, active, time) {
     ctx.fillStyle = `rgba(104, 190, 169, ${0.18 + pulse * 0.2})`;
     ctx.fillRect(-tile * 0.34, -tile * 0.02, tile * 0.68, tile * 0.5);
   }
+}
+
+function drawObject(ctx, object, tile, interaction, time, sprite = null, binding = null) {
+  const x = object.x * tile;
+  const y = object.y * tile;
+  const pulse = 0.5 + Math.sin(time / 420) * 0.18;
+  const extent = Math.max(0.78, (binding?.scale || 1.35) * 0.53);
+  const left = x - tile * extent;
+  const top = y - tile * extent;
+  const size = tile * extent * 2;
+
+  if (interaction.hovered) {
+    ctx.strokeStyle = 'rgba(126, 205, 177, .82)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(left, top, size, size);
+  }
+  if (interaction.nearby) {
+    ctx.strokeStyle = `rgba(245, 196, 76, ${pulse})`;
+    ctx.lineWidth = interaction.active ? 4 : 3;
+    const corner = tile * 0.32;
+    for (const [startX, startY, directionX, directionY] of [
+      [left, top, 1, 1],
+      [left + size, top, -1, 1],
+      [left, top + size, 1, -1],
+      [left + size, top + size, -1, -1],
+    ]) {
+      ctx.beginPath();
+      ctx.moveTo(startX + directionX * corner, startY);
+      ctx.lineTo(startX, startY);
+      ctx.lineTo(startX, startY + directionY * corner);
+      ctx.stroke();
+    }
+  }
+  if (interaction.active) {
+    ctx.fillStyle = `rgba(245, 196, 76, ${0.08 + pulse * 0.06})`;
+    ctx.fillRect(left, top, size, size);
+    ctx.fillStyle = '#f1ca62';
+    ctx.beginPath();
+    ctx.moveTo(x, top - tile * 0.2);
+    ctx.lineTo(x + tile * 0.12, top - tile * 0.08);
+    ctx.lineTo(x, top + tile * 0.04);
+    ctx.lineTo(x - tile * 0.12, top - tile * 0.08);
+    ctx.fill();
+  }
+
+  ctx.save();
+  ctx.translate(x, y);
+  const spriteReady = Boolean(sprite?.complete && sprite.naturalWidth && sprite.naturalHeight);
+  if (binding?.proceduralUnderlay && spriteReady) drawProceduralObject(ctx, object, tile, pulse);
+  if (spriteReady) {
+    const maxSize = tile * binding.scale;
+    const aspect = sprite.naturalWidth / sprite.naturalHeight;
+    const width = aspect >= 1 ? maxSize : maxSize * aspect;
+    const height = aspect >= 1 ? maxSize / aspect : maxSize;
+    ctx.fillStyle = 'rgba(3, 8, 6, .30)';
+    ctx.beginPath();
+    ctx.ellipse(0, height * 0.34, width * 0.32, Math.max(3, height * 0.11), 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(sprite, -width / 2, -height / 2, width, height);
+  } else {
+    drawProceduralObject(ctx, object, tile, pulse);
+  }
   ctx.restore();
 }
 
-function drawAvatar(ctx, person, tile, isPlayer = false, time = 0, emote) {
+function drawDecoration(ctx, decoration, tile, sprite = null) {
+  const spriteReady = Boolean(sprite?.complete && sprite.naturalWidth && sprite.naturalHeight);
+  if (!spriteReady) return;
+  const x = decoration.x * tile;
+  const y = decoration.y * tile;
+  const maxSize = tile * decoration.scale;
+  const aspect = sprite.naturalWidth / sprite.naturalHeight;
+  const width = aspect >= 1 ? maxSize : maxSize * aspect;
+  const height = aspect >= 1 ? maxSize / aspect : maxSize;
+  const centered = decoration.floor || aspect >= 1;
+  const top = centered ? y - height / 2 : y - height * .82;
+
+  ctx.save();
+  ctx.globalAlpha = decoration.opacity || .9;
+  if (!decoration.floor) {
+    ctx.fillStyle = 'rgba(3, 8, 6, .24)';
+    ctx.beginPath();
+    ctx.ellipse(x, y, width * .3, Math.max(2, height * .08), 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(sprite, x - width / 2, top, width, height);
+  ctx.restore();
+}
+
+function drawAvatar(ctx, person, tile, isPlayer = false, time = 0, emote, sprite = null) {
   const bob = Math.sin(time / 330 + person.x) * tile * 0.025;
   const x = person.x * tile;
   const y = person.y * tile + bob;
   const color = person.color || '#4f9f73';
+  const spriteReady = Boolean(sprite?.complete && sprite.naturalWidth && sprite.naturalHeight);
+  const spriteHeight = spriteReady ? tile * 2.3 : tile * 0.9;
+  const spriteWidth = spriteReady
+    ? Math.min(tile * 1.45, spriteHeight * (sprite.naturalWidth / sprite.naturalHeight))
+    : tile * 0.54;
+  const spriteFeetY = y + tile * 0.44;
+  const spriteTop = spriteFeetY - spriteHeight;
 
   ctx.fillStyle = 'rgba(3, 8, 6, .38)';
   ctx.beginPath();
-  ctx.ellipse(x, y + tile * 0.43, tile * 0.34, tile * 0.14, 0, 0, Math.PI * 2);
+  ctx.ellipse(x, spriteFeetY, tile * 0.44, tile * 0.17, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = color;
-  ctx.fillRect(x - tile * 0.27, y - tile * 0.02, tile * 0.54, tile * 0.5);
-  ctx.fillStyle = isPlayer ? '#e4c56f' : '#d5a985';
-  ctx.fillRect(x - tile * 0.22, y - tile * 0.4, tile * 0.44, tile * 0.38);
-  ctx.fillStyle = isPlayer ? '#4c3022' : '#31261f';
-  ctx.fillRect(x - tile * 0.22, y - tile * 0.45, tile * 0.44, tile * 0.13);
-  ctx.fillRect(x - tile * 0.26, y - tile * 0.34, tile * 0.08, tile * 0.22);
-  ctx.fillRect(x + tile * 0.18, y - tile * 0.34, tile * 0.08, tile * 0.22);
-  ctx.fillStyle = '#1d2722';
-  ctx.fillRect(x - tile * 0.12, y - tile * 0.23, 2, 2);
-  ctx.fillRect(x + tile * 0.09, y - tile * 0.23, 2, 2);
-
-  if (isPlayer) {
-    ctx.strokeStyle = '#f0c95d';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x - tile * 0.31, y - tile * 0.49, tile * 0.62, tile * 1.02);
+  if (spriteReady) {
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(sprite, x - spriteWidth / 2, spriteTop, spriteWidth, spriteHeight);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = color;
+    ctx.fillRect(x - tile * 0.27, y - tile * 0.02, tile * 0.54, tile * 0.5);
+    ctx.fillStyle = isPlayer ? '#e4c56f' : '#d5a985';
+    ctx.fillRect(x - tile * 0.22, y - tile * 0.4, tile * 0.44, tile * 0.38);
+    ctx.fillStyle = isPlayer ? '#4c3022' : '#31261f';
+    ctx.fillRect(x - tile * 0.22, y - tile * 0.45, tile * 0.44, tile * 0.13);
+    ctx.fillRect(x - tile * 0.26, y - tile * 0.34, tile * 0.08, tile * 0.22);
+    ctx.fillRect(x + tile * 0.18, y - tile * 0.34, tile * 0.08, tile * 0.22);
+    ctx.fillStyle = '#1d2722';
+    ctx.fillRect(x - tile * 0.12, y - tile * 0.23, 2, 2);
+    ctx.fillRect(x + tile * 0.09, y - tile * 0.23, 2, 2);
   }
 
+  if (isPlayer) {
+    ctx.fillStyle = 'rgba(240, 201, 93, .13)';
+    ctx.beginPath();
+    ctx.ellipse(x, spriteFeetY, tile * 0.58, tile * 0.24, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#f0c95d';
+    ctx.lineWidth = Math.max(2, tile * 0.07);
+    ctx.beginPath();
+    ctx.ellipse(x, spriteFeetY, tile * 0.58, tile * 0.24, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  const name = person.name || 'Adventurer';
+  const nameY = spriteReady ? spriteTop - tile * 0.18 : y - tile * 0.68;
+  const nameHeight = Math.max(14, tile * 0.34);
+  ctx.font = `800 ${Math.max(10, tile * 0.31)}px "Be Vietnam Pro", sans-serif`;
+  const textWidth = ctx.measureText(name).width;
+  ctx.fillStyle = 'rgba(7, 15, 12, .80)';
+  ctx.fillRect(x - textWidth / 2 - 7, nameY - nameHeight / 2, textWidth + 14, nameHeight);
+  ctx.fillStyle = '#f7edd0';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(name, x, nameY);
   const status = STATUS[person.status] || STATUS.available;
   ctx.fillStyle = status.color;
   ctx.beginPath();
-  ctx.arc(x + tile * 0.28, y - tile * 0.43, Math.max(3, tile * 0.1), 0, Math.PI * 2);
+  ctx.arc(x + textWidth / 2 + 6, nameY, Math.max(3, tile * 0.1), 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = '#14231c';
   ctx.lineWidth = 2;
   ctx.stroke();
-
-  const name = person.name || 'Adventurer';
-  ctx.font = `700 ${Math.max(9, tile * 0.29)}px "Be Vietnam Pro", sans-serif`;
-  const textWidth = ctx.measureText(name).width;
-  ctx.fillStyle = 'rgba(7, 15, 12, .80)';
-  ctx.fillRect(x - textWidth / 2 - 5, y - tile * 0.82, textWidth + 10, tile * 0.28);
-  ctx.fillStyle = '#f7edd0';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(name, x, y - tile * 0.68);
   const equippedTitle = person.loadout?.title?.equipName;
   if (equippedTitle) {
     ctx.font = `700 ${Math.max(8, tile * 0.22)}px "Be Vietnam Pro", sans-serif`;
     const titleWidth = ctx.measureText(equippedTitle).width;
+    const titleY = nameY - nameHeight * 0.9;
     ctx.fillStyle = 'rgba(50, 37, 20, .92)';
-    ctx.fillRect(x - titleWidth / 2 - 5, y - tile * 1.08, titleWidth + 10, tile * 0.24);
+    ctx.fillRect(x - titleWidth / 2 - 5, titleY - tile * 0.12, titleWidth + 10, tile * 0.24);
     ctx.fillStyle = '#e6c775';
-    ctx.fillText(equippedTitle, x, y - tile * 0.96);
+    ctx.fillText(equippedTitle, x, titleY);
   }
   ctx.textAlign = 'left';
 
   if (emote) {
-    const bubbleY = y - tile * (equippedTitle ? 1.58 : 1.34) - Math.sin(time / 180) * 2;
+    const bubbleY = nameY - tile * (equippedTitle ? 1.05 : 0.72) - Math.sin(time / 180) * 2;
     const bubbleWidth = Math.max(tile * 0.82, ctx.measureText(emote.mark).width + 18);
     ctx.fillStyle = '#f4ead0';
     ctx.fillRect(x - bubbleWidth / 2, bubbleY - tile * 0.34, bubbleWidth, tile * 0.56);
@@ -381,9 +570,9 @@ function drawAvatar(ctx, person, tile, isPlayer = false, time = 0, emote) {
   }
 }
 
-function drawMinimap(ctx, width, height, player, staff, remotes) {
-  const mapW = 148;
-  const mapH = 94;
+function drawMinimap(ctx, width, height, player, staff, remotes, camera) {
+  const mapW = width < 620 ? 132 : Math.min(190, Math.max(154, width * 0.18));
+  const mapH = Math.round(mapW * WORLD.rows / WORLD.cols);
   const x0 = width - mapW - 14;
   const y0 = 14;
   const sx = mapW / WORLD.cols;
@@ -397,6 +586,15 @@ function drawMinimap(ctx, width, height, player, staff, remotes) {
     ctx.fillStyle = room.floor;
     ctx.fillRect(x0 + room.x * sx, y0 + room.y * sy, room.w * sx, room.h * sy);
   }
+  if (camera?.tile) {
+    const viewX = camera.x / camera.tile;
+    const viewY = camera.y / camera.tile;
+    const viewW = Math.min(WORLD.cols, width / camera.tile);
+    const viewH = Math.min(WORLD.rows, height / camera.tile);
+    ctx.strokeStyle = 'rgba(247, 236, 196, .82)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x0 + viewX * sx, y0 + viewY * sy, viewW * sx, viewH * sy);
+  }
   ctx.fillStyle = '#e9c65d';
   ctx.fillRect(x0 + player.x * sx - 2, y0 + player.y * sy - 2, 5, 5);
   ctx.fillStyle = '#79b79a';
@@ -408,6 +606,7 @@ function drawMinimap(ctx, width, height, player, staff, remotes) {
 function WorldCanvas({
   onObjectOpen,
   onEmote,
+  activePanel,
   playerStatus,
   playerProfile,
   onPosition,
@@ -416,22 +615,110 @@ function WorldCanvas({
   remotePlayers,
   activeEmotes,
   sessionId,
+  mapStyle,
+  position,
 }) {
   const canvasRef = useRef(null);
-  const positionRef = useRef({ x: 18.5, y: 19 });
+  const positionRef = useRef(normalizeWorldPosition(position));
   const targetRef = useRef(null);
   const keysRef = useRef(new Set());
+  const facingRef = useRef('down');
   const cameraRef = useRef({ x: 0, y: 0, tile: 32, width: 800, height: 600 });
   const activeObjectRef = useRef(null);
+  const hoveredObjectRef = useRef(null);
+  const motionAllowedRef = useRef(true);
   const staffRef = useRef(staff);
   const remoteRef = useRef(remotePlayers);
   const emotesRef = useRef(activeEmotes);
   const onObjectOpenRef = useRef(onObjectOpen);
+  const generatedArtRef = useRef({ status: GENERATED_ART_REQUESTED ? 'loading' : 'procedural', sprites: new Map() });
+  const [generatedArtState, setGeneratedArtState] = useState(GENERATED_ART_REQUESTED ? 'loading' : 'procedural');
+  const environmentArtRef = useRef({
+    status: ENVIRONMENT_ART_REQUESTED ? 'loading' : 'procedural',
+    materials: new Map(),
+    patterns: new Map(),
+  });
+  const [environmentArtState, setEnvironmentArtState] = useState(
+    ENVIRONMENT_ART_REQUESTED ? 'loading' : 'procedural',
+  );
+  const propArtRef = useRef({
+    status: PROP_ART_REQUESTED ? 'loading' : 'procedural',
+    sprites: new Map(),
+  });
+  const [propArtState, setPropArtState] = useState(PROP_ART_REQUESTED ? 'loading' : 'procedural');
 
   useEffect(() => { staffRef.current = staff; }, [staff]);
   useEffect(() => { remoteRef.current = remotePlayers; }, [remotePlayers]);
   useEffect(() => { emotesRef.current = activeEmotes; }, [activeEmotes]);
   useEffect(() => { onObjectOpenRef.current = onObjectOpen; }, [onObjectOpen]);
+  useEffect(() => {
+    const next = normalizeWorldPosition(position);
+    if (distance(positionRef.current, next) > 0.03) positionRef.current = next;
+  }, [position]);
+
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => { motionAllowedRef.current = !query.matches; };
+    sync();
+    query.addEventListener?.('change', sync);
+    return () => query.removeEventListener?.('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (!GENERATED_ART_REQUESTED) return undefined;
+    let cancelled = false;
+    Promise.all(realmGeneratedCharacterAssets().map(async (asset) => [asset.key, await loadRealmImage(asset.url)]))
+      .then((entries) => {
+        if (cancelled) return;
+        generatedArtRef.current = { status: 'ready', sprites: new Map(entries) };
+        setGeneratedArtState('ready');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        generatedArtRef.current = { status: 'fallback', sprites: new Map() };
+        setGeneratedArtState('fallback');
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!ENVIRONMENT_ART_REQUESTED) return undefined;
+    let cancelled = false;
+    Promise.all(realmGeneratedEnvironmentAssets().map(async (asset) => [asset.key, await loadRealmImage(asset.url)]))
+      .then((entries) => {
+        if (cancelled) return;
+        environmentArtRef.current = {
+          status: 'ready',
+          materials: new Map(entries),
+          patterns: new Map(),
+        };
+        setEnvironmentArtState('ready');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        environmentArtRef.current = { status: 'fallback', materials: new Map(), patterns: new Map() };
+        setEnvironmentArtState('fallback');
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!PROP_ART_REQUESTED) return undefined;
+    let cancelled = false;
+    const assets = [...realmGeneratedPropAssets(), ...realmGeneratedDecorAssets()];
+    Promise.all(assets.map(async (asset) => [asset.key, await loadRealmImage(asset.url)]))
+      .then((entries) => {
+        if (cancelled) return;
+        propArtRef.current = { status: 'ready', sprites: new Map(entries) };
+        setPropArtState('ready');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        propArtRef.current = { status: 'fallback', sprites: new Map() };
+        setPropArtState('fallback');
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const moveTo = useCallback((x, y) => {
     targetRef.current = { x: clamp(x, 1, WORLD.cols - 2), y: clamp(y, 1, WORLD.rows - 2) };
@@ -514,8 +801,10 @@ function WorldCanvas({
       }
       if (!dx && !dy) return;
 
+      facingRef.current = realmArtDirectionFromDelta(dx, dy, facingRef.current);
+
       const length = Math.hypot(dx, dy) || 1;
-      const speed = 3.35 * dt;
+      const speed = 4.45 * dt;
       dx = dx / length * speed;
       dy = dy / length * speed;
       const current = positionRef.current;
@@ -532,6 +821,7 @@ function WorldCanvas({
       const dt = Math.min((now - previous) / 1000, 0.05);
       previous = now;
       updatePosition(dt);
+      const visualTime = motionAllowedRef.current ? now : 0;
 
       const dpr = Number(canvas.dataset.dpr || 1);
       const width = canvas.width / dpr;
@@ -552,13 +842,36 @@ function WorldCanvas({
       context.save();
       context.translate(-cameraX, -cameraY);
 
+      const environmentMaterials = environmentArtRef.current.materials;
+      const environmentPatterns = environmentArtRef.current.patterns;
+      const activeMapStyle = realmMapStyle(mapStyle);
       for (let y = 0; y < WORLD.rows; y += 1) {
         for (let x = 0; x < WORLD.cols; x += 1) {
-          if (WALLS.has(`${x},${y}`)) drawWall(context, x, y, tile);
-          else drawFloor(context, x, y, tile, roomAt(x, y));
+          if (WALLS.has(`${x},${y}`)) {
+            drawWall(context, x, y, tile, environmentMaterials, environmentPatterns);
+          } else {
+            const room = roomAt(x, y);
+            drawFloor(
+              context,
+              x,
+              y,
+              tile,
+              room,
+              environmentMaterials,
+              environmentPatterns,
+              activeMapStyle.materials[room?.id] || null,
+            );
+          }
         }
       }
+      const propSprites = propArtRef.current.sprites;
+      for (const decoration of activeMapStyle.decorations.filter((item) => item.floor)) {
+        drawDecoration(context, decoration, tile, propSprites.get(`decor:${decoration.asset}`) || null);
+      }
       drawRoomDecor(context, tile);
+      for (const decoration of activeMapStyle.decorations.filter((item) => !item.floor)) {
+        drawDecoration(context, decoration, tile, propSprites.get(`decor:${decoration.asset}`) || null);
+      }
 
       const nearest = WORLD_OBJECTS.reduce((best, object) => {
         const d = distance(player, object);
@@ -566,20 +879,44 @@ function WorldCanvas({
       }, null);
       const activeObject = nearest?.distance <= 1.75 ? nearest.object : null;
       activeObjectRef.current = activeObject;
-
-      for (const object of WORLD_OBJECTS) drawObject(context, object, tile, activeObject?.id === object.id, now);
-      for (const person of staffRef.current) drawAvatar(context, person, tile, false, now, emotesRef.current[person.id]);
-      for (const person of remoteRef.current) drawAvatar(context, person, tile, false, now, emotesRef.current[person.id]);
+      const generatedSprites = generatedArtRef.current.sprites;
+      const spriteFor = (person, direction = 'down') => generatedSprites.get(
+        realmGeneratedCharacterKey(person.id || person.userId || person.name, direction),
+      ) || null;
+      for (const object of WORLD_OBJECTS) {
+        const binding = realmGeneratedPropBinding(object.id);
+        const nearby = activeObject?.id === object.id;
+        drawObject(
+          context,
+          object,
+          tile,
+          {
+            nearby,
+            hovered: hoveredObjectRef.current?.id === object.id,
+            active: nearby && activePanel === object.panel,
+          },
+          visualTime,
+          propSprites.get(object.id) || null,
+          binding,
+        );
+      }
+      for (const person of staffRef.current) {
+        drawAvatar(context, person, tile, false, visualTime, emotesRef.current[person.id], spriteFor(person));
+      }
+      for (const person of remoteRef.current) {
+        drawAvatar(context, person, tile, false, visualTime, emotesRef.current[person.id], spriteFor(person));
+      }
       drawAvatar(
         context,
         { ...player, name: playerProfile.name, status: playerStatus, color: playerProfile.color, loadout: playerProfile.loadout },
         tile,
         true,
-        now,
+        visualTime,
         emotesRef.current[sessionId],
+        spriteFor({ id: sessionId, name: playerProfile.name }, facingRef.current),
       );
       context.restore();
-      drawMinimap(context, width, height, player, staffRef.current, remoteRef.current);
+      drawMinimap(context, width, height, player, staffRef.current, remoteRef.current, cameraRef.current);
 
       if (now - lastUiSync > 110) {
         lastUiSync = now;
@@ -599,15 +936,29 @@ function WorldCanvas({
 
     frame = requestAnimationFrame(render);
     return () => cancelAnimationFrame(frame);
-  }, [onNearby, onPosition, playerProfile, playerStatus]);
+  }, [activePanel, mapStyle, onNearby, onPosition, playerProfile, playerStatus]);
 
-  const pointerMove = (event) => {
+  const pointerWorldPosition = (event) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const camera = cameraRef.current;
-    moveTo(
-      (event.clientX - rect.left + camera.x) / camera.tile,
-      (event.clientY - rect.top + camera.y) / camera.tile,
-    );
+    return {
+      x: (event.clientX - rect.left + camera.x) / camera.tile,
+      y: (event.clientY - rect.top + camera.y) / camera.tile,
+    };
+  };
+
+  const pointerMove = (event) => {
+    const point = pointerWorldPosition(event);
+    moveTo(point.x, point.y);
+  };
+
+  const pointerHover = (event) => {
+    const point = pointerWorldPosition(event);
+    const hovered = WORLD_OBJECTS.find((object) => {
+      const binding = realmGeneratedPropBinding(object.id);
+      return distance(point, object) <= Math.max(0.85, (binding?.scale || 1.35) * 0.46);
+    }) || null;
+    hoveredObjectRef.current = hovered;
   };
 
   const pressDirection = (key, pressed) => {
@@ -622,8 +973,15 @@ function WorldCanvas({
         ref={canvasRef}
         className={styles.worldCanvas}
         onPointerDown={pointerMove}
+        onPointerMove={pointerHover}
+        onPointerLeave={() => { hoveredObjectRef.current = null; }}
         aria-label="Bản đồ văn phòng ảo CRMegoric Realms. Dùng WASD hoặc phím mũi tên để di chuyển."
         role="img"
+        data-realm-art={generatedArtState}
+        data-realm-environment-art={environmentArtState}
+        data-realm-prop-art={propArtState}
+        data-realm-map-style={mapStyle}
+        data-realm-world-size={`${WORLD.cols}x${WORLD.rows}`}
       />
       <div className={styles.mapLegend} aria-hidden="true">
         <span><i className={styles.playerDot} /> Bạn</span>
@@ -656,7 +1014,7 @@ function RemoteVideoTile({ person, stream, connectionState, onSelect }) {
 
   const connectionLabel = connectionState === 'connected'
     ? 'WebRTC đã kết nối'
-    : person.isRemote ? 'Đang bắt tay P2P' : 'NPC mô phỏng';
+    : person.isRemote ? 'Đang bắt tay P2P' : person.isErpDirectory ? 'Nhân sự ERP' : 'Người chơi Realm';
 
   return (
     <button type="button" className={`${styles.videoTile} ${styles.videoTileButton}`} onClick={() => onSelect(person)} aria-label={`Mở tương tác với ${person.name}`} title={`${person.name} · ${connectionLabel}`}>
@@ -739,24 +1097,26 @@ function MediaDock({
   );
 }
 
-function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null }) {
+function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world' }) {
   const toast = useToast();
   const tavernEnabled = pilotFeatures?.tavern !== false;
   const realmNav = useMemo(() => tavernEnabled ? NAV : NAV.filter((item) => !['treasury', 'shop'].includes(item.id)), [tavernEnabled]);
   const dataSource = useMemo(
-    () => realmDataSourceMode({ erpHref, syncEnabled: ERP_SYNC_REQUESTED }),
-    [erpHref],
+    () => realmDataSourceMode({ erpHref: demoMode ? null : erpHref, syncEnabled: ERP_SYNC_REQUESTED }),
+    [demoMode, erpHref],
   );
   const initialProfile = useMemo(() => normalizeProfile(dataSource.isErp && initialBridge?.actor
     ? { name: initialBridge.actor.name, role: initialBridge.actor.title || 'Realm Builder' }
     : DEFAULT_PROFILE), [dataSource.isErp, initialBridge]);
-  const [mode, setMode] = useState('world');
+  const [mode, setMode] = useState(initialMode === 'ledger' ? 'ledger' : 'world');
   const [activePanel, setActivePanel] = useState('briefing');
+  const [ledgerView, setLedgerView] = useState('personal');
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [profile, setProfile] = useState(initialProfile);
   const [profileDraft, setProfileDraft] = useState(initialProfile);
   const [playerStatus, setPlayerStatus] = useState('available');
-  const [position, setPosition] = useState({ x: 18.5, y: 19, zoneId: null });
+  const [mapStyle, setMapStyle] = useState(REALM_MAP_STYLE_DEFAULT);
+  const [position, setPosition] = useState({ ...DEFAULT_WORLD_POSITION, zoneId: null });
   const positionRef = useRef(position);
   const [activeObject, setActiveObject] = useState(null);
   const [nearby, setNearby] = useState([]);
@@ -782,13 +1142,14 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
   const { wallet, quests, ledger } = operations;
   const career = useMemo(() => summarizeRealmCareer(operations), [operations]);
   const [messages, setMessages] = useState(() => realmInitialMessages(dataSource, [
-    { id: 'm1', name: 'Quang Võ', text: 'Mọi người qua Tavern lúc 15:00 nhé, review campaign 10 phút.', at: '10:12' },
-    { id: 'm2', name: 'Mai Anh', text: 'Đã ghim checklist onboarding lên Sổ bộ Guild.', at: '10:18' },
+    { id: 'm1', name: 'Trần Khánh Linh', text: 'Mọi người qua Tavern lúc 15:00 nhé, review campaign 10 phút.', at: '10:12' },
+    { id: 'm2', name: 'Lê Ngọc Mai', text: 'Đã ghim checklist onboarding lên Sổ bộ Guild.', at: '10:18' },
   ]));
   const [chatText, setChatText] = useState('');
   const [whisperText, setWhisperText] = useState('');
   const [contactSending, setContactSending] = useState(false);
   const [contactReceipt, setContactReceipt] = useState(null);
+  const [uiArtState, setUiArtState] = useState(UI_ART_REQUESTED ? 'loading' : 'procedural');
   const [selectedPersonId, setSelectedPersonId] = useState(null);
   const [activeEmotes, setActiveEmotes] = useState({});
   const [cameraOn, setCameraOn] = useState(false);
@@ -796,13 +1157,132 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
   const [sharing, setSharing] = useState(false);
   const [partyConfirm, setPartyConfirm] = useState(null);
   const [mediaRevision, setMediaRevision] = useState(0);
+  const [experienceReady, setExperienceReady] = useState(false);
+  const [navigationAnnouncement, setNavigationAnnouncement] = useState('');
+  const [erpHandoffState, setErpHandoffState] = useState('idle');
   const mediaRef = useRef(null);
   const screenRef = useRef(null);
   const videoRef = useRef(null);
   const emoteTimersRef = useRef(new Map());
-  const collaborationDirectory = useCollaborationDirectory({ enabled: Boolean(erpHref) });
+  const mainStageRef = useRef(null);
+  const inspectorRef = useRef(null);
+  const experienceHydratedRef = useRef(false);
+  const previousExperienceRef = useRef(null);
+  const previousSyncStateRef = useRef(null);
+  const collaborationDirectory = useCollaborationDirectory({ enabled: dataSource.isErp });
+
+  const handoffToErp = useCallback(async (event) => {
+    persistWorkspaceSurface('erp');
+    sendRealmExperienceSignal(dataSource.isErp, 'erp_handoff', 'erp', realmJourneyForContext({ mode, panel: activePanel, ledgerView }));
+    if (!demoMode || erpHandoffState === 'loading') return;
+
+    event.preventDefault();
+    setErpHandoffState('loading');
+    setNavigationAnnouncement('Đang mở ERP · CRM bằng phiên demo dùng chung.');
+    try {
+      const response = await fetch('/api/realm-demo/session', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json' },
+      });
+      if (!response.ok) throw new Error(`realm_demo_session_${response.status}`);
+      window.location.assign(erpHref);
+    } catch {
+      setErpHandoffState('fallback');
+      setNavigationAnnouncement('Không thể tạo phiên demo tự động. Đang chuyển tới trang đăng nhập ERP · CRM.');
+      window.location.assign(erpHref);
+    }
+  }, [activePanel, dataSource.isErp, demoMode, erpHandoffState, erpHref, ledgerView, mode]);
 
   useEffect(() => { setPlayerStatus(preferredCollaborationAvailability()); }, []);
+  useEffect(() => {
+    let stored = null;
+    try { stored = window.localStorage.getItem(REALM_MAP_STYLE_STORAGE_KEY); } catch {}
+    setMapStyle(normalizeRealmMapStyle(stored));
+  }, []);
+
+  const changeMapStyle = useCallback((event) => {
+    const nextStyle = normalizeRealmMapStyle(event.target.value);
+    setMapStyle(nextStyle);
+    try { window.localStorage.setItem(REALM_MAP_STYLE_STORAGE_KEY, nextStyle); } catch {}
+    const preset = realmMapStyle(nextStyle);
+    toast(`Đã đổi cảnh quan lâu đài: ${preset.label}. Dữ liệu nghiệp vụ không thay đổi.`);
+  }, [toast]);
+  useEffect(() => {
+    if (experienceHydratedRef.current) return;
+    experienceHydratedRef.current = true;
+    let restored = null;
+    try { restored = parseRealmExperienceContext(window.localStorage.getItem(REALM_EXPERIENCE_STORAGE_KEY)); } catch {}
+    if (restored) {
+      const restoredPanel = restored.panel === 'profile' || (realmNav.some((item) => item.id === restored.panel) && realmAccessForPanel(businessBridge?.access, restored.panel).allowed)
+        ? restored.panel
+        : 'briefing';
+      const restoredLedgerView = realmAccessForSurface(businessBridge?.access, restored.ledgerView).allowed
+        ? restored.ledgerView
+        : 'personal';
+      const restoredMode = restored.mode === 'ledger' && realmAccessForSurface(businessBridge?.access, restoredLedgerView).allowed
+        ? 'ledger'
+        : 'world';
+      // A deliberate deep-link to the ledger wins over a previously remembered
+      // world position. This keeps /realm?view=ledger stable for bookmarks, demos
+      // and the ERP navigation entry that restores Sổ Realm discoverability.
+      setMode(initialMode === 'ledger' ? 'ledger' : restoredMode);
+      setActivePanel(restoredPanel);
+      setLedgerView(restoredLedgerView);
+      if (restored.position) setPosition((current) => ({ ...current, ...normalizeWorldPosition(restored.position) }));
+      setNavigationAnnouncement('Đã khôi phục khu vực làm việc gần nhất trong Realm.');
+      toast('Đã khôi phục khu vực Realm gần nhất.');
+      sendRealmExperienceSignal(dataSource.isErp, 'continuity_restored', restoredMode === 'ledger' ? 'ledger' : 'realm', realmJourneyForContext({ ...restored, mode: restoredMode, panel: restoredPanel, ledgerView: restoredLedgerView }));
+    }
+    sendRealmExperienceSignal(dataSource.isErp, 'realm_opened', restored?.mode === 'ledger' ? 'ledger' : 'realm', restored ? realmJourneyForContext(restored) : null);
+    setExperienceReady(true);
+  }, [businessBridge?.access, dataSource.isErp, initialMode, realmNav, toast]);
+  useEffect(() => {
+    if (!experienceReady) return undefined;
+    const timer = window.setTimeout(() => {
+      const context = normalizeRealmExperienceContext({
+        mode,
+        panel: activePanel,
+        ledgerView,
+        position,
+      });
+      try { window.localStorage.setItem(REALM_EXPERIENCE_STORAGE_KEY, JSON.stringify(context)); } catch {}
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [activePanel, experienceReady, ledgerView, mode, position]);
+  useEffect(() => {
+    if (!experienceReady) return;
+    const context = normalizeRealmExperienceContext({ mode, panel: activePanel, ledgerView });
+    const journey = realmJourneyForContext(context);
+    const previous = previousExperienceRef.current;
+    if (previous && previous.mode !== context.mode) {
+      sendRealmExperienceSignal(dataSource.isErp, 'mode_changed', context.mode === 'ledger' ? 'ledger' : 'realm', journey);
+    }
+    if (journey && journey !== previous?.journey) {
+      sendRealmExperienceSignal(dataSource.isErp, 'journey_opened', context.mode === 'ledger' ? 'ledger' : 'realm', journey);
+    }
+    previousExperienceRef.current = { ...context, journey };
+    const panelLabel = mode === 'ledger'
+      ? `Sổ Realm · ${ledgerView}`
+      : realmNav.find((item) => item.id === activePanel)?.label || (activePanel === 'profile' ? 'Hồ sơ nhân vật' : 'Realm');
+    setNavigationAnnouncement(`Đã mở ${panelLabel}.`);
+    const target = mode === 'world' && activePanel !== 'briefing' ? inspectorRef.current : mainStageRef.current;
+    if (target) {
+      target.focus({ preventScroll: true });
+      if (window.matchMedia('(max-width: 900px)').matches) {
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        target.scrollIntoView({ block: 'start', behavior: reducedMotion ? 'auto' : 'smooth' });
+      }
+    }
+  }, [activePanel, dataSource.isErp, experienceReady, ledgerView, mode, realmNav]);
+  useEffect(() => {
+    if (!dataSource.isErp) return;
+    const degraded = ['fallback', 'stale', 'offline', 'error'].includes(operationsSyncState);
+    const previouslyDegraded = ['fallback', 'stale', 'offline', 'error'].includes(previousSyncStateRef.current);
+    if (degraded && !previouslyDegraded) sendRealmExperienceSignal(true, 'sync_degraded', mode === 'ledger' ? 'ledger' : 'realm', realmJourneyForContext({ mode, panel: activePanel, ledgerView }));
+    if (!degraded && previouslyDegraded && operationsSyncState === 'ready') sendRealmExperienceSignal(true, 'sync_recovered', mode === 'ledger' ? 'ledger' : 'realm', realmJourneyForContext({ mode, panel: activePanel, ledgerView }));
+    previousSyncStateRef.current = operationsSyncState;
+  }, [activePanel, dataSource.isErp, ledgerView, mode, operationsSyncState]);
 
   const applyRemoteOperations = useCallback((snapshot, responseEtag = null, trace = {}) => {
     if (snapshot?.source !== 'erp' || !snapshot.operations || !snapshot.profile || !snapshot.sync?.revision) {
@@ -1060,6 +1540,18 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
       setOperationsReady(true);
     }
   }, [dataSource.isErp]);
+  useEffect(() => {
+    if (!UI_ART_REQUESTED) return undefined;
+    let cancelled = false;
+    Promise.all(GENERATED_UI_ART_ASSETS.map((asset) => loadRealmImage(asset.url)))
+      .then(() => {
+        if (!cancelled) setUiArtState('ready');
+      })
+      .catch(() => {
+        if (!cancelled) setUiArtState('fallback');
+      });
+    return () => { cancelled = true; };
+  }, []);
   useEffect(() => {
     if (operationsReady && operationsSource === 'local') {
       localStorage.setItem(REALM_OPERATIONS_STORAGE_KEY, JSON.stringify(operations));
@@ -1766,7 +2258,7 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
           <PanelHeading
             eyebrow="Player interaction"
             title={selectedPerson.name}
-            text={`${selectedPerson.role} · ${selectedPerson.isRemote ? 'Đang ở trong Realm' : selectedPerson.isErpDirectory ? selectedPerson.online ? `Đang online tại ${(selectedPerson.surfaces || []).map((surface) => surface === 'realm' ? 'Realm' : 'ERP').join(' + ')}` : 'Nhân sự ERP · hiện đang offline' : 'Nhân sự mô phỏng'}`}
+            text={`${selectedPerson.role} · ${selectedPerson.isRemote ? 'Đang ở trong Realm' : selectedPerson.isErpDirectory ? selectedPerson.online ? `Đang online tại ${(selectedPerson.surfaces || []).map((surface) => surface === 'realm' ? 'Realm' : 'ERP').join(' + ')}` : 'Nhân sự ERP · hiện đang offline' : 'Người chơi Realm'}`}
           />
           <div className={styles.playerHero}>
             <span className={styles.playerHeroAvatar} style={{ '--avatar-color': selectedPerson.color }}>{initials(selectedPerson.name)}</span>
@@ -1847,7 +2339,10 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
           : 'Danh tính này được lưu trong trình duyệt demo và phát cho người chơi thuộc cùng Realm/map.'} />
         <form className={styles.profileForm} aria-busy={operationsSyncState === 'syncing' || undefined} onSubmit={saveProfile}>
           <div className={styles.profilePreview}>
-            <span className={styles.profileAvatar} style={{ '--avatar-color': profileDraft.color }}>{initials(profileDraft.name || DEFAULT_PROFILE.name)}</span>
+            <span className={styles.profileAvatar} style={{ '--avatar-color': profileDraft.color }}>
+              <span className={styles.portraitFallback}>{initials(profileDraft.name || DEFAULT_PROFILE.name)}</span>
+              <img className={styles.portraitImage} src={realmGeneratedCharacterPortraitUrl(profileDraft.name || DEFAULT_PROFILE.name)} alt="" aria-hidden="true" />
+            </span>
             <span><strong>{profileDraft.name || DEFAULT_PROFILE.name}</strong><small>{profileDraft.role}</small></span>
           </div>
           <label htmlFor="realm-profile-name">Tên hiển thị</label>
@@ -1959,11 +2454,11 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
     );
 
     if (activePanel === 'treasury') return (
-      <>
+      <section className={styles.treasurySurface} data-realm-business-surface="treasury">
         <PanelHeading eyebrow="Royal Treasury" title="Ví & sổ Gold" text="Wallet dùng để đổi vật phẩm; lịch sử Gold đã kiếm không bị giảm khi chi tiêu." />
         <div className={styles.balanceCard}><span>Gold khả dụng</span><strong>{wallet}</strong><small>Renown mùa này: {career.renown.toLocaleString('vi-VN')} XP · Level {career.level}</small></div>
         <LedgerList ledger={ledger} />
-      </>
+      </section>
     );
 
     if (activePanel === 'shop' && operationsSource === 'erp') return (
@@ -2045,7 +2540,13 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
   }, [activePanel, businessBridge, cancelInvite, career.level, career.renown, chatText, commandDashboard, confirmPartyAction, contactReceipt, contactSending, currentRoom?.name, dataSource.isErp, embassyDashboard, guildDashboard, handleLocalTreasuryChange, incomingInvite, inviteToParty, ledger, localWarRoom, mediaTopology, messages, moveToSelectedPerson, nearby.length, networkInfo, onlineCount, openAuthorizedPanel, operationsSource, operationsSyncState, outgoingInvite, party, partyConfirm, position, profile.color, profile.name, profileDraft, quests, realmDataRevision, realmPeople, refreshRealmOperations, remotePlayers, selectPerson, selectedCampaign, selectedPerson, sendContactToSelected, sendWhisperToSelected, sessionId, sfuMedia.status, transportState, treasuryDashboard, triggerEmote, wallet, whisperText]);
 
   return (
-    <main className={`${styles.realmShell} ${mode === 'ledger' ? styles.ledgerShell : ''}`}>
+    <main
+      className={`${styles.realmShell} ${mode === 'ledger' ? styles.ledgerShell : ''}`}
+      data-realm-ui-art={uiArtState}
+      style={UI_ART_REQUESTED ? GENERATED_UI_ART_STYLE : undefined}
+    >
+      <a className={styles.skipLink} href="#realm-main-content">Bỏ qua điều hướng, tới nội dung Realm</a>
+      <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">{navigationAnnouncement}</span>
       <header className={styles.topbar}>
         <div className={styles.brandCompact}>
           <span className={styles.brandShield}><Icon name="shield" size={20} /></span>
@@ -2053,16 +2554,11 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
         </div>
         <div className={styles.topbarCenter}>
           <button type="button" className={mode === 'world' ? styles.activeMode : ''} onClick={() => setMode('world')} aria-pressed={mode === 'world'}><Icon name="dashboard" size={16} />Realm</button>
-          {erpHref ? (
-            <>
-              <Link className={styles.erpGateway} href={erpHref} onClick={() => persistWorkspaceSurface('erp')} aria-label="Chuyển sang giao diện ERP CRM"><Icon name="reports" size={16} />ERP · CRM</Link>
-              <button type="button" className={mode === 'ledger' ? styles.activeMode : ''} onClick={() => setMode('ledger')} aria-pressed={mode === 'ledger'}><Icon name="wallet" size={16} />Sổ Realm</button>
-            </>
-          ) : (
-            <button type="button" className={mode === 'ledger' ? styles.activeMode : ''} onClick={() => setMode('ledger')} aria-pressed={mode === 'ledger'}><Icon name="reports" size={16} />ERP · CRM</button>
-          )}
+          {erpHref && <Link className={styles.erpGateway} href={erpHref} onClick={handoffToErp} aria-label="Mở workspace ERP CRM gốc" title="Mở đầy đủ menu và chức năng ERP · CRM" aria-busy={erpHandoffState === 'loading' || undefined}><Icon name="reports" size={16} />{erpHandoffState === 'loading' ? 'Đang mở…' : 'ERP · CRM'}</Link>}
+          <button type="button" className={mode === 'ledger' ? styles.activeMode : ''} onClick={() => setMode('ledger')} aria-pressed={mode === 'ledger'} title="Sổ gamified chỉ thuộc Realm"><Icon name="wallet" size={16} />Sổ Realm</button>
         </div>
         <div className={styles.topbarRight}>
+          <LanguageSwitch compact className={styles.realmLanguageSwitch} />
           {dataSource.isErp && <span className={`${styles.feedBadge} ${styles[`feedBadge_${changeFeed.state}`] || ''}`} title={`ERP change-feed · ${changeFeed.eventCount} sự kiện đã nhận`} aria-label={`ERP change-feed ${changeFeed.state}`}><i />{changeFeed.state === 'ready' ? 'ERP live' : changeFeed.state === 'connecting' ? 'Đang nối' : 'Feed chậm'}</span>}
           {dataSource.isErp && <RealmNotificationBell dataRevision={realmDataRevision} />}
           <label className={styles.statusSelect}>
@@ -2095,10 +2591,37 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
       <div className={styles.appGrid}>
         <aside className={styles.sidebar} aria-label="Điều hướng Realm">
           <button type="button" className={`${styles.profileCard} ${activePanel === 'profile' ? styles.profileCardActive : ''}`} onClick={() => { setMode('world'); setActivePanel('profile'); }}>
-            <span className={styles.profileAvatar} style={{ '--avatar-color': profile.color }}>{initials(profile.name)}</span>
+            <span className={styles.profileAvatar} style={{ '--avatar-color': profile.color }}>
+              <span className={styles.portraitFallback}>{initials(profile.name)}</span>
+              <img className={styles.portraitImage} src={realmGeneratedCharacterPortraitUrl(profile.name || DEFAULT_PROFILE.name)} alt="" aria-hidden="true" />
+            </span>
             <span><strong>{profile.name}</strong><small>Level {career.level} · {profile.role}</small></span>
             <Icon name="settings" size={15} />
           </button>
+          <label className={styles.mobileNavigator} htmlFor="realm-mobile-destination">
+            <span><Icon name="dashboard" size={17} />Khu vực</span>
+            <select id="realm-mobile-destination" value={mode === 'ledger' ? `ledger:${ledgerView}` : `world:${activePanel}`} onChange={(event) => {
+              const [nextMode, destination] = event.target.value.split(':');
+              if (nextMode === 'ledger') {
+                setMode('ledger');
+                setLedgerView(destination || 'personal');
+              } else {
+                moveToObject(destination || 'briefing');
+              }
+            }}>
+              {realmNav.map((item) => {
+                const access = realmAccessForPanel(businessBridge?.access, item.id);
+                return <option key={item.id} value={`world:${item.id}`} disabled={!access.allowed}>{item.label}{!access.allowed ? ' · khóa' : ''}</option>;
+              })}
+              <option value="world:profile">Hồ sơ nhân vật</option>
+              {mode === 'world' && !realmNav.some((item) => item.id === activePanel) && activePanel !== 'profile' && (
+                <option value={`world:${activePanel}`} disabled>Ngữ cảnh đang mở</option>
+              )}
+              <option value="ledger:personal">Sổ nhân vật</option>
+              <option value="ledger:guild">Guild Hall · Sổ Realm</option>
+              {tavernEnabled && <option value="ledger:treasury">Tavern · Sổ Realm</option>}
+            </select>
+          </label>
           <nav>
             <span className={styles.navLabel}>Vương quốc</span>
             {realmNav.map((item) => {
@@ -2115,22 +2638,31 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
             })}
             <span className={styles.navLabel}>Hệ thống</span>
             <button type="button" className={activePanel === 'profile' && mode === 'world' ? styles.navActive : ''} onClick={() => { setMode('world'); setActivePanel('profile'); }}><Icon name="staff" size={18} /><span>Hồ sơ nhân vật</span></button>
-            {erpHref && <Link href={erpHref} onClick={() => persistWorkspaceSurface('erp')}><Icon name="reports" size={18} /><span>Mở ERP · CRM</span></Link>}
-            <button type="button" className={mode === 'ledger' ? styles.navActive : ''} onClick={() => setMode('ledger')}><Icon name="wallet" size={18} /><span>{erpHref ? (tavernEnabled ? 'Sổ Realm & Tavern' : 'Sổ Realm') : 'Điều hành ERP · CRM'}</span></button>
+            {erpHref && <Link href={erpHref} onClick={handoffToErp} aria-busy={erpHandoffState === 'loading' || undefined}><Icon name="reports" size={18} /><span>{erpHandoffState === 'loading' ? 'Đang mở ERP · CRM…' : 'Mở ERP · CRM gốc'}</span></Link>}
+            <button type="button" className={mode === 'ledger' ? styles.navActive : ''} onClick={() => setMode('ledger')} title="Giao diện gamified, không thay thế ERP"><Icon name="wallet" size={18} /><span>{tavernEnabled ? 'Sổ Realm & Tavern' : 'Sổ Realm'}</span></button>
           </nav>
           <div className={styles.onlineSummary}><span><i />{onlineCount} online</span><small>{TRANSPORT[transportState]?.short || 'Solo mode'}</small></div>
         </aside>
 
-        <section className={styles.mainStage}>
+        <section id="realm-main-content" ref={mainStageRef} tabIndex={-1} className={styles.mainStage}>
           {mode === 'world' ? (
             <>
               <div className={styles.worldTopline}>
                 <div><span className={styles.eyebrow}>Bạn đang ở</span><h1>{currentRoom?.name || 'Hành lang lâu đài'}</h1></div>
-                <div className={styles.zoneInfo}><Icon name={privateZone || party ? 'shield' : 'meeting'} size={17} /><span>{party ? 'Party Voice: kết nối xuyên phòng' : privateZone ? `Phòng riêng: ${privateZone.name}` : 'Spatial audio: bán kính 5 ô'}</span></div>
+                <div className={styles.worldToplineActions}>
+                  <label className={styles.mapStylePicker}>
+                    <Icon name="settings" size={17} />
+                    <span><small>Cảnh quan</small><select value={mapStyle} onChange={changeMapStyle} aria-label="Đổi phong cách bản đồ lâu đài">
+                      {REALM_MAP_STYLES.map((preset) => <option key={preset.id} value={preset.id}>{preset.label}</option>)}
+                    </select></span>
+                  </label>
+                  <div className={styles.zoneInfo}><Icon name={privateZone || party ? 'shield' : 'meeting'} size={17} /><span>{party ? 'Party Voice: kết nối xuyên phòng' : privateZone ? `Phòng riêng: ${privateZone.name}` : 'Spatial audio: bán kính 5 ô'}</span></div>
+                </div>
               </div>
               <WorldCanvas
                 onObjectOpen={openObject}
                 onEmote={triggerEmote}
+                activePanel={activePanel}
                 playerStatus={playerStatus}
                 playerProfile={profile}
                 onPosition={handlePosition}
@@ -2139,6 +2671,8 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
                 remotePlayers={remotePlayers}
                 activeEmotes={activeEmotes}
                 sessionId={sessionId}
+                mapStyle={mapStyle}
+                position={position}
               />
               {activeObject && (
                 <button type="button" className={styles.interactPrompt} onClick={() => openObject(activeObject)}>
@@ -2193,11 +2727,13 @@ function RealmOfficeInner({ erpHref = null, workspaceLabel = 'Demo entity', init
               embassyDashboard={embassyDashboard}
               businessBridge={businessBridge}
               dataRevision={realmDataRevision}
+              ledgerView={ledgerView}
+              onLedgerViewChange={setLedgerView}
             />
           )}
         </section>
 
-        <aside className={styles.inspector} aria-label="Bảng thông tin CRMegoric">
+        <aside ref={inspectorRef} tabIndex={-1} className={styles.inspector} aria-label="Bảng thông tin CRMegoric">
           <div className={styles.inspectorScroll}>{mode === 'ledger'
             ? <CharacterDossier profile={profile} playerStatus={playerStatus} career={career} wallet={wallet} operationsSource={operationsSource} operationsSyncState={operationsSyncState} operationsSyncMeta={operationsSyncMeta} businessBridge={businessBridge} onOperationsRefresh={refreshRealmOperations} onCopySupportId={copyRealmSupportId} onOpenRealm={() => { setMode('world'); setActivePanel('briefing'); }} />
             : panel}</div>
@@ -2299,10 +2835,11 @@ function LedgerMode({
   embassyDashboard,
   businessBridge,
   dataRevision = 0,
+  ledgerView,
+  onLedgerViewChange,
 }) {
   const status = STATUS[playerStatus] || STATUS.available;
   const sync = operationsSyncCopy(operationsSource, operationsSyncState, operationsSyncMeta);
-  const [ledgerView, setLedgerView] = useState('personal');
   const [warRoomCampaign, setWarRoomCampaign] = useState(null);
   const [embassyOpen, setEmbassyOpen] = useState(false);
   const accessManifest = businessBridge?.access;
@@ -2322,11 +2859,11 @@ function LedgerMode({
   );
   useEffect(() => {
     if (!realmAccessForSurface(accessManifest, ledgerView).allowed) {
-      setLedgerView('personal');
+      onLedgerViewChange('personal');
       setWarRoomCampaign(null);
       setEmbassyOpen(false);
     }
-  }, [accessManifest, ledgerView]);
+  }, [accessManifest, ledgerView, onLedgerViewChange]);
   return (
     <div className={styles.ledgerMode}>
       <header className={styles.ledgerHero}>
@@ -2343,7 +2880,7 @@ function LedgerMode({
           const access = realmAccessForSurface(accessManifest, tab.key);
           return <button type="button" key={tab.key} disabled={!access.allowed} title={!access.allowed ? access.reason : undefined}
             aria-pressed={ledgerView === tab.key} className={ledgerView === tab.key ? styles.ledgerViewActive : ''}
-            onClick={() => { setLedgerView(tab.key); if (tab.key === 'guild') { setWarRoomCampaign(null); setEmbassyOpen(false); } }}>
+            onClick={() => { onLedgerViewChange(tab.key); if (tab.key === 'guild') { setWarRoomCampaign(null); setEmbassyOpen(false); } }}>
             <Icon name={tab.icon} size={16} />{tab.label}{!access.allowed && <Icon name="shield" size={12} />}
           </button>;
         })}
@@ -2533,6 +3070,6 @@ function CharacterDossier({ profile, playerStatus, career, wallet, operationsSou
   );
 }
 
-export default function RealmOffice({ erpHref = null, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null }) {
-  return <ToastProvider><RealmOfficeInner erpHref={erpHref} workspaceLabel={workspaceLabel} initialBridge={initialBridge} pilotFeatures={pilotFeatures} /></ToastProvider>;
+export default function RealmOffice({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world' }) {
+  return <ToastProvider><RealmOfficeInner erpHref={erpHref} demoMode={demoMode} workspaceLabel={workspaceLabel} initialBridge={initialBridge} pilotFeatures={pilotFeatures} initialMode={initialMode} /></ToastProvider>;
 }

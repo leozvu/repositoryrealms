@@ -179,8 +179,8 @@
       "source": "components/realm/RealmOffice.jsx",
       "signals": [
         "persistWorkspaceSurface('erp')",
-        "Chuyển sang giao diện ERP CRM",
-        "Mở ERP · CRM"
+        "Mở workspace ERP CRM gốc",
+        "Mở ERP · CRM gốc"
       ],
       "missingSignals": [],
       "forbiddenSignals": [],

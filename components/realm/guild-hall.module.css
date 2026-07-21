@@ -4,6 +4,7 @@
   --guild-border: rgba(215, 190, 126, .2);
   display: grid;
   gap: 20px;
+  min-width: 0;
   color: var(--guild-ink);
 }
 
@@ -19,6 +20,8 @@
 }
 
 .hero {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -26,6 +29,29 @@
   min-height: 116px;
   padding: 22px 24px;
   border-radius: 18px;
+  overflow: hidden;
+}
+
+:global([data-realm-ui-art='ready']) .hero::before {
+  position: absolute;
+  inset: 4px;
+  z-index: 0;
+  pointer-events: none;
+  content: '';
+  background-image:
+    var(--realm-ui-notice-corner-tl),
+    var(--realm-ui-notice-corner-tr),
+    var(--realm-ui-notice-corner-bl),
+    var(--realm-ui-notice-corner-br);
+  background-position: left top, right top, left bottom, right bottom;
+  background-repeat: no-repeat;
+  background-size: 42px 42px;
+  opacity: .68;
+}
+
+:global([data-realm-ui-art='ready']) .hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 .crest {
@@ -104,7 +130,19 @@
 }
 
 .panel { overflow: hidden; border-radius: 16px; }
-.panelHead { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 18px 18px 14px; border-bottom: 1px solid var(--guild-border); }
+.panelHead { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 18px 18px 14px; border-bottom: 1px solid var(--guild-border); }
+.panelHead::after {
+  position: absolute;
+  right: 18px;
+  bottom: -5px;
+  left: 18px;
+  height: 10px;
+  pointer-events: none;
+  content: '';
+  background: var(--realm-ui-panel-divider) center/100% 100% no-repeat;
+  opacity: 0;
+}
+:global([data-realm-ui-art='ready']) .panelHead::after { opacity: .58; }
 .panelHead h3 { font-size: 18px; }
 .panelHead > small { max-width: 190px; color: #9da29b; text-align: right; line-height: 1.4; }
 .roster,
@@ -198,12 +236,22 @@ button.memberRow:focus-visible,
 .empty { margin: 0; padding: 24px 16px; color: var(--guild-muted); text-align: center; }
 
 .compact { gap: 14px; }
-.compact .hero { min-height: auto; padding: 16px; }
+.compact .hero { min-height: auto; grid-template-columns: minmax(0, 1fr); align-items: start; padding: 16px; }
+.compact .crest { width: 46px; height: 52px; }
+.compact .hero > div { min-width: 0; }
+.compact .hero h2 { font-size: 1.26rem; overflow-wrap: anywhere; }
+.compact .sourceBadge { max-width: 100%; justify-self: start; white-space: normal; overflow-wrap: anywhere; }
 .compact .hero p { display: none; }
 .compact .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .compact .metric { min-height: 88px; padding: 12px; }
 .compact .metric strong { font-size: 20px; }
 .compact .columns { grid-template-columns: 1fr; }
+
+@container realm-inspector (max-width: 310px) {
+  .compact .metrics { grid-template-columns: 1fr; }
+  .compact .panelHead { align-items: flex-start; flex-direction: column; }
+  .compact .panelHead > small { max-width: none; text-align: left; }
+}
 
 @media (max-width: 980px) {
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }

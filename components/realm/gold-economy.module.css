@@ -6,7 +6,7 @@
   display: grid;
   gap: 14px;
   color: var(--economy-ink);
-  font-family: "Segoe UI", Inter, system-ui, sans-serif;
+  font-family: var(--font);
 }
 
 .hero {
@@ -41,7 +41,7 @@
 
 .hero > div { max-width: 720px; position: relative; z-index: 1; }
 .hero > div > span { color: #e5c579; font-size: .64rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-.hero h1 { margin: 8px 0 7px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.55rem, 3vw, 2.2rem); font-weight: 600; letter-spacing: -.02em; }
+.hero h1 { margin: 8px 0 7px; font-family: var(--font-display); font-size: clamp(1.55rem, 3vw, 2.2rem); font-weight: 600; letter-spacing: -.02em; }
 .hero p { margin: 0; color: #e0dbcd; font-size: .78rem; line-height: 1.65; }
 
 .scopeBadge {
@@ -78,7 +78,7 @@
 
 .metricIcon { width: 31px; height: 31px; grid-row: 1 / span 2; display: inline-flex; align-items: center; justify-content: center; color: #6c5630; border: 1px solid #d1bf9a; border-radius: 50%; background: #f4e8cf; }
 .metricCard > span:not(.metricIcon) { align-self: end; color: var(--economy-muted); font-size: .62rem; font-weight: 700; }
-.metricCard strong { grid-column: 2; color: #453720; font-family: Georgia, "Times New Roman", serif; font-size: 1.18rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.metricCard strong { grid-column: 2; color: #453720; font-family: var(--font-display); font-size: 1.18rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .metricCard small { grid-column: 1 / -1; margin-top: 8px; color: var(--economy-muted); font-size: .59rem; line-height: 1.45; }
 .metric_good { border-top: 3px solid #50765e; }
 .metric_warning { border-top: 3px solid #ae7931; }
@@ -103,7 +103,7 @@
 .panel { min-width: 0; overflow: hidden; border: 1px solid var(--economy-line); border-radius: 10px; background: var(--economy-paper); box-shadow: 0 8px 22px rgba(76, 57, 29, .07); }
 .panelHead { min-height: 65px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 16px; border-bottom: 1px solid var(--economy-line); background: rgba(247, 239, 224, .58); }
 .panelHead > div > span { display: block; margin-bottom: 3px; color: #98763a; font-size: .56rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.panelHead h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 1rem; font-weight: 600; }
+.panelHead h2 { margin: 0; font-family: var(--font-display); font-size: 1rem; font-weight: 600; }
 .panelHead > p { margin: 0; color: var(--economy-muted); font-size: .61rem; }
 
 .legend { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 7px 12px; }
@@ -139,7 +139,7 @@
 .alert_critical .alertTitle > span { color: #873a30; }
 .alert_info .alertTitle > span { color: #326047; }
 .alertTitle code { color: #7c7267; font-size: .5rem; overflow-wrap: anywhere; }
-.alertCard h3 { margin: 7px 0 4px; font-family: Georgia, "Times New Roman", serif; font-size: .82rem; }
+.alertCard h3 { margin: 7px 0 4px; font-family: var(--font-display); font-size: .82rem; }
 .alertCard > p { margin: 0; color: #5f564a; font-size: .61rem; line-height: 1.5; }
 .alertCard ul { margin: 8px 0; padding-left: 17px; color: #645b50; font-size: .57rem; line-height: 1.55; }
 .alertCard footer { padding-top: 8px; border-top: 1px dashed rgba(91, 68, 34, .2); }
@@ -200,7 +200,7 @@
 .stateCard { min-height: 135px; display: flex; align-items: center; gap: 12px; padding: 20px; border: 1px solid var(--economy-line, rgba(91, 68, 34, .22)); border-radius: 10px; color: #493f32; background: #fffaf0; }
 .stateCard > svg { flex: none; color: #96723a; }
 .stateCard > div { min-width: 0; flex: 1; }
-.stateCard strong { font-family: Georgia, "Times New Roman", serif; font-size: .9rem; }
+.stateCard strong { font-family: var(--font-display); font-size: .9rem; }
 .stateCard p { margin: 4px 0 0; color: #6f6558; font-size: .64rem; }
 .stateCard button { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid #806b46; border-radius: 6px; color: #4b3a20; background: #f4e7cd; font-size: .62rem; font-weight: 800; }
 

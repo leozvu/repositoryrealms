@@ -47,6 +47,12 @@ export default function RealmFeedbackLauncher() {
   const dirty = Boolean(form.summary.trim() || form.details.trim());
   const routeArea = useMemo(() => surface === 'realm' ? 'Realm workspace' : `ERP · ${pathname.split('/').filter(Boolean)[0] || 'dashboard'}`, [pathname, surface]);
 
+  const openFeedback = () => {
+    setOpen(true);
+    const payload = new Blob([JSON.stringify({ event: 'feedback_opened', surface })], { type: 'application/json' });
+    globalThis.navigator?.sendBeacon?.('/api/realm-demo/experience', payload);
+  };
+
   useEffect(() => {
     if (!open) return;
     let alive = true;
@@ -119,7 +125,7 @@ export default function RealmFeedbackLauncher() {
         type="button"
         className={styles.launcher}
         data-surface={surface}
-        onClick={() => setOpen(true)}
+        onClick={openFeedback}
         aria-label="Gửi phản hồi về Realm pilot"
       >
         <Icon name="note" size={17} />

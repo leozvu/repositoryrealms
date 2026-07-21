@@ -7,6 +7,7 @@
   --command-border: rgba(215, 183, 95, .25);
   display: grid;
   gap: 16px;
+  min-width: 0;
   color: var(--command-ink);
 }
 
@@ -264,11 +265,37 @@
 .formNote svg { flex: none; }
 .counter { margin-top: -10px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
 
-.compact { gap: 12px; }
-.compact .hero { padding: 14px; }
-.compact .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.compact { gap: 12px; max-width: 100%; overflow: hidden; }
+.compact .hero { grid-template-columns: minmax(0, 1fr); align-items: start; padding: 15px; }
+.compact .crest { width: 44px; height: 44px; }
+.compact .hero > div { min-width: 0; }
+.compact .hero h2 { font-size: 1.22rem; overflow-wrap: anywhere; }
+.compact .hero p { font-size: .76rem; overflow-wrap: anywhere; }
+.compact .sourceBadge { max-width: 100%; justify-self: start; white-space: normal; overflow-wrap: anywhere; }
+.compact .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.compact .metrics article { min-width: 0; padding: 11px; }
+.compact .sectionHead { align-items: flex-start; flex-direction: column; gap: 5px; }
+.compact .sectionHead p { max-width: none; text-align: left; }
+.compact .workloadGrid { grid-template-columns: minmax(0, 1fr); }
+.compact .filters { display: grid; }
+.compact .checkFilter { width: 100%; justify-content: flex-start; }
+.compact .taskRow { grid-template-columns: minmax(0, 1fr); }
+.compact .taskMain strong,
+.compact .taskMain small,
+.compact .taskMeta span { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+.compact .taskMeta,
+.compact .handoffState,
+.compact .taskActions { grid-column: 1; grid-row: auto; max-width: none; }
+.compact .taskActions { justify-content: flex-start; }
+.compact .taskActions button,
+.compact .taskActions a { flex: 1 1 120px; }
 .compact .workloadSection,
 .compact .queueSection { padding: 13px; }
+
+@container realm-inspector (max-width: 310px) {
+  .compact .metrics { grid-template-columns: 1fr; }
+  .compact .workloadCard dl { grid-template-columns: 1fr; }
+}
 
 .commandCenter button:focus-visible,
 .commandCenter a:focus-visible,

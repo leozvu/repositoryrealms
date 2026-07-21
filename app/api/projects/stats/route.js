@@ -19,16 +19,31 @@ export async function GET() {
   // Khóa cache tách theo canSeeMoney: người không được xem tiền phải nhận đúng bản KHÔNG
   // có biên lợi nhuận, tuyệt đối không dùng chung với bản có tiền.
   const stats = await cached(`projectStats:${canSeeMoney ? 'money' : 'nomoney'}`, 45_000, async () => {
-    const [projects, tasks, timeLogs, users, bills] = await Promise.all([
+    const [projects, tasks, timeLogs, users, bills, invoices, milestones, phases, queueStates] = await Promise.all([
       prisma.project.findMany(),
       prisma.task.findMany(),
       prisma.timeLog.findMany(),
       prisma.user.findMany({ select: { id: true, salary: true, userType: true, hourlyRate: true } }),
       canSeeMoney ? prisma.vendorBill.findMany({ select: { projectId: true, amount: true } }) : [],
+      canSeeMoney ? prisma.invoice.findMany({ select: { projectId: true, items: true, vat: true, payments: true, status: true, fxRate: true } }) : [],
+      prisma.milestone.findMany({ select: { projectId: true, date: true, done: true } }),
+      prisma.phase.findMany({ select: { id: true, projectId: true, name: true, order: true, color: true } }),
+      prisma.workQueueState.findMany({ select: { ownerId: true, wipLimit: true, version: true } }),
     ]);
     const usersById = Object.fromEntries(users.map(u => [u.id, u]));
     const out = {};
-    for (const p of projects) out[p.id] = projectStats({ project: p, tasks, timeLogs, usersById, vendorBills: bills, canSeeMoney });
+    for (const p of projects) out[p.id] = projectStats({
+      project: p,
+      tasks,
+      timeLogs,
+      usersById,
+      vendorBills: bills,
+      invoices,
+      milestones,
+      phases,
+      queueStates,
+      canSeeMoney,
+    });
     return out;
   });
   return NextResponse.json({ canSeeMoney, stats });

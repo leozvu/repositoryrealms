@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Icon, useToast } from '@/components/ui';
 import { applyRealmTreasuryDemoAction } from '@/lib/realm-treasury';
+import { money } from '@/lib/format';
 import styles from './royal-treasury.module.css';
 
 const STATUS_META = {
@@ -23,6 +25,42 @@ function StateCard({ loading = false, error = '', onRetry }) {
       <Icon name={loading ? 'clock' : 'alert'} size={22} />
       <div><strong>{loading ? 'Đang mở Tavern…' : 'Không thể tải Tavern'}</strong><p>{loading ? 'Đang đối chiếu wallet, menu và hành trình đổi thưởng.' : error}</p></div>
       {!loading && <button type="button" onClick={onRetry}><Icon name="repeat" size={15} />Thử lại</button>}
+    </section>
+  );
+}
+
+function RoyalLedgerIntelligence({ intelligence }) {
+  if (!intelligence) return null;
+  const { summary, managerQueue, cashForecast, projects, provenance } = intelligence;
+  return (
+    <section className={styles.ledgerIntelligence} aria-labelledby="royal-ledger-title">
+      <header className={styles.ledgerHead}>
+        <div><span>Royal Ledger · canonical ERP finance</span><h2 id="royal-ledger-title">The Steward&apos;s Margin Table</h2><p>Task → declared TimeLog → cost proxy → Invoice → cash. Một rule engine với ERP Finance, chỉ khác cách trình bày.</p></div>
+        <Link href="/finance"><Icon name="finance" size={15} />Mở ERP ledger</Link>
+      </header>
+      <div className={styles.ledgerMetrics} aria-label="Royal Ledger summary">
+        <article><span>Coin on record</span><strong>{money(summary.cashBalance)}</strong><small>Transaction ledger</small></article>
+        <article><span>Tribute due</span><strong>{money(summary.receivable)}</strong><small>{money(summary.overdueReceivable)} quá hạn</small></article>
+        <article><span>Obligations</span><strong>{money(summary.payable)}</strong><small>{money(summary.overduePayable)} quá hạn</small></article>
+        <article><span>Margin proxy</span><strong>{money(summary.operatingMarginProxy)}</strong><small>Không phải accounting profit</small></article>
+      </div>
+      <div className={styles.ledgerGrid}>
+        <section aria-labelledby="royal-ledger-queue-title">
+          <header><div><span>Steward Queue</span><h3 id="royal-ledger-queue-title">Việc cần hội đồng xem xét</h3></div><strong>{managerQueue.length}</strong></header>
+          <div className={styles.ledgerQueue}>{managerQueue.length ? managerQueue.slice(0, 6).map((item) => (
+            <article key={item.id} className={styles[`ledgerSeverity_${item.severity}`]}><Icon name={item.severity === 'critical' ? 'alert' : 'clock'} size={16} /><div><strong>{item.label}</strong><p>{item.explanation}</p><small>Nguồn: {item.source}</small></div></article>
+          )) : <div className={styles.ledgerEmpty}><Icon name="check" size={19} /><span>Steward Queue đang sạch.</span></div>}</div>
+        </section>
+        <section aria-labelledby="royal-ledger-forecast-title">
+          <header><div><span>Three moons</span><h3 id="royal-ledger-forecast-title">Lịch tiền ba kỳ</h3></div><Icon name="calendar" size={18} /></header>
+          <div className={styles.ledgerForecast}>{cashForecast.map((row) => <article key={row.month} className={styles[`ledgerForecast_${row.band}`]}><header><strong>{row.month}</strong><span>{row.band === 'negative' ? 'Âm' : row.band === 'thin' ? 'Mỏng' : 'Dương'}</span></header><dl><div><dt>Thu theo hạn</dt><dd>+{money(row.scheduledReceipts)}</dd></div><div><dt>Chi theo lịch</dt><dd>−{money(row.scheduledVendorPayments + row.futureRecurringTemplates)}</dd></div><div><dt>Cuối kỳ</dt><dd>{money(row.closingBalance)}</dd></div></dl></article>)}</div>
+        </section>
+      </div>
+      <details className={styles.ledgerProjects}>
+        <summary><span><Icon name="projects" size={17} /><strong>Project economics</strong><small>{projects.length} dự án · alphabet, không phải ranking</small></span><Icon name="menu" size={16} /></summary>
+        <div>{projects.map((project) => <article key={project.projectId}><Link href={`/projects/${project.projectId}`}>{project.name}</Link><span>{project.declaredHours}h khai báo</span><strong>{money(project.operatingMarginProxy)}</strong><small>{project.marginBand === 'negative' ? 'Margin proxy âm' : project.marginBand === 'unknown' ? 'Chưa đủ invoice' : 'Margin proxy dương'}</small></article>)}</div>
+      </details>
+      <footer className={styles.ledgerProvenance}><Icon name="shield" size={16} /><p>Confidence ceiling: {provenance.confidence.ceiling}. Cash dùng Transaction thật; labor cost dùng TimeLog tự khai báo × rate hiện tại. Không xếp hạng cá nhân, không tự tạo invoice và không tự thanh toán.</p></footer>
     </section>
   );
 }
@@ -220,13 +258,15 @@ export default function RoyalTreasuryExchange({
   if (error && !dashboard) return <StateCard error={error} onRetry={() => setRefreshKey((value) => value + 1)} />;
 
   return (
-    <div className={styles.treasury}>
+    <div className={styles.treasury} data-realm-business-surface="tavern">
       <header className={styles.hero}>
         <div><span>The Gilded Griffin · governed rewards</span><h1>Tavern</h1><p>Nơi Adventurer dùng Gold để mở khóa vật phẩm và quyền lợi có kiểm soát. Tavern không quy đổi Gold thành lương, tiền mặt hoặc phép luật định.</p></div>
         <span className={styles.sourceBadge}><Icon name={dashboard.source === 'erp' ? 'check' : 'shield'} size={16} />{dashboard.source === 'erp' ? 'ERP journal live' : 'Tavern sandbox'}</span>
       </header>
 
       {error && <div className={styles.errorBanner} role="alert"><Icon name="alert" size={16} /><span>{error}</span><button type="button" onClick={() => setRefreshKey((value) => value + 1)}>Tải lại</button></div>}
+
+      <RoyalLedgerIntelligence intelligence={dashboard.financialIntelligence} />
 
       <section className={styles.walletStrip} aria-label="Trạng thái ví Tavern">
         <div><span>Gold khả dụng</span><strong>{dashboard.wallet} G</strong></div>

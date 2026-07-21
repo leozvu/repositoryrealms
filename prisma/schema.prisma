@@ -89,6 +89,73 @@ model RealmActionReceipt {
   @@index([resource, entityId, createdAt])
 }
 
+// Phase 0 — Evidence & Governance Contract.
+// Đây là ledger append-only cho bằng chứng nghiệp vụ; không phải activity tracker.
+// `metadata` chỉ nhận allowlist từ lib/work-evidence-contract.js và không chứa payload nghiệp vụ thô.
+model WorkEvidenceEvent {
+  id             String                  @id @default(cuid())
+  idempotencyKey String                  @unique
+  subjectType    String
+  subjectId      String
+  eventType      String
+  sourceClass    String // declared | observed | validated | derived
+  purpose        String
+  actorId        String?
+  occurredAt     DateTime
+  recordedAt     DateTime                @default(now())
+  confidence     String                  @default("unrated") // unverified | low | medium | high | unrated
+  provenance     String
+  metadata       String                  @default("{}")
+  parentEventId  String?
+  schemaVersion  Int                     @default(1)
+  policyVersion  String                  @default("1.0.0")
+  retentionUntil DateTime?
+  reviews        EvidenceReviewRequest[]
+
+  @@index([subjectType, subjectId, occurredAt])
+  @@index([actorId, occurredAt])
+  @@index([sourceClass, eventType, occurredAt])
+  @@index([retentionUntil])
+}
+
+// Quy trình phản hồi/sửa bằng chứng. Evidence gốc không bị overwrite;
+// quyết định sửa phải sinh event mới và trỏ về event cũ qua parentEventId.
+model EvidenceReviewRequest {
+  id              String            @id @default(cuid())
+  evidenceEventId String
+  evidenceEvent   WorkEvidenceEvent @relation(fields: [evidenceEventId], references: [id], onDelete: Restrict)
+  requestedById   String
+  reasonCode      String
+  note            String?
+  status          String            @default("pending") // pending | accepted | rejected | withdrawn
+  decidedById     String?
+  decisionCode    String?
+  decisionNote    String?
+  createdAt       DateTime          @default(now())
+  decidedAt       DateTime?
+
+  @@index([evidenceEventId, createdAt])
+  @@index([requestedById, status, createdAt])
+  @@index([status, createdAt])
+}
+
+// Snapshot bất biến của policy đã duyệt. Phase 0 mặc định shadowMode=true;
+// chưa được phép dùng evidence cho Gold, payroll, kỷ luật hay xếp hạng cá nhân.
+model EvidencePolicySnapshot {
+  id           String    @id @default(cuid())
+  version      String    @unique
+  status       String    @default("draft") // draft | approved | active | retired
+  shadowMode   Boolean   @default(true)
+  contractHash String
+  policy       String
+  createdById  String?
+  approvedById String?
+  createdAt    DateTime  @default(now())
+  approvedAt   DateTime?
+
+  @@index([status, createdAt])
+}
+
 // ===== v3.11: Thành viên dự án — gắn freelancer (và nhân sự) vào dự án cụ thể =====
 model ProjectMember {
   id        String   @id @default(cuid())
@@ -235,9 +302,90 @@ model Task {
   statusSince String? // v3.12: YYYY-MM-DD vào cột hiện tại từ khi nào — tính tuổi việc
   realmQuest  RealmQuestConfig?
 
+  // Phase 1 — Unified Work Graph. Các field additive này điều phối cùng Task ERP,
+  // không tạo task store riêng cho Realm.
+  queuePosition     Int                    @default(0)
+  workVersion       Int                    @default(1)
+  workType          String?
+  complexity        String?
+  blockReason       String?
+  blockedAt         DateTime?
+  waitingReason     String?
+  escalationLevel   Int                    @default(0)
+  escalatedAt       DateTime?
+  parentTaskId      String?
+  parentTask        Task?                  @relation("TaskSplitLineage", fields: [parentTaskId], references: [id], onDelete: SetNull)
+  splitChildren     Task[]                 @relation("TaskSplitLineage")
+  mergedIntoTaskId  String?
+  mergedIntoTask    Task?                  @relation("TaskMergeLineage", fields: [mergedIntoTaskId], references: [id], onDelete: SetNull)
+  mergedSources     Task[]                 @relation("TaskMergeLineage")
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @default(now()) @updatedAt
+  completedAt       DateTime?
+  workEvents        WorkItemEvent[]
+  estimateRevisions WorkEstimateRevision[]
+
   @@index([assigneeId])
   @@index([projectId])
   @@index([status])
+  @@index([assigneeId, status, queuePosition])
+  @@index([parentTaskId])
+  @@index([mergedIntoTaskId])
+}
+
+// Version của hàng đợi theo nhân sự. Reprioritize dùng compare-and-swap trên
+// version này để hai quản lý không âm thầm ghi đè thứ tự của nhau.
+model WorkQueueState {
+  id        String   @id @default(cuid())
+  ownerId   String   @unique
+  version   Int      @default(1)
+  wipLimit  Int      @default(5)
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+// Ledger vận hành có cấu trúc. Không thay AuditLog và không chứa nội dung Task;
+// receiptId liên kết hành động canonical của RepositoryRealms.
+model WorkItemEvent {
+  id            String   @id @default(cuid())
+  taskId        String
+  task          Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  action        String
+  actorId       String
+  fromState     String
+  toState       String
+  reasonCode    String?
+  relatedTaskId String?
+  receiptId     String   @unique
+  metadata      String   @default("{}")
+  occurredAt    DateTime @default(now())
+
+  @@index([taskId, occurredAt])
+  @@index([actorId, occurredAt])
+  @@index([action, occurredAt])
+  @@index([relatedTaskId])
+}
+
+// Phase 2 — Resource Intelligence. Mỗi lần estimate được khai báo hoặc quản lý
+// hiệu chỉnh đều có receipt riêng; lịch sử không bị overwrite cùng giá trị Task hiện tại.
+model WorkEstimateRevision {
+  id            String   @id @default(cuid())
+  taskId        String
+  task          Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  actorId       String
+  kind          String // declared | manager_adjustment
+  estimateHours Float
+  previousHours Float
+  workType      String
+  complexity    String
+  reasonCode    String?
+  note          String?
+  receiptId     String   @unique
+  createdAt     DateTime @default(now())
+
+  @@index([taskId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([kind, createdAt])
+  @@index([workType, complexity, createdAt])
 }
 
 // ===== CRMegoric Realms: hồ sơ nhân vật gắn 1-1 với nhân sự ERP =====
@@ -625,12 +773,12 @@ model Ticket {
   status           String    @default("open") // open | in_progress | waiting | resolved | closed
   assigneeId       String?
   channel          String? // email | phone | zalo | messenger | meeting | Realm Pilot
-  reporterId       String?   // nhân sự gửi phản hồi; null với ticket CRM cũ
-  source           String?   // realm_pilot với phản hồi Phase 11
-  feedbackType     String?   // bug | friction | idea | support
-  feedbackSurface  String?   // realm | erp
-  feedbackContext  String?   // JSON context đã lọc, không chứa dữ liệu form/record
-  feedbackResponse String?   // phản hồi xử lý hiển thị lại cho người gửi
+  reporterId       String? // nhân sự gửi phản hồi; null với ticket CRM cũ
+  source           String? // realm_pilot với phản hồi Phase 11
+  feedbackType     String? // bug | friction | idea | support
+  feedbackSurface  String? // realm | erp
+  feedbackContext  String? // JSON context đã lọc, không chứa dữ liệu form/record
+  feedbackResponse String? // phản hồi xử lý hiển thị lại cho người gửi
   requestKey       String?   @unique // idempotency key cho feedback API
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @default(now()) @updatedAt

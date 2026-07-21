@@ -11,6 +11,7 @@
 .hero,
 .focus,
 .metric,
+.workloadPanel,
 .pipelinePanel,
 .clientPanel,
 .governance,
@@ -53,6 +54,30 @@
 .metric p { margin: 0; color: #9da19c; font-size: 12px; line-height: 1.4; }
 .metric_warning > span { color: #f2c476; background: rgba(219, 151, 60, .13); }
 
+.workloadPanel { overflow: hidden; border-radius: 16px; }
+.workloadGrid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr); gap: 11px; padding: 12px; }
+.managerQueue,
+.ownerWorkload { min-width: 0; border: 1px solid rgba(255, 255, 255, .075); border-radius: 12px; background: rgba(255, 255, 255, .02); padding: 10px; }
+.managerQueue > h4,
+.ownerWorkload > h4 { margin: 1px 2px 10px; color: #edce88; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.managerQueue article { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 64px; padding: 9px 10px; border-top: 1px solid rgba(255, 255, 255, .065); border-left: 3px solid #c49352; }
+.managerQueue article[data-level="critical"] { border-left-color: #d66b72; }
+.managerQueue article > div { display: grid; gap: 3px; min-width: 0; }
+.managerQueue article span { color: #d8ba75; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+.managerQueue article strong { color: #fff4df; font-size: 12px; overflow-wrap: anywhere; }
+.managerQueue article small { color: #999f9a; font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; }
+.managerQueue article button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; color: #f1d59b; border: 1px solid rgba(216, 186, 117, .25); border-radius: 8px; background: rgba(216, 186, 117, .08); font-size: 10px; font-weight: 760; }
+.managerQueue article button:focus-visible { outline: 3px solid rgba(241, 212, 137, .75); outline-offset: 2px; }
+.ownerWorkload article { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; padding: 10px; border-top: 1px solid rgba(255, 255, 255, .065); }
+.ownerWorkload article > div { display: grid; gap: 2px; }
+.ownerWorkload article strong { color: #fff4df; font-size: 12px; }
+.ownerWorkload article small,
+.ownerWorkload article > span { color: #999f9a; font-size: 9px; line-height: 1.4; }
+.ownerWorkload article > span { grid-column: 1 / -1; }
+.ownerWorkload article > b { color: #a2dfb9; font-variant-numeric: tabular-nums; }
+.ownerWorkload article[data-band="near"] > b { color: #f2c476; }
+.ownerWorkload article[data-band="over"] > b { color: #f2a1a5; }
+
 .pipelinePanel,
 .clientPanel { overflow: hidden; border-radius: 16px; }
 .panelHead { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; padding: 16px 17px 13px; border-bottom: 1px solid var(--embassy-border); }
@@ -76,6 +101,12 @@
 .leadCard header strong { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 4px; color: #f2a1a5; font-size: 10px; }
 .leadCard h4 { margin: 9px 0 3px; color: #fff5e1; font-size: 14px; line-height: 1.4; }
 .leadCard > p { margin: 0; color: var(--embassy-muted); font-size: 12px; }
+.workloadMeta { display: grid; gap: 4px; margin-top: 8px; }
+.workloadMeta > span { width: max-content; padding: 3px 7px; border: 1px solid currentColor; border-radius: 999px; color: #a2dfb9; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+.workloadMeta > span[data-band="stale"] { color: #f2c476; }
+.workloadMeta > span[data-band="dormant"] { color: #f2a1a5; }
+.workloadMeta > span[data-band="decided"] { color: #aaa99f; }
+.workloadMeta small { color: #8e9994; font-size: 9px; line-height: 1.4; }
 .leadValue { margin-top: 9px; color: #edce88; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .leadCard footer { display: grid; gap: 5px; margin-top: 9px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, .06); color: #999f9a; font-size: 10px; }
 .leadCard footer span { display: flex; align-items: center; gap: 5px; }
@@ -156,6 +187,7 @@
 
 @media (max-width: 1000px) {
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workloadGrid { grid-template-columns: 1fr; }
   .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .clients { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -170,6 +202,7 @@
   .focus button { width: 100%; }
   .metrics,
   .compact .metrics,
+  .workloadGrid,
   .pipeline,
   .clients { grid-template-columns: 1fr; }
   .metric { min-height: 86px; }
@@ -178,10 +211,13 @@
   .stateCard { align-items: flex-start; flex-wrap: wrap; }
   .stateActions { width: 100%; }
   .stateActions button { flex: 1; }
+  .managerQueue article { align-items: stretch; grid-template-columns: 1fr; }
+  .managerQueue article button { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .heroActions button,
   .focus button,
-  .stateActions button { transition: none; }
+  .stateActions button,
+  .managerQueue article button { transition: none; }
 }

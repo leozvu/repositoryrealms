@@ -1,59 +1,60 @@
 import { REALM_TREASURY_CATALOG } from '@/lib/realm-treasury';
 
-export const WORLD = { cols: 38, rows: 24, tile: 32 };
+// The Realm is deliberately larger than the viewport. Camera follow and the
+// minimap keep navigation legible while each business room gets enough space
+// for people, functional objects and generated environment props.
+export const WORLD = { cols: 58, rows: 36, tile: 32 };
+
+export const DEFAULT_WORLD_POSITION = Object.freeze({ x: 29, y: 30.5 });
 
 export const ROOMS = [
-  { id: 'guild', name: 'Guild Hall', subtitle: 'Nhân sự & đội nhóm', x: 1, y: 1, w: 11, h: 9, floor: '#2d4a3d' },
-  { id: 'war', name: 'War Room', subtitle: 'Dự án & chiến dịch', x: 13, y: 1, w: 12, h: 9, floor: '#3d3a48' },
-  { id: 'treasury', name: 'Royal Treasury', subtitle: 'Gold & tài chính', x: 26, y: 1, w: 11, h: 9, floor: '#4b3c2a' },
-  { id: 'tavern', name: 'The Lantern Tavern', subtitle: 'Chat & gặp gỡ', x: 1, y: 11, w: 11, h: 12, floor: '#49362f' },
-  { id: 'hall', name: 'Great Hall', subtitle: 'Quest Board', x: 13, y: 11, w: 12, h: 12, floor: '#33443d' },
-  { id: 'forge', name: 'Arcane Forge', subtitle: 'Shop & tự động hóa', x: 26, y: 11, w: 11, h: 12, floor: '#44333b' },
+  { id: 'guild', name: 'Guild Hall', subtitle: 'Nhân sự & đội nhóm', x: 1, y: 1, w: 17, h: 15, floor: '#2d4a3d' },
+  { id: 'war', name: 'War Room', subtitle: 'Dự án & chiến dịch', x: 19, y: 1, w: 20, h: 15, floor: '#3d3a48' },
+  { id: 'treasury', name: 'Royal Treasury', subtitle: 'Gold & tài chính', x: 40, y: 1, w: 17, h: 15, floor: '#4b3c2a' },
+  { id: 'tavern', name: 'The Lantern Tavern', subtitle: 'Chat & gặp gỡ', x: 1, y: 17, w: 17, h: 18, floor: '#49362f' },
+  { id: 'hall', name: 'Great Hall', subtitle: 'Quest Board', x: 19, y: 17, w: 20, h: 18, floor: '#33443d' },
+  { id: 'forge', name: 'Arcane Forge', subtitle: 'Shop & tự động hóa', x: 40, y: 17, w: 17, h: 18, floor: '#44333b' },
 ];
 
 export const PRIVATE_ZONES = [
-  { id: 'guild-pod', name: 'Bàn Guild', x: 3, y: 3, w: 7, h: 4 },
-  { id: 'war-council', name: 'Hội đồng Chiến dịch', x: 15, y: 3, w: 8, h: 4 },
-  { id: 'treasury-audit', name: 'Phòng Đối soát', x: 28, y: 3, w: 7, h: 4 },
-  { id: 'tavern-booth', name: 'Bàn riêng Tavern', x: 3, y: 14, w: 7, h: 5 },
+  { id: 'guild-pod', name: 'Bàn Guild', x: 4, y: 4, w: 10, h: 6 },
+  { id: 'war-council', name: 'Hội đồng Chiến dịch', x: 23, y: 4, w: 12, h: 6 },
+  { id: 'treasury-audit', name: 'Phòng Đối soát', x: 43, y: 4, w: 10, h: 6 },
+  { id: 'tavern-booth', name: 'Bàn riêng Tavern', x: 4, y: 22, w: 10, h: 8 },
 ];
 
 export const WORLD_OBJECTS = [
-  { id: 'guild-roster', panel: 'guild', name: 'Sổ bộ Guild', hint: 'Mở hồ sơ nhân sự', kind: 'roster', x: 5.5, y: 5.5 },
-  { id: 'war-table', panel: 'campaigns', name: 'Bàn chiến dịch', hint: 'Mở dự án và tiến độ', kind: 'table', x: 19, y: 5.5 },
-  { id: 'treasury-chest', panel: 'treasury', name: 'Rương Hoàng gia', hint: 'Mở ví Gold và sổ cái', kind: 'chest', x: 31.5, y: 5.5 },
-  { id: 'tavern-board', panel: 'chat', name: 'Bảng Tavern', hint: 'Mở chat khu vực', kind: 'tavern', x: 5.5, y: 16.5 },
-  { id: 'quest-board', panel: 'quests', name: 'Quest Board', hint: 'Xem nhiệm vụ hôm nay', kind: 'board', x: 18.5, y: 15 },
-  { id: 'realm-gate', panel: 'briefing', name: 'Cổng Realm', hint: 'Mở tổng quan ngày làm việc', kind: 'portal', x: 18.5, y: 21 },
-  { id: 'arcane-forge', panel: 'shop', name: 'Arcane Forge', hint: 'Đổi Gold lấy vật phẩm', kind: 'forge', x: 31.5, y: 16.5 },
+  { id: 'guild-roster', panel: 'guild', name: 'Sổ bộ Guild', hint: 'Mở hồ sơ nhân sự', kind: 'roster', x: 9, y: 8 },
+  { id: 'war-table', panel: 'campaigns', name: 'Bàn chiến dịch', hint: 'Mở dự án và tiến độ', kind: 'table', x: 29, y: 8 },
+  { id: 'treasury-chest', panel: 'treasury', name: 'Rương Hoàng gia', hint: 'Mở ví Gold và sổ cái', kind: 'chest', x: 48.5, y: 8 },
+  { id: 'tavern-board', panel: 'chat', name: 'Bảng Tavern', hint: 'Mở chat khu vực', kind: 'tavern', x: 9, y: 26 },
+  { id: 'quest-board', panel: 'quests', name: 'Quest Board', hint: 'Xem nhiệm vụ hôm nay', kind: 'board', x: 29, y: 23 },
+  { id: 'realm-gate', panel: 'briefing', name: 'Cổng Realm', hint: 'Mở tổng quan ngày làm việc', kind: 'portal', x: 29, y: 32.5 },
+  { id: 'arcane-forge', panel: 'shop', name: 'Arcane Forge', hint: 'Đổi Gold lấy vật phẩm', kind: 'forge', x: 48.5, y: 26 },
 ];
 
-export const STAFF = [
-  { id: 'minh-quan', name: 'Minh Quân', role: 'Quest Master', status: 'available', statusText: 'Đang rà soát campaign', color: '#4f9f73', x: 20.5, y: 6.8 },
-  { id: 'mai-anh', name: 'Mai Anh', role: 'Guild Keeper', status: 'busy', statusText: 'Đang onboarding', color: '#b7686b', x: 7.5, y: 6.5 },
-  { id: 'quang-vo', name: 'Quang Võ', role: 'Bard / Account', status: 'available', statusText: 'Rảnh để trao đổi', color: '#6e8ec7', x: 7.5, y: 17.5 },
-  { id: 'nghia-nguyen', name: 'Nghĩa Nguyễn', role: 'Arcane Engineer', status: 'focus', statusText: 'Focus tới 15:30', color: '#946fc7', x: 30.5, y: 17.5 },
-  { id: 'lan-pham', name: 'Lan Phạm', role: 'Royal Accountant', status: 'dnd', statusText: 'Đang khóa sổ', color: '#c58a4c', x: 33, y: 6.8 },
-];
+// Không dựng NPC giả. Bản đồ chỉ hiển thị nhân sự thật từ ERP directory
+// và người chơi đang online qua Realm presence.
+export const STAFF = [];
 
 export const QUESTS = [
   {
     id: 'q-close-campaign', title: 'Khóa sổ chiến dịch Rồng Xanh', project: 'Campaign Rồng Xanh',
-    businessRef: 'TASK-247', module: 'Projects', owner: 'Minh Quân', approval: 'Đã duyệt',
+    businessRef: 'TASK-247', module: 'Projects', owner: 'Nguyễn Minh An', approval: 'Đã duyệt',
     reward: 5, renown: 120, status: 'ready', priority: 'Epic', due: 'Hôm nay, 16:00',
-    progress: 4, total: 4, reviewer: 'Minh Quân',
+    progress: 4, total: 4, reviewer: 'Nguyễn Minh An',
   },
   {
     id: 'q-lead-review', title: 'Phân loại 12 lead từ Hội chợ phương Bắc', project: 'CRM / Sales',
-    businessRef: 'LEAD-086', module: 'CRM', owner: 'Quang Võ', approval: 'Theo tiêu chí',
+    businessRef: 'LEAD-086', module: 'CRM', owner: 'Trần Khánh Linh', approval: 'Theo tiêu chí',
     reward: 3, renown: 80, status: 'active', priority: 'Skilled', due: 'Hôm nay, 17:30',
-    progress: 8, total: 12, reviewer: 'Quang Võ',
+    progress: 8, total: 12, reviewer: 'Trần Khánh Linh',
   },
   {
     id: 'q-landing', title: 'Hoàn thiện landing page Nhà Giả Kim', project: 'Website Egoric',
-    businessRef: 'TASK-251', module: 'Delivery', owner: 'Nghĩa Nguyễn', approval: 'Chờ review',
+    businessRef: 'TASK-251', module: 'Delivery', owner: 'Đỗ Quốc Anh', approval: 'Chờ review',
     reward: 2, renown: 60, status: 'active', priority: 'Common', due: 'Ngày mai',
-    progress: 2, total: 5, reviewer: 'Nghĩa Nguyễn',
+    progress: 2, total: 5, reviewer: 'Đỗ Quốc Anh',
   },
 ];
 
@@ -78,20 +79,39 @@ export function makeWallSet() {
     add(WORLD.cols - 1, y);
   }
 
-  for (const x of [12, 25]) {
+  for (const x of [18, 39]) {
     for (let y = 1; y < WORLD.rows - 1; y += 1) {
-      if (![5, 6, 16, 17].includes(y)) add(x, y);
+      if (![7, 8, 25, 26].includes(y)) add(x, y);
     }
   }
 
   for (let x = 1; x < WORLD.cols - 1; x += 1) {
-    if (![5, 6, 18, 19, 31, 32].includes(x)) add(x, 10);
+    if (![8, 9, 28, 29, 48, 49].includes(x)) add(x, 16);
   }
 
   return walls;
 }
 
 export const WALLS = makeWallSet();
+
+export function isWorldPositionWalkable(position) {
+  const x = Number(position?.x);
+  const y = Number(position?.y);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return false;
+  const radius = 0.24;
+  return ![
+    [x - radius, y - radius], [x + radius, y - radius],
+    [x - radius, y + radius], [x + radius, y + radius],
+  ].some(([px, py]) => WALLS.has(`${Math.floor(px)},${Math.floor(py)}`));
+}
+
+export function normalizeWorldPosition(position, fallback = DEFAULT_WORLD_POSITION) {
+  const candidate = {
+    x: Math.max(1, Math.min(WORLD.cols - 2, Number(position?.x))),
+    y: Math.max(1, Math.min(WORLD.rows - 2, Number(position?.y))),
+  };
+  return isWorldPositionWalkable(candidate) ? candidate : { ...fallback };
+}
 
 export function roomAt(x, y) {
   return ROOMS.find((room) => x >= room.x && x < room.x + room.w && y >= room.y && y < room.y + room.h) || null;

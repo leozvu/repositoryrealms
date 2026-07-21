@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 17,
+    "verifiedContracts": 17,
+    "scenarios": 7,
+    "verifiedScenarios": 7,
+    "automaticWriteRetry": false,
+    "notificationAfterCommit": true,
+    "boundedReconnect": true,
+    "aggregateOnly": true,
+    "additiveMigrations": 0
+  },
+  "contracts": [
+    {
+      "id": "database-read-deadline",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/operations/route.js",
+      "signals": [
+        "withRealmDeadline",
+        "dependency: 'database'",
+        "timeoutMs: 5_000"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "retryable-degraded-response",
+      "layer": "api",
+      "source": "lib/realm-api-response.js",
+      "signals": [
+        "error?.expose === true",
+        "outcome: responseStatus >= 500 ? 'degraded'",
+        "Retry-After"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "bounded-websocket-reconnect",
+      "layer": "realtime",
+      "source": "components/realm/realm-transports.js",
+      "signals": [
+        "maxReconnectAttempts = 4",
+        "onState('gateway-degraded')",
+        "onExhausted()"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "websocket-local-fallback",
+      "layer": "realtime",
+      "source": "components/realm/useRealmPresence.js",
+      "signals": [
+        "onExhausted:",
+        "startLocalTransport()",
+        "setTransportState('local-ready')"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "client-api-timeout",
+      "layer": "client",
+      "source": "components/realm/realm-fetch.js",
+      "signals": [
+        "REALM_CLIENT_TIMEOUT_MS = 8_000",
+        "AbortController",
+        "RealmClientTimeoutError"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "last-known-good-ui",
+      "layer": "client",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "signals": [
+        "Đang hiển thị snapshot gần nhất",
+        "Không tự retry",
+        "state.error && !dashboard"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "notification-after-commit",
+      "layer": "transaction",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "const transition = await db.$transaction",
+        "deliverRealmPilotNotifications(db, transition.notifications)",
+        "state: 'degraded'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "approval-timeout-lock",
+      "layer": "approval",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "deadlineState: timedOut ? 'timed_out'",
+        "timedOut,",
+        "approval.status === 'pending'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "stale-if-error-cache",
+      "layer": "cache",
+      "source": "lib/cache.js",
+      "signals": [
+        "cachedResilient",
+        "source: 'stale'",
+        "staleExp"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "partial-rollout-erp-fallback",
+      "layer": "rollout",
+      "source": "lib/realm-chaos-readiness.js",
+      "signals": [
+        "id: 'partial-rollout'",
+        "fallbackUsers",
+        "gate.id === 'erp-fallback'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "seven-fault-matrix",
+      "layer": "policy",
+      "source": "lib/realm-chaos-readiness.js",
+      "signals": [
+        "id: 'database-slow'",
+        "id: 'websocket-lost'",
+        "id: 'api-timeout'",
+        "id: 'notification-failed'",
+        "id: 'approval-timeout'",
+        "id: 'stale-cache'",
+        "id: 'partial-rollout'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-chaos-readiness-ui",
+      "layer": "ui",
+      "source": "components/realm/RealmPilotOperations.jsx",
+      "signals": [
+        "Chaos Readiness",
+        "Detect",
+        "Degrade",
+        "Preserve"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-chaos-ui",
+      "layer": "style",
+      "source": "components/realm/realm-pilot-operations.module.css",
+      "signals": [
+        ".chaosGrid",
+        "min-height: 44px",
+        "@media (max-width: 680px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "deterministic-chaos-tests",
+      "layer": "test",
+      "source": "tests/realm-chaos.test.mjs",
+      "signals": [
+        "database slow",
+        "API timeout",
+        "stale cache",
+        "notification failure",
+        "partial rollout",
+        "websocket loss"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "notification-transaction-regression",
+      "layer": "test",
+      "source": "tests/realm-pilot-operations.test.mjs",
+      "signals": [
+        "notification failure cannot rollback a committed pilot transition",
+        "state: 'degraded'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "approval-timeout-regression",
+      "layer": "test",
+      "source": "tests/realm-launch-approval.test.mjs",
+      "signals": [
+        "deadlineState, 'timed_out'",
+        "timedOutBoard"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase20-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-20-CHAOS-RESILIENCE.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "Không tự retry mutation",
+        "Game Day",
+        "ERP fallback"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "database-slow",
+      "evidence": "tests/realm-chaos.test.mjs · database slow",
+      "status": "verified"
+    },
+    {
+      "id": "websocket-lost",
+      "evidence": "tests/realm-chaos.test.mjs · websocket loss",
+      "status": "verified"
+    },
+    {
+      "id": "api-timeout",
+      "evidence": "tests/realm-chaos.test.mjs · api timeout",
+      "status": "verified"
+    },
+    {
+      "id": "notification-failed",
+      "evidence": "tests/realm-chaos.test.mjs · notification failure",
+      "status": "verified"
+    },
+    {
+      "id": "approval-timeout",
+      "evidence": "tests/realm-chaos.test.mjs · id === 'approval-timeout'",
+      "status": "verified"
+    },
+    {
+      "id": "stale-cache",
+      "evidence": "tests/realm-chaos.test.mjs · stale cache",
+      "status": "verified"
+    },
+    {
+      "id": "partial-rollout",
+      "evidence": "tests/realm-chaos.test.mjs · partial rollout",
+      "status": "verified"
+    }
+  ]
+}

@@ -1,0 +1,492 @@
+{
+  "version": 1,
+  "mode": "grid",
+  "source": "public/realms/assets/generated/phase-22/characters/realm-character-directions-v1.png",
+  "sourceWidth": 1254,
+  "sourceHeight": 1254,
+  "alphaThreshold": 16,
+  "padding": 8,
+  "assetCount": 24,
+  "assets": [
+    {
+      "file": "character-01-down.png",
+      "sourceBbox": [
+        166,
+        20,
+        245,
+        188
+      ],
+      "cropBbox": [
+        158,
+        12,
+        253,
+        196
+      ],
+      "width": 95,
+      "height": 184,
+      "row": 0,
+      "column": 0,
+      "label": "down"
+    },
+    {
+      "file": "character-01-left.png",
+      "sourceBbox": [
+        413,
+        22,
+        482,
+        189
+      ],
+      "cropBbox": [
+        405,
+        14,
+        490,
+        197
+      ],
+      "width": 85,
+      "height": 183,
+      "row": 0,
+      "column": 1,
+      "label": "left"
+    },
+    {
+      "file": "character-01-right.png",
+      "sourceBbox": [
+        732,
+        21,
+        801,
+        189
+      ],
+      "cropBbox": [
+        724,
+        13,
+        809,
+        197
+      ],
+      "width": 85,
+      "height": 184,
+      "row": 0,
+      "column": 2,
+      "label": "right"
+    },
+    {
+      "file": "character-01-up.png",
+      "sourceBbox": [
+        1015,
+        24,
+        1099,
+        190
+      ],
+      "cropBbox": [
+        1007,
+        16,
+        1107,
+        198
+      ],
+      "width": 100,
+      "height": 182,
+      "row": 0,
+      "column": 3,
+      "label": "up"
+    },
+    {
+      "file": "character-02-down.png",
+      "sourceBbox": [
+        160,
+        212,
+        250,
+        418
+      ],
+      "cropBbox": [
+        152,
+        204,
+        258,
+        426
+      ],
+      "width": 106,
+      "height": 222,
+      "row": 1,
+      "column": 0,
+      "label": "down"
+    },
+    {
+      "file": "character-02-left.png",
+      "sourceBbox": [
+        417,
+        213,
+        481,
+        418
+      ],
+      "cropBbox": [
+        409,
+        205,
+        489,
+        426
+      ],
+      "width": 80,
+      "height": 221,
+      "row": 1,
+      "column": 1,
+      "label": "left"
+    },
+    {
+      "file": "character-02-right.png",
+      "sourceBbox": [
+        737,
+        213,
+        802,
+        418
+      ],
+      "cropBbox": [
+        729,
+        205,
+        810,
+        426
+      ],
+      "width": 81,
+      "height": 221,
+      "row": 1,
+      "column": 2,
+      "label": "right"
+    },
+    {
+      "file": "character-02-up.png",
+      "sourceBbox": [
+        1010,
+        216,
+        1106,
+        418
+      ],
+      "cropBbox": [
+        1002,
+        208,
+        1114,
+        426
+      ],
+      "width": 112,
+      "height": 218,
+      "row": 1,
+      "column": 3,
+      "label": "up"
+    },
+    {
+      "file": "character-03-down.png",
+      "sourceBbox": [
+        160,
+        418,
+        252,
+        627
+      ],
+      "cropBbox": [
+        152,
+        410,
+        260,
+        635
+      ],
+      "width": 108,
+      "height": 225,
+      "row": 2,
+      "column": 0,
+      "label": "down"
+    },
+    {
+      "file": "character-03-left.png",
+      "sourceBbox": [
+        412,
+        418,
+        480,
+        627
+      ],
+      "cropBbox": [
+        404,
+        410,
+        488,
+        635
+      ],
+      "width": 84,
+      "height": 225,
+      "row": 2,
+      "column": 1,
+      "label": "left"
+    },
+    {
+      "file": "character-03-right.png",
+      "sourceBbox": [
+        733,
+        418,
+        803,
+        627
+      ],
+      "cropBbox": [
+        725,
+        410,
+        811,
+        635
+      ],
+      "width": 86,
+      "height": 225,
+      "row": 2,
+      "column": 2,
+      "label": "right"
+    },
+    {
+      "file": "character-03-up.png",
+      "sourceBbox": [
+        1012,
+        418,
+        1103,
+        627
+      ],
+      "cropBbox": [
+        1004,
+        410,
+        1111,
+        635
+      ],
+      "width": 107,
+      "height": 225,
+      "row": 2,
+      "column": 3,
+      "label": "up"
+    },
+    {
+      "file": "character-04-down.png",
+      "sourceBbox": [
+        156,
+        627,
+        251,
+        836
+      ],
+      "cropBbox": [
+        148,
+        619,
+        259,
+        844
+      ],
+      "width": 111,
+      "height": 225,
+      "row": 3,
+      "column": 0,
+      "label": "down"
+    },
+    {
+      "file": "character-04-left.png",
+      "sourceBbox": [
+        411,
+        627,
+        480,
+        836
+      ],
+      "cropBbox": [
+        403,
+        619,
+        488,
+        844
+      ],
+      "width": 85,
+      "height": 225,
+      "row": 3,
+      "column": 1,
+      "label": "left"
+    },
+    {
+      "file": "character-04-right.png",
+      "sourceBbox": [
+        730,
+        627,
+        797,
+        836
+      ],
+      "cropBbox": [
+        722,
+        619,
+        805,
+        844
+      ],
+      "width": 83,
+      "height": 225,
+      "row": 3,
+      "column": 2,
+      "label": "right"
+    },
+    {
+      "file": "character-04-up.png",
+      "sourceBbox": [
+        1009,
+        627,
+        1104,
+        836
+      ],
+      "cropBbox": [
+        1001,
+        619,
+        1112,
+        844
+      ],
+      "width": 111,
+      "height": 225,
+      "row": 3,
+      "column": 3,
+      "label": "up"
+    },
+    {
+      "file": "character-05-down.png",
+      "sourceBbox": [
+        158,
+        836,
+        247,
+        1045
+      ],
+      "cropBbox": [
+        150,
+        828,
+        255,
+        1053
+      ],
+      "width": 105,
+      "height": 225,
+      "row": 4,
+      "column": 0,
+      "label": "down"
+    },
+    {
+      "file": "character-05-left.png",
+      "sourceBbox": [
+        418,
+        836,
+        486,
+        1045
+      ],
+      "cropBbox": [
+        410,
+        828,
+        494,
+        1053
+      ],
+      "width": 84,
+      "height": 225,
+      "row": 4,
+      "column": 1,
+      "label": "left"
+    },
+    {
+      "file": "character-05-right.png",
+      "sourceBbox": [
+        730,
+        836,
+        800,
+        1045
+      ],
+      "cropBbox": [
+        722,
+        828,
+        808,
+        1053
+      ],
+      "width": 86,
+      "height": 225,
+      "row": 4,
+      "column": 2,
+      "label": "right"
+    },
+    {
+      "file": "character-05-up.png",
+      "sourceBbox": [
+        1012,
+        836,
+        1102,
+        1045
+      ],
+      "cropBbox": [
+        1004,
+        828,
+        1110,
+        1053
+      ],
+      "width": 106,
+      "height": 225,
+      "row": 4,
+      "column": 3,
+      "label": "up"
+    },
+    {
+      "file": "character-06-down.png",
+      "sourceBbox": [
+        153,
+        1045,
+        250,
+        1210
+      ],
+      "cropBbox": [
+        145,
+        1037,
+        258,
+        1218
+      ],
+      "width": 113,
+      "height": 181,
+      "row": 5,
+      "column": 0,
+      "label": "down"
+    },
+    {
+      "file": "character-06-left.png",
+      "sourceBbox": [
+        417,
+        1045,
+        487,
+        1210
+      ],
+      "cropBbox": [
+        409,
+        1037,
+        495,
+        1218
+      ],
+      "width": 86,
+      "height": 181,
+      "row": 5,
+      "column": 1,
+      "label": "left"
+    },
+    {
+      "file": "character-06-right.png",
+      "sourceBbox": [
+        729,
+        1045,
+        799,
+        1210
+      ],
+      "cropBbox": [
+        721,
+        1037,
+        807,
+        1218
+      ],
+      "width": 86,
+      "height": 181,
+      "row": 5,
+      "column": 2,
+      "label": "right"
+    },
+    {
+      "file": "character-06-up.png",
+      "sourceBbox": [
+        1009,
+        1045,
+        1105,
+        1210
+      ],
+      "cropBbox": [
+        1001,
+        1037,
+        1113,
+        1218
+      ],
+      "width": 112,
+      "height": 181,
+      "row": 5,
+      "column": 3,
+      "label": "up"
+    }
+  ]
+}

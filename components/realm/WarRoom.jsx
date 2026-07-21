@@ -176,7 +176,7 @@ export default function WarRoom({
   const { campaign, metrics, phases, milestones, blockers, focus, source, permissions } = dashboard;
   const health = HEALTH[campaign.health] || HEALTH.attention;
   return (
-    <section className={`${styles.warRoom} ${compact ? styles.compact : ''}`} aria-labelledby={titleId}>
+    <section className={`${styles.warRoom} ${compact ? styles.compact : ''}`} data-realm-business-surface="war" aria-labelledby={titleId}>
       <header className={styles.hero}>
         <div className={styles.heroActions}>
           {onBack && <button type="button" onClick={onBack} aria-label="Về Guild Hall"><Icon name="repeat" size={16} />Guild Hall</button>}

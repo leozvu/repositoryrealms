@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Icon, Modal, useToast } from '@/components/ui';
+import { realmGeneratedCharacterPortraitUrl } from '@/lib/realm-generated-art';
 import styles from './realm-pilot-onboarding.module.css';
 
 export const REALM_ONBOARDING_RESET_EVENT = 'realm-pilot-onboarding-reset';
@@ -11,8 +12,8 @@ const STEPS = [
   {
     icon: 'repeat',
     title: 'Một dữ liệu, hai giao diện',
-    copy: 'Realm và ERP cùng dùng tài khoản, phân quyền và dữ liệu nghiệp vụ. Chuyển giao diện không tạo bản sao Task, Lead hay Ticket.',
-    checks: ['ERP luôn là lối quay về an toàn', 'Trạng thái nhân vật phản ánh dữ liệu ERP hiện có'],
+    copy: 'Realm và ERP cùng dùng tài khoản, phân quyền và dữ liệu nghiệp vụ. Realm nhớ khu vực hiển thị gần nhất trên thiết bị để bạn tiếp tục nhanh, nhưng không tạo bản sao Task, Lead hay Ticket.',
+    checks: ['ERP luôn là lối quay về an toàn', 'Chỉ lưu mode, panel và vị trí bản đồ; không lưu record hoặc nội dung nghiệp vụ'],
   },
   {
     icon: 'meeting',
@@ -83,6 +84,8 @@ export default function RealmPilotOnboarding({ user, pilot }) {
   if (!eligible || !hydrated) return null;
   const current = STEPS[step];
   const finalStep = step === STEPS.length - 1;
+  const identity = user?.id || user?.name || 'realm-adventurer';
+  const displayName = user?.name || user?.email || 'Tân Adventurer';
 
   return (
     <>
@@ -118,9 +121,19 @@ export default function RealmPilotOnboarding({ user, pilot }) {
               <span>Bước {step + 1} / {STEPS.length}</span>
               <span>Onboarding v{version} · chỉ lưu trên thiết bị này</span>
             </div>
-            <div className={styles.progress} aria-label={`Tiến độ hướng dẫn: bước ${step + 1} trên ${STEPS.length}`}>
+            <div className={styles.progress} role="progressbar" aria-label={`Tiến độ hướng dẫn: bước ${step + 1} trên ${STEPS.length}`} aria-valuemin="1" aria-valuemax={STEPS.length} aria-valuenow={step + 1}>
               {STEPS.map((item, index) => <span key={item.title} data-active={index <= step || undefined} />)}
             </div>
+            <section className={styles.identityCard} aria-label={`Nhân vật Realm của ${displayName}`}>
+              <span className={styles.portraitStage}>
+                <img src={realmGeneratedCharacterPortraitUrl(identity)} alt={`Chân dung Realm của ${displayName}`} />
+              </span>
+              <div>
+                <span className={styles.identityEyebrow}>Onboarding avatar</span>
+                <strong>{displayName}</strong>
+                <p>Chân dung chi tiết dùng cho hồ sơ và onboarding; nhân vật v2 gọn hơn sẽ đại diện bạn khi di chuyển trên bản đồ.</p>
+              </div>
+            </section>
             <section className={styles.step} aria-live="polite" aria-labelledby="realm-onboarding-step-title">
               <span className={styles.stepIcon}><Icon name={current.icon} size={25} /></span>
               <div>

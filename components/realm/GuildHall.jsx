@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { Icon } from '@/components/ui';
+import HrEvidenceIntelligence from '@/components/hr/HrEvidenceIntelligence';
 import { createRealmGuildDashboard, mergeRealmGuildPresence } from '@/lib/realm-guild';
 import styles from './guild-hall.module.css';
 
@@ -138,7 +139,7 @@ export default function GuildHall({
   const { guild, metrics, members, campaigns, source } = visibleDashboard;
 
   return (
-    <section className={`${styles.guildHall} ${compact ? styles.compact : ''}`} aria-labelledby={titleId}>
+    <section className={`${styles.guildHall} ${compact ? styles.compact : ''}`} data-realm-business-surface="guild" aria-labelledby={titleId}>
       <header className={styles.hero}>
         <span className={styles.crest}><Icon name="shield" size={compact ? 22 : 28} /></span>
         <div>
@@ -155,6 +156,8 @@ export default function GuildHall({
         <Metric icon="projects" label="Chiến dịch" value={metrics.activeCampaigns} detail="Đang được phối hợp" />
         <Metric icon="reports" label="Tiến độ chung" value={`${metrics.completionPercent}%`} detail="Theo tiêu chí công việc" />
       </div>
+
+      {!compact && source === 'erp' && <HrEvidenceIntelligence variant="realm" />}
 
       {onOpenEmbassy && <button type="button" className={styles.embassyLink} onClick={onOpenEmbassy}>
         <span><Icon name="leads" size={20} /></span>

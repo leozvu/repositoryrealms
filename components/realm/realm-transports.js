@@ -37,31 +37,49 @@ export function createGatewayTransport({
   onState,
   onToken,
   onOpen,
+  onExhausted = () => {},
+  maxReconnectAttempts = 4,
+  tokenTimeoutMs = 4_000,
 }) {
   let socket;
   let stopped = false;
   let reconnectTimer;
   let reconnectAttempt = 0;
+  const setClientTimer = (...args) => (globalThis.window?.setTimeout || globalThis.setTimeout)(...args);
+  const clearClientTimer = (timer) => (globalThis.window?.clearTimeout || globalThis.clearTimeout)(timer);
 
   async function fetchToken() {
-    const response = await fetch('/api/realm-demo/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, profile, mapId }),
-      cache: 'no-store',
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok || !payload.token) throw new Error(payload.error || 'Realm token unavailable');
-    onToken(payload);
-    return payload.token;
+    const controller = new AbortController();
+    const timer = setClientTimer(() => controller.abort('realm-token-timeout'), tokenTimeoutMs);
+    try {
+      const response = await fetch('/api/realm-demo/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, profile, mapId }),
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload.token) throw new Error(payload.error || 'Realm token unavailable');
+      onToken(payload);
+      return payload.token;
+    } finally {
+      clearClientTimer(timer);
+    }
   }
 
   function scheduleReconnect() {
     if (stopped || reconnectTimer) return;
+    if (reconnectAttempt >= Math.max(0, Number(maxReconnectAttempts) || 0)) {
+      stopped = true;
+      onState('gateway-degraded');
+      onExhausted();
+      return;
+    }
     reconnectAttempt += 1;
     const delay = Math.min(8000, 600 * (2 ** Math.min(reconnectAttempt, 4))) + Math.round(Math.random() * 250);
     onState('gateway-reconnecting');
-    reconnectTimer = window.setTimeout(() => {
+    reconnectTimer = setClientTimer(() => {
       reconnectTimer = null;
       openSocket(false).catch(scheduleReconnect);
     }, delay);
@@ -77,7 +95,7 @@ export function createGatewayTransport({
       let opened = false;
       const candidate = new WebSocket(url.toString(), ['realm-v2', token]);
       socket = candidate;
-      const timeout = window.setTimeout(() => {
+      const timeout = setClientTimer(() => {
         if (!opened) {
           candidate.close();
           reject(new Error('Gateway connection timed out'));
@@ -86,7 +104,7 @@ export function createGatewayTransport({
 
       candidate.onopen = () => {
         opened = true;
-        window.clearTimeout(timeout);
+        clearClientTimer(timeout);
         reconnectAttempt = 0;
         onState('gateway-ready');
         onOpen();
@@ -97,12 +115,12 @@ export function createGatewayTransport({
       };
       candidate.onerror = () => {
         if (!opened) {
-          window.clearTimeout(timeout);
+          clearClientTimer(timeout);
           reject(new Error('Gateway connection failed'));
         }
       };
       candidate.onclose = () => {
-        window.clearTimeout(timeout);
+        clearClientTimer(timeout);
         if (!opened) reject(new Error('Gateway rejected the connection'));
         else scheduleReconnect();
       };
@@ -119,7 +137,7 @@ export function createGatewayTransport({
     },
     close() {
       stopped = true;
-      window.clearTimeout(reconnectTimer);
+      clearClientTimer(reconnectTimer);
       reconnectTimer = null;
       socket?.close(1000, 'Realm client leaving');
       socket = null;

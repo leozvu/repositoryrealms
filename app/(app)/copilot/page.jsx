@@ -36,10 +36,10 @@ export default function CopilotPage() {
   if (noKey) return (
     <div className="card" style={{ maxWidth: 620, margin: '40px auto', padding: '30px 34px', textAlign: 'center' }}>
       <div style={{ width: 54, height: 54, borderRadius: 14, background: 'linear-gradient(135deg,#2563EB,#7C3AED)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', margin: '0 auto 16px' }}>AI</div>
-      <h2 style={{ fontSize: '1.05rem', marginBottom: 10 }}>AI Copilot cần Claude API key để hoạt động</h2>
+      <h2 style={{ fontSize: '1.05rem', marginBottom: 10 }}>AI Copilot cần OpenRouter API key để hoạt động</h2>
       <p style={{ fontSize: '.86rem', color: 'var(--muted)', lineHeight: 1.7 }}>
-        1. Tạo API key tại <b>console.anthropic.com</b> (Settings → API Keys)<br />
-        2. Giám đốc dán key vào <b>Cài đặt → Claude API key</b> của hệ thống này<br />
+        1. Tạo API key tại <b>openrouter.ai/keys</b><br />
+        2. Giám đốc dán key vào <b>Cài đặt → OpenRouter API key</b> của hệ thống này<br />
         3. Quay lại đây và bắt đầu hỏi — AI sẽ trả lời dựa trên dữ liệu thật của công ty,<br />tự lọc theo quyền của từng người hỏi.
       </p>
     </div>

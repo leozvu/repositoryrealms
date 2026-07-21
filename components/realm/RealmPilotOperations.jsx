@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AsyncButton, ConfirmDialog, Icon, useToast } from '@/components/ui';
+import { fetchRealmWithTimeout } from './realm-fetch';
 import styles from './realm-pilot-operations.module.css';
 
 const PILOT_OPERATIONS_EVENT = 'crmegoric:pilot-operations-changed';
@@ -35,6 +36,11 @@ const INCIDENT_STATUS = {
   open: ['Mới', 'open'],
   monitoring: ['Đang theo dõi', 'monitoring'],
   resolved: ['Đã khống chế', 'resolved'],
+};
+const CHAOS_STATE = {
+  protected: ['Đã bảo vệ', 'protected', 'check'],
+  contained: ['Đã contain', 'contained', 'shield'],
+  critical: ['Cần can thiệp', 'critical', 'alert'],
 };
 
 function Metric({ value, label, detail }) {
@@ -186,6 +192,35 @@ function IncidentCommand({ command, wave, onReport, onMonitor, onResolve }) {
   );
 }
 
+function ChaosReadiness({ readiness }) {
+  if (!readiness) return null;
+  return (
+    <section className={styles.chaos} aria-labelledby="realm-chaos-readiness-title">
+      <div className={styles.chaosHead}>
+        <div>
+          <span>Phase 20 · fault containment</span>
+          <h3 id="realm-chaos-readiness-title">Chaos Readiness</h3>
+          <p>Mỗi dependency được phép hỏng có kiểm soát; ERP, dữ liệu gốc và thao tác đang làm không bị biến thành collateral damage.</p>
+        </div>
+        <span data-posture={readiness.posture}><Icon name={readiness.posture === 'critical' ? 'alert' : readiness.posture === 'degraded' ? 'shield' : 'check'} size={13} /> {readiness.summary?.protected || 0}/{readiness.summary?.total || 0} protected</span>
+      </div>
+      <div className={styles.chaosGrid}>
+        {(readiness.scenarios || []).map((scenario) => {
+          const [label, tone, icon] = CHAOS_STATE[scenario.state] || CHAOS_STATE.protected;
+          return (
+            <article key={scenario.id} data-state={tone}>
+              <div><span><Icon name={icon} size={13} /></span><strong>{scenario.label}</strong><small>{label}</small></div>
+              <p>{scenario.liveDetail}</p>
+              <dl><div><dt>Detect</dt><dd>{scenario.detection}</dd></div><div><dt>Degrade</dt><dd>{scenario.fallback}</dd></div><div><dt>Preserve</dt><dd>{scenario.preserves}</dd></div></dl>
+            </article>
+          );
+        })}
+      </div>
+      <p className={styles.chaosRule}><Icon name="shield" size={14} /> Không tự retry mutation. Không dùng stale cache cho Gold, quyền hạn hoặc quyết định duyệt. Evidence chỉ là số tổng hợp.</p>
+    </section>
+  );
+}
+
 export default function RealmPilotOperations() {
   const toast = useToast();
   const [state, setState] = useState({ loading: true, error: '', dashboard: null });
@@ -196,7 +231,7 @@ export default function RealmPilotOperations() {
   const load = useCallback(async ({ quiet = false } = {}) => {
     if (!quiet) setState((current) => ({ ...current, loading: true, error: '' }));
     try {
-      const response = await fetch('/api/realm-demo/pilot/operations', { cache: 'no-store' });
+      const response = await fetchRealmWithTimeout('/api/realm-demo/pilot/operations', { cache: 'no-store' });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Không thể tải Pilot Operations.');
       setState({ loading: false, error: '', dashboard: payload });
@@ -215,38 +250,46 @@ export default function RealmPilotOperations() {
   const mutate = async (action, extra = {}) => {
     const dashboard = state.dashboard;
     const wave = dashboard?.operations?.currentWave;
-    const response = await fetch('/api/realm-demo/pilot/operations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action,
-        expectedVersion: dashboard?.operations?.version,
-        waveId: wave?.id,
-        ...extra,
-      }),
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      if (response.status === 409) await load({ quiet: true });
-      toast(payload.error || 'Không thể cập nhật Pilot Operations.', 'error');
+    try {
+      const response = await fetchRealmWithTimeout('/api/realm-demo/pilot/operations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          expectedVersion: dashboard?.operations?.version,
+          waveId: wave?.id,
+          ...extra,
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if (response.status === 409) await load({ quiet: true });
+        toast(payload.error || 'Không thể cập nhật Pilot Operations.', 'error');
+        return false;
+      }
+      setState({ loading: false, error: '', dashboard: payload });
+      window.dispatchEvent(new CustomEvent(PILOT_OPERATIONS_EVENT));
+      const messages = {
+        create: 'Đã tạo bản nháp pilot wave.',
+        submit: 'Đã gửi wave cho Director khác duyệt.',
+        approve: 'Wave đã kích hoạt và invitation đã gửi qua ERP.',
+        reject: 'Đã trả wave về bản nháp.',
+        clear_activation: 'Canary gate đã đạt; cohort hiện tại tiếp tục mà không tự mở rộng.',
+        report_incident: 'Đã ghi nhận incident và cập nhật guardrail vận hành.',
+        monitor_incident: 'Incident đã chuyển sang trạng thái theo dõi.',
+        resolve_incident: 'Incident đã được khống chế; Realm không tự tái kích hoạt.',
+        pause: 'Đã tạm dừng wave và bật ERP fallback.',
+        complete: 'Đã hoàn tất wave và giữ nguyên toàn bộ dữ liệu.',
+      };
+      toast(payload.notificationDelivery?.state === 'degraded'
+        ? `${messages[action] || 'Đã cập nhật Pilot Operations.'} Chuông thông báo đang gián đoạn; core state vẫn an toàn.`
+        : messages[action] || 'Đã cập nhật Pilot Operations.', payload.notificationDelivery?.state === 'degraded' ? 'warning' : undefined);
+      return true;
+    } catch (error) {
+      setState((current) => ({ ...current, error: error.message || 'Không thể cập nhật Pilot Operations.' }));
+      toast(error.message || 'Không thể cập nhật Pilot Operations. Không tự retry để tránh gửi lặp.', 'error');
       return false;
     }
-    setState({ loading: false, error: '', dashboard: payload });
-    window.dispatchEvent(new CustomEvent(PILOT_OPERATIONS_EVENT));
-    const messages = {
-      create: 'Đã tạo bản nháp pilot wave.',
-      submit: 'Đã gửi wave cho Director khác duyệt.',
-      approve: 'Wave đã kích hoạt và invitation đã gửi qua ERP.',
-      reject: 'Đã trả wave về bản nháp.',
-      clear_activation: 'Canary gate đã đạt; cohort hiện tại tiếp tục mà không tự mở rộng.',
-      report_incident: 'Đã ghi nhận incident và cập nhật guardrail vận hành.',
-      monitor_incident: 'Incident đã chuyển sang trạng thái theo dõi.',
-      resolve_incident: 'Incident đã được khống chế; Realm không tự tái kích hoạt.',
-      pause: 'Đã tạm dừng wave và bật ERP fallback.',
-      complete: 'Đã hoàn tất wave và giữ nguyên toàn bộ dữ liệu.',
-    };
-    toast(messages[action] || 'Đã cập nhật Pilot Operations.');
-    return true;
   };
 
   const dashboard = state.dashboard;
@@ -273,12 +316,13 @@ export default function RealmPilotOperations() {
       </div>
 
       <div className={`card-body ${styles.body}`}>
-        {state.loading ? (
+        {state.loading && !dashboard ? (
           <div className={styles.loading} aria-live="polite" aria-busy="true">Đang tải bàn điều phối pilot…</div>
-        ) : state.error ? (
+        ) : state.error && !dashboard ? (
           <div className={styles.error} role="alert"><span>{state.error}</span><button type="button" className="btn btn-outline btn-sm" onClick={() => load()}>Thử lại</button></div>
         ) : (
           <>
+            {state.error && <div className={styles.degraded} role="status"><span><Icon name="shield" size={15} /></span><p><strong>Đang hiển thị snapshot gần nhất</strong><small>{state.error} Core ERP không bị gián đoạn và hệ thống không tự gửi lại mutation.</small></p><button type="button" className="btn btn-outline btn-sm" onClick={() => load()}>Thử lại</button></div>}
             <div className={styles.alerts} aria-label="Cảnh báo vận hành">
               {(dashboard.alerts || []).map((alert) => (
                 <div key={alert.id} data-severity={alert.severity}>
@@ -350,6 +394,8 @@ export default function RealmPilotOperations() {
               onMonitor={(incidentId) => mutate('monitor_incident', { incidentId })}
               onResolve={(incidentId) => mutate('resolve_incident', { incidentId })}
             />}
+
+            <ChaosReadiness readiness={dashboard.chaosReadiness} />
 
             <section className={styles.report} aria-labelledby="pilot-report-title">
               <div className={styles.reportHead}>

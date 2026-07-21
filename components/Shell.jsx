@@ -15,6 +15,7 @@ import { useRealmChangeFeed } from './realm/useRealmChangeFeed';
 import { NOTIFICATION_SYNC_EVENT } from '@/lib/notification-inbox';
 import RealmFeedbackLauncher from './realm/RealmFeedbackLauncher';
 import RealmPilotOnboarding from './realm/RealmPilotOnboarding';
+import { LanguageSwitch, useLanguage } from './LanguageProvider';
 
 /* v3.14: TỰ GẮN NHÃN CỘT CHO BẢNG.
    Toàn app có 19 trang bảng, mỗi bảng viết tay riêng. Trên điện thoại, bảng 8 cột buộc phải
@@ -221,6 +222,7 @@ function TwoFAModal({ onClose }) {
 const NAV = ERP_NAV;
 
 export default function Shell({ user, company, realmPilot, children }) {
+  const { locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadChat, setUnreadChat] = useState(0);
@@ -235,10 +237,10 @@ export default function Shell({ user, company, realmPilot, children }) {
   useEffect(() => {
     // Vercel renders in UTC while the browser uses the employee's local timezone.
     // Resolve the label client-side so midnight never causes a hydration mismatch.
-    setTodayLabel(new Date().toLocaleDateString('vi-VN', {
+    setTodayLabel(new Date().toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     }));
-  }, []);
+  }, [locale]);
   useEffect(() => { // v3.6: chức danh tùy biến theo công ty · v3.17: phân hệ bật/tắt
     fetch('/api/settings').then(r => r.ok ? r.json() : null)
       .then(d => {
@@ -270,7 +272,7 @@ export default function Shell({ user, company, realmPilot, children }) {
   // luôn qua modOn. Freelancer đi lối riêng.
   const visible = item => isFL
     ? true
-    : (item.key !== 'realm' || realmPilot?.allowed) && hasAny(user, item.roles) && modOn(item.mod, modules);
+    : (!item.realmSurface || realmPilot?.allowed) && hasAny(user, item.roles) && modOn(item.mod, modules);
 
   const loadShellCounters = useCallback(() => {
     fetch('/api/approvals').then(r => r.ok ? r.json() : null)
@@ -317,13 +319,17 @@ export default function Shell({ user, company, realmPilot, children }) {
       <CollaborationBridge />
       {!isFL && realmPilot?.allowed && realmPilot?.config?.features?.feedback !== false && <RealmFeedbackLauncher />}
       {!isFL && <RealmPilotOnboarding user={user} pilot={realmPilot} />}
-      <div id="app" className={isRealmRoute ? 'realm-immersive' : ''}>
+      <div
+        id="app"
+        className={isRealmRoute ? 'realm-immersive' : 'repository-realms-workspace'}
+        data-visual-system="phase-22"
+      >
         <aside id="sidebar" className={open ? 'open' : ''}>
           <div className="brand">
             <div className="brand-logo">{(company || 'A')[0].toUpperCase()}</div>
             <div className="brand-text">
               <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">Royal ERP · CRM · 7 vai trò</span>
+              <span className="brand-sub">ERP · CRM · 7 vai trò nghiệp vụ</span>
             </div>
           </div>
           <nav id="nav">
@@ -336,7 +342,7 @@ export default function Shell({ user, company, realmPilot, children }) {
               if (!visible(item)) return null;
               const active = pathname.startsWith('/' + item.key);
               return (
-                <Link key={item.key} href={'/' + item.key} className={`nav-item ${active ? 'active' : ''}`} onClick={() => setOpen(false)}>
+                <Link key={item.key} href={item.href || '/' + item.key} className={`nav-item ${active ? 'active' : ''}`} onClick={() => setOpen(false)}>
                   <Icon name={item.icon} size={18} /><span>{item.label}</span>
                   {item.badge && pendingCount > 0 && <span className="count" style={{ background: 'var(--danger)', color: '#fff' }}>{pendingCount}</span>}
                   {item.chatBadge && unreadChat > 0 && <span className="count" style={{ background: 'var(--danger)', color: '#fff' }}>{unreadChat}</span>}
@@ -369,6 +375,7 @@ export default function Shell({ user, company, realmPilot, children }) {
             <h1 id="page-title">{current?.label || 'Agency ERP'}</h1>
             <div className="topbar-right">
               <WorkspaceSurfaceSwitch pilot={realmPilot} />
+              <LanguageSwitch compact />
               <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
                 <Icon name="search" size={14} /><span> Ctrl+K</span>
               </button>

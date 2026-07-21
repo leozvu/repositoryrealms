@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 20,
+    "verifiedContracts": 20,
+    "scenarios": 7,
+    "verifiedScenarios": 7,
+    "registeredBusinessActions": 12,
+    "buttonParityRequired": false,
+    "businessInvariantParityRequired": true,
+    "additiveMigrations": 0,
+    "parallelBusinessTables": 0
+  },
+  "contracts": [
+    {
+      "id": "parity-is-business-invariants",
+      "layer": "product",
+      "source": "docs/realms/PHASE-21-ERP-REALM-PARITY.md",
+      "signals": [
+        "Parity không phải button parity",
+        "authorization → business rules → receipt → audit",
+        "RepositoryRealms"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canonical-action-catalog",
+      "layer": "domain",
+      "source": "lib/repository-realms.js",
+      "signals": [
+        "REPOSITORY_REALMS_ACTION_CONTRACTS",
+        "action: 'task.transition'",
+        "action: 'lead.followup.create'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "presentation-independent-contract",
+      "layer": "domain",
+      "source": "lib/repository-realms.js",
+      "signals": [
+        "presentationIndependent: true",
+        "buttonMatchingRequired: false",
+        "apiShapeMatchingRequired: false",
+        "sharedBusinessInvariantsRequired: true"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "presentation-metadata-stripped",
+      "layer": "domain",
+      "source": "lib/repository-realms.js",
+      "signals": [
+        "presentation: _presentation",
+        "uiLabel: _uiLabel",
+        "sourceControl: _sourceControl"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "repository-route-delegation",
+      "layer": "api",
+      "source": "app/api/realm-demo/actions/route.js",
+      "signals": [
+        "executeRepositoryRealmsAction",
+        "repositoryRealmsSurface",
+        "repository: result.repository"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "surface-is-availability-gate",
+      "layer": "api",
+      "source": "app/api/realm-demo/actions/route.js",
+      "signals": [
+        "realmSurfaceDecision",
+        "loadRealmCompanyModules",
+        "repositoryRealmsSurface(body?.action)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canonical-task-authorization",
+      "layer": "authorization",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "canWrite('tasks', user)",
+        "RESOURCES.tasks.canWriteRow",
+        "taskInScope(before, user)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canonical-lead-authorization",
+      "layer": "authorization",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "canWrite('leads', user)",
+        "leadInScope(before, user)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canonical-business-rules",
+      "layer": "rules",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "requireAllowedTransition",
+        "realmTaskTransitions",
+        "realmLeadTransitions",
+        "RESOURCES.tasks.validate"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "optimistic-concurrency",
+      "layer": "rules",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "requireExpected",
+        "updateMany({",
+        "realm_action_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "idempotent-receipts",
+      "layer": "receipt",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "existingReceipt",
+        "realmActionReceipt.create",
+        "realm_action_idempotency_conflict"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "atomic-receipt-audit",
+      "layer": "audit",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "db.$transaction",
+        "auditLog.create",
+        "action: 'realm_action'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "receipt-evidence-required",
+      "layer": "safety",
+      "source": "lib/repository-realms.js",
+      "signals": [
+        "repository_realms_receipt_missing",
+        "receiptId: result.action.id",
+        "receipt: 'verified'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "safe-repository-response",
+      "layer": "api",
+      "source": "lib/repository-realms.js",
+      "signals": [
+        "authorization: 'enforced'",
+        "businessRules: 'enforced'",
+        "audit: 'atomic'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "suggested-action-ui",
+      "layer": "client",
+      "source": "components/realm/RealmActionDialog.jsx",
+      "signals": [
+        "Suggested Action:",
+        "RepositoryRealms",
+        "business rules",
+        "receipt"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "distinct-create-action-ui",
+      "layer": "client",
+      "source": "components/realm/RealmCreateActionDialog.jsx",
+      "signals": [
+        "Gửi War Council note",
+        "Lập Diplomatic follow-up",
+        "UI Realm không cần giống ERP"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "unregistered-intent-fails-closed",
+      "layer": "safety",
+      "source": "lib/repository-realms.js",
+      "signals": [
+        "repository_realms_action_unsupported",
+        "repositoryRealmsContract(input?.action)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "no-parallel-business-store",
+      "layer": "data",
+      "source": "lib/repository-realms.js",
+      "signals": [
+        "resource: 'tasks'",
+        "resource: 'leads'",
+        "resource: 'activities'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase21-domain-tests",
+      "layer": "test",
+      "source": "tests/repository-realms.test.mjs",
+      "signals": [
+        "business invariants instead of matching buttons",
+        "strips presentation metadata",
+        "receipt evidence is missing"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase21-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-21-ERP-REALM-PARITY.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "Suggested Action",
+        "Invoice",
+        "không tự động tạo action `invoice.approve`"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "canonical-intents-registered",
+      "expected": "12",
+      "actual": "12",
+      "status": "verified"
+    },
+    {
+      "id": "all-intents-have-four-invariants",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "button-matching-not-required",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "api-shape-matching-not-required",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "route-delegates-to-repository",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "suggested-action-can-differ",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "unregistered-invoice-is-not-invented",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    }
+  ]
+}

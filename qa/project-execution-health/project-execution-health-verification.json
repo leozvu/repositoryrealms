@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 15,
+    "verifiedContracts": 15,
+    "scenarios": 5,
+    "verifiedScenarios": 5,
+    "canonicalProjectStores": 1,
+    "confidenceCeiling": "medium",
+    "employeeRankingEnabled": false,
+    "accountingProfitClaimed": false,
+    "schemaMigrationRequired": false
+  },
+  "contracts": [
+    {
+      "id": "canonical-erp-records",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model Project {",
+        "model Task {",
+        "model TimeLog {",
+        "model Milestone {",
+        "model VendorBill {",
+        "model Invoice {"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "execution-health-rule-version",
+      "layer": "domain",
+      "source": "lib/project-execution-health.js",
+      "signals": [
+        "PROJECT_EXECUTION_HEALTH_RULE_VERSION = 'project-execution-health-v1'",
+        "buildProjectExecutionHealth",
+        "dependencyCycles",
+        "capacitySnapshot"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "delivery-risk-signals",
+      "layer": "domain",
+      "source": "lib/project-execution-health.js",
+      "signals": [
+        "deadline_overdue",
+        "blocked_work",
+        "dependency_cycle",
+        "dependencies_unresolved",
+        "capacity_constrained"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "declared-timelog-provenance",
+      "layer": "governance",
+      "source": "lib/project-execution-health.js",
+      "signals": [
+        "actualSource: 'declared_timelog'",
+        "actualIsObservedTruth: false",
+        "ceiling: 'medium'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "anti-ranking-policy",
+      "layer": "governance",
+      "source": "lib/project-execution-health.js",
+      "signals": [
+        "employeeRanking: false",
+        "presenceAsProductivity: false",
+        "payrollUse: false",
+        "goldUse: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "finance-planning-proxy",
+      "layer": "finance",
+      "source": "lib/project-execution-health.js",
+      "signals": [
+        "planningCostProxy",
+        "planningMarginProxy",
+        "cashContributionProxy",
+        "isAccountingProfit: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canonical-read-model",
+      "layer": "server",
+      "source": "lib/project-execution-health-admin.js",
+      "signals": [
+        "db.project.findUnique",
+        "db.task.findMany",
+        "db.timeLog.findMany",
+        "source: 'canonical-erp-project'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "financial-authorization",
+      "layer": "authorization",
+      "source": "lib/project-execution-health-admin.js",
+      "signals": [
+        "hasAny(user, ['ACCOUNTANT', 'PM', 'LEAD'])",
+        "canSeeMoney ? db.vendorBill.findMany",
+        "canSeeMoney ? db.invoice.findMany"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-api",
+      "layer": "api",
+      "source": "app/api/projects/[id]/execution-health/route.js",
+      "signals": [
+        "currentUser()",
+        "loadProjectExecutionHealth",
+        "'Cache-Control': 'private, no-store'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "dashboard-before-drilldown",
+      "layer": "ui",
+      "source": "app/(app)/projects/[id]/page.jsx",
+      "signals": [
+        "Project Execution Health",
+        "Delivery risk",
+        "Capacity",
+        "Estimate ≠ TimeLog",
+        "Execution drill-down"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "portfolio-constraints",
+      "layer": "ui",
+      "source": "app/(app)/portfolio/page.jsx",
+      "signals": [
+        "Delivery constraints",
+        "Planning margin proxy",
+        "Capacity constraints",
+        "không phải accounting profit",
+        "không phải điểm hiệu suất hay bảng xếp hạng"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-dashboard",
+      "layer": "ux",
+      "source": "app/(app)/projects/[id]/project-execution-health.module.css",
+      "signals": [
+        "min-height:44px",
+        "@media(max-width:700px)",
+        "@media(prefers-reduced-motion:reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase3-domain-tests",
+      "layer": "test",
+      "source": "tests/project-execution-health.test.mjs",
+      "signals": [
+        "dependency cycle",
+        "không tạo employee ranking",
+        "không nhận là accounting profit"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase3-server-tests",
+      "layer": "test",
+      "source": "tests/project-execution-health-admin.test.mjs",
+      "signals": [
+        "không leak salary",
+        "finance bị chặn từ query tới response",
+        "fail-closed"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase3-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-3-PROJECT-EXECUTION-HEALTH.md",
+      "signals": [
+        "Project không phải Task list",
+        "canonical ERP records",
+        "crmegoric-realms-demo"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "one-canonical-project-store",
+      "expected": "1",
+      "actual": "1",
+      "status": "verified"
+    },
+    {
+      "id": "dashboard-precedes-task-drilldown",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "declared-actual-confidence-ceiling",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "money-query-fails-closed",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "no-ranking-or-accounting-claim",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    }
+  ]
+}

@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 15,
+    "verifiedContracts": 15,
+    "scenarios": 7,
+    "verifiedScenarios": 7,
+    "mode": "shadow",
+    "collectionActive": false,
+    "decisionAutomationActive": false
+  },
+  "contracts": [
+    {
+      "id": "governance-runbook",
+      "layer": "policy",
+      "source": "docs/realms/PHASE-0-EVIDENCE-GOVERNANCE.md",
+      "signals": [
+        "Runtime mode: `shadow`",
+        "Collection: `disabled`",
+        "Presence không phải productivity",
+        "Activation gates"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "machine-readable-policy",
+      "layer": "policy",
+      "source": "docs/realms/evidence-policy-v1.json",
+      "signals": [
+        "\"mode\": \"shadow\"",
+        "\"collectionActive\": false",
+        "\"individual_performance_ranking\""
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "append-only-ledger-schema",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model WorkEvidenceEvent",
+        "idempotencyKey String",
+        "sourceClass",
+        "retentionUntil"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "employee-review-schema",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model EvidenceReviewRequest",
+        "requestedById",
+        "reasonCode",
+        "decisionCode"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "policy-snapshot-schema",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model EvidencePolicySnapshot",
+        "shadowMode",
+        "contractHash"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "additive-migration",
+      "layer": "migration",
+      "source": "prisma/migrations/20260720150000_add_work_evidence_governance/migration.sql",
+      "signals": [
+        "CREATE TABLE \"WorkEvidenceEvent\"",
+        "CREATE TABLE \"EvidenceReviewRequest\"",
+        "CREATE TABLE \"EvidencePolicySnapshot\""
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "fail-closed-contract",
+      "layer": "domain",
+      "source": "lib/work-evidence-contract.js",
+      "signals": [
+        "work_evidence_metadata_not_allowed",
+        "work_evidence_purpose_not_allowed",
+        "work_evidence_source_mismatch"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "surveillance-denylist",
+      "layer": "privacy",
+      "source": "lib/work-evidence-contract.js",
+      "signals": [
+        "EVIDENCE_PROHIBITED_SIGNALS",
+        "work_evidence_surveillance_signal_prohibited",
+        "raw_device_id"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "shadow-decision-guard",
+      "layer": "safety",
+      "source": "lib/work-evidence-contract.js",
+      "signals": [
+        "EVIDENCE_PROHIBITED_DECISION_USES",
+        "work_evidence_shadow_decision_prohibited",
+        "gold_award"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "trusted-producer-authorization",
+      "layer": "authorization",
+      "source": "lib/work-evidence-admin.js",
+      "signals": [
+        "trustedProducer",
+        "work_evidence_trusted_producer_required",
+        "work_evidence_validation_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "atomic-event-audit",
+      "layer": "audit",
+      "source": "lib/work-evidence-admin.js",
+      "signals": [
+        "db.$transaction",
+        "workEvidenceEvent.create",
+        "auditLog.create"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "receipt-provenance-verification",
+      "layer": "receipt",
+      "source": "lib/work-evidence-admin.js",
+      "signals": [
+        "verifyBusinessReceipt",
+        "work_evidence_business_receipt_not_found",
+        "work_evidence_business_receipt_mismatch"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "idempotent-receipt",
+      "layer": "receipt",
+      "source": "lib/work-evidence-admin.js",
+      "signals": [
+        "work_evidence_idempotency_conflict",
+        "type: 'work_evidence.recorded'",
+        "error?.code !== 'P2002'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "self-read-server-scope",
+      "layer": "authorization",
+      "source": "lib/work-evidence-admin.js",
+      "signals": [
+        "listOwnWorkEvidenceEvents",
+        "actorId: user.id",
+        "work_evidence_page_size_invalid"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "contract-security-tests",
+      "layer": "test",
+      "source": "tests/work-evidence-contract.test.mjs",
+      "signals": [
+        "rejects surveillance signal",
+        "blocks Gold, payroll",
+        "untrusted producer",
+        "payload-free audit"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "shadow-mode",
+      "expected": "shadow:false",
+      "actual": "shadow:false",
+      "status": "verified"
+    },
+    {
+      "id": "four-source-classes",
+      "expected": "declared,observed,validated,derived",
+      "actual": "declared,observed,validated,derived",
+      "status": "verified"
+    },
+    {
+      "id": "policy-file-matches-runtime",
+      "expected": "[\"gold_award\",\"payroll\",\"discipline\",\"termination\",\"individual_performance_ranking\"]",
+      "actual": "[\"gold_award\",\"payroll\",\"discipline\",\"termination\",\"individual_performance_ranking\"]",
+      "status": "verified"
+    },
+    {
+      "id": "gold-payroll-discipline-blocked",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "surveillance-signals-blocked",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "generic-crud-not-exposed",
+      "expected": "false:false",
+      "actual": "false:false",
+      "status": "verified"
+    },
+    {
+      "id": "collection-path-disabled",
+      "expected": "false",
+      "actual": "false",
+      "status": "verified"
+    }
+  ]
+}

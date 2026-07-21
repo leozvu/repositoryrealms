@@ -4,6 +4,7 @@ import { RealmOperationError } from '@/lib/realm-operation';
 import { realmErrorResponse, realmJsonResponse } from '@/lib/realm-api-response';
 import { startRealmApiRequest } from '@/lib/realm-observability';
 import { safelyPublishRealmChange } from '@/lib/realm-change-feed';
+import { withRealmDeadline } from '@/lib/realm-resilience';
 import {
   createRealmPilotWave,
   loadRealmPilotOperationsDashboard,
@@ -23,7 +24,10 @@ export async function GET(request) {
   const trace = startRealmApiRequest(request, { route: 'realm.pilot.operations', operation: 'pilot.operations.read' });
   try {
     const user = await authenticatedUser();
-    const dashboard = await loadRealmPilotOperationsDashboard(prisma, user);
+    const dashboard = await withRealmDeadline(
+      () => loadRealmPilotOperationsDashboard(prisma, user),
+      { dependency: 'database', timeoutMs: 5_000 },
+    );
     return realmJsonResponse(trace, dashboard, { code: 'realm_pilot_operations_ready' });
   } catch (error) {
     return realmErrorResponse(trace, error, {
@@ -47,7 +51,9 @@ export async function POST(request) {
       entityId: result.wave?.id,
       actorId: user.id,
     });
-    const dashboard = await loadRealmPilotOperationsDashboard(prisma, user);
+    const dashboard = await loadRealmPilotOperationsDashboard(prisma, user, {
+      notificationDelivery: result.notificationDelivery,
+    });
     return realmJsonResponse(trace, { ok: true, ...dashboard }, { code: 'realm_pilot_operations_updated' });
   } catch (error) {
     return realmErrorResponse(trace, error, {

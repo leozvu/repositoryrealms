@@ -4,29 +4,29 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 ## Phạm vi
 
-- UI routes: **56**
-- API routes: **62**
-- Interactive element definitions: **727**
-- Source files có interaction: **79**
-- Routes có ERP resource candidate: **43**
+- UI routes: **57**
+- API routes: **72**
+- Interactive element definitions: **791**
+- Source files có interaction: **85**
+- Routes có ERP resource candidate: **42**
 - Parse errors: **0**
 
 ## Phân loại element
 
 | Loại | Số lượng |
 | --- | --- |
-| action | 441 |
-| form-control | 231 |
-| form-submit | 10 |
-| navigation | 45 |
+| action | 479 |
+| form-control | 249 |
+| form-submit | 11 |
+| navigation | 52 |
 
 ## UX risk candidates cần review thủ công
 
 | Candidate | Số lượng |
 | --- | --- |
-| clickable_non_semantic | 18 |
-| control_binding_unverified | 217 |
-| keyboard_path_unverified | 18 |
+| clickable_non_semantic | 17 |
+| control_binding_unverified | 230 |
+| keyboard_path_unverified | 17 |
 | unlabelled_button_candidate | 22 |
 
 Các candidate ưu tiên accessibility, keyboard, semantic control và possible no-op theo checklist UI/UX. Danh sách đầy đủ nằm trong `inventory.json` và `elements.csv`.
@@ -71,10 +71,10 @@ Các candidate ưu tiên accessibility, keyboard, semantic control và possible 
 | route.commissions.form-control.hop-ong-q3-deal-ac-biet-thuong-kpi | app/(app)/commissions/page.jsx:214 | Hợp đồng Q3, deal đặc biệt, thưởng KPI… | control_binding_unverified |
 | route.contracts.form-control.tat-ca-loai | app/(app)/contracts/page.jsx:75 | Tất cả loại | control_binding_unverified |
 | route.copilot.form-control.hoi-ve-doanh-thu-khach-hang-du-an-hoac-nho-viet-email-proposal | app/(app)/copilot/page.jsx:77 | Hỏi về doanh thu, khách hàng, dự án… hoặc nhờ viết email/proposal | control_binding_unverified |
-| route.finance.form-control.thu-chi-chi-thu-chi-chi | app/(app)/finance/page.jsx:53 | Thu & chi / Chỉ thu / Chỉ chi | control_binding_unverified |
-| route.finance.form-control.tat-ca-cac-thang | app/(app)/finance/page.jsx:56 | Tất cả các tháng | control_binding_unverified |
 | route.financials.form-control.ca-nam-year | app/(app)/financials/page.jsx:90 | Cả năm / {year} | control_binding_unverified |
 | route.finplan.form-control.select | app/(app)/finplan/page.jsx:136 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.freelancer.form-control.gio | app/(app)/freelancer/page.jsx:101 | giờ | control_binding_unverified |
+| route.freelancer.form-control.ghi-chu-lam-gi | app/(app)/freelancer/page.jsx:102 | Ghi chú (làm gì) | control_binding_unverified |
 
 ## Authenticated routes chưa nằm trong primary navigation
 

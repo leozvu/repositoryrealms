@@ -119,7 +119,7 @@ export default function GuidePage() {
           <H>Quản 3 công ty một màn hình</H>
           <P><b>Master Dashboard</b> (link riêng đã giao): tổng doanh thu/chi/lợi nhuận/AR/pipeline cả 3 entity + insight từng công ty. Chỉ mình bạn có mật khẩu.</P>
           <H>Cài đặt hệ thống (chỉ bạn)</H>
-          <P><B>Cài đặt</B>: thông tin công ty (in trên báo giá/hóa đơn), <b>ngưỡng phê duyệt</b>, xác suất forecast theo giai đoạn, <b>tên chức danh</b> theo công ty, quota phép, <b>Email SMTP</b> (gửi báo giá/hóa đơn), Claude API key (bật AI Copilot), <b>API key + Webhook</b> nối hệ thống ngoài.</P>
+          <P><B>Cài đặt</B>: thông tin công ty (in trên báo giá/hóa đơn), <b>ngưỡng phê duyệt</b>, xác suất forecast theo giai đoạn, <b>tên chức danh</b> theo công ty, quota phép, <b>Email SMTP</b> (gửi báo giá/hóa đơn), OpenRouter API key (bật AI Copilot), <b>API key + Webhook</b> nối hệ thống ngoài.</P>
           <H>Vận hành nâng cao</H>
           <P><B>Tự động hóa</B>: rule KHI-THÌ (VD thắng deal → nhắn Kênh chung + tạo việc) · <B>Nhật ký hệ thống</B>: mọi thao tác của mọi người · <B>Báo cáo</B> → in báo cáo tháng PDF · Quản tài khoản: tạo/khóa người dùng, đặt lại mật khẩu, <b>reset 2FA</b> khi nhân sự mất điện thoại (Hồ sơ &amp; nhóm).</P>
         </S>

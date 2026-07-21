@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 20,
+    "verifiedContracts": 20,
+    "scenarios": 4,
+    "verifiedScenarios": 4,
+    "canonicalTaskStores": 1,
+    "managerActions": 6,
+    "employeeRankingEnabled": false,
+    "migrationAppliedByAudit": false
+  },
+  "contracts": [
+    {
+      "id": "canonical-task-store",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model Task {",
+        "Phase 1 — Unified Work Graph",
+        "workVersion",
+        "queuePosition"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "queue-cas-model",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model WorkQueueState",
+        "ownerId   String   @unique",
+        "version   Int"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "structured-work-ledger",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model WorkItemEvent",
+        "receiptId",
+        "relatedTaskId"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "additive-migration",
+      "layer": "migration",
+      "source": "prisma/migrations/20260720190000_add_execution_engine/migration.sql",
+      "signals": [
+        "ALTER TABLE \"Task\"",
+        "ADD COLUMN \"workVersion\"",
+        "CREATE TABLE \"WorkQueueState\"",
+        "CREATE TABLE \"WorkItemEvent\""
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "my-work-read-model",
+      "layer": "domain",
+      "source": "lib/execution-engine.js",
+      "signals": [
+        "buildMyWorkReadModel",
+        "myWorkQueueFor",
+        "normalizedExecutionStatus"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "team-work-read-model",
+      "layer": "domain",
+      "source": "lib/execution-engine.js",
+      "signals": [
+        "buildTeamWorkReadModel",
+        "capacityBand",
+        "employeeRanking: false",
+        "presenceAsProductivity: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "manager-actions",
+      "layer": "domain",
+      "source": "lib/execution-engine-admin.js",
+      "signals": [
+        "'task.reprioritize'",
+        "'task.block'",
+        "'task.unblock'",
+        "'task.escalate'",
+        "'task.split'",
+        "'task.merge'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "manager-auth-scope",
+      "layer": "authorization",
+      "source": "lib/execution-engine-admin.js",
+      "signals": [
+        "requireManager",
+        "hasAny(user, ['PM', 'LEAD'])",
+        "managerTaskScope"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "optimistic-concurrency",
+      "layer": "safety",
+      "source": "lib/execution-engine-admin.js",
+      "signals": [
+        "workVersion: command.expectedVersion",
+        "expectedQueueVersion",
+        "execution_work_stale",
+        "execution_queue_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "atomic-receipt-event-audit",
+      "layer": "audit",
+      "source": "lib/execution-engine-admin.js",
+      "signals": [
+        "realmActionReceipt.create",
+        "workItemEvent.create",
+        "auditLog.create",
+        "appendReceipt"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "repository-realms-canonical-route",
+      "layer": "parity",
+      "source": "lib/repository-realms.js",
+      "signals": [
+        "executeExecutionAction",
+        "EXECUTION_ACTIONS.includes",
+        "action: 'task.merge'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "my-work-api",
+      "layer": "api",
+      "source": "app/api/execution/my-work/route.js",
+      "signals": [
+        "loadMyWork",
+        "private, no-store"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "team-work-api",
+      "layer": "api",
+      "source": "app/api/execution/team-work/route.js",
+      "signals": [
+        "loadTeamWork",
+        "private, no-store"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canonical-action-api",
+      "layer": "api",
+      "source": "app/api/execution/actions/route.js",
+      "signals": [
+        "executeRepositoryRealmsAction",
+        "Idempotency-Key",
+        "emitEvent"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "personal-cockpit",
+      "layer": "ui",
+      "source": "app/(app)/myday/page.jsx",
+      "signals": [
+        "Personal execution cockpit",
+        "/api/execution/my-work",
+        "Task ERP"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "manager-orchestrator",
+      "layer": "ui",
+      "source": "app/(app)/teamwork/page.jsx",
+      "signals": [
+        "Team work orchestrator",
+        "/api/execution/team-work",
+        "Canonical manager actions"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "parallel-experience-nav",
+      "layer": "ui",
+      "source": "lib/erp-navigation.js",
+      "signals": [
+        "key: 'myday'",
+        "key: 'teamwork'",
+        "roles: ['PM', 'LEAD']"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-accessible-controls",
+      "layer": "ux",
+      "source": "app/(app)/teamwork/team-work.module.css",
+      "signals": [
+        "min-height:44px",
+        "@media(max-width:720px)",
+        "@media(prefers-reduced-motion:reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "execution-tests",
+      "layer": "test",
+      "source": "tests/execution-engine-admin.test.mjs",
+      "signals": [
+        "work-version CAS",
+        "Reprioritize CAS queue version",
+        "Split tạo lineage"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase1-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-1-EXECUTION-ENGINE.md",
+      "signals": [
+        "Task ERP là source of truth",
+        "Không xếp hạng nhân sự",
+        "crmegoric-realms-demo"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "one-task-store",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "six-manager-actions",
+      "expected": "6",
+      "actual": "6",
+      "status": "verified"
+    },
+    {
+      "id": "two-distinct-cockpits",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "ranking-disabled",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    }
+  ]
+}

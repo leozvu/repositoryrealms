@@ -32,6 +32,40 @@
 .progress span { height: 5px; border-radius: 999px; background: var(--border); }
 .progress span[data-active] { background: #315b43; }
 
+.identityCard {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  overflow: hidden;
+  border: 1px solid #b89a58;
+  border-radius: 14px;
+  color: #f5ecd5;
+  background:
+    radial-gradient(circle at 11% 22%, rgba(216, 186, 117, .2), transparent 9rem),
+    linear-gradient(135deg, #1b3026, #101f18);
+}
+
+.portraitStage {
+  width: 92px;
+  height: 112px;
+  display: grid;
+  place-items: end center;
+  overflow: hidden;
+  border: 1px solid rgba(237, 204, 112, .52);
+  border-radius: 42% 42% 14px 14px;
+  background: radial-gradient(circle at 50% 35%, #3c5f49, #102019 72%);
+  box-shadow: inset 0 0 24px rgba(233, 199, 93, .14);
+}
+
+.portraitStage img { width: auto; height: 104px; display: block; object-fit: contain; }
+.identityCard > div { min-width: 0; }
+.identityEyebrow { display: block; color: #d8ba75; font-size: .65rem; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+.identityCard strong { display: block; margin-top: 4px; color: #fff8e8; font-size: 1rem; overflow-wrap: anywhere; }
+.identityCard p { margin: 6px 0 0; color: #c2c8bd; font-size: .76rem; line-height: 1.55; }
+
 .step { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 14px; align-items: start; padding: 16px; border: 1px solid #c9d7cd; border-radius: 12px; background: #f4f8f5; }
 .stepIcon { width: 54px; height: 54px; display: inline-flex; align-items: center; justify-content: center; border-radius: 14px; color: #fff; background: #315b43; }
 .step h2 { margin: 1px 0 6px; color: var(--fg); font-size: 1.05rem; line-height: 1.3; }
@@ -48,6 +82,10 @@
   .launcher { right: auto; left: calc(100dvw - 12px); bottom: calc(max(12px, env(safe-area-inset-bottom)) + 54px); transform: translateX(-100%); }
   .tour { min-height: 0; }
   .progressHeader { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .identityCard { grid-template-columns: 72px minmax(0, 1fr); gap: 12px; padding: 12px; }
+  .portraitStage { width: 72px; height: 88px; }
+  .portraitStage img { height: 82px; }
+  .identityCard p { font-size: .7rem; }
   .step { grid-template-columns: 1fr; padding: 13px; }
   .stepIcon { width: 46px; height: 46px; border-radius: 12px; }
   .actions { display: grid; grid-template-columns: 1fr 1fr; }

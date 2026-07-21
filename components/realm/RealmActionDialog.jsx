@@ -39,8 +39,9 @@ export default function RealmActionDialog({ command, onClose, onComplete }) {
   };
   return (
     <ConfirmDialog
-      msg={`Xác nhận chuyển ${command.recordType} “${command.recordLabel}” từ “${fromLabel}” sang “${toLabel}”? ERP vẫn là nguồn dữ liệu chính và thao tác này sẽ được ghi vào nhật ký kiểm toán.`}
-      yesLabel={`Xác nhận · ${toLabel}`}
+      msg={`Suggested Action: chuyển ${command.recordType} “${command.recordLabel}” từ “${fromLabel}” sang “${toLabel}”. RepositoryRealms sẽ kiểm tra quyền, business rules, receipt và audit trước khi xác nhận.`}
+      yesLabel={`Suggested Action · ${toLabel}`}
+      modalClassName="realm-generated-dialog"
       onYes={apply}
       onClose={onClose}
     />

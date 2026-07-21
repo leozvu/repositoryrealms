@@ -44,15 +44,15 @@ function TaskCommentDialog({ command, onClose, onComplete }) {
     }
   };
   return (
-    <Modal title="War Council note" onClose={onClose} footer={<>
+    <Modal title="War Council note" className="realm-generated-dialog" onClose={onClose} footer={<>
       <button type="button" className="btn btn-outline" onClick={onClose}>Hủy</button>
-      <AsyncButton type="button" className="btn btn-primary" pendingLabel="Đang gửi tới ERP…" disabled={!content.trim()} onClick={submit}>Gửi tới Task ERP</AsyncButton>
+      <AsyncButton type="button" className="btn btn-primary" pendingLabel="Đang kiểm tra invariant…" disabled={!content.trim()} onClick={submit}>Gửi War Council note</AsyncButton>
     </>}>
       <div className={styles.composer}>
         <p>Ghi chú cho Quest <strong>“{command.recordLabel}”</strong>. Người phụ trách ERP sẽ nhận thông báo như một comment thông thường.</p>
         <label htmlFor="realm-task-comment">Nội dung ghi chú</label>
         <textarea id="realm-task-comment" value={content} onChange={(event) => setContent(event.target.value)} maxLength={800} rows={6} autoFocus placeholder="Nêu quyết định, blocker hoặc @nhắc đồng đội…" />
-        <small>{content.length}/800 · Nội dung được lưu trực tiếp trong Task ERP; audit chỉ lưu mã bản ghi.</small>
+        <small>{content.length}/800 · RepositoryRealms áp cùng authorization, business rules, receipt và audit; UI Realm không cần giống ERP.</small>
       </div>
     </Modal>
   );
@@ -86,9 +86,9 @@ function LeadFollowupDialog({ command, onClose, onComplete }) {
     }
   };
   return (
-    <Modal title="Diplomatic follow-up" onClose={onClose} footer={<>
+    <Modal title="Diplomatic follow-up" className="realm-generated-dialog" onClose={onClose} footer={<>
       <button type="button" className="btn btn-outline" onClick={onClose}>Hủy</button>
-      <AsyncButton type="button" className="btn btn-primary" pendingLabel="Đang ghi vào CRM…" disabled={!title.trim() || !date} onClick={submit}>Lưu vào CRM ERP</AsyncButton>
+      <AsyncButton type="button" className="btn btn-primary" pendingLabel="Đang kiểm tra invariant…" disabled={!title.trim() || !date} onClick={submit}>Lập Diplomatic follow-up</AsyncButton>
     </>}>
       <div className={styles.composer}>
         <p>Lên lịch chăm sóc <strong>“{command.recordLabel}”</strong>. Đây là Activity CRM thật, không phải dữ liệu game riêng.</p>
@@ -98,7 +98,7 @@ function LeadFollowupDialog({ command, onClose, onComplete }) {
         </div>
         <label htmlFor="realm-followup-title">Nội dung follow-up</label>
         <input id="realm-followup-title" value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} autoFocus placeholder="Ví dụ: Gọi xác nhận phạm vi proposal" />
-        <small>{title.length}/160 · Có thể tiếp tục chỉnh sửa hoặc hoàn tất Activity từ CRM nguyên bản.</small>
+        <small>{title.length}/160 · RepositoryRealms giữ chung authorization, business rules, receipt và audit với CRM nguyên bản.</small>
       </div>
     </Modal>
   );

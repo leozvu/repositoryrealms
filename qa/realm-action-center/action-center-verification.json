@@ -170,8 +170,9 @@
         "War Council note",
         "Diplomatic follow-up",
         "Idempotency-Key",
-        "Gửi tới Task ERP",
-        "Lưu vào CRM ERP"
+        "Gửi War Council note",
+        "Lập Diplomatic follow-up",
+        "RepositoryRealms"
       ],
       "missingSignals": [],
       "status": "verified"

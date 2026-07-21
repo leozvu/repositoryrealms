@@ -6,6 +6,7 @@ import { ROLES, ROLE_LABEL } from '@/lib/perm';
 import { REALM_PILOT_MEMBER_LIMIT } from '@/lib/realm-pilot';
 import { REALM_ONBOARDING_RESET_EVENT } from './RealmPilotOnboarding';
 import styles from './realm-pilot-control.module.css';
+import { fetchRealmWithTimeout } from './realm-fetch';
 
 const PILOT_OPERATIONS_EVENT = 'crmegoric:pilot-operations-changed';
 
@@ -50,7 +51,7 @@ function Metric({ label, value, detail }) {
 }
 
 function LaunchApprovalCard({ approval, mine = false, busy = false, onDecide }) {
-  const statusLabel = approval.status === 'approved' ? 'Đã duyệt' : approval.status === 'rejected' ? 'Đã đóng' : mine ? 'Chờ Director khác' : 'Chờ bạn duyệt';
+  const statusLabel = approval.timedOut ? 'Đã timeout · policy giữ nguyên' : approval.status === 'approved' ? 'Đã duyệt' : approval.status === 'rejected' ? 'Đã đóng' : mine ? 'Chờ Director khác' : 'Chờ bạn duyệt';
   const expiresAt = approval.expiresAt ? new Date(approval.expiresAt) : null;
   return (
     <article className={styles.approvalCard} data-status={approval.status}>
@@ -67,10 +68,10 @@ function LaunchApprovalCard({ approval, mine = false, busy = false, onDecide }) 
         <span><strong>v{approval.policyVersion ?? '—'}</strong> policy nguồn</span>
       </div>
       <div className={styles.approvalCardFooter}>
-        <span>{expiresAt ? `Hết hạn ${expiresAt.toLocaleString('vi-VN')}` : 'Payload không thể xác minh — không được duyệt'}</span>
+        <span>{approval.timedOut ? `Quá hạn từ ${expiresAt?.toLocaleString('vi-VN')}; tạo proposal mới để tiếp tục` : expiresAt ? `Hết hạn ${expiresAt.toLocaleString('vi-VN')}` : 'Payload không thể xác minh — không được duyệt'}</span>
         {!mine && approval.status === 'pending' && (
           <div>
-            <AsyncButton className="btn btn-primary btn-sm" disabled={!approval.payloadReadable || busy} pendingLabel="Đang duyệt…" onClick={() => onDecide(approval, 'approve')}>Duyệt &amp; áp dụng</AsyncButton>
+            <AsyncButton className="btn btn-primary btn-sm" disabled={!approval.payloadReadable || approval.timedOut || busy} pendingLabel="Đang duyệt…" onClick={() => onDecide(approval, 'approve')}>{approval.timedOut ? 'Đã khóa do timeout' : <>Duyệt &amp; áp dụng</>}</AsyncButton>
             <AsyncButton className="btn btn-outline btn-sm" disabled={busy} pendingLabel="Đang đóng…" onClick={() => onDecide(approval, 'reject')}>Từ chối</AsyncButton>
           </div>
         )}
@@ -99,9 +100,9 @@ export default function RealmPilotControl() {
     setState((current) => ({ ...current, loading: true, error: '' }));
     try {
       const [pilotResponse, readinessResponse, approvalsResponse] = await Promise.all([
-        fetch('/api/realm-demo/pilot', { cache: 'no-store' }),
-        fetch('/api/realm-demo/readiness', { cache: 'no-store' }),
-        fetch('/api/realm-demo/launch/approvals', { cache: 'no-store' }),
+        fetchRealmWithTimeout('/api/realm-demo/pilot', { cache: 'no-store' }),
+        fetchRealmWithTimeout('/api/realm-demo/readiness', { cache: 'no-store' }),
+        fetchRealmWithTimeout('/api/realm-demo/launch/approvals', { cache: 'no-store' }),
       ]);
       const [pilotPayload, readinessPayload, approvalsPayload] = await Promise.all([
         pilotResponse.json().catch(() => ({})),
