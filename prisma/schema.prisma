@@ -1046,6 +1046,7 @@ model CeoEntityRegistry {
   updatedAt            DateTime  @updatedAt
   memberships          CeoEntityMembership[]
   snapshotCache        CeoEntitySnapshotCache?
+  commandDeliveries    CeoCommandDelivery[]
 
   @@index([enabled, status])
   @@index([circuitState, circuitRetryAt])
@@ -1090,6 +1091,7 @@ model CeoGlobalIdentity {
   sessions        CeoPortalSession[]
   recoveryCodes   CeoRecoveryCode[]
   authorizationCodes CeoSsoAuthorizationCode[]
+  commandDeliveries  CeoCommandDelivery[]
 
   @@index([status, email])
 }
@@ -1168,6 +1170,58 @@ model CeoSsoAuthorizationCode {
   @@index([entityId, expiresAt, consumedAt])
   @@index([identityId, createdAt])
   @@index([sessionId, createdAt])
+}
+
+// ===== CEO-5: cross-entity command delivery control plane =====
+// Portal rows contain delivery metadata and receipt references only. They never retain
+// task titles, announcement bodies, employee emails or approval notes.
+model CeoCommandDelivery {
+  id                 String            @id @default(cuid())
+  identityId         String
+  identity           CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Restrict)
+  entityId           String
+  entity             CeoEntityRegistry @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  idempotencyKeyHash String            @unique
+  correlationId      String            @unique
+  command            String
+  scope              String
+  payloadHash        String
+  status             String            @default("dispatching")
+  attemptCount       Int               @default(1)
+  targetReceiptId    String?
+  targetResource     String?
+  targetRecordId     String?
+  targetReceiptAt    DateTime?
+  lastErrorCode      String?
+  lastAttemptAt      DateTime?
+  confirmedAt        DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([identityId, createdAt])
+  @@index([entityId, status, createdAt])
+  @@index([status, updatedAt])
+}
+
+// This canonical receipt lives inside each target entity database. The business record,
+// receipt and AuditLog are committed together; payload content is represented by a hash.
+model CeoEntityCommandReceipt {
+  id             String   @id @default(cuid())
+  idempotencyKey String   @unique
+  correlationId  String   @unique
+  actorSubject   String
+  targetEntityId String
+  action         String
+  scope          String
+  payloadHash    String
+  resource       String
+  recordId       String?
+  resultCount    Int      @default(1)
+  createdAt      DateTime @default(now())
+
+  @@index([actorSubject, createdAt])
+  @@index([targetEntityId, action, createdAt])
+  @@index([resource, recordId])
 }
 
 // ===== v3.19: XUẤT NHẬP KHẨU NÔNG SẢN (phân hệ 'export' — Fretas) =====

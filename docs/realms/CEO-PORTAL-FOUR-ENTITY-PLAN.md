@@ -242,6 +242,8 @@ Exit gate: all four registered entities populate the dashboard from their own CE
 
 ### CEO-5 — Cross-entity command gateway
 
+Implementation status: code complete on `codex/realms-demo` with the four-action allowlist, step-up protected Portal dispatcher, target-owned RepositoryRealms receipts, payload-free delivery ledger and correlation-only reconciliation. Migration, entity credentials, deployment and write enablement remain on HOLD behind CEO-0 and the CEO-9 rollout rings. See `CEO-5-CROSS-ENTITY-COMMAND-GATEWAY.md`.
+
 - Initial allowlist: create task, request status, send announcement and submit approval request.
 - Every request carries target entity, actor subject, scope, idempotency key and correlation ID.
 - Target entity produces canonical RepositoryRealms receipt and audit.

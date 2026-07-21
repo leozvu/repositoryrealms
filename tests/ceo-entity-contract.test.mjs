@@ -36,7 +36,11 @@ test('Agency capabilities expose legacy agency domains but not specialist vertic
   assert.equal(payload.capabilities.domains.delivery, true);
   assert.equal(payload.capabilities.domains.livestream, false);
   assert.equal(payload.capabilities.domains.export, false);
-  assert.deepEqual(payload.capabilities.commands, []);
+  assert.deepEqual(payload.capabilities.commands.map((command) => command.action), [
+    'task.create', 'status.request', 'announcement.send', 'approval.request',
+  ]);
+  assert.equal(payload.capabilities.modes.snapshotReadOnly, true);
+  assert.equal(payload.capabilities.modes.crossEntityWrites, true);
   assert.equal(payload.capabilities.modes.directDatabaseWrites, false);
 });
 

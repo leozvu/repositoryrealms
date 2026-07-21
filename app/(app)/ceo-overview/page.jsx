@@ -32,7 +32,7 @@ const COPY = {
     openDetail: 'Mở chi tiết tại entity', activatingRequired: 'Cần CEO session + TOTP để mở deep link đã ký.', manageIdentity: 'Mở Identity & Registry',
     staleNotice: 'Một số nguồn đang dùng snapshot cũ vì entity chưa phản hồi. Các số hết hạn đã bị loại khỏi tổng.',
     partialRefresh: 'Làm mới một phần: một số entity không phản hồi; snapshot gần nhất vẫn được giữ.', refreshSuccess: 'Đã cập nhật snapshot của các entity khả dụng.',
-    cachePolicy: 'Cache 5 phút · stale-if-error 24 giờ', noEntities: 'Chưa có entity hoặc migration CEO-4 chưa được áp dụng.',
+    cachePolicy: 'Cache 5 phút · stale-if-error 24 giờ', noEntities: 'Chưa có entity hoặc migration CEO-4 chưa được áp dụng.', commandCenter: 'Điều phối liên công ty',
     cashBasis: 'Cash-ledger, không phải lợi nhuận kế toán', gmvWarning: 'GMV không được cộng vào revenue',
   },
   en: {
@@ -51,7 +51,7 @@ const COPY = {
     openDetail: 'Open detail in entity', activatingRequired: 'A CEO session with TOTP step-up is required for a signed deep link.', manageIdentity: 'Open Identity & Registry',
     staleNotice: 'Some sources use stale snapshots because an entity did not respond. Expired numbers are excluded from totals.',
     partialRefresh: 'Partial refresh: some entities did not respond; their latest usable snapshots were retained.', refreshSuccess: 'Available entity snapshots were updated.',
-    cachePolicy: '5-minute cache · stale-if-error for 24 hours', noEntities: 'No entity exists or the CEO-4 migration has not been applied.',
+    cachePolicy: '5-minute cache · stale-if-error for 24 hours', noEntities: 'No entity exists or the CEO-4 migration has not been applied.', commandCenter: 'Cross-company commands',
     cashBasis: 'Cash-ledger view, not accounting profit', gmvWarning: 'GMV is never added to revenue',
   },
 };
@@ -174,9 +174,12 @@ export default function CeoOverviewPage() {
     <main className={styles.page} data-no-i18n>
       <header className={styles.hero}>
         <div><p className={styles.eyebrow}>{c.eyebrow}</p><h1>{c.title}</h1><p>{c.intro}</p></div>
-        <AsyncButton type="button" className="btn btn-primary" pendingLabel={c.refreshing} onClick={() => refresh(filter)}>
-          <Icon name="repeat" size={16} />{c.refresh}
-        </AsyncButton>
+        <div className={styles.heroActions}>
+          <Link className="btn btn-outline" href="/ceo-commands"><Icon name="link" size={16} />{c.commandCenter}</Link>
+          <AsyncButton type="button" className="btn btn-primary" pendingLabel={c.refreshing} onClick={() => refresh(filter)}>
+            <Icon name="repeat" size={16} />{c.refresh}
+          </AsyncButton>
+        </div>
       </header>
 
       <section className={styles.policy} aria-label={c.readOnly}>

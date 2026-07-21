@@ -14,7 +14,7 @@ test('Phase 21 audit measures RepositoryRealms invariants and explicitly rejects
   const result = buildRepositoryRealmsParityAudit(root);
   assert.equal(result.summary.verifiedContracts, result.summary.contracts);
   assert.equal(result.summary.verifiedScenarios, result.summary.scenarios);
-  assert.equal(result.summary.registeredBusinessActions, 12);
+  assert.equal(result.summary.registeredBusinessActions, 16);
   assert.equal(result.summary.buttonParityRequired, false);
   assert.equal(result.summary.businessInvariantParityRequired, true);
   assert.equal(result.summary.additiveMigrations, 0);

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 52,
-    "mappedNavigationRoutes": 52,
-    "verifiedNavigationRoutes": 52,
+    "erpNavigationRoutes": 53,
+    "mappedNavigationRoutes": 53,
+    "verifiedNavigationRoutes": 53,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -760,6 +760,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/ceo-overview/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "ceo-commands",
+      "erpLabel": "CEO · Điều phối liên công ty",
+      "realmLabel": "Royal Dispatch",
+      "realmSurface": "Phòng điều hành CEO",
+      "group": "Công ty",
+      "href": "/ceo-commands",
+      "icon": "link",
+      "roles": "DIRECTOR only",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/ceo-commands/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

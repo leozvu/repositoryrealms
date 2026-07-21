@@ -202,6 +202,32 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/ceo-commands",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "dynamic": false,
+      "auth": "authenticated",
+      "inNavigation": true,
+      "navLabel": "CEO · Điều phối liên công ty",
+      "navSection": "Công ty",
+      "roles": [
+        "DIRECTOR"
+      ],
+      "module": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/ceo-overview",
       "source": "app/(app)/ceo-overview/page.jsx",
       "dynamic": false,
@@ -1605,6 +1631,43 @@
     {
       "route": "/api/ceo/v1/capabilities",
       "source": "app/api/ceo/v1/capabilities/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/command-gateway",
+      "source": "app/api/ceo/v1/command-gateway/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/command-gateway/[id]/reconcile",
+      "source": "app/api/ceo/v1/command-gateway/[id]/reconcile/route.js",
+      "dynamic": true,
+      "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/commands",
+      "source": "app/api/ceo/v1/commands/route.js",
+      "dynamic": false,
+      "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/commands/receipts",
+      "source": "app/api/ceo/v1/commands/receipts/route.js",
       "dynamic": false,
       "methods": [
         "GET"
@@ -3803,10 +3866,969 @@
       ]
     },
     {
+      "elementId": "route.ceo-commands.navigation.ceo-overview",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 195,
+      "column": 7,
+      "surface": "route.ceo-commands",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-overview",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-overview",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.navigation.ceo-registry",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 204,
+      "column": 138,
+      "surface": "route.ceo-commands",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-registry",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.action.load",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 205,
+      "column": 109,
+      "surface": "route.ceo-commands",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-submit.command",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 208,
+      "column": 7,
+      "surface": "route.ceo-commands",
+      "tag": "form",
+      "kind": "form-submit",
+      "label": "COMMAND / * / — / *",
+      "handlerEvent": "onSubmit",
+      "handler": "submit",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "submitting || undefined",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.select",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 211,
+      "column": 119,
+      "surface": "route.ceo-commands",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "—",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.action",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 212,
+      "column": 119,
+      "surface": "route.ceo-commands",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "action",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.title",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 215,
+      "column": 138,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "title",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.note",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 216,
+      "column": 99,
+      "surface": "route.ceo-commands",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "note",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.assigneeemail",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 217,
+      "column": 95,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "assigneeEmail",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.projectid",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 218,
+      "column": 90,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "projectId",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.duedate",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 219,
+      "column": 84,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "dueDate",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.priority",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 220,
+      "column": 90,
+      "surface": "route.ceo-commands",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "priority",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.esthours",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 221,
+      "column": 87,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "estHours",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.topic",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 225,
+      "column": 132,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "topic",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.message",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 226,
+      "column": 136,
+      "surface": "route.ceo-commands",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "message",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.targetemail",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 227,
+      "column": 128,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "targetEmail",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.duedate.2",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 228,
+      "column": 83,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "dueDate",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.priority.2",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 229,
+      "column": 89,
+      "surface": "route.ceo-commands",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "priority",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.title.2",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 233,
+      "column": 143,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "title",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.message.2",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 234,
+      "column": 141,
+      "surface": "route.ceo-commands",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "message",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.audience",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 235,
+      "column": 95,
+      "surface": "route.ceo-commands",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "audience",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.role",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 236,
+      "column": 111,
+      "surface": "route.ceo-commands",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "role",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.title.3",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 240,
+      "column": 139,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "title",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.note.2",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 241,
+      "column": 131,
+      "surface": "route.ceo-commands",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "note",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.approverrole",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 242,
+      "column": 91,
+      "surface": "route.ceo-commands",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "approverRole",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.form-control.input",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 245,
+      "column": 73,
+      "surface": "route.ceo-commands",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.action.button",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 246,
+      "column": 9,
+      "surface": "route.ceo-commands",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": true,
+      "disabledBinding": "!identityReady || submitting || !entities.length",
+      "actionStatus": "form-submit-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.action.load.2",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 253,
+      "column": 184,
+      "surface": "route.ceo-commands",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.action.openrecord-delivery",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 262,
+      "column": 350,
+      "surface": "route.ceo-commands",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openRecord(delivery)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-commands.action.reconcile-delivery",
+      "source": "app/(app)/ceo-commands/page.jsx",
+      "line": 262,
+      "column": 143,
+      "surface": "route.ceo-commands",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => reconcile(delivery)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "GET '/api/ceo/v1/command-gateway?limit=75'",
+        "POST '/api/ceo/v1/command-gateway'",
+        "POST `/api/ceo/v1/command-gateway/${encodeURIComponent(delivery.id)}/reconcile`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-overview.navigation.ceo-commands",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 178,
+      "column": 11,
+      "surface": "route.ceo-overview",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-commands",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-commands",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 177,
-      "column": 9,
+      "line": 179,
+      "column": 11,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
       "kind": "action",
@@ -3834,7 +4856,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-all",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 189,
+      "line": 192,
       "column": 9,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -3865,7 +4887,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-entity-id",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 190,
+      "line": 193,
       "column": 40,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -3896,7 +4918,7 @@
     {
       "elementId": "route.ceo-overview.action.load-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 194,
+      "line": 197,
       "column": 111,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -3927,7 +4949,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-registry",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 206,
+      "line": 209,
       "column": 161,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -3956,7 +4978,7 @@
     {
       "elementId": "route.ceo-overview.action.opendetail-entity-domain",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 258,
+      "line": 261,
       "column": 216,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -26289,17 +27311,17 @@
     }
   ],
   "summary": {
-    "uiRoutes": 59,
-    "apiRoutes": 88,
-    "interactiveElements": 819,
-    "sourceFilesWithInteractions": 87,
-    "routesInPrimaryNavigation": 55,
+    "uiRoutes": 60,
+    "apiRoutes": 92,
+    "interactiveElements": 850,
+    "sourceFilesWithInteractions": 88,
+    "routesInPrimaryNavigation": 56,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 499,
-      "form-control": 255,
-      "form-submit": 11,
-      "navigation": 54
+      "action": 504,
+      "form-control": 277,
+      "form-submit": 12,
+      "navigation": 57
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 17,
@@ -26315,6 +27337,10 @@
       {
         "source": "app/(app)/tasks/page.jsx",
         "count": 38
+      },
+      {
+        "source": "app/(app)/ceo-commands/page.jsx",
+        "count": 30
       },
       {
         "source": "app/(app)/teamwork/page.jsx",
@@ -26362,10 +27388,6 @@
       },
       {
         "source": "components/DocEditor.jsx",
-        "count": 17
-      },
-      {
-        "source": "components/realm/RealmPilotControl.jsx",
         "count": 17
       }
     ]

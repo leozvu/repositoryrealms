@@ -87,7 +87,7 @@ Clients can request a subset with `?domains=finance,crm`. Disabled, unknown or u
 
 Capabilities are derived from `Setting.modules` through the canonical module rules. Legacy agency settings continue to expose agency domains but not opt-in verticals. Egolive exposes `livestream` only when its module is enabled.
 
-CEO-1 publishes no write command. `capabilities.commands` is empty and `directDatabaseWrites` is false. Cross-entity commands belong to CEO-5 and must return RepositoryRealms receipts from the target entity.
+CEO-1 originally published no write command. CEO-5 now extends `capabilities.commands` additively with four scoped actions while `snapshotReadOnly` and `directDatabaseWrites: false` remain invariant. Every cross-entity command must return a RepositoryRealms receipt from the target entity; the snapshot contract itself is unchanged.
 
 ## Tests
 

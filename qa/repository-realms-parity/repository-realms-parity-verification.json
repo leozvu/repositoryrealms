@@ -5,7 +5,7 @@
     "verifiedContracts": 20,
     "scenarios": 7,
     "verifiedScenarios": 7,
-    "registeredBusinessActions": 12,
+    "registeredBusinessActions": 16,
     "buttonParityRequired": false,
     "businessInvariantParityRequired": true,
     "additiveMigrations": 0,
@@ -258,8 +258,8 @@
   "scenarios": [
     {
       "id": "canonical-intents-registered",
-      "expected": "12",
-      "actual": "12",
+      "expected": "16",
+      "actual": "16",
       "status": "verified"
     },
     {
