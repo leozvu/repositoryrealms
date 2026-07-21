@@ -1,9 +1,13 @@
 # RepositoryRealms — Post-pilot roadmap (Phase 26–42)
 
-Status: deferred roadmap  
-Owner: Vũ Lương Sơn  
-Working branch: `codex/realms-demo`  
-Production constraint: no production merge or deployment without an approved Go/No-Go  
+Status: deferred roadmap
+
+Owner: Vũ Lương Sơn
+
+Working branch: `codex/realms-demo`
+
+Production constraint: no production merge or deployment without an approved Go/No-Go
+
 Last updated: 2026-07-21
 
 ## Product invariants

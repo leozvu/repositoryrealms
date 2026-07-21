@@ -1,8 +1,11 @@
 # CEO Portal — Four-entity architecture and delivery plan
 
-Status: proposed; no production deployment authorized  
-Owner: Vũ Lương Sơn  
-Working branch: `codex/realms-demo`  
+Status: proposed; no production deployment authorized
+
+Owner: Vũ Lương Sơn
+
+Working branch: `codex/realms-demo`
+
 Last updated: 2026-07-21
 
 ## 1. Codebase audit
