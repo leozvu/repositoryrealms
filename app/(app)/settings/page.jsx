@@ -10,6 +10,7 @@ import RealmPilotOperations from '@/components/realm/RealmPilotOperations';
 import RealmFeedbackOperations from '@/components/realm/RealmFeedbackOperations';
 import RealmExperienceScorecard from '@/components/realm/RealmExperienceScorecard';
 import RealmReleaseCandidateDossier from '@/components/realm/RealmReleaseCandidateDossier';
+import CeoFederationPolicy from '@/components/ceo/CeoFederationPolicy';
 
 /* ---------- v3.3: API key + Webhook (chỉ Giám đốc) ---------- */
 function ApiSection() {
@@ -263,6 +264,7 @@ export default function SettingsPage() {
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <CeoFederationPolicy />
         <RealmPilotControl />
         <RealmPilotRehearsal />
         <RealmPilotOperations />

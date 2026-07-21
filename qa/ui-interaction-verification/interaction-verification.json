@@ -9,8 +9,8 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 125,
-    "asyncButtonGuards": 66,
+    "guardedActions": 126,
+    "asyncButtonGuards": 67,
     "disabledBindings": 55,
     "localPendingStates": 4,
     "destructiveFlows": 6,
@@ -153,7 +153,7 @@
     {
       "elementId": "route.ceo-inbox.action.sync",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 145,
+      "line": 149,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -165,7 +165,7 @@
     {
       "elementId": "route.ceo-inbox.form-submit.form",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 153,
+      "line": 157,
       "label": "—",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -177,7 +177,7 @@
     {
       "elementId": "route.ceo-inbox.action.button",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 158,
+      "line": 162,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -189,7 +189,7 @@
     {
       "elementId": "route.ceo-inbox.action.refresh",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 170,
+      "line": 174,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -201,7 +201,7 @@
     {
       "elementId": "route.ceo-inbox.action.reconcile-message",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 173,
+      "line": 177,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -213,7 +213,7 @@
     {
       "elementId": "route.ceo-inbox.action.button.2",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 175,
+      "line": 179,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -225,7 +225,7 @@
     {
       "elementId": "route.ceo-inbox.form-submit.send",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 175,
+      "line": 179,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -237,7 +237,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 180,
+      "line": 181,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -525,7 +525,7 @@
     {
       "elementId": "route.messages.action.ngung-chia-se-voi-ceo-portal-chia-se-voi-ceo-portal",
       "source": "app/(app)/messages/page.jsx",
-      "line": 150,
+      "line": 165,
       "label": "Ngừng chia sẻ với CEO Portal / Chia sẻ với CEO Portal",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -537,7 +537,7 @@
     {
       "elementId": "route.messages.form-submit.ang-gui-gui",
       "source": "app/(app)/messages/page.jsx",
-      "line": 208,
+      "line": 229,
       "label": "Đang gửi… / Gửi",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -549,7 +549,7 @@
     {
       "elementId": "route.messages.action.ang-gui-gui",
       "source": "app/(app)/messages/page.jsx",
-      "line": 210,
+      "line": 231,
       "label": "Đang gửi… / Gửi",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -669,7 +669,7 @@
     {
       "elementId": "route.settings.action.khoa-mo",
       "source": "app/(app)/settings/page.jsx",
-      "line": 71,
+      "line": 72,
       "label": "Khóa / Mở",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -681,7 +681,7 @@
     {
       "elementId": "route.settings.action.delkey-k",
       "source": "app/(app)/settings/page.jsx",
-      "line": 72,
+      "line": 73,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -693,7 +693,7 @@
     {
       "elementId": "route.settings.action.tao-key",
       "source": "app/(app)/settings/page.jsx",
-      "line": 80,
+      "line": 81,
       "label": "Tạo key",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -705,7 +705,7 @@
     {
       "elementId": "route.settings.action.tat-bat",
       "source": "app/(app)/settings/page.jsx",
-      "line": 91,
+      "line": 92,
       "label": "Tắt / Bật",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -717,7 +717,7 @@
     {
       "elementId": "route.settings.action.them",
       "source": "app/(app)/settings/page.jsx",
-      "line": 100,
+      "line": 101,
       "label": "Thêm",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -729,7 +729,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 248,
+      "line": 249,
       "label": "Lưu & gửi email thử tới chính hộp thư này",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -741,7 +741,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 262,
+      "line": 263,
       "label": "Lưu cài đặt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -975,6 +975,18 @@
       "loadingState": "async-button-guard",
       "successState": "hook-refresh",
       "errorState": "hook-error-toast",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-ceo-ceofederationpolicy.action.toggle",
+      "source": "components/ceo/CeoFederationPolicy.jsx",
+      "line": 69,
+      "label": "",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
       "confirmationState": "not-required",
       "status": "verified"
     },

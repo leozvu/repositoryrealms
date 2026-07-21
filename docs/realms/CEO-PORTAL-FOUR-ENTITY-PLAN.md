@@ -262,6 +262,8 @@ Implementation status: code complete on `codex/realms-demo` with an explicitly s
 
 ### CEO-7 — Realm federation
 
+Implementation status: code complete on `codex/realms-demo` with a four-kingdom world map, CEO-3 SSO gateways, double-consent ephemeral presence, per-entity degradation and explicit record-access boundaries. Scope migration, credentials, policy enablement and deployment remain on HOLD behind CEO-0 and CEO-9. See `CEO-7-REALM-FEDERATION.md`.
+
 - Each company remains a separate Realm/kingdom.
 - CEO portal can show a world map with four gateways.
 - Entering a gateway performs SSO into that entity.

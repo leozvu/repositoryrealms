@@ -10,14 +10,14 @@ route.automation.action.tat-bat,app/(app)/automation/page.jsx,126,Tắt / Bật,
 route.ceo-commands.form-submit.command,app/(app)/ceo-commands/page.jsx,208,COMMAND / * / — / *,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.ceo-commands.action.button,app/(app)/ceo-commands/page.jsx,246,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.ceo-commands.action.reconcile-delivery,app/(app)/ceo-commands/page.jsx,262,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.ceo-inbox.action.sync,app/(app)/ceo-inbox/page.jsx,145,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.ceo-inbox.form-submit.form,app/(app)/ceo-inbox/page.jsx,153,—,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.ceo-inbox.action.button,app/(app)/ceo-inbox/page.jsx,158,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.ceo-inbox.action.refresh,app/(app)/ceo-inbox/page.jsx,170,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.ceo-inbox.action.reconcile-message,app/(app)/ceo-inbox/page.jsx,173,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.ceo-inbox.action.button.2,app/(app)/ceo-inbox/page.jsx,175,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.ceo-inbox.form-submit.send,app/(app)/ceo-inbox/page.jsx,175,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.ceo-overview.action.refresh-filter,app/(app)/ceo-overview/page.jsx,180,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-inbox.action.sync,app/(app)/ceo-inbox/page.jsx,149,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-inbox.form-submit.form,app/(app)/ceo-inbox/page.jsx,157,—,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.ceo-inbox.action.button,app/(app)/ceo-inbox/page.jsx,162,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.ceo-inbox.action.refresh,app/(app)/ceo-inbox/page.jsx,174,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-inbox.action.reconcile-message,app/(app)/ceo-inbox/page.jsx,177,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.ceo-inbox.action.button.2,app/(app)/ceo-inbox/page.jsx,179,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.ceo-inbox.form-submit.send,app/(app)/ceo-inbox/page.jsx,179,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.ceo-overview.action.refresh-filter,app/(app)/ceo-overview/page.jsx,181,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.activateidentity,app/(app)/ceo-registry/page.jsx,301,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.stepupidentity,app/(app)/ceo-registry/page.jsx,319,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.rotaterecoverycodes,app/(app)/ceo-registry/page.jsx,320,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
@@ -41,9 +41,9 @@ route.invoices.action.ang-tao-tao-hoa-on-nhap,app/(app)/invoices/page.jsx,78,Đa
 route.invoices.action.sinh-hoa-on-ky-toi-thang-sau,app/(app)/invoices/page.jsx,195,Sinh hóa đơn kỳ tới (tháng sau),data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.leads.action.chuyen-thanh-khach-hang,app/(app)/leads/page.jsx,258,Chuyển thành khách hàng,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.messages.action.bat-au,app/(app)/messages/page.jsx,32,Bắt đầu,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.messages.action.ngung-chia-se-voi-ceo-portal-chia-se-voi-ceo-portal,app/(app)/messages/page.jsx,150,Ngừng chia sẻ với CEO Portal / Chia sẻ với CEO Portal,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.messages.form-submit.ang-gui-gui,app/(app)/messages/page.jsx,208,Đang gửi… / Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.messages.action.ang-gui-gui,app/(app)/messages/page.jsx,210,Đang gửi… / Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.messages.action.ngung-chia-se-voi-ceo-portal-chia-se-voi-ceo-portal,app/(app)/messages/page.jsx,165,Ngừng chia sẻ với CEO Portal / Chia sẻ với CEO Portal,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.messages.form-submit.ang-gui-gui,app/(app)/messages/page.jsx,229,Đang gửi… / Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.messages.action.ang-gui-gui,app/(app)/messages/page.jsx,231,Đang gửi… / Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.myday.action.ang-cap-nhat,app/(app)/myday/page.jsx,88,Đang cập nhật…,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.myday.form-submit.so-gio-uoc-luong-nhom-cong-viec-o-phuc-tap-ghi-chu-pham-vi-khong,app/(app)/myday/page.jsx,111,Số giờ ước lượng / Nhóm công việc / Độ phức tạp / Ghi chú phạm vi (không bắt buộc) / Hủy / Đang lưu… / Lưu estimate có receipt,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
 route.myday.action.ang-luu-luu-estimate-co-receipt,app/(app)/myday/page.jsx,119,Đang lưu… / Lưu estimate có receipt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
@@ -53,13 +53,13 @@ route.resources.action.gan,app/(app)/resources/page.jsx,174,Gán,data-action,asy
 route.reviews.action.gui-tu-anh-gia,app/(app)/reviews/page.jsx,40,Gửi tự đánh giá,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.reviews.action.chot-anh-gia,app/(app)/reviews/page.jsx,44,Chốt đánh giá,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.reviews.action.mo-ot-anh-gia-q,app/(app)/reviews/page.jsx,110,Mở đợt đánh giá / {q},data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
-route.settings.action.khoa-mo,app/(app)/settings/page.jsx,71,Khóa / Mở,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.settings.action.delkey-k,app/(app)/settings/page.jsx,72,,data-action,async-button-guard,toast-or-state,handled-candidate,confirmed,verified
-route.settings.action.tao-key,app/(app)/settings/page.jsx,80,Tạo key,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.settings.action.tat-bat,app/(app)/settings/page.jsx,91,Tắt / Bật,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
-route.settings.action.them,app/(app)/settings/page.jsx,100,Thêm,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
-route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay,app/(app)/settings/page.jsx,248,Lưu & gửi email thử tới chính hộp thư này,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.settings.action.luu-cai-at,app/(app)/settings/page.jsx,262,Lưu cài đặt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.khoa-mo,app/(app)/settings/page.jsx,72,Khóa / Mở,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.delkey-k,app/(app)/settings/page.jsx,73,,data-action,async-button-guard,toast-or-state,handled-candidate,confirmed,verified
+route.settings.action.tao-key,app/(app)/settings/page.jsx,81,Tạo key,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.tat-bat,app/(app)/settings/page.jsx,92,Tắt / Bật,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
+route.settings.action.them,app/(app)/settings/page.jsx,101,Thêm,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
+route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay,app/(app)/settings/page.jsx,249,Lưu & gửi email thử tới chính hộp thư này,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.luu-cai-at,app/(app)/settings/page.jsx,263,Lưu cài đặt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.staff.action.luu,app/(app)/staff/page.jsx,22,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.ang-luu-luu,app/(app)/tasks/page.jsx,71,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.ghi-gio,app/(app)/tasks/page.jsx,141,Ghi giờ,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
@@ -79,6 +79,7 @@ route.tickets.action.anh-dau-a-xu-ly,app/(app)/tickets/page.jsx,134,Đánh dấu
 route.vendors.action.luu,app/(app)/vendors/page.jsx,19,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 component.components-activities.action.them-hoat-ong,components/Activities.jsx,36,Thêm hoạt động,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 component.components-activities.action.update-a-id-done-a-done,components/Activities.jsx,46,,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
+component.components-ceo-ceofederationpolicy.action.toggle,components/ceo/CeoFederationPolicy.jsx,69,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-doceditor.action.luu-hoa-on-bao-gia,components/DocEditor.jsx,60,Lưu / hóa đơn / báo giá,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 component.components-doclinks.action.gan,components/DocLinks.jsx,36,Gắn,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 component.components-realm-realmcreateactiondialog.action.gui-war-council-note,components/realm/RealmCreateActionDialog.jsx,49,Gửi War Council note,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified

@@ -58,6 +58,19 @@ test('the product Realm uses the original ERP authentication boundary', async ({
   expect(response.headers().location).toBe('/login');
 });
 
+test('CEO Realm federation preserves the ERP and Director authentication boundary', async ({ request }) => {
+  const page = await request.get('/ceo-world', { maxRedirects: 0 });
+  expect(page.status()).toBe(307);
+  expect(page.headers().location).toBe('/login');
+
+  for (const route of ['/api/ceo/v1/federation/world', '/api/ceo/v1/federation/presence', '/api/ceo/v1/federation/policy']) {
+    const response = await request.get(route);
+    expect(response.status()).toBe(401);
+    expect(response.headers()['cache-control']).toContain('no-store');
+    expect((await response.json()).code).toBe('unauthorized');
+  }
+});
+
 test('cross-surface collaboration APIs preserve the ERP authentication boundary', async ({ request }) => {
   for (const route of ['/api/collaboration/presence', '/api/collaboration/contact', '/api/realm-demo/command-center', '/api/realm-demo/chronicle', '/api/realm-demo/pilot', '/api/realm-demo/feedback', '/api/realm-demo/readiness', '/api/realm-demo/experience', '/api/realm-demo/release-candidate']) {
     const response = await request.get(route);

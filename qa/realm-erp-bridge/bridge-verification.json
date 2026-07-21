@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 54,
-    "mappedNavigationRoutes": 54,
-    "verifiedNavigationRoutes": 54,
+    "erpNavigationRoutes": 55,
+    "mappedNavigationRoutes": 55,
+    "verifiedNavigationRoutes": 55,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -760,6 +760,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/ceo-overview/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "ceo-world",
+      "erpLabel": "CEO · Bản đồ 4 vương quốc",
+      "realmLabel": "Realm Federation Atlas",
+      "realmSurface": "Bản đồ bốn vương quốc",
+      "group": "Công ty",
+      "href": "/ceo-world",
+      "icon": "link",
+      "roles": "DIRECTOR only",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/ceo-world/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

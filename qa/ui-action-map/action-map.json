@@ -228,6 +228,7 @@
             "apiUser"
           ],
           "statuses": [
+            400,
             401,
             403,
             503
@@ -520,6 +521,112 @@
             404
           ],
           "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/federation/policy",
+      "source": "app/api/ceo/v1/federation/policy/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "Setting"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "PUT": {
+          "models": [
+            "AuditLog",
+            "Setting"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            409,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/federation/presence",
+      "source": "app/api/ceo/v1/federation/presence/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoEntityDirectoryProfile",
+            "CollaborationPresenceSession",
+            "Setting"
+          ],
+          "roles": [],
+          "guards": [
+            "apiUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/federation/world",
+      "source": "app/api/ceo/v1/federation/world/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "AuditLog",
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoPortalSession"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            409,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
           "usesModuleGuard": false,
           "hasErrorHandling": true
         }
@@ -1102,6 +1209,7 @@
             "isDirector"
           ],
           "statuses": [
+            400,
             401,
             403,
             404,
@@ -1223,6 +1331,7 @@
             "apiUser"
           ],
           "statuses": [
+            400,
             401,
             403,
             503
@@ -11665,7 +11774,7 @@
     {
       "elementId": "route.ceo-inbox.action.sync",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 145,
+      "line": 149,
       "column": 148,
       "surface": "route.ceo-inbox",
       "tag": "AsyncButton",
@@ -11735,7 +11844,7 @@
     {
       "elementId": "route.ceo-inbox.navigation.api-ceo-v1-messaging-export",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 145,
+      "line": 149,
       "column": 283,
       "surface": "route.ceo-inbox",
       "tag": "a",
@@ -11793,7 +11902,7 @@
     {
       "elementId": "route.ceo-inbox.navigation.ceo-overview",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 145,
+      "line": 149,
       "column": 43,
       "surface": "route.ceo-inbox",
       "tag": "Link",
@@ -11851,7 +11960,7 @@
     {
       "elementId": "route.ceo-inbox.navigation.ceo-registry",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 148,
+      "line": 152,
       "column": 119,
       "surface": "route.ceo-inbox",
       "tag": "Link",
@@ -11909,7 +12018,7 @@
     {
       "elementId": "route.ceo-inbox.action.load",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 149,
+      "line": 153,
       "column": 78,
       "surface": "route.ceo-inbox",
       "tag": "button",
@@ -11986,7 +12095,7 @@
     {
       "elementId": "route.ceo-inbox.form-submit.form",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 153,
+      "line": 157,
       "column": 9,
       "surface": "route.ceo-inbox",
       "tag": "form",
@@ -12061,7 +12170,7 @@
     {
       "elementId": "route.ceo-inbox.form-control.select",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 155,
+      "line": 159,
       "column": 84,
       "surface": "route.ceo-inbox",
       "tag": "select",
@@ -12121,7 +12230,7 @@
     {
       "elementId": "route.ceo-inbox.form-control.select.2",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 156,
+      "line": 160,
       "column": 78,
       "surface": "route.ceo-inbox",
       "tag": "select",
@@ -12181,7 +12290,7 @@
     {
       "elementId": "route.ceo-inbox.form-control.select.3",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 157,
+      "line": 161,
       "column": 106,
       "surface": "route.ceo-inbox",
       "tag": "select",
@@ -12256,7 +12365,7 @@
     {
       "elementId": "route.ceo-inbox.action.button",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 158,
+      "line": 162,
       "column": 11,
       "surface": "route.ceo-inbox",
       "tag": "button",
@@ -12333,7 +12442,7 @@
     {
       "elementId": "route.ceo-inbox.action.setselectedid-conversation-id",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 162,
+      "line": 166,
       "column": 87,
       "surface": "route.ceo-inbox",
       "tag": "button",
@@ -12393,7 +12502,7 @@
     {
       "elementId": "route.ceo-inbox.action.refresh",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 170,
+      "line": 174,
       "column": 159,
       "surface": "route.ceo-inbox",
       "tag": "AsyncButton",
@@ -12473,7 +12582,7 @@
     {
       "elementId": "route.ceo-inbox.action.reconcile-message",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 173,
+      "line": 177,
       "column": 336,
       "surface": "route.ceo-inbox",
       "tag": "AsyncButton",
@@ -12548,7 +12657,7 @@
     {
       "elementId": "route.ceo-inbox.action.button.2",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 175,
+      "line": 179,
       "column": 312,
       "surface": "route.ceo-inbox",
       "tag": "button",
@@ -12635,7 +12744,7 @@
     {
       "elementId": "route.ceo-inbox.form-control.textarea",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 175,
+      "line": 179,
       "column": 144,
       "surface": "route.ceo-inbox",
       "tag": "textarea",
@@ -12695,7 +12804,7 @@
     {
       "elementId": "route.ceo-inbox.form-submit.send",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 175,
+      "line": 179,
       "column": 11,
       "surface": "route.ceo-inbox",
       "tag": "form",
@@ -12778,9 +12887,66 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.ceo-overview.navigation.ceo-commands",
+      "elementId": "route.ceo-overview.navigation.ceo-world",
       "source": "app/(app)/ceo-overview/page.jsx",
       "line": 178,
+      "column": 11,
+      "surface": "route.ceo-overview",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-world",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-world",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/dashboard/refresh'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoOverviewPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-overview.navigation.ceo-commands",
+      "source": "app/(app)/ceo-overview/page.jsx",
+      "line": 179,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -12837,7 +13003,7 @@
     {
       "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 179,
+      "line": 180,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -12894,7 +13060,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 180,
+      "line": 181,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -12961,7 +13127,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-all",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 193,
+      "line": 194,
       "column": 9,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -13020,7 +13186,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-entity-id",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 194,
+      "line": 195,
       "column": 40,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -13079,7 +13245,7 @@
     {
       "elementId": "route.ceo-overview.action.load-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 198,
+      "line": 199,
       "column": 111,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -13147,7 +13313,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-registry",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 210,
+      "line": 211,
       "column": 161,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13204,7 +13370,7 @@
     {
       "elementId": "route.ceo-overview.action.opendetail-entity-domain",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 262,
+      "line": 263,
       "column": 216,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -14596,6 +14762,503 @@
       "loadingState": "not-required",
       "successState": "not-required",
       "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-world.navigation.ceo-overview",
+      "source": "app/(app)/ceo-world/page.jsx",
+      "line": 96,
+      "column": 9,
+      "surface": "route.ceo-world",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-overview",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-overview",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/federation/world?entity=${encodeURIComponent(entityId)}`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorldPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-world.navigation.ceo-inbox",
+      "source": "app/(app)/ceo-world/page.jsx",
+      "line": 97,
+      "column": 9,
+      "surface": "route.ceo-world",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-inbox",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-inbox",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/federation/world?entity=${encodeURIComponent(entityId)}`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorldPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-world.action.load",
+      "source": "app/(app)/ceo-world/page.jsx",
+      "line": 98,
+      "column": 9,
+      "surface": "route.ceo-world",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => load()",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/federation/world?entity=${encodeURIComponent(entityId)}`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorldPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/federation/world?entity=*"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-world.navigation.ceo-registry",
+      "source": "app/(app)/ceo-world/page.jsx",
+      "line": 103,
+      "column": 148,
+      "surface": "route.ceo-world",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-registry",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/federation/world?entity=${encodeURIComponent(entityId)}`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorldPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-world.action.load.2",
+      "source": "app/(app)/ceo-world/page.jsx",
+      "line": 104,
+      "column": 82,
+      "surface": "route.ceo-world",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => load()",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/federation/world?entity=${encodeURIComponent(entityId)}`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoWorldPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/federation/world?entity=*"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-world.action.opengateway-kingdom",
+      "source": "app/(app)/ceo-world/page.jsx",
+      "line": 128,
+      "column": 13,
+      "surface": "route.ceo-world",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openGateway(kingdom)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!kingdom.gateway.available || Boolean(openingId)",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/federation/world?entity=${encodeURIComponent(entityId)}`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorldPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "openGateway"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/sso/authorize"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoSsoAuthorizationCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.location.assign"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-world.navigation.kingdom-chat-href",
+      "source": "app/(app)/ceo-world/page.jsx",
+      "line": 129,
+      "column": 13,
+      "surface": "route.ceo-world",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "kingdom.chat.href",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "kingdom.chat.href",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/federation/world?entity=${encodeURIComponent(entityId)}`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorldPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-world.action.load-kingdom-id",
+      "source": "app/(app)/ceo-world/page.jsx",
+      "line": 130,
+      "column": 55,
+      "surface": "route.ceo-world",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => load(kingdom.id)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET `/api/ceo/v1/federation/world?entity=${encodeURIComponent(entityId)}`",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoWorldPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/federation/world?entity=*"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
       "confirmationState": "not-required",
       "uxStateCandidates": []
     },
@@ -25112,6 +25775,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25128,7 +25792,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/messages/page.jsx",
-          "line": 216,
+          "line": 237,
           "surface": "route:/messages",
           "apiCalls": [],
           "resourceOperations": [],
@@ -25186,6 +25850,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25206,7 +25871,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/messages/page.jsx",
-          "line": 216,
+          "line": 237,
           "surface": "route:/messages",
           "apiCalls": [],
           "resourceOperations": [],
@@ -25219,7 +25884,7 @@
         {
           "callback": "onCreated",
           "source": "app/(app)/messages/page.jsx",
-          "line": 216,
+          "line": 237,
           "surface": "route:/messages",
           "apiCalls": [
             "GET /api/chat"
@@ -25292,6 +25957,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25348,6 +26014,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25404,6 +26071,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25462,6 +26130,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25498,7 +26167,7 @@
     {
       "elementId": "route.messages.action.ngung-chia-se-voi-ceo-portal-chia-se-voi-ceo-portal",
       "source": "app/(app)/messages/page.jsx",
-      "line": 150,
+      "line": 165,
       "column": 34,
       "surface": "route.messages",
       "tag": "button",
@@ -25520,6 +26189,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25564,7 +26234,7 @@
     {
       "elementId": "route.messages.action.moi",
       "source": "app/(app)/messages/page.jsx",
-      "line": 151,
+      "line": 166,
       "column": 13,
       "surface": "route.messages",
       "tag": "button",
@@ -25586,6 +26256,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25618,9 +26289,78 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "route.messages.form-control.input",
+      "source": "app/(app)/messages/page.jsx",
+      "line": 171,
+      "column": 15,
+      "surface": "route.messages",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!directoryProfile.sharedWithCeoPortal || directorySaving",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "POST '/api/chat'",
+        "GET '/api/chat'",
+        "GET `/api/chat/${id}`",
+        "GET '/api/ceo/v1/directory/profile'",
+        "GET url",
+        "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
+        "PUT '/api/ceo/v1/directory/profile'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "MessagesPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "togglePresenceShare"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "PUT /api/ceo/v1/directory/profile"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityDirectoryProfile",
+        "User"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "authenticated-custom"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "route.messages.action.button",
       "source": "app/(app)/messages/page.jsx",
-      "line": 156,
+      "line": 177,
       "column": 15,
       "surface": "route.messages",
       "tag": "button",
@@ -25642,6 +26382,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25676,7 +26417,7 @@
     {
       "elementId": "route.messages.action.button.2",
       "source": "app/(app)/messages/page.jsx",
-      "line": 179,
+      "line": 200,
       "column": 17,
       "surface": "route.messages",
       "tag": "button",
@@ -25698,6 +26439,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25732,7 +26474,7 @@
     {
       "elementId": "route.messages.action.ong",
       "source": "app/(app)/messages/page.jsx",
-      "line": 186,
+      "line": 207,
       "column": 17,
       "surface": "route.messages",
       "tag": "button",
@@ -25754,6 +26496,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25788,7 +26531,7 @@
     {
       "elementId": "route.messages.form-submit.ang-gui-gui",
       "source": "app/(app)/messages/page.jsx",
-      "line": 208,
+      "line": 229,
       "column": 15,
       "surface": "route.messages",
       "tag": "form",
@@ -25810,6 +26553,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25859,9 +26603,9 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.messages.form-control.input",
+      "elementId": "route.messages.form-control.input.2",
       "source": "app/(app)/messages/page.jsx",
-      "line": 209,
+      "line": 230,
       "column": 17,
       "surface": "route.messages",
       "tag": "input",
@@ -25883,6 +26627,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -25919,7 +26664,7 @@
     {
       "elementId": "route.messages.action.ang-gui-gui",
       "source": "app/(app)/messages/page.jsx",
-      "line": 210,
+      "line": 231,
       "column": 17,
       "surface": "route.messages",
       "tag": "button",
@@ -25941,6 +26686,7 @@
         "GET '/api/ceo/v1/directory/profile'",
         "GET url",
         "POST `/api/chat/${sel}`",
+        "PUT '/api/ceo/v1/directory/profile'",
         "PUT '/api/ceo/v1/directory/profile'"
       ],
       "routeCandidates": [],
@@ -31297,7 +32043,7 @@
     {
       "elementId": "route.settings.action.khoa-mo",
       "source": "app/(app)/settings/page.jsx",
-      "line": 71,
+      "line": 72,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -31372,7 +32118,7 @@
     {
       "elementId": "route.settings.action.delkey-k",
       "source": "app/(app)/settings/page.jsx",
-      "line": 72,
+      "line": 73,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -31447,7 +32193,7 @@
     {
       "elementId": "route.settings.form-control.ten-key-vd-n8n-zapier",
       "source": "app/(app)/settings/page.jsx",
-      "line": 76,
+      "line": 77,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -31513,7 +32259,7 @@
     {
       "elementId": "route.settings.form-control.ctrl-click-chon-nhieu-vai-tro",
       "source": "app/(app)/settings/page.jsx",
-      "line": 77,
+      "line": 78,
       "column": 13,
       "surface": "route.settings",
       "tag": "select",
@@ -31579,7 +32325,7 @@
     {
       "elementId": "route.settings.action.tao-key",
       "source": "app/(app)/settings/page.jsx",
-      "line": 80,
+      "line": 81,
       "column": 13,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -31656,7 +32402,7 @@
     {
       "elementId": "route.settings.action.tat-bat",
       "source": "app/(app)/settings/page.jsx",
-      "line": 91,
+      "line": 92,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -31756,7 +32502,7 @@
     {
       "elementId": "route.settings.action.setdeletewebhook-h",
       "source": "app/(app)/settings/page.jsx",
-      "line": 92,
+      "line": 93,
       "column": 15,
       "surface": "route.settings",
       "tag": "button",
@@ -31820,7 +32566,7 @@
     {
       "elementId": "route.settings.form-control.https-url-nhan-webhook",
       "source": "app/(app)/settings/page.jsx",
-      "line": 96,
+      "line": 97,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -31886,7 +32632,7 @@
     {
       "elementId": "route.settings.form-control.su-kien-mac-inh",
       "source": "app/(app)/settings/page.jsx",
-      "line": 98,
+      "line": 99,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -31952,7 +32698,7 @@
     {
       "elementId": "route.settings.form-control.secret-tuy-chon",
       "source": "app/(app)/settings/page.jsx",
-      "line": 99,
+      "line": 100,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -32018,7 +32764,7 @@
     {
       "elementId": "route.settings.action.them",
       "source": "app/(app)/settings/page.jsx",
-      "line": 100,
+      "line": 101,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -32120,7 +32866,7 @@
     {
       "elementId": "route.settings.action.copy-ong",
       "source": "app/(app)/settings/page.jsx",
-      "line": 107,
+      "line": 108,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -32186,7 +32932,7 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 150,
+      "line": 151,
       "column": 7,
       "surface": "route.settings",
       "tag": "input",
@@ -32252,7 +32998,7 @@
     {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 182,
+      "line": 183,
       "column": 17,
       "surface": "route.settings",
       "tag": "input",
@@ -32318,7 +33064,7 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 191,
+      "line": 192,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -32384,7 +33130,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 207,
+      "line": 208,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -32448,7 +33194,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 210,
+      "line": 211,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -32512,7 +33258,7 @@
     {
       "elementId": "route.settings.form-control.input.4",
       "source": "app/(app)/settings/page.jsx",
-      "line": 220,
+      "line": 221,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -32578,7 +33324,7 @@
     {
       "elementId": "route.settings.form-control.input.5",
       "source": "app/(app)/settings/page.jsx",
-      "line": 244,
+      "line": 245,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -32644,7 +33390,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 248,
+      "line": 249,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -32721,7 +33467,7 @@
     {
       "elementId": "route.settings.form-control.sk-or-v1-tao-tai-openrouter-ai-keys",
       "source": "app/(app)/settings/page.jsx",
-      "line": 258,
+      "line": 259,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -32787,7 +33533,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 262,
+      "line": 263,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -32860,7 +33606,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 279,
+      "line": 281,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -32926,7 +33672,7 @@
     {
       "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 282,
+      "line": 284,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -45430,6 +46176,127 @@
       "localMutations": [],
       "loadingState": "not-required",
       "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-ceo-ceofederationpolicy.action.load",
+      "source": "components/ceo/CeoFederationPolicy.jsx",
+      "line": 68,
+      "column": 80,
+      "surface": "component.components-ceo-ceofederationpolicy",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/federation/policy'",
+        "PUT '/api/ceo/v1/federation/policy'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoFederationPolicy",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/federation/policy"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "Setting"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "component.components-ceo-ceofederationpolicy.action.toggle",
+      "source": "components/ceo/CeoFederationPolicy.jsx",
+      "line": 69,
+      "column": 7,
+      "surface": "component.components-ceo-ceofederationpolicy",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "toggle",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!policy",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/federation/policy'",
+        "PUT '/api/ceo/v1/federation/policy'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoFederationPolicy",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "toggle"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "PUT /api/ceo/v1/federation/policy"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "Setting"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
       "errorState": "handled-candidate",
       "confirmationState": "not-required",
       "uxStateCandidates": []
@@ -67625,6 +68492,7 @@
         "openDetail",
         "openEditor",
         "openEntity",
+        "openGateway",
         "openRecord",
         "openRound",
         "payNow",
@@ -67789,7 +68657,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-inbox/page.jsx",
-          "line": 145,
+          "line": 149,
           "surface": "route:/ceo-inbox",
           "apiCalls": [
             "POST /api/ceo/v1/messaging/directory"
@@ -67804,7 +68672,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-inbox/page.jsx",
-          "line": 170,
+          "line": 174,
           "surface": "route:/ceo-inbox",
           "apiCalls": [
             "GET /api/ceo/v1/identity/session",
@@ -67828,7 +68696,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-inbox/page.jsx",
-          "line": 173,
+          "line": 177,
           "surface": "route:/ceo-inbox",
           "apiCalls": [
             "GET /api/ceo/v1/messaging/conversations/*",
@@ -67845,7 +68713,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 180,
+          "line": 181,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/dashboard/refresh"
@@ -67861,7 +68729,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 262,
+          "line": 263,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/sso/authorize"
@@ -68001,6 +68869,59 @@
           "routeTargets": [],
           "helperCalls": [],
           "localState": []
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-world/page.jsx",
+          "line": 98,
+          "surface": "route:/ceo-world",
+          "apiCalls": [
+            "GET /api/ceo/v1/federation/world?entity=*"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setError",
+            "setForbidden",
+            "setLoading",
+            "setWorld"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-world/page.jsx",
+          "line": 128,
+          "surface": "route:/ceo-world",
+          "apiCalls": [
+            "POST /api/ceo/v1/sso/authorize"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [
+            "body.destination"
+          ],
+          "helperCalls": [],
+          "localState": [
+            "setOpeningId"
+          ]
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/ceo-world/page.jsx",
+          "line": 130,
+          "surface": "route:/ceo-world",
+          "apiCalls": [
+            "GET /api/ceo/v1/federation/world?entity=*"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setError",
+            "setForbidden",
+            "setLoading",
+            "setWorld"
+          ]
         },
         {
           "callback": "onClick",
@@ -68234,7 +69155,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 71,
+          "line": 72,
           "surface": "route:/settings",
           "apiCalls": [
             "GET /api/apikeys",
@@ -68248,7 +69169,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 72,
+          "line": 73,
           "surface": "route:/settings",
           "apiCalls": [
             "DELETE /api/apikeys",
@@ -68262,7 +69183,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 80,
+          "line": 81,
           "surface": "route:/settings",
           "apiCalls": [
             "GET /api/apikeys",
@@ -68279,7 +69200,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 91,
+          "line": 92,
           "surface": "route:/settings",
           "apiCalls": [
             "PUT /api/data/webhooks/[id]"
@@ -68294,7 +69215,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 100,
+          "line": 101,
           "surface": "route:/settings",
           "apiCalls": [
             "POST /api/data/webhooks"
@@ -68313,7 +69234,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 248,
+          "line": 249,
           "surface": "route:/settings",
           "apiCalls": [
             "POST /api/email/send",
@@ -68327,7 +69248,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 262,
+          "line": 263,
           "surface": "route:/settings",
           "apiCalls": [
             "PUT /api/settings"
@@ -68463,6 +69384,22 @@
           "routeTargets": [],
           "helperCalls": [],
           "localState": []
+        },
+        {
+          "callback": "onClick",
+          "source": "components/ceo/CeoFederationPolicy.jsx",
+          "line": 69,
+          "surface": "component:ceo/CeoFederationPolicy",
+          "apiCalls": [
+            "PUT /api/ceo/v1/federation/policy"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": [
+            "setError",
+            "setPolicy"
+          ]
         },
         {
           "callback": "onClick",
@@ -68867,6 +69804,7 @@
         "component:DocEditor",
         "component:DocLinks",
         "component:Shell",
+        "component:ceo/CeoFederationPolicy",
         "component:realm/RealmCreateActionDialog",
         "component:realm/RealmFeedbackOperations",
         "component:realm/RealmPilotControl",
@@ -68878,6 +69816,7 @@
         "route:/ceo-inbox",
         "route:/ceo-overview",
         "route:/ceo-registry",
+        "route:/ceo-world",
         "route:/commissions",
         "route:/freelancer",
         "route:/freelancers",
@@ -68901,6 +69840,7 @@
         "DELETE /api/apikeys",
         "DYNAMIC /api/users/2fa",
         "GET /api/apikeys",
+        "GET /api/ceo/v1/federation/world?entity=*",
         "GET /api/ceo/v1/identity/session",
         "GET /api/ceo/v1/messaging/conversations",
         "GET /api/ceo/v1/messaging/conversations/*",
@@ -68948,6 +69888,7 @@
         "POST /api/realm-demo/launch/approvals",
         "POST /api/realm-demo/pilot/rehearsal",
         "PUT /api/apikeys",
+        "PUT /api/ceo/v1/federation/policy",
         "PUT /api/data/activities/[id]",
         "PUT /api/data/attendance/[id]",
         "PUT /api/data/commissions/[id]",
@@ -69293,7 +70234,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/settings/page.jsx",
-          "line": 106,
+          "line": 107,
           "surface": "route:/settings",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69815,7 +70756,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/settings/page.jsx",
-          "line": 106,
+          "line": 107,
           "surface": "route:/settings",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70590,7 +71531,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/settings/page.jsx",
-          "line": 112,
+          "line": 113,
           "surface": "route:/settings",
           "apiCalls": [],
           "resourceOperations": [],
@@ -71884,7 +72825,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/settings/page.jsx",
-          "line": 112,
+          "line": 113,
           "surface": "route:/settings",
           "apiCalls": [],
           "resourceOperations": [],
@@ -71897,7 +72838,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/settings/page.jsx",
-          "line": 112,
+          "line": 113,
           "surface": "route:/settings",
           "apiCalls": [
             "DELETE /api/data/webhooks/[id]"
@@ -83079,31 +84020,31 @@
     }
   ],
   "summary": {
-    "elements": 868,
-    "apiContracts": 104,
+    "elements": 880,
+    "apiContracts": 107,
     "registryResources": 50,
     "byActionType": {
       "local-state": 237,
-      "data-action": 152,
-      "form-control": 281,
+      "data-action": 157,
+      "form-control": 282,
       "delegated-action": 84,
-      "navigation": 79,
+      "navigation": 85,
       "browser-action": 27,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 586,
+      "classified-local": 591,
       "delegated-resolved": 46,
-      "handler-resolved": 152,
+      "handler-resolved": 159,
       "delegated": 84
     },
     "byConfidence": {
-      "high": 822,
+      "high": 834,
       "medium": 46
     },
     "uxStateCandidates": {},
-    "dataActions": 152,
-    "delegatedBindings": 1118,
+    "dataActions": 157,
+    "delegatedBindings": 1122,
     "actionableUnresolved": 0
   }
 }

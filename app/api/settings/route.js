@@ -61,6 +61,8 @@ export async function PUT(req) {
     else delete next.realmPilotRehearsal;
     if (current.realmExperienceTelemetry) next.realmExperienceTelemetry = current.realmExperienceTelemetry;
     else delete next.realmExperienceTelemetry;
+    if (current.ceoFederation) next.ceoFederation = current.ceoFederation;
+    else delete next.ceoFederation;
     const json = JSON.stringify(next);
     await tx.setting.upsert({ where: { id: 1 }, create: { id: 1, json }, update: { json } });
     await tx.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'settings', detail: 'Cập nhật cài đặt công ty' } });

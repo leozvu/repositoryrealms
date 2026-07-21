@@ -140,6 +140,21 @@ export default function MessagesPage() {
     } finally { setDirectorySaving(false); }
   };
 
+  const togglePresenceShare = async () => {
+    if (!directoryProfile?.sharedWithCeoPortal || directorySaving) return;
+    setDirectorySaving(true);
+    try {
+      const response = await fetch('/api/ceo/v1/directory/profile', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sharedWithCeoPortal: true, sharePresence: !directoryProfile.sharePresence }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) return toast(body.error || 'Không thể cập nhật chia sẻ presence', 'error');
+      setDirectoryProfile(body.profile);
+      toast(body.profile.sharePresence ? 'Đã cho phép CEO Portal thấy khi bạn đang online' : 'Đã ngừng chia sẻ trạng thái online');
+    } finally { setDirectorySaving(false); }
+  };
+
   return (
     <>
       <div className={`chat-wrap ${sel ? 'thread-open' : ''}`}>
@@ -150,7 +165,13 @@ export default function MessagesPage() {
             {directoryProfile && <button type="button" className="btn btn-outline btn-sm" disabled={directorySaving} aria-pressed={directoryProfile.sharedWithCeoPortal} onClick={toggleDirectoryShare} title="Hồ sơ danh bạ chỉ gồm tên, email và chức danh; không gồm lương hay dữ liệu hiệu suất.">{directoryProfile.sharedWithCeoPortal ? 'Ngừng chia sẻ với CEO Portal' : 'Chia sẻ với CEO Portal'}</button>}
             <button className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}><Icon name="plus" size={13} /> Mới</button>
           </div>
-          {directoryProfile && <p style={{ margin: '0 12px 8px', color: 'var(--muted)', fontSize: '.72rem', lineHeight: 1.45 }}>Hồ sơ danh bạ chỉ gồm tên, email và chức danh; không gồm lương hay dữ liệu hiệu suất.</p>}
+          {directoryProfile && <div style={{ margin: '0 12px 9px', display: 'grid', gap: 7, color: 'var(--muted)', fontSize: '.72rem', lineHeight: 1.45 }}>
+            <p>Hồ sơ danh bạ chỉ gồm tên, email và chức danh; không gồm lương hay dữ liệu hiệu suất.</p>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, minHeight: 44, padding: '8px 10px', border: '1px solid var(--border)', borderRadius: 8, cursor: directoryProfile.sharedWithCeoPortal ? 'pointer' : 'not-allowed', opacity: directoryProfile.sharedWithCeoPortal ? 1 : .55 }}>
+              <input type="checkbox" style={{ width: 'auto', marginTop: 2 }} checked={directoryProfile.sharePresence} disabled={!directoryProfile.sharedWithCeoPortal || directorySaving} onChange={togglePresenceShare} />
+              <span><b style={{ color: 'var(--fg)' }}>Chia sẻ presence tự nguyện</b><br />Chỉ gửi trạng thái online hiện tại; không gửi thời lượng, công việc, Gold hay dữ liệu chấm năng suất.</span>
+            </label>
+          </div>}
           <div className="chat-list-body">
             {convs.map(c => (
               <button key={c.id} className={`chat-item ${sel === c.id ? 'active' : ''}`} onClick={() => setSel(c.id)}>

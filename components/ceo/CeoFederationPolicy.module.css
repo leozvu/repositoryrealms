@@ -1,0 +1,17 @@
+.card { overflow: hidden; }
+.head { display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: var(--on-primary); }
+.icon { display: grid; width: 44px; height: 44px; flex: 0 0 44px; place-items: center; border: 1px solid rgba(255,255,255,.38); border-radius: 11px; background: rgba(255,255,255,.1); }
+.head p { margin: 0 0 3px; color: #f1cc70; font-size: .66rem; font-weight: 800; letter-spacing: .1em; }
+.head h2 { margin: 0; font-family: var(--font-display); font-size: 1rem; }
+.body { display: grid; gap: 13px; padding: 16px; }
+.body > p { color: var(--muted); font-size: .78rem; line-height: 1.6; }
+.state { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid; border-radius: 10px; }
+.state span { display: grid; gap: 3px; }
+.state strong { font-size: .8rem; }
+.state small, .body > small { color: var(--muted); font-size: .68rem; line-height: 1.5; }
+.enabled { border-color: #8ebba0; color: #17603f; background: var(--info-soft); }
+.disabled { border-color: #d4bd83; color: #73531d; background: var(--warn-soft); }
+.error { display: flex; align-items: center; gap: 8px; padding: 10px; border: 1px solid #efaaaa; border-radius: 8px; color: #8f1d1d; background: var(--danger-soft); font-size: .74rem; }
+.error span { flex: 1; }
+.error button, .body > button { min-height: 44px; justify-content: center; }
+@media (prefers-reduced-motion: reduce) { .card * { transition: none !important; animation: none !important; } }

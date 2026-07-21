@@ -81,6 +81,10 @@ export default function CeoInboxPage() {
   }, [c.loadError]);
 
   useEffect(() => { if (sessionStatus === 'authenticated') load(); }, [load, sessionStatus]);
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get('entity')?.trim().toLowerCase() || '';
+    if (requested && directory.some((profile) => profile.targetEntityId === requested)) setEntityId((current) => current || requested);
+  }, [directory]);
   useEffect(() => { if (selectedId) loadThread(selectedId); else setThread(null); }, [selectedId, loadThread]);
 
   const companies = useMemo(() => [...new Map(directory.map((profile) => [profile.targetEntityId, { id: profile.targetEntityId, name: profile.targetDisplayName }])).values()], [directory]);
