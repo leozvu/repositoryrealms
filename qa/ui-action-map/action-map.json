@@ -214,6 +214,93 @@
       }
     },
     {
+      "route": "/api/ceo/v1/capabilities",
+      "source": "app/api/ceo/v1/capabilities/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "Setting"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "apiUser"
+          ],
+          "statuses": [
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/health",
+      "source": "app/api/ceo/v1/health/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "Setting"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "apiUser"
+          ],
+          "statuses": [
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/snapshot",
+      "source": "app/api/ceo/v1/snapshot/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "Client",
+            "Invoice",
+            "Lead",
+            "LiveSession",
+            "Project",
+            "Setting",
+            "Shipment",
+            "StockLot",
+            "Task",
+            "Ticket",
+            "Transaction",
+            "User",
+            "VendorBill"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "apiUser"
+          ],
+          "statuses": [
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/chat",
       "source": "app/api/chat/route.js",
       "methods": {
@@ -76166,7 +76253,7 @@
   ],
   "summary": {
     "elements": 791,
-    "apiContracts": 72,
+    "apiContracts": 75,
     "registryResources": 50,
     "byActionType": {
       "local-state": 230,

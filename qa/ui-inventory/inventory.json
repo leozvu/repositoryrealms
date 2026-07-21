@@ -1548,6 +1548,33 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/api/ceo/v1/capabilities",
+      "source": "app/api/ceo/v1/capabilities/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/health",
+      "source": "app/api/ceo/v1/health/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/snapshot",
+      "source": "app/api/ceo/v1/snapshot/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/api/chat",
       "source": "app/api/chat/route.js",
       "dynamic": false,
@@ -25150,7 +25177,7 @@
   ],
   "summary": {
     "uiRoutes": 57,
-    "apiRoutes": 72,
+    "apiRoutes": 75,
     "interactiveElements": 791,
     "sourceFilesWithInteractions": 85,
     "routesInPrimaryNavigation": 53,
