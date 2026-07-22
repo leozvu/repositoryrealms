@@ -1053,7 +1053,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -1546,6 +1545,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -1559,7 +1559,7 @@
       "dynamic": false,
       "auth": "authenticated",
       "inNavigation": true,
-      "navLabel": "Điều phối công việc",
+      "navLabel": "Quản lý công việc",
       "navSection": "Vận hành",
       "roles": [
         "DIRECTOR",
@@ -4031,16 +4031,80 @@
       ]
     },
     {
+      "elementId": "route.calendar.action.tuan",
+      "source": "app/(app)/calendar/page.jsx",
+      "line": 113,
+      "column": 11,
+      "surface": "route.calendar",
+      "tag": "button",
+      "kind": "action",
+      "label": "Tuần",
+      "handlerEvent": "onClick",
+      "handler": "() => setMode('week')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "activities",
+        "contracts",
+        "invoices",
+        "leaves",
+        "projects",
+        "tasks",
+        "users"
+      ],
+      "apiCandidates": [
+        "GET '/api/ics'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.calendar.action.thang",
+      "source": "app/(app)/calendar/page.jsx",
+      "line": 114,
+      "column": 11,
+      "surface": "route.calendar",
+      "tag": "button",
+      "kind": "action",
+      "label": "Tháng",
+      "handlerEvent": "onClick",
+      "handler": "() => setMode('month')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "activities",
+        "contracts",
+        "invoices",
+        "leaves",
+        "projects",
+        "tasks",
+        "users"
+      ],
+      "apiCandidates": [
+        "GET '/api/ics'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "route.calendar.action.button",
       "source": "app/(app)/calendar/page.jsx",
-      "line": 61,
+      "line": 116,
       "column": 9,
       "surface": "route.calendar",
       "tag": "button",
       "kind": "action",
       "label": "←",
       "handlerEvent": "onClick",
-      "handler": "() => go(-1)",
+      "handler": "() => mode === 'week' ? goWeek(-1) : goMonth(-1)",
       "target": "",
       "insideForm": false,
       "disabledBinding": "",
@@ -4065,14 +4129,14 @@
     {
       "elementId": "route.calendar.action.button.2",
       "source": "app/(app)/calendar/page.jsx",
-      "line": 63,
+      "line": 118,
       "column": 9,
       "surface": "route.calendar",
       "tag": "button",
       "kind": "action",
       "label": "→",
       "handlerEvent": "onClick",
-      "handler": "() => go(1)",
+      "handler": "() => mode === 'week' ? goWeek(1) : goMonth(1)",
       "target": "",
       "insideForm": false,
       "disabledBinding": "",
@@ -4097,14 +4161,14 @@
     {
       "elementId": "route.calendar.action.hom-nay",
       "source": "app/(app)/calendar/page.jsx",
-      "line": 64,
+      "line": 119,
       "column": 9,
       "surface": "route.calendar",
       "tag": "button",
       "kind": "action",
       "label": "Hôm nay",
       "handlerEvent": "onClick",
-      "handler": "() => { setY(now.getFullYear()); setM(now.getMonth()); }",
+      "handler": "goToday",
       "target": "",
       "insideForm": false,
       "disabledBinding": "",
@@ -4129,7 +4193,7 @@
     {
       "elementId": "route.calendar.action.link-ics",
       "source": "app/(app)/calendar/page.jsx",
-      "line": 65,
+      "line": 120,
       "column": 9,
       "surface": "route.calendar",
       "tag": "button",
@@ -4159,16 +4223,51 @@
       "uxRiskCandidates": []
     },
     {
+      "elementId": "route.calendar.action.setdaymodal-label-dow-i-fmtdm-d-evs",
+      "source": "app/(app)/calendar/page.jsx",
+      "line": 141,
+      "column": 19,
+      "surface": "route.calendar",
+      "tag": "div",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setDayModal({ label: `${DOW[i]} ${fmtDM(d)}`, evs })",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "activities",
+        "contracts",
+        "invoices",
+        "leaves",
+        "projects",
+        "tasks",
+        "users"
+      ],
+      "apiCandidates": [
+        "GET '/api/ics'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "clickable_non_semantic",
+        "keyboard_path_unverified"
+      ]
+    },
+    {
       "elementId": "route.calendar.action.d",
       "source": "app/(app)/calendar/page.jsx",
-      "line": 83,
-      "column": 13,
+      "line": 163,
+      "column": 15,
       "surface": "route.calendar",
       "tag": "div",
       "kind": "action",
       "label": "{d}",
       "handlerEvent": "onClick",
-      "handler": "() => setDayModal({ d, evs })",
+      "handler": "() => setDayModal({ label: `Ngày ${d}/${m + 1}/${y}`, evs })",
       "target": "",
       "insideForm": false,
       "disabledBinding": "",
@@ -13044,17 +13143,69 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.myday.navigation.mo-chi-tiet",
+      "elementId": "route.myday.action.ua-viec-len-mot-bac",
       "source": "app/(app)/myday/page.jsx",
-      "line": 85,
-      "column": 9,
+      "line": 97,
+      "column": 13,
+      "surface": "route.myday",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đưa việc lên một bậc",
+      "handlerEvent": "onClick",
+      "handler": "() => onNudge(task, index, index - 1)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "busy || index === 0",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/execution/my-work'",
+        "GET '/api/approvals'",
+        "POST '/api/execution/actions'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.myday.action.ua-viec-xuong-mot-bac",
+      "source": "app/(app)/myday/page.jsx",
+      "line": 98,
+      "column": 13,
+      "surface": "route.myday",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đưa việc xuống một bậc",
+      "handlerEvent": "onClick",
+      "handler": "() => onNudge(task, index, index + 1)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "busy || index === count - 1",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/execution/my-work'",
+        "GET '/api/approvals'",
+        "POST '/api/execution/actions'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.myday.navigation.mo-chi-tiet-viec",
+      "source": "app/(app)/myday/page.jsx",
+      "line": 102,
+      "column": 7,
       "surface": "route.myday",
       "tag": "Link",
       "kind": "navigation",
-      "label": "Mở chi tiết",
+      "label": "Mở chi tiết việc",
       "handlerEvent": "",
       "handler": "",
-      "target": "/tasks",
+      "target": "`/tasks?focus=${task.id}`",
       "insideForm": false,
       "disabledBinding": "",
       "actionStatus": "navigation-candidate",
@@ -13064,7 +13215,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13073,8 +13223,8 @@
     {
       "elementId": "route.myday.action.cap-nhat-estimate",
       "source": "app/(app)/myday/page.jsx",
-      "line": 86,
-      "column": 55,
+      "line": 110,
+      "column": 9,
       "surface": "route.myday",
       "tag": "button",
       "kind": "action",
@@ -13091,21 +13241,20 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.myday.action.ang-cap-nhat",
+      "elementId": "route.myday.action.button",
       "source": "app/(app)/myday/page.jsx",
-      "line": 88,
+      "line": 112,
       "column": 11,
       "surface": "route.myday",
       "tag": "button",
       "kind": "action",
-      "label": "Đang cập nhật…",
+      "label": "…",
       "handlerEvent": "onClick",
       "handler": "() => onTransition(task, transition.nextState)",
       "target": "",
@@ -13118,7 +13267,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13127,7 +13275,7 @@
     {
       "elementId": "route.myday.action.ong-form-estimate",
       "source": "app/(app)/myday/page.jsx",
-      "line": 108,
+      "line": 131,
       "column": 9,
       "surface": "route.myday",
       "tag": "button",
@@ -13145,7 +13293,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13154,7 +13301,7 @@
     {
       "elementId": "route.myday.form-submit.so-gio-uoc-luong-nhom-cong-viec-o-phuc-tap-ghi-chu-pham-vi-khong",
       "source": "app/(app)/myday/page.jsx",
-      "line": 111,
+      "line": 134,
       "column": 7,
       "surface": "route.myday",
       "tag": "form",
@@ -13172,7 +13319,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13181,7 +13327,7 @@
     {
       "elementId": "route.myday.form-control.input",
       "source": "app/(app)/myday/page.jsx",
-      "line": 115,
+      "line": 138,
       "column": 73,
       "surface": "route.myday",
       "tag": "input",
@@ -13199,7 +13345,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13210,7 +13355,7 @@
     {
       "elementId": "route.myday.form-control.select",
       "source": "app/(app)/myday/page.jsx",
-      "line": 116,
+      "line": 139,
       "column": 70,
       "surface": "route.myday",
       "tag": "select",
@@ -13228,7 +13373,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13239,7 +13383,7 @@
     {
       "elementId": "route.myday.form-control.select.2",
       "source": "app/(app)/myday/page.jsx",
-      "line": 117,
+      "line": 140,
       "column": 73,
       "surface": "route.myday",
       "tag": "select",
@@ -13257,7 +13401,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13268,7 +13411,7 @@
     {
       "elementId": "route.myday.form-control.input.2",
       "source": "app/(app)/myday/page.jsx",
-      "line": 118,
+      "line": 141,
       "column": 120,
       "surface": "route.myday",
       "tag": "input",
@@ -13286,7 +13429,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13297,7 +13439,7 @@
     {
       "elementId": "route.myday.action.ang-luu-luu-estimate-co-receipt",
       "source": "app/(app)/myday/page.jsx",
-      "line": 119,
+      "line": 142,
       "column": 125,
       "surface": "route.myday",
       "tag": "button",
@@ -13315,7 +13457,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13324,7 +13465,7 @@
     {
       "elementId": "route.myday.action.huy",
       "source": "app/(app)/myday/page.jsx",
-      "line": 119,
+      "line": 142,
       "column": 45,
       "surface": "route.myday",
       "tag": "button",
@@ -13342,7 +13483,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13351,7 +13491,7 @@
     {
       "elementId": "route.myday.action.lam-moi",
       "source": "app/(app)/myday/page.jsx",
-      "line": 209,
+      "line": 271,
       "column": 11,
       "surface": "route.myday",
       "tag": "button",
@@ -13369,21 +13509,20 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.myday.navigation.mo-bang-cong-viec",
+      "elementId": "route.myday.navigation.bang-cong-viec",
       "source": "app/(app)/myday/page.jsx",
-      "line": 210,
+      "line": 272,
       "column": 11,
       "surface": "route.myday",
       "tag": "Link",
       "kind": "navigation",
-      "label": "Mở bảng công việc",
+      "label": "Bảng công việc",
       "handlerEvent": "",
       "handler": "",
       "target": "/tasks",
@@ -13396,7 +13535,58 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
+        "POST '/api/execution/actions'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.myday.action.theo-uu-tien",
+      "source": "app/(app)/myday/page.jsx",
+      "line": 288,
+      "column": 11,
+      "surface": "route.myday",
+      "tag": "button",
+      "kind": "action",
+      "label": "Theo ưu tiên",
+      "handlerEvent": "onClick",
+      "handler": "() => setView('priority')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/execution/my-work'",
+        "GET '/api/approvals'",
+        "POST '/api/execution/actions'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.myday.action.theo-deadline",
+      "source": "app/(app)/myday/page.jsx",
+      "line": 291,
+      "column": 11,
+      "surface": "route.myday",
+      "tag": "button",
+      "kind": "action",
+      "label": "Theo deadline",
+      "handlerEvent": "onClick",
+      "handler": "() => setView('deadline')",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/execution/my-work'",
+        "GET '/api/approvals'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13405,7 +13595,7 @@
     {
       "elementId": "route.myday.action.thu-lai",
       "source": "app/(app)/myday/page.jsx",
-      "line": 242,
+      "line": 301,
       "column": 80,
       "surface": "route.myday",
       "tag": "button",
@@ -13423,7 +13613,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13432,7 +13621,7 @@
     {
       "elementId": "route.myday.navigation.mo-phe-duyet",
       "source": "app/(app)/myday/page.jsx",
-      "line": 259,
+      "line": 347,
       "column": 9,
       "surface": "route.myday",
       "tag": "Link",
@@ -13450,7 +13639,6 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -17054,6 +17242,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17084,6 +17273,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17114,6 +17304,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17144,6 +17335,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17176,6 +17368,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17208,6 +17401,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17240,6 +17434,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17272,6 +17467,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17304,6 +17500,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17336,6 +17533,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17368,6 +17566,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17400,6 +17599,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17432,6 +17632,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17465,6 +17666,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17497,6 +17699,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17529,6 +17732,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17561,6 +17765,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17593,6 +17798,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17625,6 +17831,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17657,6 +17864,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17689,6 +17897,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17721,6 +17930,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17751,6 +17961,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17781,6 +17992,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17813,6 +18025,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17823,7 +18036,7 @@
     {
       "elementId": "route.tasks.action.selmode-togglesel-t-id-setmodal-mode-edit-row-t",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 275,
+      "line": 295,
       "column": 7,
       "surface": "route.tasks",
       "tag": "div",
@@ -17843,6 +18056,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17856,7 +18070,7 @@
     {
       "elementId": "route.tasks.form-control.input.4",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 279,
+      "line": 299,
       "column": 48,
       "surface": "route.tasks",
       "tag": "input",
@@ -17876,6 +18090,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17888,7 +18103,7 @@
     {
       "elementId": "route.tasks.form-control.tat-ca-du-an-viec-chung",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 326,
+      "line": 346,
       "column": 9,
       "surface": "route.tasks",
       "tag": "select",
@@ -17908,6 +18123,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17920,7 +18136,7 @@
     {
       "elementId": "route.tasks.form-control.moi-nguoi-phu-trach",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 331,
+      "line": 351,
       "column": 9,
       "surface": "route.tasks",
       "tag": "select",
@@ -17940,6 +18156,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17952,7 +18169,7 @@
     {
       "elementId": "route.tasks.form-control.moi-nhan",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 335,
+      "line": 355,
       "column": 34,
       "surface": "route.tasks",
       "tag": "select",
@@ -17972,6 +18189,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -17984,7 +18202,7 @@
     {
       "elementId": "route.tasks.form-control.nhom-trang-thai-nhom-nguoi-phu-trach-nhom-giai-oan",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 339,
+      "line": 359,
       "column": 9,
       "surface": "route.tasks",
       "tag": "select",
@@ -18004,6 +18222,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -18016,7 +18235,7 @@
     {
       "elementId": "route.tasks.form-control.input.5",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 345,
+      "line": 365,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -18036,6 +18255,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -18048,7 +18268,7 @@
     {
       "elementId": "route.tasks.action.xong-chon-nhieu",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 348,
+      "line": 368,
       "column": 20,
       "surface": "route.tasks",
       "tag": "button",
@@ -18068,6 +18288,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -18078,8 +18299,8 @@
     {
       "elementId": "route.tasks.action.them-cong-viec",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 349,
-      "column": 32,
+      "line": 369,
+      "column": 22,
       "surface": "route.tasks",
       "tag": "button",
       "kind": "action",
@@ -18098,6 +18319,38 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
+        "timelogs",
+        "users"
+      ],
+      "apiCandidates": [],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.tasks.action.giao-viec",
+      "source": "app/(app)/tasks/page.jsx",
+      "line": 370,
+      "column": 32,
+      "surface": "route.tasks",
+      "tag": "button",
+      "kind": "action",
+      "label": "Giao việc",
+      "handlerEvent": "onClick",
+      "handler": "() => setModal({ mode: 'assign' })",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "phases",
+        "projects",
+        "taskcomments",
+        "taskevents",
+        "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -18108,7 +18361,7 @@
     {
       "elementId": "route.tasks.form-control.gan-cho",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 355,
+      "line": 376,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -18128,6 +18381,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -18140,7 +18394,7 @@
     {
       "elementId": "route.tasks.form-control.oi-trang-thai",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 359,
+      "line": 380,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -18160,6 +18414,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -18172,7 +18427,7 @@
     {
       "elementId": "route.tasks.form-control.oi-han-cho-tat-ca",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 363,
+      "line": 384,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -18192,6 +18447,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -18204,7 +18460,7 @@
     {
       "elementId": "route.tasks.action.bo-chon",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 364,
+      "line": 385,
       "column": 11,
       "surface": "route.tasks",
       "tag": "button",
@@ -18224,6 +18480,7 @@
         "taskcomments",
         "taskevents",
         "tasks",
+        "teams",
         "timelogs",
         "users"
       ],
@@ -18234,7 +18491,7 @@
     {
       "elementId": "route.teamwork.action.len",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 46,
+      "line": 56,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18259,7 +18516,7 @@
     {
       "elementId": "route.teamwork.action.xuong",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 47,
+      "line": 57,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18284,7 +18541,7 @@
     {
       "elementId": "route.teamwork.action.go-chan",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 49,
+      "line": 59,
       "column": 39,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18309,7 +18566,7 @@
     {
       "elementId": "route.teamwork.action.ieu-phoi",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 50,
+      "line": 60,
       "column": 35,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18334,7 +18591,7 @@
     {
       "elementId": "route.teamwork.action.ong-bang-ieu-phoi",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 101,
+      "line": 111,
       "column": 9,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18359,7 +18616,7 @@
     {
       "elementId": "route.teamwork.form-control.chon-nhan-su",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 108,
+      "line": 118,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "select",
@@ -18386,7 +18643,7 @@
     {
       "elementId": "route.teamwork.action.giao-viec",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 112,
+      "line": 122,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18411,7 +18668,7 @@
     {
       "elementId": "route.teamwork.form-control.phu-thuoc-can-quyet-inh-thieu-nang-luc-xu-ly-yeu-to-ben-ngoai",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 117,
+      "line": 127,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "select",
@@ -18438,7 +18695,7 @@
     {
       "elementId": "route.teamwork.form-control.neu-ro-ieu-ang-can-tro-va-ho-tro-can-thiet",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 121,
+      "line": 131,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "textarea",
@@ -18465,7 +18722,7 @@
     {
       "elementId": "route.teamwork.action.anh-dau-bi-chan",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 123,
+      "line": 133,
       "column": 43,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18490,7 +18747,7 @@
     {
       "elementId": "route.teamwork.form-control.muc-escalation",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 124,
+      "line": 134,
       "column": 13,
       "surface": "route.teamwork",
       "tag": "select",
@@ -18515,7 +18772,7 @@
     {
       "elementId": "route.teamwork.action.escalate",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 127,
+      "line": 137,
       "column": 13,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18540,7 +18797,7 @@
     {
       "elementId": "route.teamwork.form-control.textarea",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 133,
+      "line": 143,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "textarea",
@@ -18567,7 +18824,7 @@
     {
       "elementId": "route.teamwork.action.tach-task",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 134,
+      "line": 144,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18592,7 +18849,7 @@
     {
       "elementId": "route.teamwork.form-control.input",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 139,
+      "line": 149,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "input",
@@ -18619,7 +18876,7 @@
     {
       "elementId": "route.teamwork.form-control.input.2",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 141,
+      "line": 151,
       "column": 75,
       "surface": "route.teamwork",
       "tag": "input",
@@ -18646,7 +18903,7 @@
     {
       "elementId": "route.teamwork.action.hop-nhat-task",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 144,
+      "line": 154,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18671,7 +18928,7 @@
     {
       "elementId": "route.teamwork.form-control.input.3",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 150,
+      "line": 160,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "input",
@@ -18698,7 +18955,7 @@
     {
       "elementId": "route.teamwork.form-control.select",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 152,
+      "line": 162,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "select",
@@ -18725,7 +18982,7 @@
     {
       "elementId": "route.teamwork.form-control.select.2",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 154,
+      "line": 164,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "select",
@@ -18752,7 +19009,7 @@
     {
       "elementId": "route.teamwork.form-control.scope-thay-oi-oi-chieu-historical-phu-thuoc-thay-oi-manager-revi",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 156,
+      "line": 166,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "select",
@@ -18779,7 +19036,7 @@
     {
       "elementId": "route.teamwork.form-control.neu-thay-oi-ve-scope-hoac-du-kien-khien-estimate-can-hieu-chinh",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 158,
+      "line": 168,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "textarea",
@@ -18806,7 +19063,7 @@
     {
       "elementId": "route.teamwork.action.luu-hieu-chinh-co-receipt",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 159,
+      "line": 169,
       "column": 11,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18831,7 +19088,7 @@
     {
       "elementId": "route.teamwork.action.lam-moi",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 224,
+      "line": 235,
       "column": 9,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18856,7 +19113,7 @@
     {
       "elementId": "route.teamwork.action.thu-lai",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 244,
+      "line": 255,
       "column": 80,
       "surface": "route.teamwork",
       "tag": "button",
@@ -18881,7 +19138,7 @@
     {
       "elementId": "route.teamwork.action.ieu-phoi.2",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 268,
+      "line": 279,
       "column": 49,
       "surface": "route.teamwork",
       "tag": "button",
@@ -29670,7 +29927,7 @@
     {
       "elementId": "component.components-ui.action.run",
       "source": "components/ui.jsx",
-      "line": 128,
+      "line": 130,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "button",
@@ -29697,7 +29954,7 @@
     {
       "elementId": "component.components-ui.action.title-children",
       "source": "components/ui.jsx",
-      "line": 142,
+      "line": 144,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "div",
@@ -29725,7 +29982,7 @@
     {
       "elementId": "component.components-ui.action.ong",
       "source": "components/ui.jsx",
-      "line": 146,
+      "line": 148,
       "column": 11,
       "surface": "component.components-ui",
       "tag": "button",
@@ -29750,7 +30007,7 @@
     {
       "elementId": "component.components-ui.action.huy",
       "source": "components/ui.jsx",
-      "line": 177,
+      "line": 179,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -29775,7 +30032,7 @@
     {
       "elementId": "component.components-ui.action.ang-xu-ly",
       "source": "components/ui.jsx",
-      "line": 178,
+      "line": 180,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -29800,7 +30057,7 @@
     {
       "elementId": "component.components-ui.action.huy.2",
       "source": "components/ui.jsx",
-      "line": 224,
+      "line": 226,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -29825,7 +30082,7 @@
     {
       "elementId": "component.components-ui.action.ang-luu-luu",
       "source": "components/ui.jsx",
-      "line": 225,
+      "line": 227,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -29850,7 +30107,7 @@
     {
       "elementId": "component.components-ui.form-submit.e-e-preventdefault-submit",
       "source": "components/ui.jsx",
-      "line": 229,
+      "line": 231,
       "column": 7,
       "surface": "component.components-ui",
       "tag": "form",
@@ -29875,7 +30132,7 @@
     {
       "elementId": "component.components-ui.form-control.select",
       "source": "components/ui.jsx",
-      "line": 236,
+      "line": 238,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "select",
@@ -29900,7 +30157,7 @@
     {
       "elementId": "component.components-ui.form-control.select.2",
       "source": "components/ui.jsx",
-      "line": 240,
+      "line": 242,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "select",
@@ -29925,7 +30182,7 @@
     {
       "elementId": "component.components-ui.form-control.textarea",
       "source": "components/ui.jsx",
-      "line": 245,
+      "line": 247,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "textarea",
@@ -29950,7 +30207,7 @@
     {
       "elementId": "component.components-ui.form-control.input",
       "source": "components/ui.jsx",
-      "line": 247,
+      "line": 249,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "input",
@@ -29975,7 +30232,7 @@
     {
       "elementId": "component.components-ui.action.csv",
       "source": "components/ui.jsx",
-      "line": 358,
+      "line": 360,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "button",
@@ -30001,20 +30258,20 @@
   "summary": {
     "uiRoutes": 65,
     "apiRoutes": 114,
-    "interactiveElements": 927,
+    "interactiveElements": 935,
     "sourceFilesWithInteractions": 94,
     "routesInPrimaryNavigation": 61,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 540,
+      "action": 548,
       "form-control": 303,
       "form-submit": 15,
       "navigation": 69
     },
     "uxRiskCandidates": {
-      "clickable_non_semantic": 17,
+      "clickable_non_semantic": 18,
       "control_binding_unverified": 253,
-      "keyboard_path_unverified": 17,
+      "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 52
     },
     "topInteractiveSources": [
@@ -30024,7 +30281,7 @@
       },
       {
         "source": "app/(app)/tasks/page.jsx",
-        "count": 38
+        "count": 39
       },
       {
         "source": "app/(app)/ceo-commands/page.jsx",
@@ -30071,11 +30328,11 @@
         "count": 19
       },
       {
-        "source": "app/(app)/ceo-rollout/page.jsx",
-        "count": 18
+        "source": "app/(app)/myday/page.jsx",
+        "count": 19
       },
       {
-        "source": "app/(app)/ceo-workforce/page.jsx",
+        "source": "app/(app)/ceo-rollout/page.jsx",
         "count": 18
       }
     ]

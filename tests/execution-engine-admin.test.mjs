@@ -118,6 +118,49 @@ test('Reprioritize CAS queue version và viết vị trí liên tục', async ()
   assert.equal(result.updated.queuePosition, 2);
 });
 
+test('Nhân viên tự sắp hàng đợi CỦA MÌNH được; hàng đợi người khác vẫn cần manager', async () => {
+  const STAFF = { id: 'staff-1', name: 'Staff', roles: ['STAFF'], teamId: 'delivery', userType: 'employee' };
+  const makeDb = (ownerId) => {
+    const tx = {
+      workQueueState: { create: async ({ data }) => data },
+      task: {
+        findMany: async () => [{ id: 'task-1' }, { id: 'task-2' }],
+        update: async ({ where }) => ({ id: where.id }),
+        findUnique: async () => ({ ...BASE, queuePosition: 2, workVersion: 4 }),
+      },
+      realmActionReceipt: { create: async ({ data }) => ({ id: 'receipt-self', ...data }) },
+      workItemEvent: { create: async ({ data }) => data },
+      auditLog: { create: async ({ data }) => data },
+    };
+    return {
+      realmActionReceipt: { findUnique: async () => null },
+      user: { findUnique: async () => ({ id: ownerId, teamId: 'delivery', status: 'active', userType: 'employee' }) },
+      task: { findUnique: async () => BASE },
+      workQueueState: { findUnique: async () => null },
+      $transaction: async (fn) => fn(tx),
+    };
+  };
+  // Chính mình: được sắp lại (task-1 thuộc staff-1 trong BASE)
+  const self = await executeExecutionAction(makeDb('staff-1'), STAFF, {
+    action: 'task.reprioritize', entityId: BASE.id, ownerId: 'staff-1', expectedQueueVersion: 0, targetIndex: 1, idempotencyKey: key('self-queue'),
+  });
+  assert.equal(self.updated.queuePosition, 2);
+  // Hàng đợi người khác: STAFF bị chặn như cũ
+  await assert.rejects(
+    executeExecutionAction(makeDb('staff-2'), STAFF, {
+      action: 'task.reprioritize', entityId: BASE.id, ownerId: 'staff-2', expectedQueueVersion: 0, targetIndex: 1, idempotencyKey: key('other-queue'),
+    }),
+    (error) => error.code === 'execution_manager_forbidden',
+  );
+  // Freelancer không dùng hàng đợi nội bộ, kể cả của chính mình
+  await assert.rejects(
+    executeExecutionAction(makeDb('fl-1'), { id: 'fl-1', roles: ['FREELANCER'], userType: 'freelancer' }, {
+      action: 'task.reprioritize', entityId: BASE.id, ownerId: 'fl-1', expectedQueueVersion: 0, targetIndex: 0, idempotencyKey: key('freelancer-queue'),
+    }),
+    (error) => error.code === 'execution_freelancer_forbidden',
+  );
+});
+
 test('Split tạo lineage; merge chỉ hợp nhất Task cùng project và owner', async () => {
   let child = 0;
   const splitTx = {

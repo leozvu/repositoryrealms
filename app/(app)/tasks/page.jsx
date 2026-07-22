@@ -195,6 +195,7 @@ export default function TasksPage() {
   const { rows, loading, create, update, remove } = useResource('tasks');
   const projects = useResource('projects');
   const users = useResource('users');
+  const teams = useResource('teams');
   const [proj, setProj] = useState('all');
   const [mine, setMine] = useState(false);
   const [assignee, setAssignee] = useState('all');
@@ -229,15 +230,34 @@ export default function TasksPage() {
 
   const userName = id => users.rows.find(u => u.id === id)?.name || '—';
   const projName = id => projects.rows.find(p => p.id === id)?.name || 'Việc chung';
-  const ADD_FIELDS = [
+  const activeStaff = users.rows.filter(u => u.status === 'active' && u.userType !== 'freelancer');
+
+  // Feedback AIm 07/2026: nút "Giao việc" cạnh nút thêm — danh sách người phụ trách chỉ gồm
+  // người THUỘC QUYỀN mình: PM/Giám đốc giao cho cả công ty; Trưởng nhóm chỉ giao trong nhóm
+  // mình (nhóm mình đang thuộc + nhóm mình đứng tên trưởng nhóm) — khớp phạm vi realmGuildScope ở server.
+  const isCompanyMgmt = hasAny(user, ['PM']); // PM + Giám đốc (hasAny luôn cho DIRECTOR qua)
+  const myTeamIds = new Set(teams.rows.filter(t => t.leadId === user?.id).map(t => t.id));
+  if (user?.teamId) myTeamIds.add(user.teamId);
+  const subordinates = (isCompanyMgmt ? activeStaff : activeStaff.filter(u => myTeamIds.has(u.teamId)))
+    .filter(u => u.id !== user?.id);
+
+  const BASE_FIELDS = [
     { key: 'title', label: 'Tên công việc', required: true, full: true },
     { key: 'projectId', label: 'Dự án', type: 'select', options: [{ value: '', label: '— Việc chung —' }, ...projects.rows.map(p => ({ value: p.id, label: p.name }))] },
-    { key: 'assigneeId', label: 'Người phụ trách', type: 'select', options: users.rows.filter(u => u.status === 'active').map(u => ({ value: u.id, label: u.name })) },
     { key: 'priority', label: 'Ưu tiên', type: 'select', options: Object.entries(BADGE.priority).map(([v, [l]]) => ({ value: v, label: l })) },
     { key: 'dueDate', label: 'Hạn hoàn thành', type: 'date' },
     { key: 'estHours', label: 'Giờ ước lượng', type: 'number' },
     { key: 'recur', label: 'Lặp lại', type: 'select', options: RECUR_OPTS },
     { key: 'note', label: 'Mô tả', type: 'textarea', full: true },
+  ];
+  // Thêm công việc: quản lý chọn được người phụ trách bất kỳ; nhân viên tự thêm cho MÌNH.
+  const ADD_FIELDS = isMgmt
+    ? [BASE_FIELDS[0], BASE_FIELDS[1], { key: 'assigneeId', label: 'Người phụ trách', type: 'select', options: activeStaff.map(u => ({ value: u.id, label: u.name })) }, ...BASE_FIELDS.slice(2)]
+    : BASE_FIELDS;
+  const ASSIGN_FIELDS = [
+    BASE_FIELDS[0],
+    { key: 'assigneeId', label: 'Giao cho', required: true, type: 'select', options: [{ value: '', label: '— Chọn người thuộc quyền bạn —' }, ...subordinates.map(u => ({ value: u.id, label: u.name }))] },
+    ...BASE_FIELDS.slice(1),
   ];
   const allLabels = [...new Set(rows.flatMap(t => parseItems(t.labels)))];
   const visible = rows.filter(t => (proj === 'all' || String(t.projectId || '') === proj)
@@ -346,7 +366,8 @@ export default function TasksPage() {
         </label>
         <div className="spacer"></div>
         {isMgmt && <button className={selMode ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'} onClick={() => { setSelMode(!selMode); setSel(new Set()); }}>{selMode ? 'Xong' : <><Icon name="check" size={15} /><span>Chọn nhiều</span></>}</button>}
-        {isMgmt && !selMode && <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm công việc</span></button>}
+        {!selMode && <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm công việc</span></button>}
+        {isMgmt && !selMode && <button className="btn btn-outline" onClick={() => setModal({ mode: 'assign' })} title="Thêm việc và giao thẳng cho người thuộc quyền bạn"><Icon name="staff" size={16} /><span>Giao việc</span></button>}
       </div>
 
       {selMode && sel.size > 0 && (
@@ -379,10 +400,18 @@ export default function TasksPage() {
         {selMode ? 'Nhấp thẻ để chọn/bỏ chọn · dùng thanh trên để đổi hàng loạt.' : isMgmt ? 'Kéo thả để đổi trạng thái · nhấp thẻ để mở chi tiết · thẻ có số ngày kèm đồng hồ = việc ứ đọng lâu.' : 'Bạn chỉ kéo được thẻ việc của mình · nhấp thẻ để mở chi tiết.'}
       </p>
 
-      {modal?.mode === 'add' && <FormModal title="Thêm công việc" fields={ADD_FIELDS}
+      {modal?.mode === 'add' && <FormModal title={isMgmt ? 'Thêm công việc' : 'Thêm việc cho tôi'} fields={ADD_FIELDS}
         data={{ priority: 'medium', dueDate: daysFromNow(3), projectId: proj !== 'all' ? proj : '', recur: '' }}
         onClose={() => setModal(null)}
-        onSave={async d => { await create({ ...d, status: 'todo', projectId: d.projectId || null, recur: d.recur || null, estHours: +d.estHours || 0 }); toast('Đã thêm công việc'); }} />}
+        onSave={async d => { await create({ ...d, status: 'todo', assigneeId: isMgmt ? (d.assigneeId || null) : user?.id, projectId: d.projectId || null, recur: d.recur || null, estHours: +d.estHours || 0 }); toast('Đã thêm công việc'); }} />}
+      {modal?.mode === 'assign' && <FormModal title="Giao việc" fields={ASSIGN_FIELDS}
+        data={{ priority: 'medium', dueDate: daysFromNow(3), projectId: proj !== 'all' ? proj : '', recur: '', assigneeId: '' }}
+        onClose={() => setModal(null)}
+        onSave={async d => {
+          if (!d.assigneeId) { toast('Chọn người nhận việc', 'error'); return false; }
+          const r = await create({ ...d, status: 'todo', projectId: d.projectId || null, recur: d.recur || null, estHours: +d.estHours || 0 });
+          if (r) toast(`Đã giao việc cho ${userName(d.assigneeId)} — người nhận sẽ có thông báo 🔔`);
+        }} />}
       {modal?.mode === 'edit' && <TaskDetailModal task={modal.row} projects={projects.rows} users={users.rows} allTasks={rows}
         isMgmt={isMgmt} me={user} onClose={() => setModal(null)}
         onDelete={() => setModal({ mode: 'del', row: modal.row })}

@@ -62,6 +62,8 @@ const RAW = {
   cake: '<path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s1-1 2.5-1 2.5 2 5 2 3.5-2 5-2 2.5 1 2.5 1"/><path d="M2 21h20"/><path d="M12 4v3"/><path d="M8 5v2"/><path d="M16 5v2"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="m17.7 17.7 1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.3 17.7-1.4 1.4"/><path d="m19.1 4.9-1.4 1.4"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  'chevron-up': '<polyline points="18 15 12 9 6 15"/>',
+  'chevron-down': '<polyline points="6 9 12 15 18 9"/>',
 };
 export function Icon({ name, size = 20 }) {
   return (

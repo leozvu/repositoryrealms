@@ -52,9 +52,11 @@ route.messages.action.bat-au,app/(app)/messages/page.jsx,32,Bắt đầu,data-ac
 route.messages.action.ngung-chia-se-voi-ceo-portal-chia-se-voi-ceo-portal,app/(app)/messages/page.jsx,165,Ngừng chia sẻ với CEO Portal / Chia sẻ với CEO Portal,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.messages.form-submit.ang-gui-gui,app/(app)/messages/page.jsx,229,Đang gửi… / Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.messages.action.ang-gui-gui,app/(app)/messages/page.jsx,231,Đang gửi… / Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.myday.action.ang-cap-nhat,app/(app)/myday/page.jsx,88,Đang cập nhật…,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.myday.form-submit.so-gio-uoc-luong-nhom-cong-viec-o-phuc-tap-ghi-chu-pham-vi-khong,app/(app)/myday/page.jsx,111,Số giờ ước lượng / Nhóm công việc / Độ phức tạp / Ghi chú phạm vi (không bắt buộc) / Hủy / Đang lưu… / Lưu estimate có receipt,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
-route.myday.action.ang-luu-luu-estimate-co-receipt,app/(app)/myday/page.jsx,119,Đang lưu… / Lưu estimate có receipt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.myday.action.ua-viec-len-mot-bac,app/(app)/myday/page.jsx,97,Đưa việc lên một bậc,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.myday.action.ua-viec-xuong-mot-bac,app/(app)/myday/page.jsx,98,Đưa việc xuống một bậc,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.myday.action.button,app/(app)/myday/page.jsx,112,…,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.myday.form-submit.so-gio-uoc-luong-nhom-cong-viec-o-phuc-tap-ghi-chu-pham-vi-khong,app/(app)/myday/page.jsx,134,Số giờ ước lượng / Nhóm công việc / Độ phức tạp / Ghi chú phạm vi (không bắt buộc) / Hủy / Đang lưu… / Lưu estimate có receipt,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
+route.myday.action.ang-luu-luu-estimate-co-receipt,app/(app)/myday/page.jsx,142,Đang lưu… / Lưu estimate có receipt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.payroll.action.tinh-lai-tu-cham-cong,app/(app)/payroll/page.jsx,86,Tính lại từ chấm công,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.payroll.action.tao-bang-luong-thang,app/(app)/payroll/page.jsx,89,Tạo bảng lương tháng,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.resources.action.gan,app/(app)/resources/page.jsx,174,Gán,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
@@ -72,15 +74,15 @@ route.staff.action.luu,app/(app)/staff/page.jsx,22,Lưu,data-action,async-button
 route.tasks.action.ang-luu-luu,app/(app)/tasks/page.jsx,71,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.ghi-gio,app/(app)/tasks/page.jsx,141,Ghi giờ,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.gui,app/(app)/tasks/page.jsx,169,Gửi,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
-route.teamwork.action.len,app/(app)/teamwork/page.jsx,46,Lên,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.teamwork.action.xuong,app/(app)/teamwork/page.jsx,47,Xuống,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.teamwork.action.go-chan,app/(app)/teamwork/page.jsx,49,Gỡ chặn,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.teamwork.action.giao-viec,app/(app)/teamwork/page.jsx,112,Giao việc,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.teamwork.action.anh-dau-bi-chan,app/(app)/teamwork/page.jsx,123,Đánh dấu bị chặn,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.teamwork.action.escalate,app/(app)/teamwork/page.jsx,127,Escalate,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.teamwork.action.tach-task,app/(app)/teamwork/page.jsx,134,Tách Task,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.teamwork.action.hop-nhat-task,app/(app)/teamwork/page.jsx,144,Hợp nhất Task,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.teamwork.action.luu-hieu-chinh-co-receipt,app/(app)/teamwork/page.jsx,159,Lưu hiệu chỉnh có receipt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.teamwork.action.len,app/(app)/teamwork/page.jsx,56,Lên,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.teamwork.action.xuong,app/(app)/teamwork/page.jsx,57,Xuống,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.teamwork.action.go-chan,app/(app)/teamwork/page.jsx,59,Gỡ chặn,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.teamwork.action.giao-viec,app/(app)/teamwork/page.jsx,122,Giao việc,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.teamwork.action.anh-dau-bi-chan,app/(app)/teamwork/page.jsx,133,Đánh dấu bị chặn,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.teamwork.action.escalate,app/(app)/teamwork/page.jsx,137,Escalate,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.teamwork.action.tach-task,app/(app)/teamwork/page.jsx,144,Tách Task,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.teamwork.action.hop-nhat-task,app/(app)/teamwork/page.jsx,154,Hợp nhất Task,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+route.teamwork.action.luu-hieu-chinh-co-receipt,app/(app)/teamwork/page.jsx,169,Lưu hiệu chỉnh có receipt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.templates.action.luu-mau,app/(app)/templates/page.jsx,24,Lưu mẫu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.tickets.action.luu-anh-gia,app/(app)/tickets/page.jsx,13,Lưu đánh giá,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.tickets.action.anh-dau-a-xu-ly,app/(app)/tickets/page.jsx,134,Đánh dấu đã xử lý,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
@@ -130,6 +132,6 @@ component.components-sendemail.action.ang-gui-gui-email,components/SendEmail.jsx
 component.components-shell.action.oc-tat-ca,components/Shell.jsx,153,Đọc tất cả,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-shell.action.tat-2fa,components/Shell.jsx,197,Tắt 2FA,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-shell.action.bat-2fa,components/Shell.jsx,198,Bật 2FA,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-component.components-ui.action.ang-xu-ly,components/ui.jsx,178,Đang xử lý…,data-action,disabled-binding,hook-refresh,hook-error-toast,confirmed,verified
-component.components-ui.action.ang-luu-luu,components/ui.jsx,225,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
-component.components-ui.form-submit.e-e-preventdefault-submit,components/ui.jsx,229,,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
+component.components-ui.action.ang-xu-ly,components/ui.jsx,180,Đang xử lý…,data-action,disabled-binding,hook-refresh,hook-error-toast,confirmed,verified
+component.components-ui.action.ang-luu-luu,components/ui.jsx,227,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
+component.components-ui.form-submit.e-e-preventdefault-submit,components/ui.jsx,231,,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified

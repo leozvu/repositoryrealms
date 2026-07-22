@@ -437,6 +437,12 @@ a.link:hover{text-decoration:underline}
 .cal-more{font-size:.7rem;color:var(--muted);font-weight:600}
 @media(max-width:900px){.cal-cell{min-height:64px}.cal-ev{display:none}.cal-cell .cal-dots{display:flex;gap:3px;flex-wrap:wrap}.cal-dots i{width:6px;height:6px;border-radius:50%}}
 .cal-dots{display:none}
+/* View tuần (feedback AIm 07/2026): 7 cột như Google Calendar, ô cao, hiện đủ thẻ sự kiện */
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-week-col{display:flex;flex-direction:column}
+.cal-week .cal-week-cell{flex:1;min-height:220px}
+.cal-week .cal-ev{white-space:normal}
+@media(max-width:900px){.cal-week{grid-template-columns:1fr;gap:8px}.cal-week .cal-week-cell{min-height:0}.cal-week .cal-ev{display:flex}.cal-week .cal-dow{text-align:left}}
 
 /* ============ Dark theme ============ */
 :root[data-theme="dark"]{
