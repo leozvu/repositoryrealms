@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
+import { useResource, useServiceLines, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
 import { DocLinksModal } from '@/components/DocLinks';
 import { moneyShort, fmtDate, todayISO, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
@@ -28,10 +28,11 @@ export default function ProjectsPage() {
   useEffect(() => { loadStats(); }, [rows.length]);
 
   const clientName = id => clients.rows.find(c => c.id === id)?.name || '—';
+  const serviceLines = useServiceLines(); // v3.37: mảng dịch vụ theo công ty (chỉnh trong Cài đặt)
   const FIELDS = [
     { key: 'name', label: 'Tên dự án', required: true, full: true },
     { key: 'clientId', label: 'Khách hàng', type: 'select', options: clients.rows.map(c => ({ value: c.id, label: c.name })), required: true },
-    { key: 'service', label: 'Dịch vụ', type: 'select', options: ['Digital Ads', 'Social Media', 'Branding', 'Web & SEO', 'Production', 'PR / Event', 'Khác'].map(s => ({ value: s, label: s })) },
+    { key: 'service', label: 'Dịch vụ', type: 'select', options: serviceLines.map(s => ({ value: s, label: s })) },
     { key: 'budget', label: 'Ngân sách / giá trị HĐ (đ)', type: 'number' },
     { key: 'budgetHours', label: 'Ngân sách giờ công (giờ)', type: 'number', hint: 'Để 0 nếu chưa ước lượng' },
     { key: 'status', label: 'Trạng thái', type: 'select', options: Object.entries(BADGE.project).map(([v, [l]]) => ({ value: v, label: l })) },

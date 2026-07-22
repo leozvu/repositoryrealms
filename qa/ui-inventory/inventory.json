@@ -573,6 +573,33 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/docs",
+      "source": "app/(app)/docs/page.jsx",
+      "dynamic": false,
+      "auth": "authenticated",
+      "inNavigation": true,
+      "navLabel": "Tài liệu công ty",
+      "navSection": "Tổng quan",
+      "roles": [
+        "DIRECTOR",
+        "PM",
+        "AM",
+        "ACCOUNTANT",
+        "HR",
+        "LEAD",
+        "STAFF"
+      ],
+      "module": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/docs'",
+        "POST '/api/docs'",
+        "DELETE `/api/docs/${doc.id}`"
+      ],
+      "routeCandidates": [],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/finance",
       "source": "app/(app)/finance/page.jsx",
       "dynamic": false,
@@ -2205,6 +2232,26 @@
       "dynamic": true,
       "methods": [
         "PUT",
+        "DELETE"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/docs",
+      "source": "app/api/docs/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/docs/[id]",
+      "source": "app/api/docs/[id]/route.js",
+      "dynamic": true,
+      "methods": [
+        "GET",
         "DELETE"
       ],
       "mappingStatus": "unreviewed"
@@ -8437,7 +8484,7 @@
     {
       "elementId": "route.clients.form-control.tim-khach-hang",
       "source": "app/(app)/clients/page.jsx",
-      "line": 33,
+      "line": 37,
       "column": 69,
       "surface": "route.clients",
       "tag": "input",
@@ -8461,9 +8508,35 @@
       ]
     },
     {
+      "elementId": "route.clients.form-control.moi-mang-dich-vu-chua-xep-mang",
+      "source": "app/(app)/clients/page.jsx",
+      "line": 38,
+      "column": 9,
+      "surface": "route.clients",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Mọi mảng dịch vụ / Chưa xếp mảng",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "clients"
+      ],
+      "apiCandidates": [],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
       "elementId": "route.clients.action.them-khach-hang",
       "source": "app/(app)/clients/page.jsx",
-      "line": 39,
+      "line": 48,
       "column": 20,
       "surface": "route.clients",
       "tag": "button",
@@ -8487,7 +8560,7 @@
     {
       "elementId": "route.clients.navigation.clients-c-id",
       "source": "app/(app)/clients/page.jsx",
-      "line": 47,
+      "line": 56,
       "column": 21,
       "surface": "route.clients",
       "tag": "Link",
@@ -8511,7 +8584,7 @@
     {
       "elementId": "route.clients.action.nhat-ky-lich-hen",
       "source": "app/(app)/clients/page.jsx",
-      "line": 54,
+      "line": 64,
       "column": 21,
       "surface": "route.clients",
       "tag": "button",
@@ -8535,7 +8608,7 @@
     {
       "elementId": "route.clients.action.sua",
       "source": "app/(app)/clients/page.jsx",
-      "line": 56,
+      "line": 66,
       "column": 21,
       "surface": "route.clients",
       "tag": "button",
@@ -8559,7 +8632,7 @@
     {
       "elementId": "route.clients.action.xoa",
       "source": "app/(app)/clients/page.jsx",
-      "line": 57,
+      "line": 67,
       "column": 21,
       "surface": "route.clients",
       "tag": "button",
@@ -9475,6 +9548,196 @@
       ],
       "apiCandidates": [
         "GET '/api/insights'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.docs.form-control.moi-danh-muc",
+      "source": "app/(app)/docs/page.jsx",
+      "line": 68,
+      "column": 9,
+      "surface": "route.docs",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Mọi danh mục",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/docs'",
+        "POST '/api/docs'",
+        "DELETE `/api/docs/${doc.id}`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.docs.form-control.danh-muc-cho-file-sap-upload",
+      "source": "app/(app)/docs/page.jsx",
+      "line": 74,
+      "column": 9,
+      "surface": "route.docs",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Danh mục cho file sắp upload",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/docs'",
+        "POST '/api/docs'",
+        "DELETE `/api/docs/${doc.id}`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.docs.form-control.ghi-chu-tuy-chon",
+      "source": "app/(app)/docs/page.jsx",
+      "line": 77,
+      "column": 9,
+      "surface": "route.docs",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "Ghi chú (tùy chọn)",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/docs'",
+        "POST '/api/docs'",
+        "DELETE `/api/docs/${doc.id}`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.docs.form-control.input",
+      "source": "app/(app)/docs/page.jsx",
+      "line": 78,
+      "column": 9,
+      "surface": "route.docs",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/docs'",
+        "POST '/api/docs'",
+        "DELETE `/api/docs/${doc.id}`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.docs.action.ang-tai-len-upload-tai-lieu",
+      "source": "app/(app)/docs/page.jsx",
+      "line": 79,
+      "column": 9,
+      "surface": "route.docs",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đang tải lên… / Upload tài liệu",
+      "handlerEvent": "onClick",
+      "handler": "() => fileRef.current?.click()",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "uploading",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/docs'",
+        "POST '/api/docs'",
+        "DELETE `/api/docs/${doc.id}`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.docs.navigation.tai-xuong",
+      "source": "app/(app)/docs/page.jsx",
+      "line": 95,
+      "column": 19,
+      "surface": "route.docs",
+      "tag": "a",
+      "kind": "navigation",
+      "label": "Tải xuống",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "`/api/docs/${d.id}`",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/docs'",
+        "POST '/api/docs'",
+        "DELETE `/api/docs/${doc.id}`"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.docs.action.xoa",
+      "source": "app/(app)/docs/page.jsx",
+      "line": 96,
+      "column": 36,
+      "surface": "route.docs",
+      "tag": "button",
+      "kind": "action",
+      "label": "Xóa",
+      "handlerEvent": "onClick",
+      "handler": "() => setToDelete(d)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/docs'",
+        "POST '/api/docs'",
+        "DELETE `/api/docs/${doc.id}`"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -14250,7 +14513,7 @@
     {
       "elementId": "route.projects.form-control.tim-du-an",
       "source": "app/(app)/projects/page.jsx",
-      "line": 64,
+      "line": 65,
       "column": 69,
       "surface": "route.projects",
       "tag": "input",
@@ -14283,7 +14546,7 @@
     {
       "elementId": "route.projects.form-control.tat-ca-trang-thai",
       "source": "app/(app)/projects/page.jsx",
-      "line": 65,
+      "line": 66,
       "column": 9,
       "surface": "route.projects",
       "tag": "select",
@@ -14316,7 +14579,7 @@
     {
       "elementId": "route.projects.navigation.so-chi-huy",
       "source": "app/(app)/projects/page.jsx",
-      "line": 70,
+      "line": 71,
       "column": 20,
       "surface": "route.projects",
       "tag": "Link",
@@ -14347,7 +14610,7 @@
     {
       "elementId": "route.projects.action.them-du-an",
       "source": "app/(app)/projects/page.jsx",
-      "line": 71,
+      "line": 72,
       "column": 20,
       "surface": "route.projects",
       "tag": "button",
@@ -14378,7 +14641,7 @@
     {
       "elementId": "route.projects.navigation.projects-p-id",
       "source": "app/(app)/projects/page.jsx",
-      "line": 94,
+      "line": 95,
       "column": 23,
       "surface": "route.projects",
       "tag": "Link",
@@ -14409,7 +14672,7 @@
     {
       "elementId": "route.projects.action.tai-lieu-drive-notion",
       "source": "app/(app)/projects/page.jsx",
-      "line": 110,
+      "line": 111,
       "column": 23,
       "surface": "route.projects",
       "tag": "button",
@@ -14440,7 +14703,7 @@
     {
       "elementId": "route.projects.action.setmodal-mode-edit-row-p",
       "source": "app/(app)/projects/page.jsx",
-      "line": 111,
+      "line": 112,
       "column": 23,
       "surface": "route.projects",
       "tag": "button",
@@ -14471,7 +14734,7 @@
     {
       "elementId": "route.projects.action.setmodal-mode-del-row-p",
       "source": "app/(app)/projects/page.jsx",
-      "line": 112,
+      "line": 113,
       "column": 23,
       "surface": "route.projects",
       "tag": "button",
@@ -14502,7 +14765,7 @@
     {
       "elementId": "route.projects.form-control.khong-dung-mau",
       "source": "app/(app)/projects/page.jsx",
-      "line": 128,
+      "line": 129,
       "column": 51,
       "surface": "route.projects",
       "tag": "select",
@@ -15306,9 +15569,35 @@
       ]
     },
     {
+      "elementId": "route.services.form-control.moi-mang-dich-vu-chua-xep-mang",
+      "source": "app/(app)/services/page.jsx",
+      "line": 62,
+      "column": 9,
+      "surface": "route.services",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Mọi mảng dịch vụ / Chưa xếp mảng",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "services"
+      ],
+      "apiCandidates": [],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
       "elementId": "route.services.action.them-dich-vu",
       "source": "app/(app)/services/page.jsx",
-      "line": 27,
+      "line": 69,
       "column": 20,
       "surface": "route.services",
       "tag": "button",
@@ -15330,9 +15619,57 @@
       "uxRiskCandidates": []
     },
     {
+      "elementId": "route.services.action.ua-len",
+      "source": "app/(app)/services/page.jsx",
+      "line": 78,
+      "column": 19,
+      "surface": "route.services",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đưa lên",
+      "handlerEvent": "onClick",
+      "handler": "() => nudge(i, -1)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "ordering || i === 0",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "services"
+      ],
+      "apiCandidates": [],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.services.action.ua-xuong",
+      "source": "app/(app)/services/page.jsx",
+      "line": 79,
+      "column": 19,
+      "surface": "route.services",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đưa xuống",
+      "handlerEvent": "onClick",
+      "handler": "() => nudge(i, 1)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "ordering || i === filtered.length - 1",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "services"
+      ],
+      "apiCandidates": [],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "route.services.action.sua",
       "source": "app/(app)/services/page.jsx",
-      "line": 40,
+      "line": 87,
       "column": 19,
       "surface": "route.services",
       "tag": "button",
@@ -15356,7 +15693,7 @@
     {
       "elementId": "route.services.action.xoa",
       "source": "app/(app)/services/page.jsx",
-      "line": 41,
+      "line": 88,
       "column": 19,
       "surface": "route.services",
       "tag": "button",
@@ -15798,7 +16135,7 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 151,
+      "line": 154,
       "column": 7,
       "surface": "route.settings",
       "tag": "input",
@@ -15832,9 +16169,45 @@
       ]
     },
     {
+      "elementId": "route.settings.form-control.digital-ads-social-media-seeding-livestream",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 174,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "Digital Ads Social Media Seeding Livestream…",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 183,
+      "line": 193,
       "column": 17,
       "surface": "route.settings",
       "tag": "input",
@@ -15870,7 +16243,7 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 192,
+      "line": 202,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -15906,7 +16279,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 208,
+      "line": 218,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -15940,7 +16313,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 211,
+      "line": 221,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -15974,7 +16347,7 @@
     {
       "elementId": "route.settings.form-control.input.4",
       "source": "app/(app)/settings/page.jsx",
-      "line": 221,
+      "line": 231,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -16010,7 +16383,7 @@
     {
       "elementId": "route.settings.form-control.input.5",
       "source": "app/(app)/settings/page.jsx",
-      "line": 245,
+      "line": 255,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -16046,7 +16419,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 249,
+      "line": 259,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -16080,7 +16453,7 @@
     {
       "elementId": "route.settings.form-control.sk-or-v1-tao-tai-openrouter-ai-keys",
       "source": "app/(app)/settings/page.jsx",
-      "line": 259,
+      "line": 269,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -16116,7 +16489,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 263,
+      "line": 273,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -16150,7 +16523,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 281,
+      "line": 291,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -16184,7 +16557,7 @@
     {
       "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 284,
+      "line": 294,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -29927,7 +30300,7 @@
     {
       "elementId": "component.components-ui.action.run",
       "source": "components/ui.jsx",
-      "line": 130,
+      "line": 146,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "button",
@@ -29943,6 +30316,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -29954,7 +30328,7 @@
     {
       "elementId": "component.components-ui.action.title-children",
       "source": "components/ui.jsx",
-      "line": 144,
+      "line": 160,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "div",
@@ -29970,6 +30344,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -29982,7 +30357,7 @@
     {
       "elementId": "component.components-ui.action.ong",
       "source": "components/ui.jsx",
-      "line": 148,
+      "line": 164,
       "column": 11,
       "surface": "component.components-ui",
       "tag": "button",
@@ -29998,6 +30373,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30007,7 +30383,7 @@
     {
       "elementId": "component.components-ui.action.huy",
       "source": "components/ui.jsx",
-      "line": 179,
+      "line": 195,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -30023,6 +30399,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30032,7 +30409,7 @@
     {
       "elementId": "component.components-ui.action.ang-xu-ly",
       "source": "components/ui.jsx",
-      "line": 180,
+      "line": 196,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -30048,6 +30425,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30057,7 +30435,7 @@
     {
       "elementId": "component.components-ui.action.huy.2",
       "source": "components/ui.jsx",
-      "line": 226,
+      "line": 242,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -30073,6 +30451,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30082,7 +30461,7 @@
     {
       "elementId": "component.components-ui.action.ang-luu-luu",
       "source": "components/ui.jsx",
-      "line": 227,
+      "line": 243,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -30098,6 +30477,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30107,7 +30487,7 @@
     {
       "elementId": "component.components-ui.form-submit.e-e-preventdefault-submit",
       "source": "components/ui.jsx",
-      "line": 231,
+      "line": 247,
       "column": 7,
       "surface": "component.components-ui",
       "tag": "form",
@@ -30123,6 +30503,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30132,7 +30513,7 @@
     {
       "elementId": "component.components-ui.form-control.select",
       "source": "components/ui.jsx",
-      "line": 238,
+      "line": 254,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "select",
@@ -30148,6 +30529,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30157,7 +30539,7 @@
     {
       "elementId": "component.components-ui.form-control.select.2",
       "source": "components/ui.jsx",
-      "line": 242,
+      "line": 258,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "select",
@@ -30173,6 +30555,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30182,7 +30565,7 @@
     {
       "elementId": "component.components-ui.form-control.textarea",
       "source": "components/ui.jsx",
-      "line": 247,
+      "line": 263,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "textarea",
@@ -30198,6 +30581,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30207,7 +30591,7 @@
     {
       "elementId": "component.components-ui.form-control.input",
       "source": "components/ui.jsx",
-      "line": 249,
+      "line": 265,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "input",
@@ -30223,6 +30607,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30232,7 +30617,7 @@
     {
       "elementId": "component.components-ui.action.csv",
       "source": "components/ui.jsx",
-      "line": 360,
+      "line": 376,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "button",
@@ -30248,6 +30633,7 @@
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
+        "GET '/api/settings'",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -30256,21 +30642,21 @@
     }
   ],
   "summary": {
-    "uiRoutes": 65,
-    "apiRoutes": 114,
-    "interactiveElements": 935,
-    "sourceFilesWithInteractions": 94,
-    "routesInPrimaryNavigation": 61,
+    "uiRoutes": 66,
+    "apiRoutes": 116,
+    "interactiveElements": 947,
+    "sourceFilesWithInteractions": 95,
+    "routesInPrimaryNavigation": 62,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 548,
-      "form-control": 303,
+      "action": 552,
+      "form-control": 310,
       "form-submit": 15,
-      "navigation": 69
+      "navigation": 70
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 253,
+      "control_binding_unverified": 260,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 52
     },
@@ -30293,7 +30679,7 @@
       },
       {
         "source": "app/(app)/settings/page.jsx",
-        "count": 24
+        "count": 25
       },
       {
         "source": "app/(app)/automation/page.jsx",

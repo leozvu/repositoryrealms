@@ -15,6 +15,22 @@ export const useRoleLabels = () => useContext(RoleLabelsCtx) || ROLE_LABEL;
 export const ModulesCtx = createContext(null);
 export const useModules = () => useContext(ModulesCtx);
 
+/* ---------- v3.37: mảng dịch vụ theo công ty (Setting.serviceLines) ---------- */
+// Feedback Egoric 07/2026: danh sách mảng dịch vụ từng hard-code (thiếu Seeding/Livestream).
+// Nay đọc từ Cài đặt; fallback đúng bộ mặc định của /api/settings khi chưa tải xong.
+export const DEFAULT_SERVICE_LINES = ['Digital Ads', 'Social Media', 'Branding', 'Web & SEO', 'Production', 'PR / Event', 'Seeding', 'Livestream', 'Khác'];
+export function useServiceLines() {
+  const [lines, setLines] = useState(DEFAULT_SERVICE_LINES);
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/settings').then(r => r.ok ? r.json() : null).then(s => {
+      if (alive && Array.isArray(s?.serviceLines) && s.serviceLines.length) setLines(s.serviceLines);
+    }).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  return lines;
+}
+
 /* ---------- Icons (Lucide-style, giữ nguyên từ v1) ---------- */
 const RAW = {
   dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',

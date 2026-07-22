@@ -63,13 +63,15 @@ route.resources.action.gan,app/(app)/resources/page.jsx,174,Gán,data-action,asy
 route.reviews.action.gui-tu-anh-gia,app/(app)/reviews/page.jsx,40,Gửi tự đánh giá,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.reviews.action.chot-anh-gia,app/(app)/reviews/page.jsx,44,Chốt đánh giá,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.reviews.action.mo-ot-anh-gia-q,app/(app)/reviews/page.jsx,110,Mở đợt đánh giá / {q},data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
+route.services.action.ua-len,app/(app)/services/page.jsx,78,Đưa lên,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
+route.services.action.ua-xuong,app/(app)/services/page.jsx,79,Đưa xuống,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
 route.settings.action.khoa-mo,app/(app)/settings/page.jsx,72,Khóa / Mở,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.settings.action.delkey-k,app/(app)/settings/page.jsx,73,,data-action,async-button-guard,toast-or-state,handled-candidate,confirmed,verified
 route.settings.action.tao-key,app/(app)/settings/page.jsx,81,Tạo key,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.settings.action.tat-bat,app/(app)/settings/page.jsx,92,Tắt / Bật,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.settings.action.them,app/(app)/settings/page.jsx,101,Thêm,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
-route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay,app/(app)/settings/page.jsx,249,Lưu & gửi email thử tới chính hộp thư này,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.settings.action.luu-cai-at,app/(app)/settings/page.jsx,263,Lưu cài đặt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay,app/(app)/settings/page.jsx,259,Lưu & gửi email thử tới chính hộp thư này,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.luu-cai-at,app/(app)/settings/page.jsx,273,Lưu cài đặt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.staff.action.luu,app/(app)/staff/page.jsx,22,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.ang-luu-luu,app/(app)/tasks/page.jsx,71,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.ghi-gio,app/(app)/tasks/page.jsx,141,Ghi giờ,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
@@ -132,6 +134,6 @@ component.components-sendemail.action.ang-gui-gui-email,components/SendEmail.jsx
 component.components-shell.action.oc-tat-ca,components/Shell.jsx,153,Đọc tất cả,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-shell.action.tat-2fa,components/Shell.jsx,197,Tắt 2FA,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-shell.action.bat-2fa,components/Shell.jsx,198,Bật 2FA,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-component.components-ui.action.ang-xu-ly,components/ui.jsx,180,Đang xử lý…,data-action,disabled-binding,hook-refresh,hook-error-toast,confirmed,verified
-component.components-ui.action.ang-luu-luu,components/ui.jsx,227,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
-component.components-ui.form-submit.e-e-preventdefault-submit,components/ui.jsx,231,,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
+component.components-ui.action.ang-xu-ly,components/ui.jsx,196,Đang xử lý…,data-action,disabled-binding,hook-refresh,hook-error-toast,confirmed,verified
+component.components-ui.action.ang-luu-luu,components/ui.jsx,243,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
+component.components-ui.form-submit.e-e-preventdefault-submit,components/ui.jsx,247,,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified

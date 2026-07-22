@@ -53,6 +53,8 @@
 "/api/copilot","app/api/copilot/route.js","false","POST","unreviewed"
 "/api/data/[resource]","app/api/data/[resource]/route.js","true","GET | POST","unreviewed"
 "/api/data/[resource]/[id]","app/api/data/[resource]/[id]/route.js","true","PUT | DELETE","unreviewed"
+"/api/docs","app/api/docs/route.js","false","GET | POST","unreviewed"
+"/api/docs/[id]","app/api/docs/[id]/route.js","true","GET | DELETE","unreviewed"
 "/api/email/send","app/api/email/send/route.js","false","POST","unreviewed"
 "/api/errorlog","app/api/errorlog/route.js","false","POST","unreviewed"
 "/api/execution/actions","app/api/execution/actions/route.js","false","POST","unreviewed"

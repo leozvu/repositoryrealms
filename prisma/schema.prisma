@@ -175,15 +175,32 @@ model Holiday {
   name String
 }
 
+// v3.37 (feedback Egoric): Tài liệu công ty — kho tài sản số dùng chung (profile, brand kit,
+// mẫu biểu…). File lưu thẳng trong Postgres (cap 4MB/file vì giới hạn request Vercel);
+// file lớn hơn vẫn dùng cơ chế dán link (DocLinks) như cũ.
+model CompanyDoc {
+  id           String   @id @default(cuid())
+  name         String
+  category     String? // Profile / Brand / Mẫu biểu / Khác
+  mime         String
+  size         Int
+  data         Bytes
+  note         String?
+  uploadedById String?
+  uploadedBy   String // giữ tên người upload kể cả khi tài khoản bị xóa
+  createdAt    DateTime @default(now())
+}
+
 model Client {
-  id        String    @id @default(cuid())
-  name      String
-  contact   String?
-  email     String?
-  phone     String?
-  industry  String?
-  address   String?
-  note      String?
+  id          String    @id @default(cuid())
+  name        String
+  contact     String?
+  email       String?
+  phone       String?
+  industry    String?
+  serviceLine String? // v3.37: mảng dịch vụ khách đang dùng (Seeding, Digital Ads…) — lọc danh sách khách
+  address     String?
+  note        String?
   createdAt String? // ISO date
   projects  Project[]
   invoices  Invoice[]
@@ -220,11 +237,13 @@ model Lead {
 }
 
 model Service {
-  id    String  @id @default(cuid())
-  name  String
-  unit  String?
-  price Int     @default(0)
-  desc  String?
+  id        String  @id @default(cuid())
+  name      String
+  unit      String?
+  price     Int     @default(0)
+  desc      String?
+  category  String? // v3.37: mảng dịch vụ (Seeding, Digital Ads…) — lọc bảng giá theo mảng
+  sortOrder Int     @default(0) // v3.37: thứ tự tùy chỉnh trong bảng giá (0 = chưa xếp, sort theo tên)
 }
 
 model Project {

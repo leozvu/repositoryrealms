@@ -128,7 +128,10 @@ export default function SettingsPage() {
   if (!s) return null;
 
   const save = async () => {
-    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(s) });
+    // v3.37: serviceLines soạn dạng text mỗi dòng một mảng → chuẩn hóa thành mảng khi lưu
+    const serviceLines = (Array.isArray(s.serviceLines) ? s.serviceLines : String(s.serviceLines || '').split('\n'))
+      .map(x => String(x).trim()).filter(Boolean);
+    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...s, serviceLines }) });
     toast(res.ok ? 'Đã lưu cài đặt' : 'Có lỗi khi lưu', res.ok ? 'success' : 'error');
   };
 
@@ -166,8 +169,15 @@ export default function SettingsPage() {
             <F k="monthlyTarget" label="Mục tiêu doanh thu tháng (đ)" type="number" />
             <F k="address" label="Địa chỉ" full />
             <F k="bank" label="Thông tin ngân hàng (in trên hóa đơn)" full />
+            <div className="field full">
+              <label>Mảng dịch vụ (mỗi dòng một mảng — dùng cho Dự án, Khách hàng, Bảng giá)</label>
+              <textarea rows={5} value={Array.isArray(s.serviceLines) ? s.serviceLines.join('\n') : (s.serviceLines ?? '')}
+                onChange={e => setS({ ...s, serviceLines: e.target.value })}
+                placeholder={'Digital Ads\nSocial Media\nSeeding\nLivestream…'} />
+              <div className="hint">Nhân viên chỉ chọn từ danh sách này; muốn thêm mảng mới thì Giám đốc bổ sung tại đây.</div>
+            </div>
             <F k="approveQuoteOver" label="Ngưỡng duyệt báo giá (đ)" type="number" />
-            <F k="approveExpenseOver" label="Ngưỡng duyệt khoản chi (đ)" type="number" />
+            <F k="approveExpenseOver" label="Ngưỡng duyệt khoản chi (đ) — nhập 0 nếu muốn MỌI khoản chi đều phải duyệt" type="number" />
             <F k="approveExpenseDirectorOver" label="Chi cần thêm Giám đốc duyệt từ (đ)" type="number" />
             <F k="commissionRate" label="Tỷ lệ hoa hồng mặc định (%)" type="number" />
             <F k="leaveQuota" label="Ngày phép năm / nhân sự" type="number" />
