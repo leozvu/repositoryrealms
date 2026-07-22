@@ -22,8 +22,10 @@ const ENTITIES = [
   { id: 'crmtest', displayName: 'Sandbox Test', baseUrl: 'https://erp-crm-test.vercel.app', businessProfile: 'agency', environment: 'staging', backupFile: 'crmtest.json' },
   { id: 'aim', displayName: 'AIm Agency', baseUrl: 'https://agency-erp-mu.vercel.app', businessProfile: 'agency', environment: 'production', backupFile: 'public.json' },
   { id: 'egoric', displayName: 'Egoric Agency', baseUrl: 'https://erp-egoric.vercel.app', businessProfile: 'agency', environment: 'production', backupFile: 'egoric.json' },
-  { id: 'fretas', displayName: 'Fretas (XNK)', baseUrl: 'https://erp-fretas.vercel.app', businessProfile: 'export', environment: 'production', backupFile: 'fretas.json' },
+  { id: 'vnecom', displayName: 'Vnecom LLC', baseUrl: 'https://erp-vnecom.vercel.app', businessProfile: 'agency', environment: 'production', backupFile: 'vnecom.json' },
   { id: 'egolive', displayName: 'Egolive (livestream)', baseUrl: 'https://erp-egolive.vercel.app', businessProfile: 'livestream', environment: 'production', backupFile: 'egolive.json' },
+  // Fretas thuộc đơn vị khác (chỉ đạo 23/7/2026) — KHÔNG nối vào terminal. Registry row cũ
+  // (nếu có) bị vô hiệu bởi bước disable trong lần provision kế tiếp, không xuất hiện ở đây.
 ];
 const RING_ORDER = ['local_staging', 'read_only', 'ceo_sso', 'messaging', 'commands'];
 const BASE_KINDS = ['backup', 'restore_test', 'canary', 'reconciliation', 'rollback'];
