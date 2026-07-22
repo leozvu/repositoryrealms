@@ -1,6 +1,7 @@
 'use client';
 // UI kit dùng chung: icon, toast, modal, form động, hook dữ liệu — port từ v1
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { BADGE } from '@/lib/format';
 import { ROLE_LABEL } from '@/lib/perm';
 
@@ -156,7 +157,7 @@ export function Modal({ title, children, footer, large, className = '', onClose 
     document.addEventListener('keydown', h);
     return () => document.removeEventListener('keydown', h);
   }, [onClose]);
-  return (
+  const dialog = (
     <div className="modal-overlay" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className={`modal ${large ? 'modal-lg' : ''} ${className}`.trim()} role="dialog" aria-modal="true" aria-label={title}>
         <div className="modal-head">
@@ -168,6 +169,12 @@ export function Modal({ title, children, footer, large, className = '', onClose 
       </div>
     </div>
   );
+  // v3.37 (feedback Egoric): PORTAL ra document.body. Modal từng render bên trong #view —
+  // #view của theme Realm có isolation:isolate nên z-index 100 của modal bị NHỐT trong
+  // stacking context đó: topbar (z 30) đè lên đầu modal, lớp phủ mờ không che nổi
+  // topbar/sidebar → nhìn như modal "dính" vào bảng phía sau. Ra body là thoát hết.
+  if (typeof document === 'undefined') return dialog; // SSR không render modal — giữ an toàn
+  return createPortal(dialog, document.body);
 }
 
 export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa', modalClassName = '' }) {

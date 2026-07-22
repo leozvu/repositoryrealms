@@ -48,7 +48,9 @@ function useTableLabels(pathname) {
     // tab nền sẽ không bao giờ được gắn nhãn (đã dính đúng lỗi này lúc kiểm thử).
     const schedule = () => { clearTimeout(timer); timer = setTimeout(apply, 0); };
     schedule();
-    const root = document.getElementById('view');
+    // v3.37: theo dõi cả document.body (không chỉ #view) — Modal đã portal ra body,
+    // bảng bên trong modal vẫn phải được gắn nhãn cột cho mobile.
+    const root = document.body || document.getElementById('view');
     const mo = new MutationObserver(schedule);
     if (root) mo.observe(root, { childList: true, subtree: true });
     return () => { mo.disconnect(); clearTimeout(timer); };
