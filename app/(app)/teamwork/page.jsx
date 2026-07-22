@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Icon, useToast } from '@/components/ui';
+import { Icon, Avatar, useToast } from '@/components/ui';
 import styles from './team-work.module.css';
 
 const OPEN = new Set(['todo', 'doing', 'in_progress', 'review', 'waiting', 'blocked']);
@@ -259,7 +259,7 @@ export default function TeamWorkPage() {
         return (
           <section key={row.member.id} className={styles.member} aria-labelledby={`member-${row.member.id}`}>
             <header className={styles.memberHead}>
-              <div className={styles.identity}><span className={styles.avatar}>{row.member.name.split(/\s+/).slice(-2).map((part) => part[0]).join('').toUpperCase()}</span><div><h2 id={`member-${row.member.id}`}>{row.member.name}</h2><p>{row.member.title || row.member.realmProfile?.realmClass || 'Thành viên'}</p></div></div>
+              <div className={styles.identity}><Avatar className={styles.avatar} userId={row.member.id} name={row.member.name} /><div><h2 id={`member-${row.member.id}`}>{row.member.name}</h2><p>{row.member.title || row.member.realmProfile?.realmClass || 'Thành viên'}</p></div></div>
               <div className={styles.memberMetrics}><span>Open <strong>{row.metrics.open}</strong></span><span>WIP <strong>{row.metrics.wip}/{row.queue.wipLimit}</strong></span><span>Blocked <strong>{row.metrics.blocked}</strong></span><span className={styles[row.capacity.key]}>{row.capacity.label}</span></div>
             </header>
             <div className={styles.taskList}>

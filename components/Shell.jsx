@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { SessionProvider, signOut } from 'next-auth/react';
-import { Icon, Modal, AsyncButton, ToastProvider, useToast, RoleLabelsCtx, ModulesCtx } from './ui';
+import { Icon, Modal, Avatar, AsyncButton, ToastProvider, useToast, RoleLabelsCtx, ModulesCtx } from './ui';
 import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
 import { modOn } from '@/lib/modules';
@@ -229,6 +229,8 @@ export default function Shell({ user, company, realmPilot, children }) {
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadChat, setUnreadChat] = useState(0);
   const [show2fa, setShow2fa] = useState(false);
+  const [avatarVer, setAvatarVer] = useState(0); // v3.38: bust cache sau khi đổi ảnh
+  const avatarInputRef = useRef(null);
   const [showSearch, setShowSearch] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [unreadNotif, setUnreadNotif] = useState(0);
@@ -356,7 +358,21 @@ export default function Shell({ user, company, realmPilot, children }) {
             })}
           </nav>
           <div className="user-chip">
-            <span className="avatar">{initials(user.name)}</span>
+            {/* v3.38: bấm vào avatar để upload ảnh thật của mình (thay chữ cái đầu / nhân vật gán sẵn) */}
+            <button onClick={() => avatarInputRef.current?.click()} title="Đổi ảnh đại diện của bạn" aria-label="Đổi ảnh đại diện"
+              style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer' }}>
+              <Avatar userId={user.id} name={user.name} version={avatarVer} />
+            </button>
+            <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" hidden
+              onChange={async e => {
+                const f = e.target.files?.[0];
+                e.target.value = '';
+                if (!f) return;
+                if (f.size > 512 * 1024) { alert('Ảnh vượt 512KB — hãy crop/nén nhỏ lại rồi thử lại.'); return; }
+                const form = new FormData(); form.append('file', f);
+                const r = await fetch('/api/avatar', { method: 'POST', body: form });
+                if (r.ok) setAvatarVer(v => v + 1); else alert((await r.json().catch(() => ({})))?.error || 'Upload avatar thất bại');
+              }} />
             <div>
               <div className="uc-name">{user.name}</div>
               <div className="uc-role">{myRoles.map(r => roleLabels[r] || r).join(' · ')}</div>

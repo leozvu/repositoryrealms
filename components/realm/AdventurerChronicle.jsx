@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
-import { Icon } from '@/components/ui';
+import { Icon, Avatar } from '@/components/ui';
 import styles from './adventurer-chronicle.module.css';
 
 const QUEST_STATUS = {
@@ -116,7 +116,7 @@ export default function AdventurerChronicle({ operationsSource = 'local', localD
   const { identity, career, metrics, muster, campaigns, approvals, timeline, privacy, source, links } = dashboard;
   return <section className={`${styles.chronicle} ${compact ? styles.compact : ''}`} aria-label="Adventurer Chronicle từ dữ liệu ERP cá nhân">
     <header className={styles.hero}>
-      <span className={styles.avatar} style={{ '--chronicle-color': identity.color }}>{initials(identity.name)}</span>
+      <Avatar className={styles.avatar} style={{ '--chronicle-color': identity.color }} userId={identity.id || null} name={identity.name} />
       <div className={styles.heroCopy}>
         <span className={styles.eyebrow}>Adventurer Chronicle · Self-service ERP status</span>
         <h2 id={titleId}>Nhật trình của {identity.name}</h2>

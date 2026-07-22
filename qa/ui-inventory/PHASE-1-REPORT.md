@@ -5,8 +5,8 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 ## Phạm vi
 
 - UI routes: **66**
-- API routes: **116**
-- Interactive element definitions: **947**
+- API routes: **118**
+- Interactive element definitions: **949**
 - Source files có interaction: **95**
 - Routes có ERP resource candidate: **42**
 - Parse errors: **0**
@@ -15,8 +15,8 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 | Loại | Số lượng |
 | --- | --- |
-| action | 552 |
-| form-control | 310 |
+| action | 553 |
+| form-control | 311 |
 | form-submit | 15 |
 | navigation | 70 |
 
@@ -25,7 +25,7 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 | Candidate | Số lượng |
 | --- | --- |
 | clickable_non_semantic | 18 |
-| control_binding_unverified | 260 |
+| control_binding_unverified | 261 |
 | keyboard_path_unverified | 18 |
 | unlabelled_button_candidate | 52 |
 

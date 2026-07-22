@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Icon, ToastProvider, useToast } from '@/components/ui';
+import { Icon, Avatar, ToastProvider, useToast } from '@/components/ui';
 import {
   DEFAULT_WORLD_POSITION,
   INITIAL_LEDGER,
@@ -213,6 +213,15 @@ function collaborationPeopleForRealm(people = []) {
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const initials = (name) => name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
+
+// v3.38: ảnh avatar THẬT của nhân sự đè lên portrait vẽ sẵn (yêu cầu "avatar thật từng người").
+// Chưa upload ảnh → im lặng rút lui, portrait sinh sẵn + chữ cái đầu hiện như cũ.
+function RealPortrait({ userId, className }) {
+  const [broken, setBroken] = useState(false);
+  useEffect(() => { setBroken(false); }, [userId]);
+  if (!userId || broken) return null;
+  return <img className={className} src={`/api/avatar/${userId}`} alt="" aria-hidden="true" style={{ objectFit: 'cover' }} onError={() => setBroken(true)} />;
+}
 
 function loadRealmImage(url) {
   return new Promise((resolve, reject) => {
@@ -1108,6 +1117,8 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const initialProfile = useMemo(() => normalizeProfile(dataSource.isErp && initialBridge?.actor
     ? { name: initialBridge.actor.name, role: initialBridge.actor.title || 'Realm Builder' }
     : DEFAULT_PROFILE), [dataSource.isErp, initialBridge]);
+  // v3.38: id ERP thật của người đang chơi — để hiện ảnh avatar thật thay portrait vẽ sẵn
+  const viewerRealUserId = dataSource.isErp ? (initialBridge?.actor?.id || null) : null;
   const [mode, setMode] = useState(initialMode === 'ledger' ? 'ledger' : 'world');
   const [activePanel, setActivePanel] = useState('briefing');
   const [ledgerView, setLedgerView] = useState('personal');
@@ -2169,7 +2180,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                   <div className={styles.partyCandidates}>
                     {candidates.map((person) => (
                       <button type="button" key={person.id} onClick={() => inviteToParty(person)}>
-                        <span className={styles.personAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span>
+                        <Avatar className={styles.personAvatar} style={{ '--avatar-color': person.color }} userId={person.userId || null} name={person.name} />
                         <span><strong>{person.name}</strong><small>{person.role}</small></span>
                         <Icon name="plus" size={17} />
                       </button>
@@ -2214,7 +2225,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                 <div className={styles.partyCandidates}>
                   {remotePlayers.map((person) => (
                     <button type="button" key={person.id} onClick={() => inviteToParty(person)}>
-                      <span className={styles.personAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span>
+                      <Avatar className={styles.personAvatar} style={{ '--avatar-color': person.color }} userId={person.userId || null} name={person.name} />
                       <span><strong>{person.name}</strong><small>{person.role}</small></span>
                       <Icon name="plus" size={17} />
                     </button>
@@ -2261,7 +2272,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
             text={`${selectedPerson.role} · ${selectedPerson.isRemote ? 'Đang ở trong Realm' : selectedPerson.isErpDirectory ? selectedPerson.online ? `Đang online tại ${(selectedPerson.surfaces || []).map((surface) => surface === 'realm' ? 'Realm' : 'ERP').join(' + ')}` : 'Nhân sự ERP · hiện đang offline' : 'Người chơi Realm'}`}
           />
           <div className={styles.playerHero}>
-            <span className={styles.playerHeroAvatar} style={{ '--avatar-color': selectedPerson.color }}>{initials(selectedPerson.name)}</span>
+            <Avatar className={styles.playerHeroAvatar} style={{ '--avatar-color': selectedPerson.color }} userId={selectedPerson.userId || null} name={selectedPerson.name} />
             <div>
               <strong>{selectedStatus.label}</strong>
               <span>{selectedRoom?.name || 'Hành lang lâu đài'} · cách {tilesAway} ô</span>
@@ -2342,6 +2353,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
             <span className={styles.profileAvatar} style={{ '--avatar-color': profileDraft.color }}>
               <span className={styles.portraitFallback}>{initials(profileDraft.name || DEFAULT_PROFILE.name)}</span>
               <img className={styles.portraitImage} src={realmGeneratedCharacterPortraitUrl(profileDraft.name || DEFAULT_PROFILE.name)} alt="" aria-hidden="true" />
+              <RealPortrait userId={viewerRealUserId} className={styles.portraitImage} />
             </span>
             <span><strong>{profileDraft.name || DEFAULT_PROFILE.name}</strong><small>{profileDraft.role}</small></span>
           </div>
@@ -2594,6 +2606,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
             <span className={styles.profileAvatar} style={{ '--avatar-color': profile.color }}>
               <span className={styles.portraitFallback}>{initials(profile.name)}</span>
               <img className={styles.portraitImage} src={realmGeneratedCharacterPortraitUrl(profile.name || DEFAULT_PROFILE.name)} alt="" aria-hidden="true" />
+              <RealPortrait userId={viewerRealUserId} className={styles.portraitImage} />
             </span>
             <span><strong>{profile.name}</strong><small>Level {career.level} · {profile.role}</small></span>
             <Icon name="settings" size={15} />

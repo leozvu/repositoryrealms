@@ -32,6 +32,24 @@ export function useServiceLines() {
   return lines;
 }
 
+/* ---------- v3.38: Avatar thật — ảnh upload của từng người, fallback chữ cái đầu ---------- */
+// Dùng thay cho <span className="avatar">{initials(...)}</span> ở những chỗ quan trọng.
+// Ảnh lấy từ /api/avatar/<userId>?v=<version>; 404 (chưa upload) → hiện chữ cái đầu như cũ.
+export function Avatar({ userId, name = '', version = 0, size, className = 'avatar', title, style: styleProp }) {
+  const [broken, setBroken] = useState(false);
+  useEffect(() => { setBroken(false); }, [userId, version]);
+  const init = String(name).split(/\s+/).filter(Boolean).slice(-2).map(w => w[0]).join('').toUpperCase() || '?';
+  const style = { ...(size ? { width: size, height: size } : {}), ...styleProp };
+  if (!userId || broken) return <span className={className} style={style} title={title || name}>{init}</span>;
+  return (
+    <span className={className} style={{ ...style, overflow: 'hidden', padding: 0 }} title={title || name}>
+      <img src={`/api/avatar/${userId}?v=${version}`} alt={name}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit', display: 'block' }}
+        onError={() => setBroken(true)} />
+    </span>
+  );
+}
+
 /* ---------- Icons (Lucide-style, giữ nguyên từ v1) ---------- */
 const RAW = {
   dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',

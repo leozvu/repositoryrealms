@@ -1233,7 +1233,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.go-cua-erp-nguoi-nhan-ang-offline-loi-nhan-van-uoc-luu-trong-not",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2296,
+      "line": 2307,
       "label": "Gõ cửa ERP / Người nhận đang offline; lời nhắn vẫn được lưu trong Notification và Lantern Mail.",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1245,7 +1245,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2309,
+      "line": 2320,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1257,7 +1257,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2340,
+      "line": 2351,
       "label": "Tên hiển thị / Class trong Realm / Màu huy hiệu / Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1269,7 +1269,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2360,
+      "line": 2372,
       "label": "Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1281,7 +1281,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2396,
+      "line": 2408,
       "label": "Nhận / Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1293,7 +1293,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 3009,
+      "line": 3022,
       "label": "Đang ghi… / Ghi nhận Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1605,7 +1605,7 @@
     {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 153,
+      "line": 155,
       "label": "Đọc tất cả",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1617,7 +1617,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 197,
+      "line": 199,
       "label": "Tắt 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1629,7 +1629,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 198,
+      "line": 200,
       "label": "Bật 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1641,7 +1641,7 @@
     {
       "elementId": "component.components-ui.action.ang-xu-ly",
       "source": "components/ui.jsx",
-      "line": 196,
+      "line": 221,
       "label": "Đang xử lý…",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1653,7 +1653,7 @@
     {
       "elementId": "component.components-ui.action.ang-luu-luu",
       "source": "components/ui.jsx",
-      "line": 243,
+      "line": 268,
       "label": "Đang lưu… / Lưu",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1665,7 +1665,7 @@
     {
       "elementId": "component.components-ui.form-submit.e-e-preventdefault-submit",
       "source": "components/ui.jsx",
-      "line": 247,
+      "line": 272,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",

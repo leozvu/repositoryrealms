@@ -30,6 +30,9 @@ model User {
   birthday                      String? // v3.8: YYYY-MM-DD — AI Summary nhắc sinh nhật
   userType                      String                         @default("employee") // v3.11: employee | freelancer
   workspacePreference           String                         @default("auto") // auto | erp | realm — lựa chọn giao diện, không phải dữ liệu hiệu suất
+  avatar                        Bytes? // v3.38: ảnh avatar thật (≤512KB, tự upload) — Realm + ERP hiển thị thay chữ cái đầu
+  avatarMime                    String? // image/jpeg | image/png | image/webp
+  avatarVersion                 Int                            @default(0) // tăng mỗi lần đổi — bust cache trình duyệt
   accessUntil                   String? // v3.11: YYYY-MM-DD — freelancer hết hạn thì chặn đăng nhập
   hourlyRate                    Int                            @default(0) // v3.11: đơn giá giờ freelancer (nhân viên dùng lương÷176)
   skills                        String? // v3.11: kỹ năng freelancer

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
-import { Icon } from '@/components/ui';
+import { Icon, Avatar } from '@/components/ui';
 import HrEvidenceIntelligence from '@/components/hr/HrEvidenceIntelligence';
 import { createRealmGuildDashboard, mergeRealmGuildPresence } from '@/lib/realm-guild';
 import styles from './guild-hall.module.css';
@@ -49,7 +49,8 @@ function Metric({ icon, label, value, detail }) {
 function MemberRow({ member, onSelect }) {
   const presence = PRESENCE_META[member.presence] || PRESENCE_META.unknown;
   const content = <>
-    <span className={styles.avatar} style={{ '--guild-color': member.color }}>{member.name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase()}</span>
+    {/* v3.38: avatar thật của thành viên guild (member.id = User.id ERP); chưa có ảnh → chữ cái đầu */}
+    <Avatar className={styles.avatar} style={{ '--guild-color': member.color }} userId={member.id || null} name={member.name} />
     <span className={styles.memberIdentity}>
       <strong>{member.name}{member.isLead && <small className={styles.leadBadge}>Guild Lead</small>}</strong>
       <small>{member.realmClass} · {member.currentProject}</small>
