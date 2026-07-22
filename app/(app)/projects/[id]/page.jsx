@@ -1,18 +1,44 @@
 'use client';
-// v3.10: Trang vận hành một dự án — sức khỏe, chi phí/biên lợi nhuận, giai đoạn (phase),
-// việc theo phase, mốc, tài liệu. Số tiền chỉ hiện với CEO/Kế toán/PM/Lead.
-import { useEffect, useState } from 'react';
+
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
 import { DocLinks } from '@/components/DocLinks';
-import { money, moneyShort, fmtDate, todayISO, initials, BADGE } from '@/lib/format';
+import { moneyShort, fmtDate, todayISO, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
+import styles from './project-execution-health.module.css';
 
-// v3.14: bỏ emoji — màu đã có trong biến, chữ đứng riêng (không truyền tin bằng màu đơn thuần)
-const HEALTH = { green: ['#059669', 'Ổn'], amber: ['#D97706', 'Cần chú ý'], red: ['#DC2626', 'Rủi ro'] };
 const PHASE_COLORS = ['#2563EB', '#7C3AED', '#059669', '#D97706', '#DB2777', '#0891B2'];
+const HEALTH_LABEL = { red: 'Rủi ro', amber: 'Cần chú ý', green: 'Ổn định' };
+
+function hours(value) {
+  return Number(value || 0).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
+}
+
+function Metric({ label, value, detail, tone = 'neutral' }) {
+  return (
+    <article className={styles.metric} data-tone={tone}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      {detail && <small>{detail}</small>}
+    </article>
+  );
+}
+
+function Progress({ value, label }) {
+  const safe = Math.max(0, Math.min(100, Number(value) || 0));
+  return (
+    <div className={styles.progress} role="progressbar" aria-label={label} aria-valuemin="0" aria-valuemax="100" aria-valuenow={safe}>
+      <span style={{ width: `${safe}%` }} />
+    </div>
+  );
+}
+
+function HealthBadge({ level }) {
+  return <span className={styles.healthBadge} data-level={level}><span aria-hidden="true" />{HEALTH_LABEL[level] || 'Chưa rõ'}</span>;
+}
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
@@ -22,55 +48,65 @@ export default function ProjectDetailPage() {
   const tasks = useResource('tasks');
   const phases = useResource('phases');
   const users = useResource('users');
-  const clients = useResource('clients');
-  const [st, setSt] = useState(null);
-  const [canMoney, setCanMoney] = useState(false);
+  const [data, setData] = useState(null);
+  const [loadingHealth, setLoadingHealth] = useState(true);
+  const [healthError, setHealthError] = useState('');
   const [modal, setModal] = useState(null);
   const toast = useToast();
 
-  useEffect(() => { fetch('/api/projects/stats').then(r => r.ok ? r.json() : null).then(d => { if (d) { setSt(d.stats[id]); setCanMoney(d.canSeeMoney); } }).catch(() => {}); }, [id, tasks.rows.length, phases.rows.length]);
+  const loadHealth = useCallback(async () => {
+    setLoadingHealth(true);
+    setHealthError('');
+    try {
+      const response = await fetch(`/api/projects/${encodeURIComponent(id)}/execution-health`, { cache: 'no-store' });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body?.error || 'Không thể tải Execution Health.');
+      setData(body);
+    } catch (error) {
+      setHealthError(error.message || 'Không thể tải Execution Health.');
+    } finally {
+      setLoadingHealth(false);
+    }
+  }, [id]);
 
-  const p = projects.rows.find(x => x.id === id);
+  useEffect(() => { loadHealth(); }, [loadHealth, tasks.rows.length, phases.rows.length]);
+
+  const project = projects.rows.find((row) => row.id === id);
+  const myPhases = useMemo(() => phases.rows.filter((phase) => phase.projectId === id).sort((a, b) => a.order - b.order), [phases.rows, id]);
+  const myTasks = useMemo(() => tasks.rows.filter((task) => task.projectId === id), [tasks.rows, id]);
+  const noPhase = myTasks.filter((task) => !task.phaseId || !myPhases.some((phase) => phase.id === task.phaseId));
+  const health = data?.executionHealth;
+
   if (projects.loading) return null;
-  if (!p) return <EmptyState title="Không tìm thấy dự án" />;
+  if (!project) return <EmptyState title="Không tìm thấy dự án" />;
 
-  const uName = uid => users.rows.find(u => u.id === uid)?.name || '—';
-  const myPhases = phases.rows.filter(ph => ph.projectId === id).sort((a, b) => a.order - b.order);
-  const myTasks = tasks.rows.filter(t => t.projectId === id);
-  const noPhase = myTasks.filter(t => !t.phaseId || !myPhases.some(ph => ph.id === t.phaseId));
-  const [hc, hl] = HEALTH[st?.health] || ['var(--muted)', ''];
-  const clientName = clients.rows.find(c => c.id === p.clientId)?.name || '—';
-
-  const phaseProgress = phId => {
-    const ts = myTasks.filter(t => t.phaseId === phId);
-    if (!ts.length) return 0;
-    const est = ts.reduce((s, t) => s + (t.estHours || 0), 0);
-    if (est > 0) return Math.round(ts.filter(t => t.status === 'done').reduce((s, t) => s + (t.estHours || 0), 0) / est * 100);
-    return Math.round(ts.filter(t => t.status === 'done').length / ts.length * 100);
-  };
-
-  const addPhase = async name => {
+  const userName = (userId) => users.rows.find((user) => user.id === userId)?.name || '—';
+  const addPhase = async (name) => {
     if (!name?.trim()) return;
     await phases.create({ projectId: id, name: name.trim(), order: myPhases.length, color: PHASE_COLORS[myPhases.length % PHASE_COLORS.length] });
     toast('Đã thêm giai đoạn');
+    await loadHealth();
   };
-  const moveTask = async (task, phaseId) => { await tasks.update(task.id, { phaseId: phaseId || null }); };
+  const moveTask = async (task, phaseId) => {
+    await tasks.update(task.id, { phaseId: phaseId || null });
+    await loadHealth();
+  };
 
-  const TaskRow = ({ t }) => {
-    const late = t.status !== 'done' && t.dueDate && t.dueDate < todayISO();
+  const TaskRow = ({ task }) => {
+    const late = task.status !== 'done' && task.dueDate && task.dueDate < todayISO();
     return (
-      <div className="act-item" style={{ alignItems: 'center', gap: 8 }}>
-        <span style={{ width: 8, height: 8, borderRadius: '50%', flex: 'none', background: BADGE.task[t.status]?.[1] === 'b-green' ? 'var(--accent)' : t.status === 'doing' ? 'var(--primary)' : 'var(--muted)' }}></span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="act-title" style={{ textDecoration: t.status === 'done' ? 'line-through' : 'none', opacity: t.status === 'done' ? .6 : 1 }}>{t.title}</div>
-          <div className="act-sub">{uName(t.assigneeId)}{t.estHours ? ` · ${t.estHours}h ước lượng` : ''}{t.dueDate ? ` · hạn ${fmtDate(t.dueDate)}` : ''}{late ? ' ⚠' : ''}</div>
+      <div className={styles.taskRow}>
+        <span className={styles.taskState} data-status={task.status} aria-hidden="true" />
+        <div>
+          <strong data-complete={task.status === 'done'}>{task.title}</strong>
+          <small>{userName(task.assigneeId)}{task.estHours ? ` · ${task.estHours}h estimate` : ''}{task.dueDate ? ` · hạn ${fmtDate(task.dueDate)}` : ''}{late ? ' · Trễ' : ''}</small>
         </div>
-        <Badge map="task" k={t.status} />
+        <Badge map="task" k={task.status} />
         {isMgmt && (
-          <select value={t.phaseId && myPhases.some(ph => ph.id === t.phaseId) ? t.phaseId : ''} onChange={e => moveTask(t, e.target.value)}
-            title="Chuyển giai đoạn" style={{ fontSize: '.72rem', padding: '2px 4px', maxWidth: 110 }}>
-            <option value="">— Chưa xếp —</option>
-            {myPhases.map(ph => <option key={ph.id} value={ph.id}>{ph.name}</option>)}
+          <select value={task.phaseId && myPhases.some((phase) => phase.id === task.phaseId) ? task.phaseId : ''}
+            onChange={(event) => moveTask(task, event.target.value)} aria-label={`Chuyển giai đoạn cho ${task.title}`}>
+            <option value="">Chưa xếp</option>
+            {myPhases.map((phase) => <option key={phase.id} value={phase.id}>{phase.name}</option>)}
           </select>
         )}
       </div>
@@ -78,107 +114,170 @@ export default function ProjectDetailPage() {
   };
 
   return (
-    <>
-      <div className="toolbar">
-        <Link href="/projects" className="btn btn-outline btn-sm">← Dự án</Link>
-        <span style={{ fontSize: '1.05rem', fontWeight: 800 }}>{p.name}</span>
-        <span className="badge" style={{ borderColor: hc, color: hc }}>{hl}</span>
-        <Badge map="project" k={p.status} />
-        <div className="spacer"></div>
-        <span style={{ fontSize: '.78rem', color: 'var(--muted)' }}>{clientName} · {p.service || '—'} · {fmtDate(p.startDate)} → {fmtDate(p.deadline)}</span>
-        <Link href="/tasks" className="btn btn-outline btn-sm">Mở bảng công việc →</Link>
-      </div>
-
-      {st?.healthReasons?.length > 0 && (
-        <div className="card" style={{ marginBottom: 14, borderLeft: `4px solid ${hc}` }}>
-          <div className="card-body" style={{ fontSize: '.84rem' }}>⚠ {st.healthReasons.join(' · ')}</div>
-        </div>
-      )}
-
-      <div className="grid kpi-grid">
-        <div className="card kpi"><span className="kpi-label">Tiến độ {p.autoProgress ? '(tự động)' : '(nhập tay)'}</span>
-          <div className="kpi-value">{st?.progress ?? p.progress}%</div>
-          <div className="kpi-sub">{st?.taskDone ?? 0}/{st?.taskTotal ?? 0} việc xong{st?.taskOverdue ? ` · ${st.taskOverdue} trễ` : ''}</div></div>
-        <div className="card kpi"><span className="kpi-label">Giờ công</span>
-          <div className="kpi-value" style={st?.burnHours > 100 ? { color: 'var(--danger)' } : {}}>{st?.loggedHours ?? 0}h{p.budgetHours ? <span style={{ fontSize: '.85rem', color: 'var(--muted)' }}> / {p.budgetHours}h</span> : ''}</div>
-          <div className="kpi-sub">{st?.estHours ? `Ước lượng ${st.estHours}h` : ''}{st?.burnHours != null ? ` · đốt ${st.burnHours}%` : ''}</div></div>
-        {canMoney && <div className="card kpi"><span className="kpi-label">Chi phí thực tế</span>
-          <div className="kpi-value">{moneyShort(st?.cost ?? 0)}</div>
-          <div className="kpi-sub">Nhân công {moneyShort(st?.labor ?? 0)} + NCC {moneyShort(st?.vendor ?? 0)}</div></div>}
-        {canMoney && <div className="card kpi"><span className="kpi-label">Biên lợi nhuận</span>
-          <div className="kpi-value" style={{ color: (st?.margin ?? 0) >= 0 ? 'var(--accent)' : 'var(--danger)' }}>{moneyShort(st?.margin ?? 0)}</div>
-          <div className="kpi-sub">Ngân sách {moneyShort(p.budget)}{p.budget > 0 && st ? ` · biên ${Math.round(st.margin / p.budget * 100)}%` : ''}</div></div>}
-      </div>
-
-      <div className="grid two-col" style={{ marginTop: 16, alignItems: 'start' }}>
-        <div style={{ display: 'grid', gap: 14 }}>
-          <div className="toolbar" style={{ margin: 0 }}>
-            <span className="card-title">Giai đoạn &amp; công việc</span>
-            <div className="spacer"></div>
-            {isMgmt && <button className="btn btn-outline btn-sm" onClick={() => setModal({ mode: 'addphase' })}><Icon name="plus" size={13} /> Thêm giai đoạn</button>}
+    <main className={styles.page}>
+      <header className={styles.hero}>
+        <div>
+          <Link href="/projects" className={styles.backLink}>Dự án /</Link>
+          <p>Project Execution Health</p>
+          <h1>{project.name}</h1>
+          <div className={styles.heroMeta}>
+            <HealthBadge level={health?.health?.level} />
+            <Badge map="project" k={project.status} />
+            <span>{data?.project?.clientName || 'Chưa có khách hàng'} · {project.service || 'Chưa phân loại dịch vụ'}</span>
           </div>
-          {myPhases.map(ph => {
-            const ts = myTasks.filter(t => t.phaseId === ph.id);
-            const pct = phaseProgress(ph.id);
+        </div>
+        <div className={styles.heroActions}>
+          <Link href="/tasks" className="btn btn-outline">Mở bảng công việc</Link>
+          <button className="btn btn-outline" onClick={loadHealth} disabled={loadingHealth}>Làm mới health</button>
+        </div>
+      </header>
+
+      <div className={styles.live} aria-live="polite">
+        {loadingHealth ? 'Đang tổng hợp Task, TimeLog, dependency và WIP…'
+          : healthError || `Snapshot ${new Date(data.generatedAt).toLocaleString('vi-VN')} · ${data.source}`}
+      </div>
+      {healthError && <div className={styles.error} role="alert"><span>{healthError}</span><button className="btn btn-outline" onClick={loadHealth}>Thử lại</button></div>}
+
+      {health && <>
+        <section className={styles.metrics} aria-label="Chỉ số Project Execution Health">
+          <Metric label="Delivery risk" value={health.health.label} tone={health.health.level}
+            detail={`${health.health.confidence.label} · ceiling ${health.health.confidence.ceiling}`} />
+          <Metric label="Tiến độ có trọng số" value={`${health.progress.percent}%`}
+            detail={`${health.progress.completed}/${health.progress.total} Task · ${health.progress.basis === 'task_estimate' ? 'theo estimate' : 'theo số Task'}`} />
+          <Metric label="Blocker / dependency" value={`${health.delivery.blocked} / ${health.delivery.unresolvedDependencies}`}
+            detail={`${health.delivery.overdue} Task trễ · ${health.delivery.overdueMilestones} milestone trễ`}
+            tone={health.delivery.blocked ? 'red' : health.delivery.unresolvedDependencies ? 'amber' : 'green'} />
+          <Metric label="Capacity" value={`${health.capacity.constrainedMembers} vượt WIP`}
+            detail={`${health.capacity.assignedMembers} nguồn lực · đơn vị WIP, không phải performance`} tone={health.capacity.constrainedMembers ? 'amber' : 'green'} />
+          <Metric label="Resource burn" value={`${hours(health.resource.declaredLoggedHours)}h`}
+            detail={`${hours(health.resource.estimateHours)}h estimate · ${health.resource.burnVsBudgetPercent ?? '—'}% budget giờ`} />
+          <Metric label="Estimate coverage" value={`${health.resource.estimateCoveragePercent ?? 0}%`}
+            detail={`${health.resource.managerValidatedEstimates} manager-validated · ${health.resource.classifiedTasks} đã phân loại`} />
+        </section>
+
+        <section className={styles.dashboardGrid}>
+          <article className={styles.panel} aria-labelledby="project-risk-signals">
+            <div className={styles.panelHead}><div><p>Delivery risk</p><h2 id="project-risk-signals">Tín hiệu cần quyết định</h2></div><HealthBadge level={health.health.level} /></div>
+            <div className={styles.signalList}>
+              {health.health.signals.map((signal) => (
+                <div key={signal.id} className={styles.signal} data-level={signal.level}>
+                  <span aria-hidden="true" />
+                  <div><strong>{signal.label}</strong><p>{signal.explanation}</p><small>Nguồn: {signal.source}</small></div>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className={styles.panel} aria-labelledby="project-resource-burn">
+            <div className={styles.panelHead}><div><p>Resource</p><h2 id="project-resource-burn">Estimate ≠ TimeLog</h2></div></div>
+            <dl className={styles.definitionGrid}>
+              <div><dt>Estimate đang mở</dt><dd>{hours(health.resource.openEstimateHours)}h</dd></div>
+              <div><dt>Còn lại theo estimate</dt><dd>{hours(health.resource.remainingEstimateHours)}h</dd></div>
+              <div><dt>TimeLog tự khai báo</dt><dd>{hours(health.resource.declaredLoggedHours)}h</dd></div>
+              <div><dt>Burn / estimate</dt><dd>{health.resource.burnVsEstimatePercent ?? '—'}%</dd></div>
+            </dl>
+            <div className={styles.provenance} role="note"><Icon name="shield" size={17} /><span>Actual source: <b>{health.resource.actualSource}</b>. Đây không phải observed truth và không dùng cho Gold, payroll hay xếp hạng.</span></div>
+          </article>
+        </section>
+
+        <section className={styles.dashboardGrid}>
+          <article className={styles.panel} aria-labelledby="project-capacity">
+            <div className={styles.panelHead}><div><p>Capacity</p><h2 id="project-capacity">Nguồn lực theo WIP</h2></div><small>Thứ tự alphabet, không ranking</small></div>
+            {health.capacity.members.length ? <div className={styles.capacityList}>
+              {health.capacity.members.map((member) => (
+                <div key={member.userId} className={styles.capacityRow}>
+                  <div><strong>{member.name}</strong><small>{member.title || 'Thành viên dự án'} · {member.projectOpenTasks} Task dự án</small></div>
+                  <div><span className={styles.capacityBand} data-band={member.band}>{member.label}</span><small>WIP {member.globalWip}/{member.wipLimit} · còn {hours(member.projectRemainingEstimateHours)}h estimate</small></div>
+                </div>
+              ))}
+            </div> : <p className={styles.empty}>Chưa có Task đang mở được gán cho nhân sự.</p>}
+          </article>
+
+          <article className={styles.panel} aria-labelledby="project-flow-blockers">
+            <div className={styles.panelHead}><div><p>Flow</p><h2 id="project-flow-blockers">Blocker &amp; dependency</h2></div></div>
+            {!health.blockers.length && !health.dependencies.length && <p className={styles.empty}>Không có blocker hoặc dependency chưa hoàn tất trong snapshot này.</p>}
+            {health.blockers.map((blocker) => <div key={blocker.id} className={styles.flowRow}><strong>{blocker.title}</strong><span>Blocked · {blocker.assigneeName}</span><small>{blocker.reason}</small></div>)}
+            {health.dependencies.map((dependency) => <div key={`${dependency.taskId}:${dependency.dependsOnId}`} className={styles.flowRow}><strong>{dependency.taskTitle}</strong><span>đang chờ {dependency.dependsOnTitle}</span><small>Dependency status: {dependency.dependsOnStatus}</small></div>)}
+          </article>
+        </section>
+
+        <section className={styles.panel} aria-labelledby="project-phase-health">
+          <div className={styles.panelHead}><div><p>Execution map</p><h2 id="project-phase-health">Health theo giai đoạn</h2></div></div>
+          {health.phases.length ? <div className={styles.phaseGrid}>{health.phases.map((phase) => (
+            <article key={phase.id} className={styles.phaseHealth} data-level={phase.level}>
+              <div><strong>{phase.name}</strong><span>{phase.progress.percent}%</span></div>
+              <Progress value={phase.progress.percent} label={`Tiến độ ${phase.name}`} />
+              <small>{phase.progress.completed}/{phase.progress.total} Task · {hours(phase.declaredLoggedHours)}h TimeLog / {hours(phase.estimateHours)}h estimate</small>
+              <small>{phase.blocked} blocked · {phase.unresolvedDependencies} dependency</small>
+            </article>
+          ))}</div> : <p className={styles.empty}>Chưa có phase. Project vẫn hiển thị health tổng hợp từ Task hiện hữu.</p>}
+        </section>
+
+        {data.canSeeMoney && health.financial && <section className={styles.financePanel} aria-labelledby="project-finance-proxy">
+          <div className={styles.panelHead}><div><p>Finance bridge · provisional</p><h2 id="project-finance-proxy">Planning margin proxy</h2></div><span>Không phải accounting profit</span></div>
+          <div className={styles.financeGrid}>
+            <Metric label="Revenue target" value={moneyShort(health.financial.revenueTarget)} detail="Nguồn: Project.budget" />
+            <Metric label="Đã xuất invoice" value={moneyShort(health.financial.invoiced)} detail={`Đã thu ${moneyShort(health.financial.collected)}`} />
+            <Metric label="Planning cost proxy" value={moneyShort(health.financial.planningCostProxy)} detail={`Labor ${moneyShort(health.financial.laborAccrued)} + vendor ${moneyShort(health.financial.vendorCommitted)}`} />
+            <Metric label="Planning margin proxy" value={moneyShort(health.financial.planningMarginProxy)} tone={health.financial.planningMarginProxy < 0 ? 'red' : 'green'} detail="Phase 5 mới nối accounting cost thật" />
+          </div>
+          <p>Nguồn chi phí: {health.financial.costBasis}. Confidence: {health.financial.confidence}. Không dùng con số này để chốt báo cáo tài chính.</p>
+        </section>}
+      </>}
+
+      <details className={styles.operations}>
+        <summary><span>Execution drill-down</span><strong>Giai đoạn &amp; Task ({myTasks.length})</strong><small>Mở để quản lý cấu trúc hiện hữu; dashboard phía trên vẫn là lớp quyết định chính.</small></summary>
+        <div className={styles.operationsBody}>
+          <div className={styles.operationsToolbar}>
+            <h2>Giai đoạn &amp; công việc</h2>
+            {isMgmt && <button className="btn btn-outline" onClick={() => setModal({ mode: 'addphase' })}><Icon name="plus" size={15} />Thêm giai đoạn</button>}
+          </div>
+          {myPhases.map((phase) => {
+            const rows = myTasks.filter((task) => task.phaseId === phase.id);
             return (
-              <div className="card" key={ph.id}>
-                <div className="card-head">
-                  <span className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ width: 10, height: 10, borderRadius: 3, background: ph.color || 'var(--primary)' }}></span>{ph.name}
-                    <span style={{ fontSize: '.74rem', color: 'var(--muted)', fontWeight: 400 }}>{ts.filter(t => t.status === 'done').length}/{ts.length} · {pct}%</span>
-                  </span>
-                  {isMgmt && <button className="icon-btn danger" title="Xóa giai đoạn (việc chuyển về Chưa xếp)" onClick={() => setModal({ mode: 'delphase', row: ph })}><Icon name="trash" size={14} /></button>}
+              <section className={styles.taskPhase} key={phase.id}>
+                <div><h3><span style={{ background: phase.color || 'var(--primary)' }} aria-hidden="true" />{phase.name}</h3>
+                  {isMgmt && <button className="icon-btn danger" aria-label={`Xóa giai đoạn ${phase.name}`} onClick={() => setModal({ mode: 'delphase', row: phase })}><Icon name="trash" size={15} /></button>}
                 </div>
-                <div className="card-body" style={{ paddingTop: 4 }}>
-                  <div className="progress" style={{ marginBottom: 8 }}><i style={{ width: pct + '%', background: ph.color }}></i></div>
-                  {ts.map(t => <TaskRow key={t.id} t={t} />)}
-                  {!ts.length && <p style={{ fontSize: '.78rem', color: 'var(--muted)' }}>Chưa có việc trong giai đoạn này — dùng ô "chuyển giai đoạn" ở mỗi việc.</p>}
-                </div>
-              </div>
+                {rows.map((task) => <TaskRow key={task.id} task={task} />)}
+                {!rows.length && <p className={styles.empty}>Chưa có Task trong giai đoạn này.</p>}
+              </section>
             );
           })}
-          <div className="card">
-            <div className="card-head"><span className="card-title">{myPhases.length ? 'Chưa xếp giai đoạn' : 'Công việc'} ({noPhase.length})</span></div>
-            <div className="card-body" style={{ paddingTop: 4 }}>
-              {noPhase.map(t => <TaskRow key={t.id} t={t} />)}
-              {!noPhase.length && <p style={{ fontSize: '.78rem', color: 'var(--muted)' }}>{myTasks.length ? 'Mọi việc đã xếp vào giai đoạn.' : 'Chưa có công việc — thêm ở bảng Công việc.'}</p>}
-            </div>
-          </div>
+          <section className={styles.taskPhase}>
+            <div><h3>Chưa xếp giai đoạn ({noPhase.length})</h3></div>
+            {noPhase.map((task) => <TaskRow key={task.id} task={task} />)}
+            {!noPhase.length && <p className={styles.empty}>{myTasks.length ? 'Mọi Task đã được xếp phase.' : 'Chưa có Task trong dự án.'}</p>}
+          </section>
         </div>
+      </details>
 
-        <div style={{ display: 'grid', gap: 14 }}>
-          <div className="card">
-            <div className="card-head"><span className="card-title">Mốc dự án</span></div>
-            <div className="card-body" style={{ paddingTop: 4 }}>
-              <Milestones projectId={id} />
-            </div>
-          </div>
-          <div className="card">
-            <div className="card-head"><span className="card-title">Tài liệu</span></div>
-            <div className="card-body" style={{ paddingTop: 8 }}><DocLinks refType="project" refId={id} canEdit={isMgmt} /></div>
-          </div>
-        </div>
-      </div>
+      <section className={styles.supportGrid}>
+        <article className={styles.panel}><div className={styles.panelHead}><div><p>Commitment</p><h2>Mốc dự án</h2></div></div><Milestones projectId={id} /></article>
+        <article className={styles.panel}><div className={styles.panelHead}><div><p>Context</p><h2>Tài liệu</h2></div></div><div className={styles.documents}><DocLinks refType="project" refId={id} canEdit={isMgmt} /></div></article>
+      </section>
 
       {modal?.mode === 'addphase' && <FormModal title="Thêm giai đoạn" fields={[{ key: 'name', label: 'Tên giai đoạn', required: true, full: true, placeholder: 'VD: Thiết kế' }]}
-        onClose={() => setModal(null)} onSave={async d => addPhase(d.name)} />}
-      {modal?.mode === 'delphase' && <ConfirmDialog msg={`Xóa giai đoạn "${modal.row.name}"? Việc trong đó chuyển về "Chưa xếp".`}
+        onClose={() => setModal(null)} onSave={async (form) => addPhase(form.name)} />}
+      {modal?.mode === 'delphase' && <ConfirmDialog msg={`Xóa giai đoạn "${modal.row.name}"? Task trong đó chuyển về "Chưa xếp".`}
         onClose={() => setModal(null)} onYes={async () => {
-          for (const t of myTasks.filter(t => t.phaseId === modal.row.id)) await tasks.update(t.id, { phaseId: null });
-          await phases.remove(modal.row.id); toast('Đã xóa giai đoạn');
+          for (const task of myTasks.filter((item) => item.phaseId === modal.row.id)) await tasks.update(task.id, { phaseId: null });
+          await phases.remove(modal.row.id);
+          toast('Đã xóa giai đoạn');
+          await loadHealth();
         }} />}
-    </>
+    </main>
   );
 }
 
 function Milestones({ projectId }) {
-  const ms = useResource('milestones');
-  const list = ms.rows.filter(m => m.projectId === projectId).sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-  if (!list.length) return <p style={{ fontSize: '.78rem', color: 'var(--muted)' }}>Chưa có mốc — thêm trên trang Gantt.</p>;
-  return list.map(m => (
-    <div key={m.id} className="act-item">
-      <span style={{ flex: 'none' }}>{m.done ? '✅' : '◆'}</span>
-      <div style={{ flex: 1 }}><div className="act-title">{m.name}</div><div className="act-sub">{fmtDate(m.date)}{m.note ? ' · ' + m.note : ''}</div></div>
+  const milestones = useResource('milestones');
+  const list = milestones.rows.filter((milestone) => milestone.projectId === projectId).sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  if (!list.length) return <p className={styles.empty}>Chưa có milestone — thêm trên trang Gantt.</p>;
+  return <div className={styles.milestones}>{list.map((milestone) => (
+    <div key={milestone.id} data-complete={milestone.done}>
+      <span aria-hidden="true"><Icon name={milestone.done ? 'check' : 'calendar'} size={17} /></span>
+      <div><strong>{milestone.name}</strong><small>{fmtDate(milestone.date)}{milestone.note ? ` · ${milestone.note}` : ''}</small></div>
     </div>
-  ));
+  ))}</div>;
 }

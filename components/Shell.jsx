@@ -1,13 +1,21 @@
 'use client';
 // Khung ứng dụng v2.1: sidebar theo 7 vai trò + badge phê duyệt
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { SessionProvider, signOut } from 'next-auth/react';
-import { Icon, Modal, ToastProvider, useToast, RoleLabelsCtx, ModulesCtx } from './ui';
+import { Icon, Modal, AsyncButton, ToastProvider, useToast, RoleLabelsCtx, ModulesCtx } from './ui';
 import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
 import { modOn } from '@/lib/modules';
+import { ERP_NAV } from '@/lib/erp-navigation';
+import { realmRecordHref } from '@/lib/realm-business-bridge';
+import CollaborationBridge, { WorkspaceSurfaceSwitch } from './collaboration/CollaborationBridge';
+import { useRealmChangeFeed } from './realm/useRealmChangeFeed';
+import { NOTIFICATION_SYNC_EVENT } from '@/lib/notification-inbox';
+import RealmFeedbackLauncher from './realm/RealmFeedbackLauncher';
+import RealmPilotOnboarding from './realm/RealmPilotOnboarding';
+import { LanguageSwitch, useLanguage } from './LanguageProvider';
 
 /* v3.14: TỰ GẮN NHÃN CỘT CHO BẢNG.
    Toàn app có 19 trang bảng, mỗi bảng viết tay riêng. Trên điện thoại, bảng 8 cột buộc phải
@@ -50,14 +58,14 @@ function useTableLabels(pathname) {
 // v3.4: tìm kiếm toàn cục Ctrl+K — gom mọi resource user được đọc
 const SEARCH_GROUPS = [
   { res: 'clients', label: 'Khách hàng', icon: 'clients', text: r => [r.name, r.contact, r.industry, r.phone], title: r => r.name, sub: r => r.industry || '', href: r => `/clients/${r.id}` },
-  { res: 'leads', label: 'Khách tiềm năng', icon: 'leads', text: r => [r.name, r.company, r.phone, r.email], title: r => r.company || r.name, sub: r => r.name, href: () => '/leads' },
-  { res: 'projects', label: 'Dự án', icon: 'projects', text: r => [r.name, r.service], title: r => r.name, sub: r => r.service || '', href: () => '/projects' },
-  { res: 'tasks', label: 'Công việc', icon: 'tasks', text: r => [r.title, r.note], title: r => r.title, sub: r => r.status, href: () => '/tasks' },
+  { res: 'leads', label: 'Khách tiềm năng', icon: 'leads', text: r => [r.name, r.company, r.phone, r.email], title: r => r.company || r.name, sub: r => r.name, href: r => realmRecordHref('lead', r.id) },
+  { res: 'projects', label: 'Dự án', icon: 'projects', text: r => [r.name, r.service], title: r => r.name, sub: r => r.service || '', href: r => realmRecordHref('project', r.id) },
+  { res: 'tasks', label: 'Công việc', icon: 'tasks', text: r => [r.title, r.note], title: r => r.title, sub: r => r.status, href: r => realmRecordHref('task', r.id) },
   { res: 'invoices', label: 'Hóa đơn', icon: 'invoices', text: r => [r.code], title: r => r.code, sub: r => r.date, href: () => '/invoices' },
   { res: 'tickets', label: 'Ticket', icon: 'check', text: r => [r.code, r.title], title: r => `${r.code}: ${r.title}`, sub: r => r.status, href: () => '/tickets' },
   { res: 'vendors', label: 'Nhà cung cấp', icon: 'wallet', text: r => [r.name, r.type], title: r => r.name, sub: r => r.type || '', href: () => '/vendors' },
   { res: 'contracts', label: 'Hợp đồng', icon: 'shield', text: r => [r.code, r.partner], title: r => `${r.code} — ${r.partner}`, sub: r => r.endDate || '', href: () => '/contracts' },
-  { res: 'users', label: 'Nhân sự', icon: 'staff', text: r => [r.name, r.email, r.title], title: r => r.name, sub: r => r.title || '', href: () => '/staff' },
+  { res: 'users', label: 'Nhân sự', icon: 'staff', text: r => [r.name, r.email, r.title], title: r => r.name, sub: r => r.title || '', href: r => realmRecordHref('staff', r.id) },
 ];
 
 function GlobalSearch({ onClose }) {
@@ -113,37 +121,47 @@ function GlobalSearch({ onClose }) {
 }
 
 // v3.5: chuông thông báo — gom gán việc, phê duyệt, kết quả duyệt một chỗ
-function NotificationsModal({ onClose, onChanged }) {
+function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
   const [data, setData] = useState(null);
   const router = useRouter();
-  const load = () => fetch('/api/notifications').then(r => r.ok ? r.json() : null).then(setData);
-  useEffect(() => { load(); }, []);
+  const toast = useToast();
+  const load = useCallback(() => fetch('/api/notifications', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(setData), []);
+  useEffect(() => { load(); }, [dataRevision, load]);
+  useEffect(() => {
+    window.addEventListener(NOTIFICATION_SYNC_EVENT, load);
+    return () => window.removeEventListener(NOTIFICATION_SYNC_EVENT, load);
+  }, [load]);
   const open = async n => {
-    await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: n.id }) });
+    const response = await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: n.id }) });
+    if (!response.ok) return toast('Không thể cập nhật thông báo', 'error');
+    window.dispatchEvent(new CustomEvent(NOTIFICATION_SYNC_EVENT));
     onChanged?.(); onClose();
     if (n.route) router.push(n.route);
   };
   const readAll = async () => {
-    await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ all: true }) });
-    onChanged?.(); load();
+    const res = await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ all: true }) });
+    if (!res.ok) return toast('Không thể cập nhật thông báo', 'error');
+    window.dispatchEvent(new CustomEvent(NOTIFICATION_SYNC_EVENT));
+    onChanged?.(); await load(); toast('Đã đánh dấu tất cả thông báo là đã đọc');
   };
   const ago = t => {
     const m = Math.round((Date.now() - new Date(t)) / 60000);
     return m < 60 ? m + ' phút' : m < 1440 ? Math.round(m / 60) + ' giờ' : Math.round(m / 1440) + ' ngày';
   };
   return (
-    <Modal title="Thông báo" onClose={onClose}
-      footer={<><button className="btn btn-outline" onClick={readAll}>Đọc tất cả</button>
+    <Modal title="Raven Inbox · Thông báo ERP" onClose={onClose}
+      footer={<><AsyncButton className="btn btn-outline" onClick={readAll}>Đọc tất cả</AsyncButton>
         <button className="btn btn-primary" onClick={onClose}>Đóng</button></>}>
-      <div style={{ maxHeight: 420, overflowY: 'auto' }}>
+      <div className="notification-inbox-list" aria-live="polite">
         {(data?.rows || []).map(n => (
-          <div key={n.id} className="act-item" style={{ cursor: 'pointer', opacity: n.readAt ? .55 : 1 }} onClick={() => open(n)}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: n.readAt ? 'var(--border)' : 'var(--primary)', flex: 'none', marginTop: 7 }}></span>
-            <div style={{ flex: 1 }}>
-              <div className="act-title" style={{ fontWeight: n.readAt ? 400 : 700 }}>{n.text}</div>
-              <div className="act-sub">{ago(n.createdAt)} trước</div>
-            </div>
-          </div>
+          <button type="button" key={n.id} className="notification-inbox-item" data-unread={!n.readAt || undefined} onClick={() => open(n)}>
+            <span className="notification-inbox-icon"><Icon name={n.icon || 'bell'} size={17} /></span>
+            <span className="notification-inbox-copy">
+              <span><b>{n.kindLabel || 'Realm Dispatch'}</b><small>{ago(n.createdAt)} trước</small></span>
+              <strong>{n.text}</strong>
+              <em>Mở {n.targetLabel || 'ERP · CRM'}</em>
+            </span>
+          </button>
         ))}
         {data && !data.rows.length && <p style={{ fontSize: '.85rem', color: 'var(--muted)' }}>Chưa có thông báo nào — khi bạn được gán việc, được giao ticket hoặc có yêu cầu chờ duyệt, chúng sẽ hiện ở đây.</p>}
       </div>
@@ -176,8 +194,8 @@ function TwoFAModal({ onClose }) {
       footer={<>
         <button className="btn btn-outline" onClick={onClose}>Đóng</button>
         {info && (info.enabled
-          ? <button className="btn btn-danger" onClick={() => call('DELETE')}>Tắt 2FA</button>
-          : <button className="btn btn-primary" onClick={() => call('POST')}>Bật 2FA</button>)}
+          ? <AsyncButton className="btn btn-danger" onClick={() => call('DELETE')}>Tắt 2FA</AsyncButton>
+          : <AsyncButton className="btn btn-primary" onClick={() => call('POST')}>Bật 2FA</AsyncButton>)}
       </>}>
       {!info ? <p style={{ fontSize: '.85rem' }}>Đang tải…</p> : info.enabled ? (
         <div style={{ fontSize: '.85rem', display: 'grid', gap: 10 }}>
@@ -201,68 +219,10 @@ function TwoFAModal({ onClose }) {
   );
 }
 
-// roles: các vai trò được thấy mục này (DIRECTOR luôn thấy tất cả)
-const ALL = ['PM', 'AM', 'ACCOUNTANT', 'HR', 'LEAD', 'STAFF'];
-const NAV = [
-  { section: 'Tổng quan' },
-  { key: 'dashboard', label: 'Bảng điều khiển', icon: 'dashboard', roles: ALL },
-  { key: 'myday', label: 'Việc của tôi', icon: 'check', roles: ALL },
-  { key: 'guide', label: 'Cẩm nang sử dụng', icon: 'note', roles: ALL },
-  { key: 'install', label: 'Cài lên điện thoại', icon: 'phone', roles: ALL },
-  { key: 'calendar', label: 'Lịch làm việc', icon: 'calendar', roles: ALL },
-  { key: 'messages', label: 'Tin nhắn', icon: 'mail', roles: ALL, chatBadge: true },
-  { key: 'approvals', label: 'Phê duyệt', icon: 'check', roles: ALL, badge: true },
-  { key: 'copilot', label: 'AI Copilot', icon: 'search', roles: ALL },
-  { section: 'CRM — Bán hàng' },
-  { key: 'leads', label: 'Khách tiềm năng', icon: 'leads', roles: ['AM'], mod: 'sales' },
-  { key: 'clients', label: 'Khách hàng', icon: 'clients', roles: ALL },
-  { key: 'quotes', label: 'Báo giá', icon: 'quotes', roles: ['AM', 'PM', 'ACCOUNTANT'], mod: 'sales' },
-  { key: 'services', label: 'Bảng giá dịch vụ', icon: 'tag', roles: ALL, mod: 'services' },
-  { key: 'tickets', label: 'Ticket hỗ trợ', icon: 'check', roles: ALL, mod: 'support' },
-  { section: 'Vận hành' },
-  { key: 'portfolio', label: 'Sở chỉ huy DA', icon: 'reports', roles: ['PM', 'LEAD', 'ACCOUNTANT'], mod: 'delivery' },
-  { key: 'projects', label: 'Dự án', icon: 'projects', roles: ALL, mod: 'delivery' },
-  { key: 'tasks', label: 'Công việc', icon: 'tasks', roles: ALL, mod: 'tasks' },
-  { key: 'timesheet', label: 'Chấm công giờ', icon: 'clock', roles: ALL, mod: 'delivery' },
-  { key: 'gantt', label: 'Gantt tiến độ', icon: 'reports', roles: ALL, mod: 'delivery' },
-  { key: 'templates', label: 'Mẫu dự án', icon: 'projects', roles: ['PM', 'LEAD'], mod: 'delivery' },
-  { key: 'resources', label: 'Nguồn lực', icon: 'staff', roles: ['PM', 'HR', 'LEAD'], mod: 'delivery' },
-  { section: 'Tài chính' },
-  { key: 'invoices', label: 'Hóa đơn', icon: 'invoices', roles: ['ACCOUNTANT', 'AM'] },
-  { key: 'commissions', label: 'Hoa hồng Sales', icon: 'percent', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'commissions' },
-  { key: 'finance', label: 'Thu / Chi', icon: 'finance', roles: ['ACCOUNTANT'] },
-  { key: 'finplan', label: 'Công nợ & Dự báo', icon: 'trendUp', roles: ['ACCOUNTANT'] },
-  { key: 'fxreval', label: 'Đánh giá lại tỷ giá', icon: 'repeat', roles: ['ACCOUNTANT'], mod: 'export' },
-  { key: 'vendors', label: 'Mua hàng / NCC', icon: 'wallet', roles: ['ACCOUNTANT', 'PM'], mod: 'procurement' },
-  { key: 'contracts', label: 'Hợp đồng', icon: 'shield', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'procurement' },
-  { section: 'Nhân sự' },
-  { key: 'staff', label: 'Hồ sơ & nhóm', icon: 'staff', roles: ALL },
-  { key: 'attendance', label: 'Chấm công ngày', icon: 'calendar', roles: ALL },
-  { key: 'payroll', label: 'Bảng lương', icon: 'wallet', roles: ALL },
-  { key: 'recruitment', label: 'Tuyển dụng', icon: 'leads', roles: ['HR'], mod: 'recruitment' },
-  { key: 'reviews', label: 'Đánh giá hiệu suất', icon: 'trendUp', roles: ALL, mod: 'reviews' },
-  { key: 'freelancers', label: 'Freelancer', icon: 'clients', roles: ['HR', 'PM', 'LEAD'], mod: 'freelancers' },
-  { section: 'Xuất nhập khẩu', mod: 'export' },
-  { key: 'growing', label: 'Vùng trồng / Đóng gói', icon: 'clients', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
-  { key: 'inventory', label: 'Kho hàng / Lô', icon: 'wallet', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'inventory' },
-  { key: 'shipments', label: 'Lô hàng xuất', icon: 'invoices', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
-  { key: 'markets', label: 'Tra cứu thị trường', icon: 'search', roles: ['PM', 'ACCOUNTANT', 'AM'], mod: 'export' },
-  { section: 'Livestream', mod: 'livestream' },
-  { key: 'live', label: 'Ca live', icon: 'calendar', roles: ['LEAD', 'ACCOUNTANT', 'AM', 'PM'], mod: 'livestream' },
-  { key: 'violations', label: 'Điểm vi phạm', icon: 'alert', roles: ['LEAD', 'ACCOUNTANT', 'PM'], mod: 'livestream' },
-  { section: 'Công ty' },
-  { key: 'assets', label: 'Tài sản', icon: 'projects', roles: ALL },
-  { key: 'import', label: 'Nhập / Xuất Excel', icon: 'upload', roles: ['ACCOUNTANT', 'AM', 'PM', 'HR', 'LEAD'] },
-  { key: 'reports', label: 'Báo cáo', icon: 'reports', roles: ['ACCOUNTANT', 'PM'] },
-  { key: 'financials', label: 'Báo cáo tài chính', icon: 'wallet', roles: ['ACCOUNTANT'], mod: 'export' },
-  { key: 'analytics', label: 'Analytics (MRR/LTV)', icon: 'trendUp', roles: ['ACCOUNTANT', 'AM', 'PM'], mod: 'analytics' },
-  { key: 'okr', label: 'KPI / OKR', icon: 'tasks', roles: ALL },
-  { key: 'automation', label: 'Tự động hóa', icon: 'repeat', roles: [] }, // chỉ DIRECTOR
-  { key: 'audit', label: 'Nhật ký hệ thống', icon: 'search', roles: [] }, // chỉ DIRECTOR
-  { key: 'settings', label: 'Cài đặt', icon: 'settings', roles: [] },
-];
+const NAV = ERP_NAV;
 
-export default function Shell({ user, company, children }) {
+export default function Shell({ user, company, realmPilot, children }) {
+  const { locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadChat, setUnreadChat] = useState(0);
@@ -270,8 +230,17 @@ export default function Shell({ user, company, children }) {
   const [showSearch, setShowSearch] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
   const [unreadNotif, setUnreadNotif] = useState(0);
+  const [notificationRevision, setNotificationRevision] = useState(0);
   const [roleLabels, setRoleLabels] = useState(ROLE_LABEL);
   const [modules, setModules] = useState(null); // v3.17: null = chưa tải/công ty cũ → bật hết
+  const [todayLabel, setTodayLabel] = useState('');
+  useEffect(() => {
+    // Vercel renders in UTC while the browser uses the employee's local timezone.
+    // Resolve the label client-side so midnight never causes a hydration mismatch.
+    setTodayLabel(new Date().toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    }));
+  }, [locale]);
   useEffect(() => { // v3.6: chức danh tùy biến theo công ty · v3.17: phân hệ bật/tắt
     fetch('/api/settings').then(r => r.ok ? r.json() : null)
       .then(d => {
@@ -283,6 +252,7 @@ export default function Shell({ user, company, children }) {
   }, []);
   const pathname = usePathname();
   const router = useRouter();
+  const isRealmRoute = pathname === '/realm' || pathname.startsWith('/realm/');
   useTableLabels(pathname); // v3.14: bảng đọc được trên điện thoại
   const isFL = user?.userType === 'freelancer';
   // v3.11: freelancer chỉ được ở /freelancer — chuyển hướng nếu lạc sang trang nhân viên
@@ -300,21 +270,39 @@ export default function Shell({ user, company, children }) {
   const myRoles = rolesOf(user);
   // v3.17: mục menu hiện khi (đúng vai trò) VÀ (phân hệ của nó đang bật). Mục lõi (không mod)
   // luôn qua modOn. Freelancer đi lối riêng.
-  const visible = item => isFL ? true : (hasAny(user, item.roles) && modOn(item.mod, modules));
+  const visible = item => isFL
+    ? true
+    : (!item.ceoPortalOnly || process.env.NEXT_PUBLIC_CEO_GROUP_WORKFORCE === '1')
+      && (!item.realmSurface || realmPilot?.allowed)
+      && hasAny(user, item.roles)
+      && modOn(item.mod, modules);
+
+  const loadShellCounters = useCallback(() => {
+    fetch('/api/approvals').then(r => r.ok ? r.json() : null)
+      .then(d => d && setPendingCount(d.pendingCount || 0)).catch(() => {});
+    fetch('/api/chat').then(r => r.ok ? r.json() : null)
+      .then(d => d && setUnreadChat(d.totalUnread || 0)).catch(() => {});
+    fetch('/api/notifications').then(r => r.ok ? r.json() : null)
+      .then(d => d && setUnreadNotif(d.unread || 0)).catch(() => {});
+  }, []);
+
+  const handleShellChanges = useCallback((feed) => {
+    const domains = new Set(feed?.domains || []);
+    if (!['notifications', 'communications', 'collaboration'].some((domain) => domains.has(domain))) return;
+    setNotificationRevision((currentRevision) => currentRevision + 1);
+    loadShellCounters();
+  }, [loadShellCounters]);
+
+  useRealmChangeFeed({
+    enabled: process.env.NEXT_PUBLIC_REALM_ERP_SYNC === '1' && !isFL && !isRealmRoute,
+    onChanges: handleShellChanges,
+  });
 
   useEffect(() => {
-    const load = () => {
-      fetch('/api/approvals').then(r => r.ok ? r.json() : null)
-        .then(d => d && setPendingCount(d.pendingCount || 0)).catch(() => {});
-      fetch('/api/chat').then(r => r.ok ? r.json() : null)
-        .then(d => d && setUnreadChat(d.totalUnread || 0)).catch(() => {});
-      fetch('/api/notifications').then(r => r.ok ? r.json() : null)
-        .then(d => d && setUnreadNotif(d.unread || 0)).catch(() => {});
-    };
-    load();
-    const t = setInterval(load, 15000);
+    loadShellCounters();
+    const t = setInterval(loadShellCounters, 15000);
     return () => clearInterval(t);
-  }, [pathname]);
+  }, [pathname, loadShellCounters]);
 
   useEffect(() => { // PWA: đăng ký service worker
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -331,13 +319,20 @@ export default function Shell({ user, company, children }) {
     <ToastProvider>
     <RoleLabelsCtx.Provider value={roleLabels}>
     <ModulesCtx.Provider value={modules}>
-      <div id="app">
+      <CollaborationBridge />
+      {!isFL && realmPilot?.allowed && realmPilot?.config?.features?.feedback !== false && <RealmFeedbackLauncher />}
+      {!isFL && <RealmPilotOnboarding user={user} pilot={realmPilot} />}
+      <div
+        id="app"
+        className={isRealmRoute ? 'realm-immersive' : 'repository-realms-workspace'}
+        data-visual-system="phase-22"
+      >
         <aside id="sidebar" className={open ? 'open' : ''}>
           <div className="brand">
             <div className="brand-logo">{(company || 'A')[0].toUpperCase()}</div>
             <div className="brand-text">
               <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">ERP v3.22 · 7 vai trò</span>
+              <span className="brand-sub">ERP · CRM · 7 vai trò nghiệp vụ</span>
             </div>
           </div>
           <nav id="nav">
@@ -350,7 +345,7 @@ export default function Shell({ user, company, children }) {
               if (!visible(item)) return null;
               const active = pathname.startsWith('/' + item.key);
               return (
-                <Link key={item.key} href={'/' + item.key} className={`nav-item ${active ? 'active' : ''}`} onClick={() => setOpen(false)}>
+                <Link key={item.key} href={item.href || '/' + item.key} className={`nav-item ${active ? 'active' : ''}`} onClick={() => setOpen(false)}>
                   <Icon name={item.icon} size={18} /><span>{item.label}</span>
                   {item.badge && pendingCount > 0 && <span className="count" style={{ background: 'var(--danger)', color: '#fff' }}>{pendingCount}</span>}
                   {item.chatBadge && unreadChat > 0 && <span className="count" style={{ background: 'var(--danger)', color: '#fff' }}>{unreadChat}</span>}
@@ -374,14 +369,16 @@ export default function Shell({ user, company, children }) {
         </aside>
         {show2fa && <TwoFAModal onClose={() => setShow2fa(false)} />}
         {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
-        {showNotif && <NotificationsModal onClose={() => setShowNotif(false)}
-          onChanged={() => fetch('/api/notifications').then(r => r.ok ? r.json() : null).then(d => d && setUnreadNotif(d.unread || 0)).catch(() => {})} />}
+        {showNotif && <NotificationsModal dataRevision={notificationRevision} onClose={() => setShowNotif(false)}
+          onChanged={() => { setNotificationRevision((currentRevision) => currentRevision + 1); loadShellCounters(); }} />}
         <div id="backdrop" className={open ? 'show' : ''} onClick={() => setOpen(false)}></div>
         <div id="main">
           <header id="topbar">
             <button id="menu-btn" onClick={() => setOpen(true)} aria-label="Mở menu"><Icon name="menu" /></button>
             <h1 id="page-title">{current?.label || 'Agency ERP'}</h1>
             <div className="topbar-right">
+              <WorkspaceSurfaceSwitch pilot={realmPilot} />
+              <LanguageSwitch compact />
               <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
                 <Icon name="search" size={14} /><span> Ctrl+K</span>
               </button>
@@ -391,7 +388,7 @@ export default function Shell({ user, company, children }) {
                 <Icon name="bell" size={15} />
                 {unreadNotif > 0 && <span className="count" style={{ position: 'absolute', top: -7, right: -7, background: 'var(--danger)', color: '#fff' }}>{unreadNotif}</span>}
               </button>
-              <span id="today-label">{new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+              <span id="today-label">{todayLabel}</span>
               <span className={`role-chip role-${myRoles[0]}`}>{myRoles.map(r => roleLabels[r] || r).join(' · ')}</span>
             </div>
           </header>

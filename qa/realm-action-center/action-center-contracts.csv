@@ -1,0 +1,18 @@
+id,layer,source,signals,missingSignals,status
+receipt-extension,database,prisma/schema.prisma,model RealmActionReceipt | resultId | payloadHash,,verified
+additive-migration,database,prisma/migrations/20260718230000_extend_realm_action_receipts/migration.sql,"ADD COLUMN ""resultId"" | ADD COLUMN ""payloadHash""",,verified
+create-action-allowlist,contract,lib/realm-action-admin.js,'task.comment.create' | 'lead.followup.create' | const ACTIONS = new Set,,verified
+input-boundaries,contract,lib/realm-action-contract.js,REALM_FOLLOWUP_KINDS | normalizeRealmTaskCommentDraft | normalizeRealmFollowupDraft,,verified
+payload-free-receipt,server,lib/realm-action-admin.js,createHash('sha256') | payloadHash: command.payloadHash | resultId: created.id,,verified
+task-comment-scope,server,lib/realm-action-admin.js,"canWrite('taskcomments', user) | taskInScope(task, user) | resource: 'taskcomments'",,verified
+lead-followup-scope,server,lib/realm-action-admin.js,"canWrite('activities', user) | leadInScope(lead, user) | refType: 'lead'",,verified
+atomic-create-audit,server,lib/realm-action-admin.js,tx.taskComment.create | tx.activity.create | createAuditData | tx.realmActionReceipt.create,,verified
+safe-action-response,api,app/api/realm-demo/actions/route.js,action: result.action | source: 'erp' | result.event ||,,verified
+cross-surface-event,server,lib/realm-change-feed.js,"activities: ['embassy'] | taskcomments: ['operations', 'campaigns']",,verified
+erp-notification,server,lib/events.js,resource === 'taskcomments' | bình luận việc | await notify(task.assigneeId | resource === 'activities' | lên lịch follow-up,,verified
+war-room-permission,server,lib/realm-war-room-admin.js,"canWrite('taskcomments', user) | canComment: commentWriteAllowed",,verified
+embassy-permission,server,lib/realm-embassy-admin.js,"canWrite('activities', user) | canFollowUp: followupWriteAllowed",,verified
+action-composer,client,components/realm/RealmCreateActionDialog.jsx,War Council note | Diplomatic follow-up | Idempotency-Key | Gửi War Council note | Lập Diplomatic follow-up | RepositoryRealms,,verified
+war-room-entrypoint,client,components/realm/WarRoom.jsx,action: 'task.comment.create' | Ghi chú War Council | RealmCreateActionDialog,,verified
+embassy-entrypoint,client,components/realm/RoyalEmbassy.jsx,action: 'lead.followup.create' | Lên lịch follow-up | RealmCreateActionDialog,,verified
+schema-readiness-v8,health,lib/realm-health.js,REALM_SCHEMA_VERSION = 8 | 20260719133000_add_realm_pilot_feedback,,verified

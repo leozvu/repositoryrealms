@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 23,
+    "verifiedContracts": 23,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "additiveMigrations": 0,
+    "parallelBusinessTables": 0,
+    "sealTtlHours": 24,
+    "aggregateOnly": true,
+    "rosterIncluded": false,
+    "selfApprovalAllowed": false,
+    "waveRequiresSeal": true,
+    "policyMutationFromRemediation": false
+  },
+  "contracts": [
+    {
+      "id": "reuse-erp-setting",
+      "layer": "data",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "realmPilotRehearsal:",
+        "tx.setting.upsert",
+        "entity: 'realm_pilot_rehearsal'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "no-parallel-business-store",
+      "layer": "data",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "no roster; no record content",
+        "REALM_REHEARSAL_LIMIT = 12"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-only-rehearsal",
+      "layer": "rbac",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "requireDirector(sessionUser)",
+        "realm_rehearsal_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "serializable-cas",
+      "layer": "concurrency",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "validateExpectedVersion(rehearsals, input.expectedVersion)",
+        "realm_rehearsal_version_conflict",
+        "isolationLevel: 'Serializable'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "fixed-operational-scenarios",
+      "layer": "domain",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "cross-surface-contact",
+        "record-deep-links",
+        "guild-support-bridge",
+        "kill-switch-rehearsal",
+        "mobile-accessibility"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "bounded-evidence",
+      "layer": "privacy",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "cleanText(input.evidence, 240)",
+        "realm_rehearsal_evidence_required",
+        "operational-attestation"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "policy-version-binding",
+      "layer": "safety",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "run.policyVersion !== policy.version",
+        "realm_rehearsal_policy_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "submit-live-readiness",
+      "layer": "safety",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "action === 'submit'",
+        "loadRealmLaunchReadiness(tx, policy, now)",
+        "realm_rehearsal_readiness_blocked"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "independent-checker-required",
+      "layer": "rbac",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "directory.count < 2",
+        "run.submittedById === sessionUser.id",
+        "self_approval_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "approval-rechecks-live-controls",
+      "layer": "safety",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "action === 'approve'",
+        "Live readiness vừa xuất hiện blocker mới",
+        "status: 'sealed'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "twenty-four-hour-seal",
+      "layer": "safety",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "REALM_REHEARSAL_TTL_HOURS = 24",
+        "expiresAt:",
+        "realm_rehearsal_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "wave-submit-needs-seal",
+      "layer": "integration",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "requireValidRealmPilotRehearsal(setting, policy, now)",
+        "rehearsalId: rehearsal.rehearsalId"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "wave-activation-rechecks-seal",
+      "layer": "integration",
+      "source": "lib/realm-pilot-operations.js",
+      "signals": [
+        "requireValidRealmPilotRehearsal(setting, policy, now, wave.rehearsalId)",
+        "rehearsalExpiresAt: rehearsal.expiresAt"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-notification-handoff",
+      "layer": "integration",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "tx.notification.createMany",
+        "/settings#realm-pilot-rehearsal-title",
+        "Chờ bạn niêm phong launch rehearsal"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "actionable-remediation",
+      "layer": "operations",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "buildRealmRehearsalRemediation",
+        "/settings#realm-pilot-title",
+        "/settings#realm-feedback-operations-title"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-privacy-contract",
+      "layer": "privacy",
+      "source": "lib/realm-pilot-rehearsal.js",
+      "signals": [
+        "aggregateOnly: true",
+        "rosterIncluded: false",
+        "performanceTracking: false",
+        "durationTracking: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-traced-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/rehearsal/route.js",
+      "signals": [
+        "authenticatedUser()",
+        "startRealmApiRequest",
+        "realmJsonResponse",
+        "realmErrorResponse"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "cross-surface-change-signal",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/rehearsal/route.js",
+      "signals": [
+        "safelyPublishRealmChange",
+        "resource: 'settings'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "stale-settings-write-protection",
+      "layer": "data",
+      "source": "app/api/settings/route.js",
+      "signals": [
+        "delete data.realmPilotRehearsal",
+        "current.realmPilotRehearsal"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-rehearsal-ui",
+      "layer": "client",
+      "source": "components/realm/RealmPilotRehearsal.jsx",
+      "signals": [
+        "Launch Rehearsal · Sealed Evidence",
+        "<fieldset",
+        "<legend>",
+        "aria-live=\"polite\"",
+        "Niêm phong 24 giờ"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-reduced-motion-ui",
+      "layer": "style",
+      "source": "components/realm/realm-pilot-rehearsal.module.css",
+      "signals": [
+        "min-height: 44px",
+        "@media (max-width: 680px)",
+        "@media (prefers-reduced-motion: reduce)",
+        ".autoChecks { grid-template-columns: 1fr; }"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase17-test-suite",
+      "layer": "test",
+      "source": "tests/realm-pilot-rehearsal.test.mjs",
+      "signals": [
+        "requires operational evidence",
+        "independent checker",
+        "actionable remediation",
+        "expires after 24 hours"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase17-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-17-LAUNCH-REHEARSAL.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "codex/realms-demo",
+        "24 giờ",
+        "không tự đổi policy",
+        "không có migration"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "maker-cannot-seal-own-evidence",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "stale-policy-or-expired-seal-fails-closed",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "wave-needs-same-sealed-rehearsal",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "settings-cannot-clobber-rehearsal",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "ui-has-evidence-privacy-guidance",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "readiness-remediation-does-not-mutate-policy",
+      "expected": "true:false",
+      "actual": "true:false",
+      "status": "verified"
+    }
+  ]
+}

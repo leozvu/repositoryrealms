@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 15,
+    "verifiedContracts": 15,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "databaseMigrations": 0
+  },
+  "contracts": [
+    {
+      "id": "single-notification-source",
+      "layer": "database",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model Notification",
+        "@@index([userId, createdAt])",
+        "@@index([userId, readAt])"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-inbox-query",
+      "layer": "api",
+      "source": "app/api/notifications/route.js",
+      "signals": [
+        "where: { userId: user.id }",
+        "rows.map(normalizeNotificationRow)",
+        "PRIVATE_HEADERS"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "scoped-read-state",
+      "layer": "api",
+      "source": "app/api/notifications/route.js",
+      "signals": [
+        "id: notificationId, userId: user.id, readAt: null",
+        "changed: result.count",
+        "audienceUserId: user.id"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "safe-route-contract",
+      "layer": "contract",
+      "source": "lib/notification-inbox.js",
+      "signals": [
+        "normalizeNotificationRoute",
+        "route.startsWith('//')",
+        "notificationRecordRoute",
+        "normalizeNotificationRow"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "exact-record-notifications",
+      "layer": "server",
+      "source": "lib/events.js",
+      "signals": [
+        "notificationRecordRoute('tasks'",
+        "notificationRecordRoute('leads'",
+        "notificationRecordRoute('tickets'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "exact-approval-notifications",
+      "layer": "server",
+      "source": "lib/approvals.js",
+      "signals": [
+        "notificationRecordRoute('approvals', ap.id)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-inbox-shared-sync",
+      "layer": "client",
+      "source": "components/Shell.jsx",
+      "signals": [
+        "Raven Inbox · Thông báo ERP",
+        "NOTIFICATION_SYNC_EVENT",
+        "fetch('/api/notifications'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realm-inbox-shared-sync",
+      "layer": "client",
+      "source": "components/realm/RealmNotificationBell.jsx",
+      "signals": [
+        "NOTIFICATION_SYNC_EVENT",
+        "window.setInterval(refresh, 15_000)",
+        "aria-labelledby",
+        "closePanel"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "approval-deep-link-consumer",
+      "layer": "client",
+      "source": "app/(app)/approvals/page.jsx",
+      "signals": [
+        "get('focus')",
+        "scrollIntoView",
+        "data-inbox-focus"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "ticket-deep-link-consumer",
+      "layer": "client",
+      "source": "app/(app)/tickets/page.jsx",
+      "signals": [
+        "get('focus')",
+        "setModal({ mode: 'edit', row: ticket })"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "scoped-war-council-history",
+      "layer": "server",
+      "source": "lib/realm-war-room-admin.js",
+      "signals": [
+        "taskId: { in: tasks.map",
+        "commentsByTask",
+        "comments.length < 3"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "war-council-timeline-ui",
+      "layer": "client",
+      "source": "components/realm/WarRoom.jsx",
+      "signals": [
+        "War Council gần đây",
+        "task.comments.map",
+        "dateTime={comment.createdAt"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "scoped-diplomatic-history",
+      "layer": "server",
+      "source": "lib/realm-embassy-admin.js",
+      "signals": [
+        "where: { refType: 'lead'",
+        "activitiesByLead",
+        "select: { id: true, refId: true, kind: true, title: true, date: true, done: true, userId: true }"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "diplomatic-timeline-ui",
+      "layer": "client",
+      "source": "components/realm/RoyalEmbassy.jsx",
+      "signals": [
+        "Diplomatic log",
+        "lead.activities.map",
+        "activity.author"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-inbox",
+      "layer": "style",
+      "source": "components/realm/realm-notification-bell.module.css",
+      "signals": [
+        "min-height: 44px",
+        ":focus-visible",
+        "@media (max-width: 390px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "external-route-denied",
+      "expected": "/messages",
+      "actual": "/messages",
+      "status": "verified"
+    },
+    {
+      "id": "task-route-metadata",
+      "expected": "quest:Task ERP",
+      "actual": "quest:Task ERP",
+      "status": "verified"
+    },
+    {
+      "id": "approval-deep-link",
+      "expected": "/approvals?focus=approval-1&from=notification",
+      "actual": "/approvals?focus=approval-1&from=notification",
+      "status": "verified"
+    },
+    {
+      "id": "notification-feed-domain",
+      "expected": "notifications",
+      "actual": "notifications",
+      "status": "verified"
+    },
+    {
+      "id": "comment-serializer-privacy",
+      "expected": "false",
+      "actual": "false",
+      "status": "verified"
+    },
+    {
+      "id": "activity-serializer-privacy",
+      "expected": "false",
+      "actual": "false",
+      "status": "verified"
+    }
+  ]
+}

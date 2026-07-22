@@ -2,19 +2,21 @@
 // v3.5: Gắn link tài liệu ngoài (Drive/Notion/Figma…) vào dự án / khách / hợp đồng.
 // Dùng inline trong card hoặc bọc trong Modal đều được.
 import { useState } from 'react';
-import { useResource, Icon, Modal, useToast } from './ui';
+import { useResource, Icon, Modal, ConfirmDialog, AsyncButton, useToast } from './ui';
 
 export function DocLinks({ refType, refId }) {
   const links = useResource('doclinks');
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
+  const [linkToDelete, setLinkToDelete] = useState(null);
   const toast = useToast();
   const mine = links.rows.filter(l => l.refType === refType && l.refId === refId);
 
   const add = async () => {
     if (!url.trim().startsWith('http')) return toast('URL phải bắt đầu bằng http', 'error');
-    await links.create({ refType, refId, title: title.trim() || url.trim(), url: url.trim() });
-    setTitle(''); setUrl(''); toast('Đã gắn link');
+    const result = await links.create({ refType, refId, title: title.trim() || url.trim(), url: url.trim() });
+    if (!result) return false;
+    setTitle(''); setUrl(''); toast('Đã gắn link'); return true;
   };
 
   return (
@@ -24,15 +26,17 @@ export function DocLinks({ refType, refId }) {
           <span style={{ flex: 'none' }}>📎</span>
           <a href={l.url} target="_blank" rel="noreferrer" style={{ flex: 1, minWidth: 0, color: 'var(--primary)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
             title={l.url}>{l.title}</a>
-          <button className="icon-btn danger" onClick={async () => { await links.remove(l.id); toast('Đã gỡ link'); }} aria-label="Gỡ"><Icon name="x" size={13} /></button>
+          <button className="icon-btn danger" onClick={() => setLinkToDelete(l)} aria-label={`Gỡ tài liệu ${l.title}`}><Icon name="x" size={13} /></button>
         </div>
       ))}
       {!mine.length && <p style={{ color: 'var(--muted)', margin: '4px 0' }}>Chưa có tài liệu nào — dán link Drive/Notion/Figma vào đây.</p>}
       <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
         <input style={{ flex: 1, minWidth: 100 }} placeholder="Tên (VD: Brief)" value={title} onChange={e => setTitle(e.target.value)} />
         <input style={{ flex: 2, minWidth: 140 }} placeholder="https://…" value={url} onChange={e => setUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
-        <button className="btn btn-outline btn-sm" onClick={add}><Icon name="plus" size={13} /> Gắn</button>
+        <AsyncButton className="btn btn-outline btn-sm" disabled={links.mutating} pendingLabel="Đang gắn…" onClick={add}><Icon name="plus" size={13} /> Gắn</AsyncButton>
       </div>
+      {linkToDelete && <ConfirmDialog msg={`Gỡ liên kết tài liệu "${linkToDelete.title}"?`} onClose={() => setLinkToDelete(null)}
+        onYes={async () => { const r = await links.remove(linkToDelete.id); if (!r) return false; toast('Đã gỡ link'); }} />}
     </div>
   );
 }

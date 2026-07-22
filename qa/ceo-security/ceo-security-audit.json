@@ -1,0 +1,87 @@
+{
+  "phase": "CEO-8",
+  "generatedBy": "scripts/audit-ceo-security.mjs",
+  "summary": {
+    "scannedFiles": 703,
+    "secretFindings": 0,
+    "scopedTargetRoutes": 10,
+    "targetRoutes": 10,
+    "audienceBoundOutboundAdapters": 4,
+    "outboundAdapters": 4,
+    "chaosScenarios": 7,
+    "migrationAdditive": true,
+    "portalOnlyKillSwitch": true,
+    "localErpMutationInKillSwitch": false
+  },
+  "routeChecks": [
+    {
+      "file": "app/api/ceo/v1/capabilities/route.js",
+      "scope": "CAPABILITIES_READ",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/health/route.js",
+      "scope": "HEALTH_READ",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/snapshot/route.js",
+      "scope": "SNAPSHOT_READ",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/commands/route.js",
+      "scope": "COMMAND_DISPATCH",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/commands/receipts/route.js",
+      "scope": "COMMAND_RECEIPTS_READ",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/directory/route.js",
+      "scope": "DIRECTORY_READ",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/messaging/deliver/route.js",
+      "scope": "MESSAGE_DELIVER",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/messaging/receipts/route.js",
+      "scope": "MESSAGE_RECEIPTS_READ",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/messaging/feed/route.js",
+      "scope": "MESSAGE_FEED_READ",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/federation/presence/route.js",
+      "scope": "FEDERATION_READ",
+      "guarded": true
+    }
+  ],
+  "outboundChecks": [
+    {
+      "file": "lib/ceo-command-gateway-admin.js",
+      "audienceHeader": true
+    },
+    {
+      "file": "lib/ceo-messaging-admin.js",
+      "audienceHeader": true
+    },
+    {
+      "file": "lib/ceo-unified-dashboard-admin.js",
+      "audienceHeader": true
+    },
+    {
+      "file": "lib/ceo-federation-admin.js",
+      "audienceHeader": true
+    }
+  ],
+  "secretFindings": []
+}

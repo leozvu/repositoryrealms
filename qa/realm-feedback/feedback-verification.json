@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 18,
+    "verifiedContracts": 18,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "additiveMigrations": 1,
+    "parallelFeedbackTables": 0,
+    "performanceTracking": false,
+    "durationTracking": false
+  },
+  "contracts": [
+    {
+      "id": "erp-ticket-source-of-truth",
+      "layer": "database",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model Ticket",
+        "source",
+        "feedbackType",
+        "feedbackSurface",
+        "feedbackContext",
+        "reporterId",
+        "requestKey"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "additive-ticket-migration",
+      "layer": "database",
+      "source": "prisma/migrations/20260719133000_add_realm_pilot_feedback/migration.sql",
+      "signals": [
+        "ALTER TABLE \"Ticket\"",
+        "Ticket_requestKey_key",
+        "Ticket_source_status_idx",
+        "Ticket_reporterId_createdAt_idx"
+      ],
+      "forbiddenSignals": [],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-internal-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/feedback/route.js",
+      "signals": [
+        "authenticatedUser()",
+        "freelancer_forbidden",
+        "export async function GET",
+        "export async function POST",
+        "export async function PATCH"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "idempotent-serializable-create",
+      "layer": "server",
+      "source": "lib/realm-feedback.js",
+      "signals": [
+        "normalizeRealmIdempotencyKey",
+        "findUnique({ where: { requestKey } })",
+        "isolationLevel: 'Serializable'",
+        "idempotent: true"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "staff-own-scope",
+      "layer": "server",
+      "source": "lib/realm-feedback.js",
+      "signals": [
+        "{ source: REALM_FEEDBACK_SOURCE, reporterId: user.id }",
+        "manager,",
+        "reporter: reporterName"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "manager-rbac",
+      "layer": "server",
+      "source": "lib/realm-feedback.js",
+      "signals": [
+        "hasAny(user, ['HR', 'PM'])",
+        "realm_feedback_manager_forbidden"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "optimistic-concurrency",
+      "layer": "server",
+      "source": "lib/realm-feedback.js",
+      "signals": [
+        "expectedUpdatedAt",
+        "realm_feedback_stale",
+        "Phản hồi vừa được người khác cập nhật"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "sla-and-status-workflow",
+      "layer": "server",
+      "source": "lib/realm-feedback.js",
+      "signals": [
+        "blocked: { priority: 'high', slaHours: 8 }",
+        "degraded: { priority: 'normal', slaHours: 24 }",
+        "REALM_FEEDBACK_STATUSES"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "audit-log-append",
+      "layer": "server",
+      "source": "lib/realm-feedback.js",
+      "signals": [
+        "realm_feedback_create",
+        "realm_feedback_update",
+        "auditLog.create"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "change-feed-and-notification",
+      "layer": "api",
+      "source": "app/api/realm-demo/feedback/route.js",
+      "signals": [
+        "emitEvent('tickets', 'create'",
+        "await notify(",
+        "emitEvent('tickets', 'update'"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "declared-private-context",
+      "layer": "server",
+      "source": "lib/realm-feedback.js",
+      "signals": [
+        "privacy: 'no-record-content'",
+        "excludedContext: ['form-values', 'record-content', 'browser-history', 'keystrokes']",
+        "durationTracking: false",
+        "performanceTracking: false"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "cross-surface-launcher",
+      "layer": "client",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "signals": [
+        "Phản hồi pilot",
+        "surface === 'realm'",
+        "Gửi vào Guild Support",
+        "Ticket ERP"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-safe-fallback",
+      "layer": "client",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "signals": [
+        "persistWorkspaceSurface('erp')",
+        "Về ERP an toàn",
+        "href=\"/dashboard\""
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "pilot-operations-queue",
+      "layer": "client",
+      "source": "components/realm/RealmFeedbackOperations.jsx",
+      "signals": [
+        "Guild Support · Pilot Operations",
+        "Hàng chờ xử lý",
+        "expectedUpdatedAt",
+        "Lưu &amp; thông báo"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-launcher",
+      "layer": "style",
+      "source": "components/realm/realm-feedback-launcher.module.css",
+      "signals": [
+        "min-height: 44px",
+        ":focus-visible",
+        "@media (max-width: 680px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-operations",
+      "layer": "style",
+      "source": "components/realm/realm-feedback-operations.module.css",
+      "signals": [
+        "min-height: 44px",
+        ":focus-visible",
+        "@media (max-width: 680px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "shell-available-on-both-surfaces",
+      "layer": "client",
+      "source": "components/Shell.jsx",
+      "signals": [
+        "RealmFeedbackLauncher",
+        "realmPilot?.config?.features?.feedback !== false"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "schema-readiness-v8",
+      "layer": "health",
+      "source": "lib/realm-health.js",
+      "signals": [
+        "REALM_SCHEMA_VERSION = 8",
+        "20260719133000_add_realm_pilot_feedback",
+        "missing.push('pilot_feedback')"
+      ],
+      "missingSignals": [],
+      "forbiddenSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "query-stripped",
+      "expected": "/realm",
+      "actual": "/realm",
+      "status": "verified"
+    },
+    {
+      "id": "privacy-marker",
+      "expected": "no-record-content",
+      "actual": "no-record-content",
+      "status": "verified"
+    },
+    {
+      "id": "director-manager",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "staff-not-manager",
+      "expected": "false",
+      "actual": "false",
+      "status": "verified"
+    },
+    {
+      "id": "request-key-hidden",
+      "expected": "false",
+      "actual": "false",
+      "status": "verified"
+    },
+    {
+      "id": "summary-unwrapped",
+      "expected": "Tavern không mở",
+      "actual": "Tavern không mở",
+      "status": "verified"
+    }
+  ]
+}

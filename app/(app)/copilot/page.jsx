@@ -36,10 +36,10 @@ export default function CopilotPage() {
   if (noKey) return (
     <div className="card" style={{ maxWidth: 620, margin: '40px auto', padding: '30px 34px', textAlign: 'center' }}>
       <div style={{ width: 54, height: 54, borderRadius: 14, background: 'linear-gradient(135deg,#2563EB,#7C3AED)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', margin: '0 auto 16px' }}>AI</div>
-      <h2 style={{ fontSize: '1.05rem', marginBottom: 10 }}>AI Copilot cần Claude API key để hoạt động</h2>
+      <h2 style={{ fontSize: '1.05rem', marginBottom: 10 }}>AI Copilot cần OpenRouter API key để hoạt động</h2>
       <p style={{ fontSize: '.86rem', color: 'var(--muted)', lineHeight: 1.7 }}>
-        1. Tạo API key tại <b>console.anthropic.com</b> (Settings → API Keys)<br />
-        2. Giám đốc dán key vào <b>Cài đặt → Claude API key</b> của hệ thống này<br />
+        1. Tạo API key tại <b>openrouter.ai/keys</b><br />
+        2. Giám đốc dán key vào <b>Cài đặt → OpenRouter API key</b> của hệ thống này<br />
         3. Quay lại đây và bắt đầu hỏi — AI sẽ trả lời dựa trên dữ liệu thật của công ty,<br />tự lọc theo quyền của từng người hỏi.
       </p>
     </div>
@@ -47,7 +47,7 @@ export default function CopilotPage() {
 
   return (
     <div style={{ maxWidth: 780, margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: 'calc(100dvh - 140px)' }}>
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1 }} aria-live="polite" aria-busy={busy || undefined}>
         {!messages.length && (
           <div style={{ textAlign: 'center', padding: '36px 0 22px' }}>
             <div style={{ width: 54, height: 54, borderRadius: 14, background: 'linear-gradient(135deg,#2563EB,#7C3AED)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', margin: '0 auto 14px' }}>AI</div>
@@ -72,7 +72,7 @@ export default function CopilotPage() {
           <span style={{ color: 'var(--muted)', fontSize: '.86rem', paddingTop: 7 }}>Đang phân tích dữ liệu công ty…</span></div>}
         <div ref={endRef}></div>
       </div>
-      <form onSubmit={e => { e.preventDefault(); send(); }}
+      <form aria-busy={busy || undefined} onSubmit={e => { e.preventDefault(); send(); }}
         style={{ position: 'sticky', bottom: 14, display: 'flex', gap: 9, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 13, padding: 9, boxShadow: 'var(--shadow-lg)', marginTop: 14 }}>
         <input value={input} onChange={e => setInput(e.target.value)} placeholder="Hỏi về doanh thu, khách hàng, dự án… hoặc nhờ viết email/proposal"
           style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: '.9rem', padding: '6px 8px', color: 'var(--fg)' }} />

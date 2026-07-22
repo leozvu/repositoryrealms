@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 21,
+    "verifiedContracts": 21,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "additiveMigrations": 0,
+    "parallelBusinessTables": 0,
+    "approvalTtlHours": 24,
+    "encryptedAtRest": true,
+    "aggregateOnly": true,
+    "rosterIncluded": false,
+    "selfApprovalAllowed": false,
+    "killSwitchRequiresApproval": false
+  },
+  "contracts": [
+    {
+      "id": "reuse-erp-approval-model",
+      "layer": "data",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "type: 'realm_launch'",
+        "tx.approval.create",
+        "tx.setting.findUnique"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "encrypted-policy-payload",
+      "layer": "security",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "createCipheriv('aes-256-gcm'",
+        "cipher.setAAD(PAYLOAD_AAD)",
+        "cipher.getAuthTag()"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-ciphertext-verification",
+      "layer": "security",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "createDecipheriv('aes-256-gcm'",
+        "decipher.setAuthTag",
+        "realm_launch_approval_payload_invalid"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-only-maker-checker",
+      "layer": "rbac",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "requireDirector(sessionUser)",
+        "approval.requesterId === sessionUser.id",
+        "self_approval_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "expansion-only-approval",
+      "layer": "server",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "preview.risk !== 'expansion'",
+        "realm_launch_approval_not_required"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "preview-reverified-before-request",
+      "layer": "server",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "verifyRealmLaunchApplication(tx, sessionUser",
+        "token,",
+        "currentPolicy"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "duplicate-pending-guard",
+      "layer": "server",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "type: 'realm_launch', refId, status: 'pending'",
+        "realm_launch_approval_duplicate"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "twenty-four-hour-expiry",
+      "layer": "safety",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "REALM_LAUNCH_APPROVAL_TTL_MS = 24 * 60 * 60 * 1000",
+        "Yêu cầu đã hết hạn 24 giờ"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "policy-digest-binding",
+      "layer": "security",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "realmLaunchPolicyDigest(proposal.draftPolicy) !== approval.refId"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "approval-cas-claim",
+      "layer": "server",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "where: { id: approval.id, status: 'pending', steps: approval.steps }",
+        "approval_decision_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "live-readiness-before-claim",
+      "layer": "server",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "loadRealmLaunchReadiness(tx, proposal.draftPolicy, now)",
+        "if (!readiness.ready)",
+        "realm_launch_readiness_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "atomic-approval-policy-audit",
+      "layer": "transaction",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "applyRealmPilotConfigInTransaction(tx",
+        "isolationLevel: 'Serializable'",
+        "entity: 'approvals'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-only-list-contract",
+      "layer": "privacy",
+      "source": "lib/realm-launch-approval.js",
+      "signals": [
+        "rosterIncluded: false",
+        "eligibleUsers:",
+        "fallbackUsers:",
+        "payloadReadable"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "direct-expansion-bypass-blocked",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/route.js",
+      "signals": [
+        "preview.risk === 'expansion'",
+        "realm_launch_approval_required"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-approval-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/launch/approvals/route.js",
+      "signals": [
+        "authenticatedUser()",
+        "realmJsonResponse",
+        "realm_launch_approval_created"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "cross-surface-notification",
+      "layer": "integration",
+      "source": "app/api/realm-demo/launch/approvals/route.js",
+      "signals": [
+        "usersWithRole('DIRECTOR')",
+        "notificationRecordRoute",
+        "safelyPublishRealmChange"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-approval-inbox-delegation",
+      "layer": "integration",
+      "source": "app/api/approvals/[id]/decide/route.js",
+      "signals": [
+        "ap.type === 'realm_launch'",
+        "decideRealmLaunchApproval",
+        "realmLaunchSecret()"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "progressive-four-eyes-ui",
+      "layer": "client",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "signals": [
+        "Bàn duyệt phát hành",
+        "Gửi Director khác duyệt",
+        "Duyệt &amp; áp dụng",
+        "Policy chi tiết được mã hóa"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-approval-ui",
+      "layer": "style",
+      "source": "components/realm/realm-pilot-control.module.css",
+      "signals": [
+        ".approvalBoard",
+        ".approvalCardFooter button { min-height: 44px;",
+        ".approvalColumns { grid-template-columns: 1fr;",
+        "@media (max-width: 680px)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase15-test-suite",
+      "layer": "test",
+      "source": "tests/realm-launch-approval.test.mjs",
+      "signals": [
+        "forbids self approval",
+        "blockers before claim",
+        "ciphertext tampering"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "operations-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-15-FOUR-EYES-LAUNCH-APPROVAL.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "Director thứ hai",
+        "mode = off",
+        "không tự bật pilot"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "maker-cannot-check-own-request",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "expansion-direct-apply-is-closed",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "restriction-path-remains-direct",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "policy-payload-uses-aead",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "checker-ui-is-visible",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    },
+    {
+      "id": "kill-switch-remains-direct",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    }
+  ]
+}

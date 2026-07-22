@@ -6,7 +6,7 @@ import { icsToken } from '@/lib/ics';
 
 export async function GET(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const base = process.env.NEXTAUTH_URL || new URL(req.url).origin;
   return NextResponse.json({ url: `${base}/api/ics/${icsToken(user.id)}` });
 }

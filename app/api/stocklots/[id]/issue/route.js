@@ -9,7 +9,7 @@ import { canIssue, lotRemaining } from '@/lib/inventory';
 // qtyOut KHÔNG cho sửa tay qua CRUD (filterUpdate loại bỏ) — chỉ đi qua đây để không lệch với StockMove.
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user) || !hasAny(user, ['ACCOUNTANT', 'PM'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const { qty, shipmentId, date, note } = await req.json().catch(() => ({}));

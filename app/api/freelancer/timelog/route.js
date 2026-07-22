@@ -5,14 +5,14 @@ import { freelancerGuard } from '@/lib/freelancer';
 
 export async function GET() {
   let ctx;
-  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message }, { status: e.status || 403 }); }
+  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message, code: e.status === 401 ? 'unauthorized' : undefined }, { status: e.status || 403 }); }
   const logs = await prisma.timeLog.findMany({ where: { userId: ctx.user.id }, orderBy: { date: 'desc' }, take: 60 });
   return NextResponse.json(logs);
 }
 
 export async function POST(req) {
   let ctx;
-  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message }, { status: e.status || 403 }); }
+  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message, code: e.status === 401 ? 'unauthorized' : undefined }, { status: e.status || 403 }); }
   const { user, projectIds } = ctx;
   const { projectId, date, hours, note } = await req.json();
   if (!projectIds.includes(projectId)) return NextResponse.json({ error: 'Không thuộc dự án này' }, { status: 403 });
@@ -25,7 +25,7 @@ export async function POST(req) {
 
 export async function DELETE(req) {
   let ctx;
-  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message }, { status: e.status || 403 }); }
+  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message, code: e.status === 401 ? 'unauthorized' : undefined }, { status: e.status || 403 }); }
   const { id } = await req.json();
   const log = await prisma.timeLog.findUnique({ where: { id } });
   if (!log || log.userId !== ctx.user.id) return NextResponse.json({ error: 'forbidden' }, { status: 403 });

@@ -9,7 +9,7 @@ import { payVendorBill, createApproval, getSettings } from '@/lib/approvals';
 // Từ ngưỡng trở lên → đi qua chuỗi duyệt Kế toán (→ Giám đốc nếu rất lớn).
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!hasAny(user, ['ACCOUNTANT', 'PM'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { date } = await req.json();
   const bill = await prisma.vendorBill.findUnique({ where: { id: params.id }, include: { vendor: true } });

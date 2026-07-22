@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Modal, FormModal, ConfirmDialog, Badge, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, FormModal, ConfirmDialog, AsyncButton, Badge, useToast } from '@/components/ui';
 import { fmtDate, todayISO, daysFromNow, initials, parseItems, TASK_COLS, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
@@ -30,6 +30,8 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
   const [newItem, setNewItem] = useState('');
   const [newLabel, setNewLabel] = useState('');
   const [logH, setLogH] = useState('');
+  const [commentToDelete, setCommentToDelete] = useState(null);
+  const [saving, setSaving] = useState(false);
   const set = (k, v) => setF(x => ({ ...x, [k]: v }));
   const myComments = comments.rows.filter(c => c.taskId === task.id);
   const myEvents = events.rows.filter(e => e.taskId === task.id);
@@ -39,8 +41,8 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
 
   const sendCmt = async () => {
     if (!cmt.trim()) return;
-    await comments.create({ taskId: task.id, content: cmt.trim() });
-    setCmt('');
+    const result = await comments.create({ taskId: task.id, content: cmt.trim() });
+    if (result) setCmt('');
   };
   const loggedOnTask = timelogs.rows.filter(l => l.taskId === task.id).reduce((s, l) => s + l.hours, 0);
   const quickLog = async () => {
@@ -50,13 +52,23 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
     const r = await timelogs.create({ projectId: f.projectId, taskId: task.id, date: todayISO(), hours: h, billable: true, note: f.title });
     if (r) { toast(`Đã ghi ${h}h cho việc này`); setLogH(''); }
   };
+  const saveTask = async () => {
+    if (saving || !f.title.trim()) return;
+    setSaving(true);
+    try {
+      const result = await onSave(f);
+      if (result !== false && result !== null) onClose();
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Modal title={`Chi tiết công việc`} onClose={onClose} large
       footer={<>
         {isMgmt && <button className="btn btn-ghost" style={{ marginRight: 'auto', color: 'var(--danger)' }} onClick={onDelete}><Icon name="trash" size={16} /> Xóa</button>}
-        <button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={() => { if (!f.title.trim()) return; onSave(f); onClose(); }}>Lưu</button>
+        <button className="btn btn-outline" onClick={onClose} disabled={saving}>Hủy</button>
+        <button className="btn btn-primary" onClick={saveTask} disabled={saving} aria-busy={saving || undefined}>{saving ? 'Đang lưu…' : 'Lưu'}</button>
       </>}>
       <div className="form-grid">
         <div className="field full"><label>Tên công việc *</label><input value={f.title} onChange={e => set('title', e.target.value)} /></div>
@@ -126,7 +138,7 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
         <div className="field full" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '.85rem' }}>⏱ Ghi giờ cho việc này:</span>
           <input style={{ width: 90 }} type="number" min="0.5" step="0.5" placeholder="giờ" value={logH} onChange={e => setLogH(e.target.value)} />
-          <button className="btn btn-outline btn-sm" onClick={quickLog}>Ghi giờ</button>
+          <AsyncButton className="btn btn-outline btn-sm" pendingLabel="Đang ghi…" disabled={timelogs.mutating} onClick={quickLog}>Ghi giờ</AsyncButton>
           {(f.estHours > 0 || loggedOnTask > 0) && (
             <span style={{ fontSize: '.8rem', marginLeft: 'auto' }}>
               Ước lượng <b>{f.estHours || 0}h</b> · đã log <b style={{ color: loggedOnTask > f.estHours && f.estHours > 0 ? 'var(--danger)' : 'var(--accent)' }}>{Math.round(loggedOnTask * 10) / 10}h</b>
@@ -146,7 +158,7 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
                   <div className="act-title">{uName(c.userId)} <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '.72rem' }}>· {new Date(c.createdAt).toLocaleString('vi-VN')}</span></div>
                   <div style={{ fontSize: '.84rem', whiteSpace: 'pre-wrap' }}>{c.content}</div>
                 </div>
-                {c.userId === me?.id && <button className="icon-btn danger" onClick={() => comments.remove(c.id)}><Icon name="x" size={12} /></button>}
+                {c.userId === me?.id && <button className="icon-btn danger" onClick={() => setCommentToDelete(c)} aria-label="Xóa bình luận"><Icon name="x" size={12} /></button>}
               </div>
             ))}
             {!myComments.length && <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Chưa có trao đổi nào — người phụ trách sẽ nhận thông báo khi bạn bình luận.</p>}
@@ -154,7 +166,7 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
           <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
             <input style={{ flex: 1 }} placeholder="Viết bình luận… gõ @tên để nhắc (Enter gửi)" value={cmt} onChange={e => setCmt(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); sendCmt(); } }} />
-            <button className="btn btn-primary btn-sm" onClick={sendCmt}>Gửi</button>
+            <AsyncButton className="btn btn-primary btn-sm" pendingLabel="Đang gửi…" disabled={comments.mutating} onClick={sendCmt}>Gửi</AsyncButton>
           </div>
         </div>
 
@@ -170,6 +182,8 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
           </div>
         )}
       </div>
+      {commentToDelete && <ConfirmDialog msg="Xóa bình luận này?" onClose={() => setCommentToDelete(null)}
+        onYes={async () => { const r = await comments.remove(commentToDelete.id); if (!r) return false; toast('Đã xóa bình luận'); }} />}
     </Modal>
   );
 }
@@ -178,7 +192,7 @@ export default function TasksPage() {
   const { data: session } = useSession();
   const user = session?.user;
   const isMgmt = hasAny(user, ['PM', 'LEAD']); // quản lý công việc: PM, Trưởng nhóm + GĐ
-  const { rows, create, update, remove } = useResource('tasks');
+  const { rows, loading, create, update, remove } = useResource('tasks');
   const projects = useResource('projects');
   const users = useResource('users');
   const [proj, setProj] = useState('all');
@@ -193,6 +207,25 @@ export default function TasksPage() {
   const [overCol, setOverCol] = useState(null);
   const phases = useResource('phases');
   const toast = useToast();
+  const focusedRecordRef = useRef(null);
+
+  // Realm/Global Search mở đúng bản ghi gốc thay vì thả người dùng ở đầu bảng Kanban.
+  useEffect(() => {
+    if (loading || typeof window === 'undefined') return;
+    const focusId = new URLSearchParams(window.location.search).get('focus');
+    if (!focusId || focusedRecordRef.current === focusId) return;
+    focusedRecordRef.current = focusId;
+    const task = rows.find((row) => row.id === focusId);
+    if (!task) {
+      toast('Không tìm thấy Task hoặc bạn không còn quyền xem bản ghi này.', 'error');
+      return;
+    }
+    setProj('all');
+    setMine(false);
+    setAssignee('all');
+    setLabel('all');
+    setModal({ mode: 'edit', row: task });
+  }, [loading, rows, toast]);
 
   const userName = id => users.rows.find(u => u.id === id)?.name || '—';
   const projName = id => projects.rows.find(p => p.id === id)?.name || 'Việc chung';
@@ -264,7 +297,7 @@ export default function TasksPage() {
   const Columns = items => (
     <div className="kanban">
       {TASK_COLS.map(c => {
-        const list = items.filter(t => t.status === c.key);
+        const list = items.filter(t => (c.states || [c.key]).includes(t.status));
         return (
           <div key={c.key} className={`kan-col ${overCol === c.key ? 'drag-over' : ''}`}
             onDragOver={e => { if (!selMode) { e.preventDefault(); setOverCol(c.key); } }}
@@ -354,13 +387,15 @@ export default function TasksPage() {
         isMgmt={isMgmt} me={user} onClose={() => setModal(null)}
         onDelete={() => setModal({ mode: 'del', row: modal.row })}
         onSave={async f => {
-          await update(modal.row.id, {
+          const result = await update(modal.row.id, {
             title: f.title, projectId: f.projectId || null, assigneeId: f.assigneeId || null,
             priority: f.priority, status: f.status, dueDate: f.dueDate || null, recur: f.recur || null,
             estHours: +f.estHours || 0, phaseId: f.phaseId || null, labels: JSON.stringify(f.labels || []),
             note: f.note, dependsOn: JSON.stringify(f.dependsOn || []), checklist: JSON.stringify(f.checklist || []),
           });
+          if (!result) return false;
           toast('Đã cập nhật');
+          return true;
         }} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa công việc "${modal.row.title}"?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}

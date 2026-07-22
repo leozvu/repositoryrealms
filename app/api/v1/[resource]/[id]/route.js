@@ -14,7 +14,7 @@ async function audit(user, action, entity, refId, detail) {
 
 export async function GET(req, { params }) {
   const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canRead(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
@@ -24,7 +24,7 @@ export async function GET(req, { params }) {
 
 export async function PUT(req, { params }) {
   const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
@@ -44,7 +44,7 @@ export async function PUT(req, { params }) {
     const updated = await prisma[cfg.model].update({ where: { id: params.id }, data });
     await audit(user, 'update', params.resource, params.id, updated.name || updated.title || updated.code || null);
     if (icp?.after) await icp.after(updated);
-    emitEvent(params.resource, 'update', updated, row, user);
+    await emitEvent(params.resource, 'update', updated, row, user);
     return NextResponse.json(cfg.sanitize ? cfg.sanitize(updated, user) : updated);
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 400 });
@@ -53,7 +53,7 @@ export async function PUT(req, { params }) {
 
 export async function DELETE(req, { params }) {
   const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canDelete(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
@@ -61,7 +61,7 @@ export async function DELETE(req, { params }) {
   try {
     await prisma[cfg.model].delete({ where: { id: params.id } });
     await audit(user, 'delete', params.resource, params.id, row.name || row.title || row.code || null);
-    emitEvent(params.resource, 'delete', row, null, user);
+    await emitEvent(params.resource, 'delete', row, null, user);
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json({ error: 'Không xóa được — còn dữ liệu liên quan' }, { status: 400 });

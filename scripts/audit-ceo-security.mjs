@@ -1,0 +1,119 @@
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const outputDirectory = path.join(root, 'qa', 'ceo-security');
+const checkOnly = process.argv.includes('--check');
+const supported = /\.(?:css|html|js|jsx|json|md|mjs|prisma|sql|ts|tsx|ya?ml)$/i;
+const ignored = /^(?:qa\/|node_modules\/|\.next\/|public\/realms\/assets\/generated\/)/;
+
+const secretRules = [
+  { id: 'openrouter-secret', pattern: /sk-or-v1-[A-Za-z0-9]{32,}/g },
+  { id: 'openai-secret', pattern: /sk-(?:proj-)?[A-Za-z0-9_-]{40,}/g },
+  { id: 'raw-api-key', pattern: /ak_[A-Za-z0-9]{32,}/g },
+  { id: 'private-key', pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/g },
+  { id: 'assigned-ceo-secret', pattern: /(?:CEO_ENTITY_[A-Z0-9_]+_(?:API|SERVICE)_KEY|OPENROUTER_API_KEY)\s*=\s*["']?[A-Za-z0-9+/_=-]{24,}/g },
+];
+
+function trackedFiles() {
+  return execFileSync('git', ['ls-files', '-co', '--exclude-standard', '-z'], { cwd: root, encoding: 'utf8' })
+    .split('\0').filter(Boolean).map((file) => file.replaceAll('\\', '/'))
+    .filter((file) => supported.test(file) && !ignored.test(file));
+}
+
+function read(relative) {
+  return fs.readFileSync(path.join(root, relative), 'utf8');
+}
+
+function scanSecrets(files) {
+  const findings = [];
+  for (const file of files) {
+    const source = read(file);
+    for (const rule of secretRules) {
+      rule.pattern.lastIndex = 0;
+      let match;
+      while ((match = rule.pattern.exec(source))) {
+        const line = source.slice(0, match.index).split('\n').length;
+        findings.push({ file, line, rule: rule.id });
+      }
+    }
+  }
+  return findings;
+}
+
+const targetRoutes = {
+  'app/api/ceo/v1/capabilities/route.js': 'CAPABILITIES_READ',
+  'app/api/ceo/v1/health/route.js': 'HEALTH_READ',
+  'app/api/ceo/v1/snapshot/route.js': 'SNAPSHOT_READ',
+  'app/api/ceo/v1/commands/route.js': 'COMMAND_DISPATCH',
+  'app/api/ceo/v1/commands/receipts/route.js': 'COMMAND_RECEIPTS_READ',
+  'app/api/ceo/v1/directory/route.js': 'DIRECTORY_READ',
+  'app/api/ceo/v1/messaging/deliver/route.js': 'MESSAGE_DELIVER',
+  'app/api/ceo/v1/messaging/receipts/route.js': 'MESSAGE_RECEIPTS_READ',
+  'app/api/ceo/v1/messaging/feed/route.js': 'MESSAGE_FEED_READ',
+  'app/api/ceo/v1/federation/presence/route.js': 'FEDERATION_READ',
+};
+
+const files = trackedFiles();
+const secretFindings = scanSecrets(files);
+const routeChecks = Object.entries(targetRoutes).map(([file, scope]) => {
+  const source = read(file);
+  return { file, scope, guarded: source.includes('ceoServiceGuard') && source.includes(`CEO_SERVICE_SCOPES.${scope}`) };
+});
+const outboundFiles = [
+  'lib/ceo-command-gateway-admin.js',
+  'lib/ceo-messaging-admin.js',
+  'lib/ceo-unified-dashboard-admin.js',
+  'lib/ceo-federation-admin.js',
+];
+const outboundChecks = outboundFiles.map((file) => ({ file, audienceHeader: read(file).includes("'X-CEO-Entity-ID'") }));
+const migration = read('prisma/migrations/20260722040000_add_ceo_security_controls/migration.sql');
+const identity = read('lib/ceo-identity-admin.js');
+const chaos = read('lib/ceo-security-chaos.js');
+const result = {
+  phase: 'CEO-8',
+  generatedBy: 'scripts/audit-ceo-security.mjs',
+  summary: {
+    scannedFiles: files.length,
+    secretFindings: secretFindings.length,
+    scopedTargetRoutes: routeChecks.filter((item) => item.guarded).length,
+    targetRoutes: routeChecks.length,
+    audienceBoundOutboundAdapters: outboundChecks.filter((item) => item.audienceHeader).length,
+    outboundAdapters: outboundChecks.length,
+    chaosScenarios: (chaos.match(/^  '[a-z-]+',?$/gm) || []).length,
+    migrationAdditive: migration.includes('ALTER TABLE "ApiKey"') && !/DROP TABLE|DROP COLUMN/i.test(migration),
+    portalOnlyKillSwitch: identity.includes("status: 'suspended'") && identity.includes('localErpLoginPreserved: true'),
+    localErpMutationInKillSwitch: /suspendCeoPortalControlPlane[\s\S]*?tx\.user\.(?:update|delete)/.test(identity.split('export async function readCeoSecurityPosture')[0]),
+  },
+  routeChecks,
+  outboundChecks,
+  secretFindings,
+};
+
+const json = `${JSON.stringify(result, null, 2)}\n`;
+const markdown = `# CEO-8 security audit\n\n- Secret findings: **${result.summary.secretFindings}**\n- Scoped target routes: **${result.summary.scopedTargetRoutes}/${result.summary.targetRoutes}**\n- Audience-bound outbound adapters: **${result.summary.audienceBoundOutboundAdapters}/${result.summary.outboundAdapters}**\n- Chaos scenarios: **${result.summary.chaosScenarios}/7**\n- Additive migration: **${result.summary.migrationAdditive ? 'yes' : 'no'}**\n- Portal-only kill switch: **${result.summary.portalOnlyKillSwitch ? 'yes' : 'no'}**\n- Local ERP mutation in kill switch: **${result.summary.localErpMutationInKillSwitch ? 'yes' : 'no'}**\n\nGenerated by \`scripts/audit-ceo-security.mjs\`. No raw secret value is included in this artifact.\n`;
+const artifacts = { 'ceo-security-audit.json': json, 'ceo-security-audit.md': markdown };
+const failures = [];
+if (secretFindings.length) failures.push('high-confidence secret patterns found');
+if (result.summary.scopedTargetRoutes !== result.summary.targetRoutes) failures.push('target route scope wiring incomplete');
+if (result.summary.audienceBoundOutboundAdapters !== result.summary.outboundAdapters) failures.push('outbound audience binding incomplete');
+if (result.summary.chaosScenarios !== 7) failures.push('seven chaos scenarios required');
+if (!result.summary.migrationAdditive) failures.push('migration is not additive');
+if (!result.summary.portalOnlyKillSwitch || result.summary.localErpMutationInKillSwitch) failures.push('Portal-only kill-switch invariant failed');
+
+if (checkOnly) {
+  const stale = Object.entries(artifacts).filter(([name, content]) => !fs.existsSync(path.join(outputDirectory, name)) || fs.readFileSync(path.join(outputDirectory, name), 'utf8') !== content).map(([name]) => name);
+  if (stale.length) failures.push(`stale artifacts: ${stale.join(', ')}`);
+} else {
+  fs.mkdirSync(outputDirectory, { recursive: true });
+  for (const [name, content] of Object.entries(artifacts)) fs.writeFileSync(path.join(outputDirectory, name), content, 'utf8');
+}
+
+if (failures.length) {
+  for (const failure of failures) console.error(`[CEO-8] ${failure}`);
+  process.exitCode = 1;
+} else {
+  console.log(`CEO-8 security gate passed: ${result.summary.scopedTargetRoutes}/${result.summary.targetRoutes} scoped routes, ${result.summary.chaosScenarios}/7 chaos scenarios, zero secret findings.`);
+}

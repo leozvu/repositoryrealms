@@ -11,7 +11,7 @@ import { IMPORTABLE, validateRow } from '@/lib/importable';
 // Kiểm lại từng dòng ở server (không tin client). Một dòng lỗi KHÔNG làm hỏng cả mẻ.
 export async function POST(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const { resource, rows } = await req.json().catch(() => ({}));

@@ -1,0 +1,282 @@
+{
+  "version": 1,
+  "mode": "components",
+  "source": "public/realms/assets/generated/phase-22/ui/realm-ui-ornament-atlas-v1.png",
+  "sourceWidth": 1536,
+  "sourceHeight": 1024,
+  "alphaThreshold": 16,
+  "padding": 8,
+  "assetCount": 15,
+  "assets": [
+    {
+      "file": "frame-001.png",
+      "sourceBbox": [
+        1215,
+        32,
+        1493,
+        484
+      ],
+      "cropBbox": [
+        1207,
+        24,
+        1501,
+        492
+      ],
+      "width": 294,
+      "height": 468,
+      "alphaPixels": 38869
+    },
+    {
+      "file": "frame-002.png",
+      "sourceBbox": [
+        58,
+        34,
+        801,
+        429
+      ],
+      "cropBbox": [
+        50,
+        26,
+        809,
+        437
+      ],
+      "width": 759,
+      "height": 411,
+      "alphaPixels": 73495
+    },
+    {
+      "file": "frame-003.png",
+      "sourceBbox": [
+        856,
+        45,
+        1174,
+        425
+      ],
+      "cropBbox": [
+        848,
+        37,
+        1182,
+        433
+      ],
+      "width": 334,
+      "height": 396,
+      "alphaPixels": 40378
+    },
+    {
+      "file": "frame-004.png",
+      "sourceBbox": [
+        69,
+        442,
+        630,
+        701
+      ],
+      "cropBbox": [
+        61,
+        434,
+        638,
+        709
+      ],
+      "width": 577,
+      "height": 275,
+      "alphaPixels": 43808
+    },
+    {
+      "file": "frame-005.png",
+      "sourceBbox": [
+        680,
+        464,
+        1059,
+        708
+      ],
+      "cropBbox": [
+        672,
+        456,
+        1067,
+        716
+      ],
+      "width": 395,
+      "height": 260,
+      "alphaPixels": 32380
+    },
+    {
+      "file": "frame-006.png",
+      "sourceBbox": [
+        1095,
+        498,
+        1302,
+        710
+      ],
+      "cropBbox": [
+        1087,
+        490,
+        1310,
+        718
+      ],
+      "width": 223,
+      "height": 228,
+      "alphaPixels": 13724
+    },
+    {
+      "file": "frame-007.png",
+      "sourceBbox": [
+        65,
+        717,
+        172,
+        870
+      ],
+      "cropBbox": [
+        57,
+        709,
+        180,
+        878
+      ],
+      "width": 123,
+      "height": 169,
+      "alphaPixels": 12740
+    },
+    {
+      "file": "frame-008.png",
+      "sourceBbox": [
+        1240,
+        731,
+        1343,
+        829
+      ],
+      "cropBbox": [
+        1232,
+        723,
+        1351,
+        837
+      ],
+      "width": 119,
+      "height": 114,
+      "alphaPixels": 3716
+    },
+    {
+      "file": "frame-009.png",
+      "sourceBbox": [
+        1379,
+        731,
+        1483,
+        829
+      ],
+      "cropBbox": [
+        1371,
+        723,
+        1491,
+        837
+      ],
+      "width": 120,
+      "height": 114,
+      "alphaPixels": 3675
+    },
+    {
+      "file": "frame-010.png",
+      "sourceBbox": [
+        217,
+        736,
+        524,
+        834
+      ],
+      "cropBbox": [
+        209,
+        728,
+        532,
+        842
+      ],
+      "width": 323,
+      "height": 114,
+      "alphaPixels": 19362
+    },
+    {
+      "file": "frame-011.png",
+      "sourceBbox": [
+        591,
+        759,
+        1132,
+        821
+      ],
+      "cropBbox": [
+        583,
+        751,
+        1140,
+        829
+      ],
+      "width": 557,
+      "height": 78,
+      "alphaPixels": 7971
+    },
+    {
+      "file": "frame-012.png",
+      "sourceBbox": [
+        1235,
+        861,
+        1325,
+        975
+      ],
+      "cropBbox": [
+        1227,
+        853,
+        1333,
+        983
+      ],
+      "width": 106,
+      "height": 130,
+      "alphaPixels": 3955
+    },
+    {
+      "file": "frame-013.png",
+      "sourceBbox": [
+        1394,
+        861,
+        1488,
+        974
+      ],
+      "cropBbox": [
+        1386,
+        853,
+        1496,
+        982
+      ],
+      "width": 110,
+      "height": 129,
+      "alphaPixels": 4025
+    },
+    {
+      "file": "frame-014.png",
+      "sourceBbox": [
+        130,
+        871,
+        265,
+        1001
+      ],
+      "cropBbox": [
+        122,
+        863,
+        273,
+        1009
+      ],
+      "width": 151,
+      "height": 146,
+      "alphaPixels": 10876
+    },
+    {
+      "file": "frame-015.png",
+      "sourceBbox": [
+        319,
+        892,
+        1145,
+        977
+      ],
+      "cropBbox": [
+        311,
+        884,
+        1153,
+        985
+      ],
+      "width": 842,
+      "height": 101,
+      "alphaPixels": 61490
+    }
+  ]
+}

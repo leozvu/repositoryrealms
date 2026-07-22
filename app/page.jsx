@@ -1,7 +1,12 @@
-import { redirect } from 'next/navigation';
-import { currentUser } from '@/lib/auth';
+import Link from 'next/link';
 
-export default async function Home() {
-  const user = await currentUser();
-  redirect(user ? '/dashboard' : '/login');
+export default function Home() {
+  return (
+    <main style={{ minHeight: '100dvh', display: 'grid', placeItems: 'center', padding: 24 }}>
+      <p>
+        Đang mở CRMegoric ERP · CRM. Nếu trình duyệt không tự chuyển trang,{' '}
+        <Link href="/dashboard">vào Bảng điều khiển tại đây</Link>.
+      </p>
+    </main>
+  );
 }

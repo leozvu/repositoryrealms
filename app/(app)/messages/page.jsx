@@ -1,7 +1,8 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { Icon, Modal, useToast } from '@/components/ui';
+import { useSearchParams } from 'next/navigation';
+import { Icon, Modal, AsyncButton, useToast } from '@/components/ui';
 import { initials } from '@/lib/format';
 
 const fmtTime = at => {
@@ -28,7 +29,7 @@ function NewChatModal({ directory, onCreated, onClose }) {
   return (
     <Modal title="Cuộc trò chuyện mới" onClose={onClose}
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={create}>Bắt đầu</button></>}>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang tạo…" onClick={create}>Bắt đầu</AsyncButton></>}>
       <div className="tabs">
         <button className={`tab ${tab === 'dm' ? 'active' : ''}`} onClick={() => { setTab('dm'); setSel([]); }}>Nhắn riêng</button>
         <button className={`tab ${tab === 'group' ? 'active' : ''}`} onClick={() => { setTab('group'); setSel([]); }}>Tạo nhóm</button>
@@ -52,13 +53,17 @@ function NewChatModal({ directory, onCreated, onClose }) {
 
 export default function MessagesPage() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const me = session?.user;
   const [convs, setConvs] = useState([]);
   const [directory, setDirectory] = useState([]);
   const [sel, setSel] = useState(null);       // conv id đang mở
   const [thread, setThread] = useState(null); // {conv, messages}
   const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
   const [showNew, setShowNew] = useState(false);
+  const [directoryProfile, setDirectoryProfile] = useState(null);
+  const [directorySaving, setDirectorySaving] = useState(false);
   const endRef = useRef(null);
   const lastAtRef = useRef(null);
   const toast = useToast();
@@ -73,6 +78,16 @@ export default function MessagesPage() {
   }, []);
 
   useEffect(() => { loadList(); const t = setInterval(loadList, 12000); return () => clearInterval(t); }, [loadList]);
+  useEffect(() => {
+    fetch('/api/ceo/v1/directory/profile', { cache: 'no-store' })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((body) => body?.profile && setDirectoryProfile(body.profile))
+      .catch(() => {});
+  }, []);
+  useEffect(() => {
+    const requested = searchParams.get('conversation');
+    if (requested && convs.some((conversation) => conversation.id === requested)) setSel(requested);
+  }, [convs, searchParams]);
   useEffect(() => { if (sel) loadThread(sel); }, [sel, loadThread]);
   // Poll tin mới của hội thoại đang mở mỗi 4 giây
   useEffect(() => {
@@ -93,14 +108,51 @@ export default function MessagesPage() {
   const send = async e => {
     e?.preventDefault();
     const content = input.trim();
-    if (!content || !sel) return;
+    if (!content || !sel || sending) return;
+    setSending(true);
     setInput('');
-    const res = await fetch(`/api/chat/${sel}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
-    const msg = await res.json();
-    if (!res.ok) return toast(msg.error || 'Gửi lỗi', 'error');
-    setThread(prev => ({ ...prev, messages: [...prev.messages, msg] }));
-    lastAtRef.current = msg.at;
-    loadList();
+    try {
+      const res = await fetch(`/api/chat/${sel}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
+      const msg = await res.json();
+      if (!res.ok) { setInput(content); return toast(msg.error || 'Gửi lỗi', 'error'); }
+      setThread(prev => ({ ...prev, messages: [...prev.messages, msg] }));
+      lastAtRef.current = msg.at;
+      loadList();
+    } catch {
+      setInput(content); toast('Không thể gửi tin nhắn', 'error');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const toggleDirectoryShare = async () => {
+    if (!directoryProfile || directorySaving) return;
+    setDirectorySaving(true);
+    try {
+      const response = await fetch('/api/ceo/v1/directory/profile', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sharedWithCeoPortal: !directoryProfile.sharedWithCeoPortal, sharePresence: false }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) return toast(body.error || 'Không thể cập nhật chia sẻ danh bạ', 'error');
+      setDirectoryProfile(body.profile);
+      toast(body.profile.sharedWithCeoPortal ? 'Đã chia sẻ hồ sơ danh bạ với CEO Portal' : 'Đã ngừng chia sẻ hồ sơ danh bạ');
+    } finally { setDirectorySaving(false); }
+  };
+
+  const togglePresenceShare = async () => {
+    if (!directoryProfile?.sharedWithCeoPortal || directorySaving) return;
+    setDirectorySaving(true);
+    try {
+      const response = await fetch('/api/ceo/v1/directory/profile', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sharedWithCeoPortal: true, sharePresence: !directoryProfile.sharePresence }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) return toast(body.error || 'Không thể cập nhật chia sẻ presence', 'error');
+      setDirectoryProfile(body.profile);
+      toast(body.profile.sharePresence ? 'Đã cho phép CEO Portal thấy khi bạn đang online' : 'Đã ngừng chia sẻ trạng thái online');
+    } finally { setDirectorySaving(false); }
   };
 
   return (
@@ -110,8 +162,16 @@ export default function MessagesPage() {
         <div className="chat-list">
           <div className="chat-list-head">
             <b style={{ fontSize: '.9rem', flex: 1 }}>Tin nhắn</b>
+            {directoryProfile && <button type="button" className="btn btn-outline btn-sm" disabled={directorySaving} aria-pressed={directoryProfile.sharedWithCeoPortal} onClick={toggleDirectoryShare} title="Hồ sơ danh bạ chỉ gồm tên, email và chức danh; không gồm lương hay dữ liệu hiệu suất.">{directoryProfile.sharedWithCeoPortal ? 'Ngừng chia sẻ với CEO Portal' : 'Chia sẻ với CEO Portal'}</button>}
             <button className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}><Icon name="plus" size={13} /> Mới</button>
           </div>
+          {directoryProfile && <div style={{ margin: '0 12px 9px', display: 'grid', gap: 7, color: 'var(--muted)', fontSize: '.72rem', lineHeight: 1.45 }}>
+            <p>Hồ sơ danh bạ chỉ gồm tên, email và chức danh; không gồm lương hay dữ liệu hiệu suất.</p>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, minHeight: 44, padding: '8px 10px', border: '1px solid var(--border)', borderRadius: 8, cursor: directoryProfile.sharedWithCeoPortal ? 'pointer' : 'not-allowed', opacity: directoryProfile.sharedWithCeoPortal ? 1 : .55 }}>
+              <input type="checkbox" style={{ width: 'auto', marginTop: 2 }} checked={directoryProfile.sharePresence} disabled={!directoryProfile.sharedWithCeoPortal || directorySaving} onChange={togglePresenceShare} />
+              <span><b style={{ color: 'var(--fg)' }}>Chia sẻ presence tự nguyện</b><br />Chỉ gửi trạng thái online hiện tại; không gửi thời lượng, công việc, Gold hay dữ liệu chấm năng suất.</span>
+            </label>
+          </div>}
           <div className="chat-list-body">
             {convs.map(c => (
               <button key={c.id} className={`chat-item ${sel === c.id ? 'active' : ''}`} onClick={() => setSel(c.id)}>
@@ -166,9 +226,9 @@ export default function MessagesPage() {
                 {!thread.messages.length && <div className="chat-empty" style={{ padding: 30 }}>Hãy gửi tin nhắn đầu tiên 👋</div>}
                 <div ref={endRef}></div>
               </div>
-              <form className="chat-input" onSubmit={send}>
+              <form className="chat-input" aria-busy={sending || undefined} onSubmit={send}>
                 <input value={input} onChange={e => setInput(e.target.value)} placeholder={`Nhắn ${thread.conv.name}…`} autoFocus />
-                <button className="btn btn-primary" disabled={!input.trim()}>Gửi</button>
+                <button className="btn btn-primary" disabled={sending || !input.trim()}>{sending ? 'Đang gửi…' : 'Gửi'}</button>
               </form>
             </>
           )}

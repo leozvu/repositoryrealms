@@ -7,7 +7,7 @@ import { currentUser } from '@/lib/auth';
 // Nhân sự v1 → tài khoản mới (mật khẩu tạm: doimatkhau), giữ nguyên mapping id qua bảng tra.
 export async function POST(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const { isDirector } = await import('@/lib/perm');
   if (!isDirector(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const v1 = await req.json();

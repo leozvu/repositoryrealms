@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useResource, Icon, Modal, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, FormModal, ConfirmDialog, EmptyState, Forbidden, AsyncButton, useToast } from '@/components/ui';
 import { money, fmtDate, todayISO, daysFromNow, initials } from '@/lib/format';
 
 const VENDOR_TYPES = ['KOL / Influencer', 'Freelancer', 'Nhà in', 'Studio', 'Media / Báo chí', 'Phần mềm', 'Khác'];
@@ -16,7 +16,7 @@ function RfqModal({ row, vendors, onSave, onClose }) {
   return (
     <Modal title={row ? 'Sửa RFQ' : 'Tạo RFQ so giá'} onClose={onClose} large
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={() => { if (!f.title.trim()) return; onSave(f); onClose(); }}>Lưu</button></>}>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={async () => { if (!f.title.trim()) return; const r = await onSave(f); if (r !== false && r !== null) onClose(); }}>Lưu</AsyncButton></>}>
       <div style={{ display: 'grid', gap: 12, fontSize: '.85rem' }}>
         <div className="field"><label>Hạng mục cần mua / thuê *</label>
           <input value={f.title} onChange={e => setF({ ...f, title: e.target.value })} placeholder="VD: In 500 standee chiến dịch EVA" /></div>
@@ -211,8 +211,9 @@ export default function VendorsPage() {
         onClose={() => setModal(null)}
         onSave={async f => {
           const data = { title: f.title.trim(), note: f.note || null, quotes: JSON.stringify(f.quotes), status: f.quotes.some(q => q.chosen) ? 'decided' : 'open' };
-          if (modal.row) await rfqs.update(modal.row.id, data); else await rfqs.create(data);
-          toast('Đã lưu RFQ');
+          const r = modal.row ? await rfqs.update(modal.row.id, data) : await rfqs.create(data);
+          if (!r) return false;
+          toast('Đã lưu RFQ'); return true;
         }} />}
       {modal?.mode === 'delRfq' && <ConfirmDialog msg={`Xóa RFQ "${modal.row.title}"?`}
         onClose={() => setModal(null)} onYes={async () => { await rfqs.remove(modal.row.id); toast('Đã xóa'); }} />}

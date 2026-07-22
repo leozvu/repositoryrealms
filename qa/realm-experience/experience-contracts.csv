@@ -1,0 +1,28 @@
+id,phase,layer,source,signals,missingSignals,status
+presentation-only-context,22,privacy,lib/realm-experience.js,"REALM_EXPERIENCE_STORAGE_KEY | mode, | panel, | ledgerView, | position,",,verified
+no-record-context,22,privacy,tests/realm-experience.test.mjs,"'recordId' in context, false | 'campaignId' in context, false",,verified
+permission-safe-restore,22,client,components/realm/RealmOffice.jsx,experienceHydratedRef | realmAccessForPanel | realmAccessForSurface | ? 'ledger' | 'briefing',,verified
+realm-erp-handoff,22,navigation,components/realm/RealmOffice.jsx,persistWorkspaceSurface | 'erp_handoff' | ERP · CRM,,verified
+mobile-destination-navigation,22,responsive,components/realm/RealmOffice.jsx,realm-mobile-destination | mobileNavigator | ledger:personal,,verified
+responsive-safe-area,22,style,components/realm/realm-office.module.css,@media (max-width: 620px) | env(safe-area-inset-bottom) | .mobileNavigator | min-height: 44px,,verified
+accessible-navigation,22,accessibility,components/realm/RealmOffice.jsx,"skipLink | aria-live=""polite"" | tabIndex={-1}",,verified
+accessible-onboarding,22,accessibility,components/realm/RealmPilotOnboarding.jsx,"role=""progressbar"" | aria-valuemin=""1"" | không lưu record",,verified
+reduced-motion,22,accessibility,components/realm/realm-office.module.css,@media (prefers-reduced-motion: reduce) | animation-duration: .01ms,,verified
+below-fold-render-budget,22,performance,components/realm/realm-office.module.css,content-visibility: auto | contain-intrinsic-size: auto 420px,,verified
+art-payload-budget,22,performance,tests/realm-art-assets.test.mjs,totalBytes < 125_000 | totalBytes < 100_000 | totalBytes < 750_000,,verified
+phase22-runbook,22,operations,docs/realms/PHASE-22-UX-JOURNEY.md,Parity là parity của business invariant | 390×844 | Không tự retry mutation,,verified
+fixed-aggregate-signals,23,privacy,lib/realm-experience.js,REALM_EXPERIENCE_EVENTS | fixedCounter | totalEvents | performanceTracking: false,,verified
+server-normalization,23,api,lib/realm-experience-admin.js,normalizeRealmExperienceEvent | applyRealmExperienceTelemetryEvent | isolationLevel: 'Serializable',,verified
+authenticated-pilot-ingest,23,api,app/api/realm-demo/experience/route.js,currentUser | isFreelancer | loadRealmPilotDecision | if (!decision.allowed),,verified
+experience-observability,23,observability,app/api/realm-demo/experience/route.js,startRealmApiRequest | realmJsonResponse | realmErrorResponse,,verified
+director-scorecard,23,authorization,app/api/realm-demo/experience/route.js,isDirector | loadRealmLaunchReadiness | evaluateRealmExperiencePilot,,verified
+settings-clobber-protection,23,persistence,app/api/settings/route.js,delete data.realmExperienceTelemetry | current.realmExperienceTelemetry | next.realmExperienceTelemetry,,verified
+advisory-not-authoritative,23,governance,lib/realm-experience.js,authoritativeLaunchGate: false | hold-or-limited-pilot | ready-for-approved-expansion,,verified
+experience-scorecard-ui,23,ui,components/realm/RealmExperienceScorecard.jsx,Experience Pilot · Phase 23 | RepositoryRealms launch readiness | Không tự động mở pilot,,verified
+scorecard-responsive-accessible,23,style,components/realm/realm-experience-scorecard.module.css,min-height: 44px | @media (max-width: 680px) | @media (prefers-reduced-motion: reduce),,verified
+feedback-loop-signal,23,feedback,components/realm/RealmFeedbackLauncher.jsx,event: 'feedback_opened' | surface === 'realm' | Guild Support,,verified
+four-journey-evidence,23,measurement,lib/realm-experience.js,"['guild', 'war', 'treasury', 'tavern'] | id: 'four-journey-coverage'",,verified
+deterministic-experience-tests,23,test,tests/realm-experience.test.mjs,Phase 22 continuity context | Phase 23 scorecard is advisory | preserves unrelated configuration,,verified
+experience-auth-boundary-e2e,23,e2e,tests/e2e/realm-smoke.spec.mjs,'/api/realm-demo/experience' | preserve the ERP authentication boundary,,verified
+continuity-responsive-e2e,23,e2e,tests/e2e/realm-smoke.spec.mjs,Realm presentation context restores without persisting business identifiers | name: 'Khu vực' | 'ledger:treasury',,verified
+phase23-runbook,23,operations,docs/realms/PHASE-23-EXPERIENCE-PILOT.md,advisory | không tạo event log tăng vô hạn | Go / no-go,,verified

@@ -1,0 +1,19 @@
+.composer { display: grid; gap: 9px; }
+.composer p { margin: 0 0 4px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.composer p strong { color: var(--text); }
+.composer label { display: grid; gap: 6px; color: var(--text); font-size: 12px; font-weight: 760; }
+.composer input,
+.composer select,
+.composer textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; color: var(--text); background: var(--surface); font: inherit; }
+.composer input,
+.composer select { min-height: 42px; padding: 0 11px; }
+.composer textarea { min-height: 128px; padding: 10px 11px; resize: vertical; line-height: 1.5; }
+.composer input:focus-visible,
+.composer select:focus-visible,
+.composer textarea:focus-visible { outline: 3px solid rgba(201, 163, 76, .35); outline-offset: 1px; border-color: #c9a34c; }
+.composer small { color: var(--muted); font-size: 11px; line-height: 1.45; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "status": "draft",
+  "mode": "shadow",
+  "collectionActive": false,
+  "retentionDays": 365,
+  "sourceClasses": [
+    "declared",
+    "observed",
+    "validated",
+    "derived"
+  ],
+  "operationalPurposes": [
+    "operational_visibility",
+    "auditability",
+    "capacity_planning",
+    "data_quality"
+  ],
+  "prohibitedDecisionUses": [
+    "gold_award",
+    "payroll",
+    "discipline",
+    "termination",
+    "individual_performance_ranking"
+  ],
+  "prohibitedSignals": [
+    "gps",
+    "latitude",
+    "longitude",
+    "precise_location",
+    "keystroke",
+    "keylogger",
+    "keyboard_activity",
+    "mouse_activity",
+    "cursor_tracking",
+    "browser_history",
+    "screen_capture",
+    "screenshot",
+    "clipboard",
+    "camera",
+    "microphone",
+    "raw_ip",
+    "raw_device_id"
+  ],
+  "activationRequires": [
+    "CEO",
+    "HR",
+    "Operations",
+    "Technology"
+  ]
+}

@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
 import { DocLinksModal } from '@/components/DocLinks';
-import { money, moneyShort, fmtDate, todayISO, BADGE } from '@/lib/format';
+import { moneyShort, fmtDate, todayISO, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
+import styles from './projects-execution-list.module.css';
 
-const HEALTH = { green: ['#059669', 'Ổn'], amber: ['#D97706', 'Cần chú ý'], red: ['#DC2626', 'Rủi ro'] };
+const HEALTH = { green: ['Ổn định', 'green'], amber: ['Cần chú ý', 'amber'], red: ['Rủi ro', 'red'] };
 
 export default function ProjectsPage() {
   const { data: session } = useSession();
@@ -74,22 +75,29 @@ export default function ProjectsPage() {
       </div>
       <div className="table-wrap">
         <table>
-          <thead><tr><th></th><th>Dự án</th><th>Khách hàng</th>{isMgmt && <th className="num">Ngân sách</th>}<th>Deadline</th><th style={{ minWidth: 140 }}>Tiến độ</th><th>Giờ (log/NS)</th><th>Trạng thái</th>{isMgmt && <th></th>}</tr></thead>
+          <thead><tr><th>Sức khỏe</th><th>Dự án</th><th>Khách hàng</th>{isMgmt && <th className="num">Ngân sách</th>}<th>Deadline</th><th style={{ minWidth: 140 }}>Tiến độ</th><th>Giờ khai báo / NS</th><th>Trạng thái</th>{isMgmt && <th><span className="sr-only">Thao tác</span></th>}</tr></thead>
           <tbody>
             {filtered.map(p => {
               const late = p.status !== 'done' && p.deadline && p.deadline < todayISO();
               const st = stats[p.id] || {};
-              const [hc, hl] = HEALTH[st.health] || ['var(--muted)', ''];
+              const [healthLabel, healthTone] = HEALTH[st.health] || ['Chưa đủ dữ liệu', 'neutral'];
+              const riskDetails = [
+                st.blockedTasks ? `${st.blockedTasks} blocked` : null,
+                st.dependencyBlocked ? `${st.dependencyBlocked} dependency` : null,
+                st.constrainedMembers ? `${st.constrainedMembers} vượt WIP` : null,
+              ].filter(Boolean);
               return (
                 <tr key={p.id}>
-                  <td title={st.healthReasons?.length ? hl + ': ' + st.healthReasons.join(', ') : hl}
-                    style={{ width: 8, padding: 0 }}><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: hc }}></span></td>
+                  <td><span className={`${styles.healthBadge} ${styles[healthTone]}`} title={st.healthReasons?.join(', ') || healthLabel}>
+                    <span className={styles.healthDot} aria-hidden="true"></span>{healthLabel}
+                  </span></td>
                   <td><Link href={`/projects/${p.id}`} style={{ textDecoration: 'none' }}>
                     <span className="cell-main" style={{ color: 'var(--primary)' }}>{p.name}</span></Link>
-                    <span className="cell-sub">{p.service || '—'} · {st.taskTotal ? `${st.taskDone}/${st.taskTotal} việc` : 'chưa có việc'}{st.taskOverdue ? ` · ${st.taskOverdue} trễ` : ''}</span></td>
+                    <span className="cell-sub">{p.service || '—'} · {st.taskTotal ? `${st.taskDone}/${st.taskTotal} việc` : 'chưa có execution plan'}{st.taskOverdue ? ` · ${st.taskOverdue} trễ` : ''}</span>
+                    {riskDetails.length > 0 && <span className={styles.riskDetails}>{riskDetails.join(' · ')}</span>}</td>
                   <td>{clientName(p.clientId)}</td>
                   {isMgmt && <td className="num" style={{ fontWeight: 700 }}>{moneyShort(p.budget)}</td>}
-                  <td style={late ? { color: 'var(--danger)', fontWeight: 600 } : {}}>{fmtDate(p.deadline)}{late ? ' ⚠' : ''}</td>
+                  <td style={late ? { color: 'var(--danger)', fontWeight: 600 } : {}}>{fmtDate(p.deadline)}{late && <span className={styles.overdueLabel}>Trễ</span>}</td>
                   <td><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div className={`progress ${(st.progress ?? p.progress) >= 100 ? 'p-done' : ''}`}><i style={{ width: `${Math.min(100, st.progress ?? p.progress)}%` }}></i></div>
                     <span style={{ fontSize: '.75rem', color: 'var(--muted)' }}>{st.progress ?? p.progress}%</span></div></td>
@@ -99,9 +107,9 @@ export default function ProjectsPage() {
                   <td><Badge map="project" k={p.status} /></td>
                   {isMgmt && (
                     <td><div className="row-actions">
-                      <button className="icon-btn" title="Tài liệu (Drive/Notion…)" onClick={() => setModal({ mode: 'docs', row: p })}>📎</button>
-                      <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: p })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
-                      <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: p })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
+                      <button className={`icon-btn ${styles.projectAction}`} title="Tài liệu (Drive/Notion…)" onClick={() => setModal({ mode: 'docs', row: p })} aria-label={`Mở tài liệu của ${p.name}`}><Icon name="link" size={16} /></button>
+                      <button className={`icon-btn ${styles.projectAction}`} onClick={() => setModal({ mode: 'edit', row: p })} aria-label={`Sửa ${p.name}`}><Icon name="edit" size={16} /></button>
+                      <button className={`icon-btn danger ${styles.projectAction}`} onClick={() => setModal({ mode: 'del', row: p })} aria-label={`Xóa ${p.name}`}><Icon name="trash" size={16} /></button>
                     </div></td>
                   )}
                 </tr>

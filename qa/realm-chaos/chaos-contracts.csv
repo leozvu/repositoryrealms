@@ -1,0 +1,18 @@
+id,layer,source,signals,missingSignals,status
+database-read-deadline,api,app/api/realm-demo/pilot/operations/route.js,withRealmDeadline | dependency: 'database' | timeoutMs: 5_000,,verified
+retryable-degraded-response,api,lib/realm-api-response.js,error?.expose === true | outcome: responseStatus >= 500 ? 'degraded' | Retry-After,,verified
+bounded-websocket-reconnect,realtime,components/realm/realm-transports.js,maxReconnectAttempts = 4 | onState('gateway-degraded') | onExhausted(),,verified
+websocket-local-fallback,realtime,components/realm/useRealmPresence.js,onExhausted: | startLocalTransport() | setTransportState('local-ready'),,verified
+client-api-timeout,client,components/realm/realm-fetch.js,REALM_CLIENT_TIMEOUT_MS = 8_000 | AbortController | RealmClientTimeoutError,,verified
+last-known-good-ui,client,components/realm/RealmPilotOperations.jsx,Đang hiển thị snapshot gần nhất | Không tự retry | state.error && !dashboard,,verified
+notification-after-commit,transaction,lib/realm-pilot-operations.js,"const transition = await db.$transaction | deliverRealmPilotNotifications(db, transition.notifications) | state: 'degraded'",,verified
+approval-timeout-lock,approval,lib/realm-launch-approval.js,"deadlineState: timedOut ? 'timed_out' | timedOut, | approval.status === 'pending'",,verified
+stale-if-error-cache,cache,lib/cache.js,cachedResilient | source: 'stale' | staleExp,,verified
+partial-rollout-erp-fallback,rollout,lib/realm-chaos-readiness.js,id: 'partial-rollout' | fallbackUsers | gate.id === 'erp-fallback',,verified
+seven-fault-matrix,policy,lib/realm-chaos-readiness.js,id: 'database-slow' | id: 'websocket-lost' | id: 'api-timeout' | id: 'notification-failed' | id: 'approval-timeout' | id: 'stale-cache' | id: 'partial-rollout',,verified
+aggregate-chaos-readiness-ui,ui,components/realm/RealmPilotOperations.jsx,Chaos Readiness | Detect | Degrade | Preserve,,verified
+accessible-responsive-chaos-ui,style,components/realm/realm-pilot-operations.module.css,.chaosGrid | min-height: 44px | @media (max-width: 680px) | @media (prefers-reduced-motion: reduce),,verified
+deterministic-chaos-tests,test,tests/realm-chaos.test.mjs,database slow | API timeout | stale cache | notification failure | partial rollout | websocket loss,,verified
+notification-transaction-regression,test,tests/realm-pilot-operations.test.mjs,notification failure cannot rollback a committed pilot transition | state: 'degraded',,verified
+approval-timeout-regression,test,tests/realm-launch-approval.test.mjs,"deadlineState, 'timed_out' | timedOutBoard",,verified
+phase20-runbook,operations,docs/realms/PHASE-20-CHAOS-RESILIENCE.md,crmegoric-realms-demo | Không tự retry mutation | Game Day | ERP fallback,,verified

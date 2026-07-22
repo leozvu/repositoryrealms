@@ -1,0 +1,11 @@
+id,layer,source,signals,missingSignals,status
+append-only-model,database,prisma/schema.prisma,"model RealmChangeEvent | domains        String | @@index([createdAt, id])",,verified
+additive-migration,database,prisma/migrations/20260718170000_add_realm_change_feed/migration.sql,"CREATE TABLE ""RealmChangeEvent"" | CREATE INDEX ""RealmChangeEvent_createdAt_id_idx""",,verified
+erp-event-publisher,server,lib/events.js,await step('Realm change feed' | publishRealmChange(prisma,,verified
+awaited-resource-events,api,app/api/data/[resource]/route.js,"await emitEvent(params.resource, 'create'",,verified
+authenticated-cursor-api,api,app/api/realm-demo/changes/route.js,"const user = await currentUser() | loadRealmChangeFeed(prisma, user, { cursor }) | realmJsonResponse(trace, feed",,verified
+payload-free-response,server,lib/realm-change-feed.js,"select: { id: true, createdAt: true, domains: true } | domains: [...domainSet].sort() | eventCount: rows.length",,verified
+fail-soft-publisher,server,lib/realm-change-feed.js,safelyPublishRealmChange | return null,,verified
+resilient-client-poll,client,components/realm/useRealmChangeFeed.js,MAX_RETRY_MS | window.addEventListener('online' | document.addEventListener('visibilitychange' | setState((current) => current === 'ready' ? 'stale' : 'unavailable'),,verified
+targeted-panel-invalidation,client,components/realm/RealmOffice.jsx,useRealmChangeFeed({ | setRealmDataRevision((current) => current + 1) | dataRevision={realmDataRevision},,verified
+schema-readiness,health,lib/realm-health.js,"to_regclass('""RealmChangeEvent""') | evaluateRealmSchemaReadiness | inspectRealmSchemaReadiness",,verified

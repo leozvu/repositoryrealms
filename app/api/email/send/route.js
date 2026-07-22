@@ -40,7 +40,7 @@ function docHtml(kind, doc, clientName, s, message) {
 
 export async function POST(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!hasAny(user, ['AM', 'ACCOUNTANT'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { type, id, to, message } = await req.json();
   if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return NextResponse.json({ error: 'Email người nhận không hợp lệ' }, { status: 400 });

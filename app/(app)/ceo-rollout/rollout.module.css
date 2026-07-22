@@ -1,0 +1,70 @@
+.page { display: grid; gap: 20px; }
+.hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.hero > div { max-width: 860px; }
+.hero h1, .sectionHead h2 { color: var(--fg); font-family: var(--font-display); }
+.hero h1 { font-size: clamp(1.7rem, 3vw, 2.35rem); }
+.hero p:not(.eyebrow), .sectionHead p:not(.eyebrow) { margin-top: 7px; color: var(--muted); font-size: .84rem; line-height: 1.65; }
+.eyebrow { margin-bottom: 5px; color: var(--warn); font-size: .7rem; font-weight: 800; letter-spacing: .11em; }
+.loading { display: grid; min-height: 180px; place-items: center; color: var(--muted); }
+.error, .approval { display: flex; align-items: flex-start; gap: 11px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius); }
+.error, .blocked { color: #842121; background: var(--danger-soft); border-color: #dfa4a4; }
+.approved { color: #096245; background: var(--accent-soft); border-color: #94c7ae; }
+.approval > div { display: grid; gap: 3px; min-width: 0; }
+.approval p, .approval > span { font-size: .76rem; line-height: 1.5; }
+.approval > span { margin-left: auto; overflow-wrap: anywhere; color: inherit; opacity: .78; }
+.sectionHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 18px; border-bottom: 1px solid var(--border); }
+.sectionHead > div { max-width: 760px; }
+.sectionHead h2 { font-size: 1.08rem; }
+.rings { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; margin: 18px; overflow: hidden; border: 1px solid var(--border); border-radius: 10px; background: var(--border); list-style: none; }
+.rings li { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 3px 9px; min-height: 76px; padding: 12px; background: var(--card); }
+.rings li > span { grid-row: span 2; display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; color: #fff; background: var(--primary); font-weight: 800; }
+.rings strong { overflow-wrap: anywhere; font-size: .77rem; }
+.rings small { color: var(--muted); font-size: .65rem; }
+.entityGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 18px; }
+.entity { display: grid; align-content: start; gap: 14px; min-width: 0; padding: 15px; border: 1px solid var(--border); border-radius: 11px; background: var(--card); box-shadow: var(--shadow-sm); }
+.entity > header { display: flex; align-items: center; gap: 10px; }
+.entity > header > div:not(.monogram) { display: grid; min-width: 0; }
+.entity h3 { overflow-wrap: anywhere; font-size: .9rem; }
+.entity header span { color: var(--muted); font-size: .67rem; }
+.monogram { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 10px; color: #fff; background: var(--primary); font-weight: 800; }
+.state { margin-left: auto; padding: 5px 8px; border-radius: 99px; color: #76500f; background: var(--warn-soft); font-size: .66rem; }
+.state.active { color: #08704a; background: var(--accent-soft); }
+.state.paused { color: #842121; background: var(--danger-soft); }
+.entity dl { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--border); }
+.entity dl div { min-width: 0; padding: 9px; background: var(--card); }
+.entity dt { color: var(--muted); font-size: .65rem; }
+.entity dd { margin-top: 3px; overflow-wrap: anywhere; font-size: .73rem; font-weight: 750; }
+.restriction { display: flex; gap: 8px; padding: 10px; border-radius: 8px; color: #67470f; background: var(--warn-soft); font-size: .72rem; line-height: 1.5; }
+.evidenceHead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.evidenceHead > div { display: grid; gap: 3px; }
+.evidenceHead strong { font-size: .76rem; }
+.evidenceHead span { font-size: .67rem; }
+.evidenceHead button { min-height: 44px; }
+.good { color: #08704a; }
+.warn { color: #9a6200; }
+.checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; list-style: none; }
+.checklist li { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 7px 9px; border: 1px solid var(--border); border-radius: 7px; color: var(--muted); background: var(--muted-bg); font-size: .68rem; }
+.checklist .checked { color: #08704a; border-color: #a6ccb7; background: var(--accent-soft); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions button { min-height: 44px; }
+.receipt { display: grid; gap: 3px; padding-top: 12px; border-top: 1px dashed var(--border); }
+.receipt span, .receipt small { color: var(--muted); font-size: .65rem; }
+.receipt strong { overflow-wrap: anywhere; font-family: ui-monospace, monospace; font-size: .69rem; }
+.form { display: grid; gap: 13px; }
+.form label { display: grid; gap: 6px; color: var(--fg); font-size: .75rem; font-weight: 750; }
+.form input, .form select, .form textarea { width: 100%; min-height: 44px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; color: var(--fg); background: var(--card); font: inherit; }
+.form textarea { resize: vertical; }
+.form code { width: fit-content; max-width: 100%; padding: 7px 9px; overflow-wrap: anywhere; border-radius: 6px; color: #67470f; background: var(--warn-soft); font-size: .72rem; }
+.formColumns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.transitionSummary { padding: 11px; border: 1px solid var(--border); border-radius: 8px; background: var(--muted-bg); font-size: .78rem; font-weight: 750; }
+
+@media (max-width: 1100px) { .rings { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 780px) {
+  .hero, .sectionHead, .approval, .evidenceHead { flex-direction: column; }
+  .hero button, .evidenceHead button { width: 100%; justify-content: center; }
+  .approval > span { margin-left: 0; }
+  .entityGrid, .rings { grid-template-columns: 1fr; }
+  .formColumns { grid-template-columns: 1fr; }
+}
+@media (max-width: 460px) { .entity dl, .checklist { grid-template-columns: 1fr; } .entity > header { align-items: flex-start; flex-wrap: wrap; } .state { margin-left: 0; } .actions button { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .page * { transition: none !important; animation: none !important; } }

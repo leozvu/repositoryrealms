@@ -124,6 +124,8 @@ test('doclink: tạo link luôn ghi lại người gắn', () => {
 test('task: nhân viên không tự gán việc cho người khác', () => {
   assert.equal(RESOURCES.tasks.filterUpdate({ assigneeId: 'ai-do', title: 'x' }, NV).assigneeId, undefined);
   assert.equal(RESOURCES.tasks.filterUpdate({ assigneeId: 'ai-do' }, PM).assigneeId, 'ai-do');
+  const forged = RESOURCES.tasks.filterUpdate({ title: 'x', workVersion: 99, escalationLevel: 3, mergedIntoTaskId: 'task-2' }, PM);
+  assert.deepEqual(forged, { title: 'x' });
 });
 
 test('task: nhân viên chỉ sửa việc của mình', () => {

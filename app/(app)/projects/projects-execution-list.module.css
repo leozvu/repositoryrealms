@@ -1,0 +1,54 @@
+.healthBadge {
+  align-items: center;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: .72rem;
+  font-weight: 750;
+  gap: 6px;
+  line-height: 1;
+  padding: 7px 9px;
+  white-space: nowrap;
+}
+
+.healthDot {
+  background: currentColor;
+  border-radius: 50%;
+  height: 7px;
+  width: 7px;
+}
+
+.green { color: #047857; background: #ecfdf5; }
+.amber { color: #a15c00; background: #fffbeb; }
+.red { color: #b42318; background: #fff1f0; }
+.neutral { color: var(--muted); background: var(--surface-2, #f6f7f9); }
+
+.riskDetails {
+  color: #a15c00;
+  display: block;
+  font-size: .7rem;
+  margin-top: 3px;
+}
+
+.overdueLabel {
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  border-radius: 999px;
+  display: inline-block;
+  font-size: .64rem;
+  margin-left: 6px;
+  padding: 2px 5px;
+  text-transform: uppercase;
+}
+
+.projectAction {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .healthBadge,
+  .projectAction {
+    scroll-behavior: auto;
+    transition: none !important;
+  }
+}

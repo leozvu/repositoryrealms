@@ -7,7 +7,7 @@ import { generateKey, hashKey } from '@/lib/apiauth';
 
 async function guard() {
   const user = await currentUser();
-  if (!user) return [null, NextResponse.json({ error: 'unauthorized' }, { status: 401 })];
+  if (!user) return [null, NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 })];
   if (!isDirector(user)) return [null, NextResponse.json({ error: 'forbidden' }, { status: 403 })];
   return [user, null];
 }

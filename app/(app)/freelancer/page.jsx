@@ -2,7 +2,7 @@
 // v3.11: Cổng freelancer — view khóa chặt: chỉ dự án được gán + việc của mình + ghi giờ.
 // Dữ liệu qua endpoint riêng /api/freelancer/* (không đụng API nội bộ).
 import { useEffect, useState } from 'react';
-import { Icon, EmptyState, useToast } from '@/components/ui';
+import { Icon, EmptyState, AsyncButton, useToast } from '@/components/ui';
 import { fmtDate, todayISO, initials, parseItems } from '@/lib/format';
 
 const COLS = [{ k: 'todo', l: 'Cần làm' }, { k: 'doing', l: 'Đang làm' }, { k: 'review', l: 'Chờ duyệt' }, { k: 'done', l: 'Hoàn thành' }];
@@ -100,7 +100,7 @@ export default function FreelancerPage() {
                 <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center', background: 'var(--bg)', padding: 10, borderRadius: 8 }}>
                   <input style={{ width: 90 }} type="number" min="0.5" step="0.5" placeholder="giờ" value={logH} onChange={e => setLogH(e.target.value)} autoFocus />
                   <input style={{ flex: 1, minWidth: 140 }} placeholder="Ghi chú (làm gì)" value={logNote} onChange={e => setLogNote(e.target.value)} />
-                  <button className="btn btn-primary btn-sm" onClick={submitLog}>Lưu giờ hôm nay</button>
+                  <AsyncButton className="btn btn-primary btn-sm" pendingLabel="Đang lưu…" onClick={submitLog}>Lưu giờ hôm nay</AsyncButton>
                   <button className="btn btn-ghost btn-sm" onClick={() => setLogFor(null)}>Hủy</button>
                 </div>
               )}

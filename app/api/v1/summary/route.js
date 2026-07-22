@@ -12,7 +12,7 @@ const mk = off => { const d = new Date(); d.setMonth(d.getMonth() + off); return
 
 export async function GET(req) {
   const user = await apiUser(req);
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!(user.roles || []).includes('DIRECTOR')) {
     return NextResponse.json({ error: 'forbidden — cần API key vai trò Giám đốc' }, { status: 403 });
   }

@@ -15,30 +15,146 @@ generator client {
 // Một người giữ được nhiều vai trò (roles = JSON array, cộng quyền).
 // Cột `role` cũ giữ lại để tương thích, không dùng nữa.
 model User {
+  id                            String                         @id @default(cuid())
+  email                         String                         @unique
+  name                          String
+  passwordHash                  String
+  role                          String                         @default("STAFF")
+  roles                         String                         @default("[\"STAFF\"]")
+  teamId                        String?
+  title                         String? // chức danh: Designer, Account Manager…
+  phone                         String?
+  salary                        Int                            @default(0) // chỉ DIRECTOR và chính chủ được xem
+  status                        String                         @default("active") // active | inactive
+  totpSecret                    String? // v3.2: 2FA TOTP — null = chưa bật
+  birthday                      String? // v3.8: YYYY-MM-DD — AI Summary nhắc sinh nhật
+  userType                      String                         @default("employee") // v3.11: employee | freelancer
+  workspacePreference           String                         @default("auto") // auto | erp | realm — lựa chọn giao diện, không phải dữ liệu hiệu suất
+  accessUntil                   String? // v3.11: YYYY-MM-DD — freelancer hết hạn thì chặn đăng nhập
+  hourlyRate                    Int                            @default(0) // v3.11: đơn giá giờ freelancer (nhân viên dùng lương÷176)
+  skills                        String? // v3.11: kỹ năng freelancer
+  portfolio                     String? // v3.11: link portfolio freelancer
+  loginFails                    Int                            @default(0) // v3.13: số lần nhập sai liên tiếp — chống dò mật khẩu
+  lockedUntil                   DateTime? // v3.13: khóa đăng nhập tạm đến thời điểm này
+  createdAt                     DateTime                       @default(now())
+  tasks                         Task[]
+  timeLogs                      TimeLog[]
+  leaves                        Leave[]
+  realmProfile                  RealmProfile?
+  realmQuestApprovals           RealmQuestConfig[]             @relation("RealmQuestApprover")
+  realmQuestConfigs             RealmQuestConfig[]             @relation("RealmQuestConfigurator")
+  realmGoldEntries              RealmGoldEntry[]
+  realmBudgetConfigs            RealmRewardBudget[]            @relation("RealmBudgetConfigurator")
+  realmBudgetApprovals          RealmRewardBudget[]            @relation("RealmBudgetApprover")
+  collaborationPresence         CollaborationPresenceSession[]
+  collaborationRequestsSent     CollaborationContactRequest[]  @relation("CollaborationRequester")
+  collaborationRequestsReceived CollaborationContactRequest[]  @relation("CollaborationTarget")
+  ceoDirectoryProfile           CeoEntityDirectoryProfile?
+
+  @@index([status, userType, workspacePreference])
+}
+
+// Invalidation log giữa ERP và Realm. Chỉ lưu metadata kỹ thuật đã allowlist,
+// không sao chép payload nghiệp vụ; API change-feed chỉ trả domain tổng hợp.
+model RealmChangeEvent {
+  id             String   @id @default(cuid())
+  resource       String
+  action         String
+  entityId       String?
+  actorId        String?
+  audienceUserId String? // null = company-wide; set = chỉ session của người nhận được thấy
+  domains        String   @default("[]")
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt, id])
+  @@index([resource, createdAt])
+  @@index([audienceUserId, createdAt, id])
+}
+
+// Receipt kỹ thuật cho command Realm -> ERP. Không chứa payload nghiệp vụ;
+// idempotencyKey bảo đảm retry/double-click không ghi Task/Lead hai lần.
+model RealmActionReceipt {
+  id             String   @id @default(cuid())
+  idempotencyKey String   @unique
+  userId         String
+  action         String
+  resource       String
+  entityId       String
+  fromState      String
+  toState        String
+  resultId       String?
+  payloadHash    String?
+  createdAt      DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([resource, entityId, createdAt])
+}
+
+// Phase 0 — Evidence & Governance Contract.
+// Đây là ledger append-only cho bằng chứng nghiệp vụ; không phải activity tracker.
+// `metadata` chỉ nhận allowlist từ lib/work-evidence-contract.js và không chứa payload nghiệp vụ thô.
+model WorkEvidenceEvent {
+  id             String                  @id @default(cuid())
+  idempotencyKey String                  @unique
+  subjectType    String
+  subjectId      String
+  eventType      String
+  sourceClass    String // declared | observed | validated | derived
+  purpose        String
+  actorId        String?
+  occurredAt     DateTime
+  recordedAt     DateTime                @default(now())
+  confidence     String                  @default("unrated") // unverified | low | medium | high | unrated
+  provenance     String
+  metadata       String                  @default("{}")
+  parentEventId  String?
+  schemaVersion  Int                     @default(1)
+  policyVersion  String                  @default("1.0.0")
+  retentionUntil DateTime?
+  reviews        EvidenceReviewRequest[]
+
+  @@index([subjectType, subjectId, occurredAt])
+  @@index([actorId, occurredAt])
+  @@index([sourceClass, eventType, occurredAt])
+  @@index([retentionUntil])
+}
+
+// Quy trình phản hồi/sửa bằng chứng. Evidence gốc không bị overwrite;
+// quyết định sửa phải sinh event mới và trỏ về event cũ qua parentEventId.
+model EvidenceReviewRequest {
+  id              String            @id @default(cuid())
+  evidenceEventId String
+  evidenceEvent   WorkEvidenceEvent @relation(fields: [evidenceEventId], references: [id], onDelete: Restrict)
+  requestedById   String
+  reasonCode      String
+  note            String?
+  status          String            @default("pending") // pending | accepted | rejected | withdrawn
+  decidedById     String?
+  decisionCode    String?
+  decisionNote    String?
+  createdAt       DateTime          @default(now())
+  decidedAt       DateTime?
+
+  @@index([evidenceEventId, createdAt])
+  @@index([requestedById, status, createdAt])
+  @@index([status, createdAt])
+}
+
+// Snapshot bất biến của policy đã duyệt. Phase 0 mặc định shadowMode=true;
+// chưa được phép dùng evidence cho Gold, payroll, kỷ luật hay xếp hạng cá nhân.
+model EvidencePolicySnapshot {
   id           String    @id @default(cuid())
-  email        String    @unique
-  name         String
-  passwordHash String
-  role         String    @default("STAFF")
-  roles        String    @default("[\"STAFF\"]")
-  teamId       String?
-  title        String? // chức danh: Designer, Account Manager…
-  phone        String?
-  salary       Int       @default(0) // chỉ DIRECTOR và chính chủ được xem
-  status       String    @default("active") // active | inactive
-  totpSecret   String? // v3.2: 2FA TOTP — null = chưa bật
-  birthday     String? // v3.8: YYYY-MM-DD — AI Summary nhắc sinh nhật
-  userType     String    @default("employee") // v3.11: employee | freelancer
-  accessUntil  String? // v3.11: YYYY-MM-DD — freelancer hết hạn thì chặn đăng nhập
-  hourlyRate   Int       @default(0) // v3.11: đơn giá giờ freelancer (nhân viên dùng lương÷176)
-  skills       String? // v3.11: kỹ năng freelancer
-  portfolio    String? // v3.11: link portfolio freelancer
-  loginFails   Int       @default(0) // v3.13: số lần nhập sai liên tiếp — chống dò mật khẩu
-  lockedUntil  DateTime? // v3.13: khóa đăng nhập tạm đến thời điểm này
+  version      String    @unique
+  status       String    @default("draft") // draft | approved | active | retired
+  shadowMode   Boolean   @default(true)
+  contractHash String
+  policy       String
+  createdById  String?
+  approvedById String?
   createdAt    DateTime  @default(now())
-  tasks        Task[]
-  timeLogs     TimeLog[]
-  leaves       Leave[]
+  approvedAt   DateTime?
+
+  @@index([status, createdAt])
 }
 
 // ===== v3.11: Thành viên dự án — gắn freelancer (và nhân sự) vào dự án cụ thể =====
@@ -138,6 +254,7 @@ model Phase {
   name      String
   order     Int     @default(0)
   color     String?
+
   @@index([projectId])
 }
 
@@ -149,6 +266,7 @@ model TaskEvent {
   userName String
   text     String
   at       DateTime @default(now())
+
   @@index([taskId])
 }
 
@@ -166,26 +284,191 @@ model ProjectTemplate {
 }
 
 model Task {
-  id         String   @id @default(cuid())
-  title      String
-  projectId  String?
-  project    Project? @relation(fields: [projectId], references: [id])
-  assigneeId String?
-  assignee   User?    @relation(fields: [assigneeId], references: [id])
-  priority   String   @default("medium")
-  status     String   @default("todo")
-  dueDate    String?
-  note       String?
-  dependsOn  String   @default("[]") // v3.2: JSON [taskId] — việc phải xong trước mới được hoàn thành
-  checklist  String   @default("[]") // v3.7: JSON [{text, done}] — các bước con trong việc
-  recur      String? // v3.7: weekly | monthly — xong tự tạo kỳ sau
-  estHours   Float    @default(0) // v3.10: giờ ước lượng — so với giờ đã log
-  phaseId    String? // v3.10: thuộc giai đoạn nào của dự án
-  labels     String   @default("[]") // v3.10: JSON nhãn phân loại
+  id          String            @id @default(cuid())
+  title       String
+  projectId   String?
+  project     Project?          @relation(fields: [projectId], references: [id])
+  assigneeId  String?
+  assignee    User?             @relation(fields: [assigneeId], references: [id])
+  priority    String            @default("medium")
+  status      String            @default("todo")
+  dueDate     String?
+  note        String?
+  dependsOn   String            @default("[]") // v3.2: JSON [taskId] — việc phải xong trước mới được hoàn thành
+  checklist   String            @default("[]") // v3.7: JSON [{text, done}] — các bước con trong việc
+  recur       String? // v3.7: weekly | monthly — xong tự tạo kỳ sau
+  estHours    Float             @default(0) // v3.10: giờ ước lượng — so với giờ đã log
+  phaseId     String? // v3.10: thuộc giai đoạn nào của dự án
+  labels      String            @default("[]") // v3.10: JSON nhãn phân loại
   statusSince String? // v3.12: YYYY-MM-DD vào cột hiện tại từ khi nào — tính tuổi việc
+  realmQuest  RealmQuestConfig?
+
+  // Phase 1 — Unified Work Graph. Các field additive này điều phối cùng Task ERP,
+  // không tạo task store riêng cho Realm.
+  queuePosition     Int                    @default(0)
+  workVersion       Int                    @default(1)
+  workType          String?
+  complexity        String?
+  blockReason       String?
+  blockedAt         DateTime?
+  waitingReason     String?
+  escalationLevel   Int                    @default(0)
+  escalatedAt       DateTime?
+  parentTaskId      String?
+  parentTask        Task?                  @relation("TaskSplitLineage", fields: [parentTaskId], references: [id], onDelete: SetNull)
+  splitChildren     Task[]                 @relation("TaskSplitLineage")
+  mergedIntoTaskId  String?
+  mergedIntoTask    Task?                  @relation("TaskMergeLineage", fields: [mergedIntoTaskId], references: [id], onDelete: SetNull)
+  mergedSources     Task[]                 @relation("TaskMergeLineage")
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @default(now()) @updatedAt
+  completedAt       DateTime?
+  workEvents        WorkItemEvent[]
+  estimateRevisions WorkEstimateRevision[]
+
   @@index([assigneeId])
   @@index([projectId])
   @@index([status])
+  @@index([assigneeId, status, queuePosition])
+  @@index([parentTaskId])
+  @@index([mergedIntoTaskId])
+}
+
+// Version của hàng đợi theo nhân sự. Reprioritize dùng compare-and-swap trên
+// version này để hai quản lý không âm thầm ghi đè thứ tự của nhau.
+model WorkQueueState {
+  id        String   @id @default(cuid())
+  ownerId   String   @unique
+  version   Int      @default(1)
+  wipLimit  Int      @default(5)
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+// Ledger vận hành có cấu trúc. Không thay AuditLog và không chứa nội dung Task;
+// receiptId liên kết hành động canonical của RepositoryRealms.
+model WorkItemEvent {
+  id            String   @id @default(cuid())
+  taskId        String
+  task          Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  action        String
+  actorId       String
+  fromState     String
+  toState       String
+  reasonCode    String?
+  relatedTaskId String?
+  receiptId     String   @unique
+  metadata      String   @default("{}")
+  occurredAt    DateTime @default(now())
+
+  @@index([taskId, occurredAt])
+  @@index([actorId, occurredAt])
+  @@index([action, occurredAt])
+  @@index([relatedTaskId])
+}
+
+// Phase 2 — Resource Intelligence. Mỗi lần estimate được khai báo hoặc quản lý
+// hiệu chỉnh đều có receipt riêng; lịch sử không bị overwrite cùng giá trị Task hiện tại.
+model WorkEstimateRevision {
+  id            String   @id @default(cuid())
+  taskId        String
+  task          Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  actorId       String
+  kind          String // declared | manager_adjustment
+  estimateHours Float
+  previousHours Float
+  workType      String
+  complexity    String
+  reasonCode    String?
+  note          String?
+  receiptId     String   @unique
+  createdAt     DateTime @default(now())
+
+  @@index([taskId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([kind, createdAt])
+  @@index([workType, complexity, createdAt])
+}
+
+// ===== CRMegoric Realms: hồ sơ nhân vật gắn 1-1 với nhân sự ERP =====
+// Wallet và Renown KHÔNG lưu ở đây; luôn cộng từ RealmGoldEntry append-only.
+model RealmProfile {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  realmClass String   @default("Realm Builder")
+  color      String   @default("#3b8061")
+  streakDays Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Reward được quản lý duyệt riêng; nhân viên không tự gán Gold cho Task.
+model RealmQuestConfig {
+  id             String    @id @default(cuid())
+  taskId         String    @unique
+  task           Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  gold           Int       @default(0)
+  renown         Int       @default(0)
+  active         Boolean   @default(true)
+  status         String    @default("draft") // draft | pending | approved | rejected
+  note           String?
+  version        Int       @default(1)
+  configuredById String?
+  configuredBy   User?     @relation("RealmQuestConfigurator", fields: [configuredById], references: [id], onDelete: SetNull)
+  configuredAt   DateTime?
+  approvedById   String?
+  approvedBy     User?     @relation("RealmQuestApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt     DateTime?
+  reviewNote     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([configuredById])
+  @@index([approvedById])
+}
+
+// Hạn mức Gold theo tháng. Budget cũng có maker/checker để tránh một người tự nâng trần rồi duyệt.
+model RealmRewardBudget {
+  id             String    @id @default(cuid())
+  period         String    @unique // YYYY-MM
+  goldCap        Int       @default(140)
+  perUserGoldCap Int       @default(45)
+  status         String    @default("draft") // draft | pending | approved | rejected
+  note           String?
+  version        Int       @default(1)
+  configuredById String?
+  configuredBy   User?     @relation("RealmBudgetConfigurator", fields: [configuredById], references: [id], onDelete: SetNull)
+  configuredAt   DateTime?
+  approvedById   String?
+  approvedBy     User?     @relation("RealmBudgetApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt     DateTime?
+  reviewNote     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([configuredById])
+  @@index([approvedById])
+}
+
+// Sổ Gold append-only. idempotencyKey unique bảo vệ double-click/retry/webhook lặp.
+model RealmGoldEntry {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type           String // quest_reward | shop_spend | adjustment
+  amount         Int
+  renown         Int      @default(0)
+  label          String
+  sourceType     String?
+  sourceId       String?
+  idempotencyKey String   @unique
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, type, sourceType, sourceId])
+  @@index([userId, createdAt])
+  @@index([sourceType, sourceId])
 }
 
 // ===== v3.8: Đánh giá hiệu suất theo quý =====
@@ -210,6 +493,7 @@ model TaskComment {
   userId    String
   content   String
   createdAt DateTime @default(now())
+
   @@index([taskId])
 }
 
@@ -222,6 +506,7 @@ model Milestone {
   date      String // YYYY-MM-DD
   done      Boolean @default(false)
   note      String?
+
   @@index([projectId])
 }
 
@@ -237,6 +522,7 @@ model TimeLog {
   hours     Float   @default(0)
   billable  Boolean @default(true)
   note      String?
+
   @@index([userId])
   @@index([projectId])
   @@index([date])
@@ -256,6 +542,7 @@ model Payout {
   note      String?
   createdAt DateTime @default(now())
   paidDate  String?
+
   @@index([userId])
   @@index([status])
 }
@@ -292,6 +579,7 @@ model Invoice {
   recGroup  String?
   currency  String  @default("VND") // v3.18: đa tiền tệ
   fxRate    Float   @default(1)
+
   @@index([clientId])
   @@index([projectId])
   @@index([status])
@@ -308,6 +596,7 @@ model Transaction {
   desc        String?
   projectId   String?
   createdById String?
+
   @@index([date])
   @@index([projectId])
 }
@@ -332,6 +621,7 @@ model Leave {
   type   String  @default("annual")
   status String  @default("pending")
   note   String?
+
   @@index([userId])
 }
 
@@ -475,20 +765,31 @@ model Budget {
 
 // ===== v2.4 Customer Success: ticket hỗ trợ + SLA =====
 model Ticket {
-  id         String    @id @default(cuid())
-  code       String
-  clientId   String?
-  title      String
-  desc       String?
-  priority   String    @default("normal") // urgent | high | normal | low
-  status     String    @default("open") // open | in_progress | waiting | resolved | closed
-  assigneeId String?
-  channel    String? // email | phone | zalo | messenger | meeting
-  createdAt  DateTime  @default(now())
-  dueAt      DateTime? // hạn SLA
-  resolvedAt DateTime?
+  id               String    @id @default(cuid())
+  code             String
+  clientId         String?
+  title            String
+  desc             String?
+  priority         String    @default("normal") // urgent | high | normal | low
+  status           String    @default("open") // open | in_progress | waiting | resolved | closed
+  assigneeId       String?
+  channel          String? // email | phone | zalo | messenger | meeting | Realm Pilot
+  reporterId       String? // nhân sự gửi phản hồi; null với ticket CRM cũ
+  source           String? // realm_pilot với phản hồi Phase 11
+  feedbackType     String? // bug | friction | idea | support
+  feedbackSurface  String? // realm | erp
+  feedbackContext  String? // JSON context đã lọc, không chứa dữ liệu form/record
+  feedbackResponse String? // phản hồi xử lý hiển thị lại cho người gửi
+  requestKey       String?   @unique // idempotency key cho feedback API
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
+  dueAt            DateTime? // hạn SLA
+  resolvedAt       DateTime?
+
   @@index([assigneeId])
   @@index([status])
+  @@index([source, status])
+  @@index([reporterId, createdAt])
 }
 
 // ===== v2.5: KPI/OKR theo quý + khảo sát NPS =====
@@ -538,6 +839,7 @@ model Message {
   senderId  String
   content   String
   createdAt DateTime     @default(now())
+
   @@index([convId, createdAt])
 }
 
@@ -553,20 +855,48 @@ model Commission {
   status    String  @default("pending") // pending | paid
   note      String?
   createdAt String?
+
   @@index([userId])
   @@index([invoiceId])
 }
 
 // ===== v3.3: API mở — key hoạt động như "user ảo" với vai trò riêng =====
 model ApiKey {
-  id        String    @id @default(cuid())
-  name      String
-  prefix    String // 10 ký tự đầu của key để nhận diện trong danh sách
-  keyHash   String    @unique // sha256(key) — key thô chỉ hiển thị 1 lần lúc tạo
-  roles     String    @default("[\"PM\"]") // quyền của key, dùng chung RBAC registry
-  active    Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  lastUsed  DateTime?
+  id               String                  @id @default(cuid())
+  name             String
+  prefix           String // 10 ký tự đầu của key để nhận diện trong danh sách
+  keyHash          String                  @unique // sha256(key) — key thô chỉ hiển thị 1 lần lúc tạo
+  roles            String                  @default("[\"PM\"]") // quyền của key, dùng chung RBAC registry
+  scopes           String                  @default("[]") // [] = legacy ERP key; CEO service keys use an explicit allowlist
+  audience         String? // Entity-bound service credential, e.g. aim / egoric / vnecom / egolive
+  active           Boolean                 @default(true)
+  expiresAt        DateTime?
+  rotatedAt        DateTime?
+  createdAt        DateTime                @default(now())
+  lastUsed         DateTime?
+  rateLimitBuckets CeoApiRateLimitBucket[]
+
+  @@index([audience, active])
+  @@index([expiresAt])
+}
+
+// CEO-8: durable fixed-window counters keep service limits consistent across serverless
+// instances. Buckets contain no request payload, business record or raw credential.
+model CeoApiRateLimitBucket {
+  bucketKey       String   @id
+  apiKeyId        String
+  apiKey          ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  audience        String
+  scope           String
+  windowStartedAt DateTime
+  expiresAt       DateTime
+  requestCount    Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([apiKeyId, expiresAt])
+  @@index([audience, scope, windowStartedAt])
+  @@index([expiresAt])
 }
 
 // ===== v3.3: Webhook — bắn sự kiện ra ngoài (n8n/Zapier/hệ thống khác) =====
@@ -620,6 +950,48 @@ model Notification {
   @@index([userId, readAt])
 }
 
+// ===== Shared Collaboration Bridge =====
+// Presence là dữ liệu phiên ngắn hạn theo tab/device. ERP và Realm cùng ghi vào bảng này,
+// sau đó directory hợp nhất theo userId để một người không bị đếm online nhiều lần.
+model CollaborationPresenceSession {
+  sessionId    String   @id
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  surface      String   @default("erp") // erp | realm
+  availability String   @default("available") // available | busy | focus | dnd | away
+  capabilities String   @default("[\"chat\"]") // JSON string: chat | voice | video
+  lastSeen     DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([userId, lastSeen])
+  @@index([lastSeen])
+}
+
+// Lời mời "ghé bàn" dùng chung cho Realm và ERP. Notification/Message vẫn là các kênh
+// nghiệp vụ chuẩn; bảng này chỉ giữ lifecycle, idempotency và trạng thái delivery.
+model CollaborationContactRequest {
+  id             String    @id @default(cuid())
+  requesterId    String
+  requester      User      @relation("CollaborationRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  targetId       String
+  target         User      @relation("CollaborationTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  conversationId String?
+  kind           String    @default("chat") // knock | chat | voice
+  sourceSurface  String    @default("realm") // realm | erp
+  status         String    @default("pending") // pending | accepted | declined | expired
+  message        String?
+  idempotencyKey String    @unique
+  seenAt         DateTime?
+  actionAt       DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([targetId, status, createdAt])
+  @@index([requesterId, createdAt])
+  @@index([expiresAt])
+}
+
 // ===== v3.5: Gắn link tài liệu ngoài (Drive/Notion/Figma…) =====
 model DocLink {
   id        String   @id @default(cuid())
@@ -669,21 +1041,431 @@ model AuditLog {
   refId    String?
   detail   String?
   at       DateTime @default(now())
+
   @@index([at])
+}
+
+// ===== CEO-2: central entity registry =====
+// Only an environment-variable REFERENCE is persisted in credentialRef. The API key value
+// stays in the server secret store and is never serialized to the browser.
+model CeoEntityRegistry {
+  id                       String                     @id
+  displayName              String
+  baseUrl                  String                     @unique
+  businessProfile          String
+  capabilities             String                     @default("[]")
+  environment              String                     @default("production")
+  enabled                  Boolean                    @default(false)
+  status                   String                     @default("unverified")
+  credentialRef            String // SSO trust secret reference; never used as a generic ERP credential
+  credentialVersion        Int                        @default(1)
+  serviceCredentialRef     String? // scoped CEO service API key reference, separate from SSO trust
+  serviceCredentialVersion Int                        @default(1)
+  serviceRotatedAt         DateTime?
+  contractVersion          String                     @default("1.0.0")
+  schemaVersion            Int                        @default(1)
+  recordVersion            Int                        @default(1)
+  lastSyncAttemptAt        DateTime?
+  lastSuccessfulSyncAt     DateTime?
+  consecutiveErrors        Int                        @default(0)
+  lastErrorCode            String?
+  circuitState             String                     @default("closed")
+  circuitOpenedAt          DateTime?
+  circuitRetryAt           DateTime?
+  rotatedAt                DateTime?
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  memberships              CeoEntityMembership[]
+  snapshotCache            CeoEntitySnapshotCache?
+  commandDeliveries        CeoCommandDelivery[]
+  directoryProfiles        CeoDirectoryProfileCache[]
+  unifiedConversations     CeoUnifiedConversation[]
+  rolloutState             CeoRolloutState?
+
+  @@index([enabled, status])
+  @@index([circuitState, circuitRetryAt])
+  @@index([environment])
+}
+
+// ===== CEO-9: staged rollout control plane =====
+// Rollout state and evidence live only in the CEO Portal database. A transition changes
+// Portal authorization gates; it never deploys code or writes an entity business database.
+model CeoRolloutState {
+  entityId         String               @id
+  entity           CeoEntityRegistry    @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  currentRing      String               @default("local_staging")
+  status           String               @default("hold")
+  recordVersion    Int                  @default(1)
+  lastTransitionAt DateTime?
+  lastReconciledAt DateTime?
+  lastRollbackAt   DateTime?
+  lastReceiptId    String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  evidence         CeoRolloutEvidence[]
+  receipts         CeoRolloutReceipt[]
+
+  @@index([status, currentRing])
+}
+
+model CeoRolloutEvidence {
+  id             String          @id @default(cuid())
+  entityId       String
+  state          CeoRolloutState @relation(fields: [entityId], references: [entityId], onDelete: Restrict)
+  ring           String
+  kind           String
+  reference      String
+  checksum       String
+  observedAt     DateTime
+  expiresAt      DateTime
+  recordedById   String
+  recordedByName String
+  createdAt      DateTime        @default(now())
+
+  @@unique([entityId, ring, kind, checksum])
+  @@index([entityId, ring, expiresAt])
+  @@index([expiresAt])
+}
+
+model CeoRolloutReceipt {
+  id             String          @id @default(cuid())
+  entityId       String
+  state          CeoRolloutState @relation(fields: [entityId], references: [entityId], onDelete: Restrict)
+  action         String
+  fromRing       String
+  toRing         String
+  decision       String
+  reason         String
+  evidenceDigest String
+  approvalId     String?
+  correlationId  String          @unique
+  createdById    String
+  createdByName  String
+  createdAt      DateTime        @default(now())
+
+  @@index([entityId, createdAt])
+  @@index([decision, createdAt])
+}
+
+// ===== CEO-4: sanitized aggregate read cache =====
+// One latest aggregate snapshot is retained per entity. snapshotJson is validated against
+// the CEO v1 contract before persistence and cannot contain entity business records.
+model CeoEntitySnapshotCache {
+  id              String            @id @default(cuid())
+  entityId        String            @unique
+  entity          CeoEntityRegistry @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  contractVersion String
+  schemaVersion   Int
+  snapshotJson    String
+  sourceAsOf      DateTime
+  fetchedAt       DateTime
+  freshUntil      DateTime
+  staleUntil      DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([freshUntil])
+  @@index([staleUntil])
+}
+
+// ===== CEO-3: central CEO identity and cross-domain SSO control plane =====
+// These tables hold identity/control metadata only. Entity business records stay in the
+// owning ERP database, and all browser/session/code secrets are persisted as keyed hashes.
+model CeoGlobalIdentity {
+  id                   String                     @id @default(cuid())
+  subject              String                     @unique
+  userId               String                     @unique
+  email                String
+  displayName          String
+  status               String                     @default("active")
+  recoveryVersion      Int                        @default(0)
+  createdAt            DateTime                   @default(now())
+  updatedAt            DateTime                   @updatedAt
+  memberships          CeoEntityMembership[]
+  sessions             CeoPortalSession[]
+  recoveryCodes        CeoRecoveryCode[]
+  authorizationCodes   CeoSsoAuthorizationCode[]
+  commandDeliveries    CeoCommandDelivery[]
+  directoryProfiles    CeoDirectoryProfileCache[]
+  unifiedConversations CeoUnifiedConversation[]
+
+  @@index([status, email])
+}
+
+model CeoEntityMembership {
+  id             String            @id @default(cuid())
+  identityId     String
+  identity       CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Restrict)
+  entityId       String
+  entity         CeoEntityRegistry @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  localUserEmail String
+  localRole      String            @default("DIRECTOR")
+  scopes         String            @default("[]")
+  status         String            @default("active")
+  recordVersion  Int               @default(1)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([identityId, entityId])
+  @@index([entityId, status])
+  @@index([localUserEmail])
+}
+
+model CeoPortalSession {
+  id                 String                    @id @default(cuid())
+  identityId         String
+  identity           CeoGlobalIdentity         @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  tokenHash          String                    @unique
+  deviceLabel        String
+  userAgentHash      String?
+  ipHash             String?
+  assuranceLevel     String                    @default("mfa")
+  stepUpAt           DateTime?
+  lastSeenAt         DateTime                  @default(now())
+  idleExpiresAt      DateTime
+  expiresAt          DateTime
+  revokedAt          DateTime?
+  revokeReason       String?
+  createdAt          DateTime                  @default(now())
+  authorizationCodes CeoSsoAuthorizationCode[]
+
+  @@index([identityId, revokedAt, expiresAt])
+  @@index([idleExpiresAt])
+}
+
+model CeoRecoveryCode {
+  id         String            @id @default(cuid())
+  identityId String
+  identity   CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  codeHash   String            @unique
+  version    Int
+  usedAt     DateTime?
+  createdAt  DateTime          @default(now())
+
+  @@index([identityId, version, usedAt])
+}
+
+model CeoSsoAuthorizationCode {
+  id             String            @id @default(cuid())
+  codeHash       String            @unique
+  stateHash      String
+  nonce          String
+  identityId     String
+  identity       CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  sessionId      String
+  session        CeoPortalSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  entityId       String
+  audience       String
+  scopes         String            @default("[]")
+  localUserEmail String
+  redirectPath   String            @default("/dashboard")
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  createdAt      DateTime          @default(now())
+
+  @@index([entityId, expiresAt, consumedAt])
+  @@index([identityId, createdAt])
+  @@index([sessionId, createdAt])
+}
+
+// ===== CEO-5: cross-entity command delivery control plane =====
+// Portal rows contain delivery metadata and receipt references only. They never retain
+// task titles, announcement bodies, employee emails or approval notes.
+model CeoCommandDelivery {
+  id                 String            @id @default(cuid())
+  identityId         String
+  identity           CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Restrict)
+  entityId           String
+  entity             CeoEntityRegistry @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  idempotencyKeyHash String            @unique
+  correlationId      String            @unique
+  command            String
+  scope              String
+  payloadHash        String
+  status             String            @default("dispatching")
+  attemptCount       Int               @default(1)
+  targetReceiptId    String?
+  targetResource     String?
+  targetRecordId     String?
+  targetReceiptAt    DateTime?
+  lastErrorCode      String?
+  lastAttemptAt      DateTime?
+  confirmedAt        DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([identityId, createdAt])
+  @@index([entityId, status, createdAt])
+  @@index([status, updatedAt])
+}
+
+// This canonical receipt lives inside each target entity database. The business record,
+// receipt and AuditLog are committed together; payload content is represented by a hash.
+model CeoEntityCommandReceipt {
+  id             String   @id @default(cuid())
+  idempotencyKey String   @unique
+  correlationId  String   @unique
+  actorSubject   String
+  targetEntityId String
+  action         String
+  scope          String
+  payloadHash    String
+  resource       String
+  recordId       String?
+  resultCount    Int      @default(1)
+  createdAt      DateTime @default(now())
+
+  @@index([actorSubject, createdAt])
+  @@index([targetEntityId, action, createdAt])
+  @@index([resource, recordId])
+}
+
+// ===== CEO-6: federated directory and unified inbox =====
+// Directory sharing is opt-in per local employee. The Portal may cache only these
+// explicitly shared fields; salary, phone, performance and business records are excluded.
+model CeoEntityDirectoryProfile {
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sharedWithCeoPortal Boolean   @default(false)
+  sharePresence       Boolean   @default(false)
+  displayName         String?
+  title               String?
+  policyVersion       String    @default("1.0.0")
+  consentedAt         DateTime?
+  revokedAt           DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([sharedWithCeoPortal, updatedAt])
+}
+
+// Portal-side cache of the explicit directory contract. It is not an HR master record.
+model CeoDirectoryProfileCache {
+  id              String            @id @default(cuid())
+  identityId      String
+  identity        CeoGlobalIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  entityId        String
+  entity          CeoEntityRegistry @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  remoteUserId    String
+  email           String
+  displayName     String
+  title           String?
+  sharePresence   Boolean           @default(false)
+  sourceUpdatedAt DateTime
+  fetchedAt       DateTime
+  retentionUntil  DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([identityId, entityId, remoteUserId])
+  @@index([identityId, displayName])
+  @@index([retentionUntil])
+}
+
+// The Portal owns only the cross-entity inbox index and encrypted message copy. The
+// target ERP still creates its own canonical Conversation/Message records and receipts.
+model CeoUnifiedConversation {
+  id             String              @id @default(cuid())
+  identityId     String
+  identity       CeoGlobalIdentity   @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  entityId       String
+  entity         CeoEntityRegistry   @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  type           String              @default("dm") // dm | entity_channel
+  remoteUserId   String?
+  name           String
+  status         String              @default("active") // active | archived | incident_hold
+  lastMessageAt  DateTime?
+  retentionUntil DateTime
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  messages       CeoUnifiedMessage[]
+
+  @@unique([identityId, entityId, type, remoteUserId])
+  @@index([identityId, status, lastMessageAt])
+  @@index([retentionUntil])
+}
+
+model CeoUnifiedMessage {
+  id                   String                 @id @default(cuid())
+  conversationId       String
+  conversation         CeoUnifiedConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction            String // outbound | inbound
+  senderRef            String
+  senderName           String
+  bodyCiphertext       String
+  bodyIv               String
+  bodyTag              String
+  keyVersion           Int                    @default(1)
+  contentHash          String
+  mentionRefs          String                 @default("[]")
+  idempotencyKeyHash   String                 @unique
+  correlationId        String                 @unique
+  sourceMessageId      String?
+  targetReceiptId      String?
+  targetConversationId String?
+  targetMessageId      String?
+  status               String                 @default("dispatching") // dispatching | delivered | pending_confirmation | failed | read | deleted
+  attemptCount         Int                    @default(1)
+  lastErrorCode        String?
+  sentAt               DateTime
+  deliveredAt          DateTime?
+  readAt               DateTime?
+  retentionUntil       DateTime
+  deletedAt            DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  @@unique([conversationId, sourceMessageId])
+  @@index([conversationId, sentAt])
+  @@index([status, updatedAt])
+  @@index([retentionUntil, deletedAt])
+}
+
+// Target-side mapping allows replies written in the existing ERP/Realm conversation to
+// be exported to the Portal without exposing unrelated local conversations.
+model CeoEntityConversationLink {
+  id                   String    @id @default(cuid())
+  portalConversationId String    @unique
+  targetEntityId       String
+  localConversationId  String
+  participantUserId    String?
+  type                 String
+  lastExportedAt       DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([targetEntityId, localConversationId])
+}
+
+model CeoEntityMessageReceipt {
+  id                   String   @id @default(cuid())
+  idempotencyKey       String   @unique
+  correlationId        String   @unique
+  actorSubject         String
+  targetEntityId       String
+  portalConversationId String
+  localConversationId  String
+  localMessageId       String
+  payloadHash          String
+  createdAt            DateTime @default(now())
+
+  @@index([actorSubject, createdAt])
+  @@index([targetEntityId, portalConversationId])
 }
 
 // ===== v3.19: XUẤT NHẬP KHẨU NÔNG SẢN (phân hệ 'export' — Fretas) =====
 // Vùng trồng (PUC) + cơ sở đóng gói (PHC). Gộp một model, phân biệt bằng type.
 model GrowingArea {
-  id        String   @id @default(cuid())
-  type      String   @default("PUC") // PUC (vùng trồng) | PHC (cơ sở đóng gói)
+  id        String     @id @default(cuid())
+  type      String     @default("PUC") // PUC (vùng trồng) | PHC (cơ sở đóng gói)
   name      String
   crop      String? // chanh dây | chôm chôm | ...
   province  String?
-  areaHa    Float    @default(0) // diện tích (ha) — với PUC
+  areaHa    Float      @default(0) // diện tích (ha) — với PUC
   owner     String? // chủ vườn / đơn vị
   note      String?
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
   codes     AreaCode[]
 }
 
@@ -700,38 +1482,40 @@ model AreaCode {
   validFrom  String?
   validTo    String?
   note       String?
+
   @@index([areaId])
 }
 
 // Lô hàng xuất khẩu.
 model Shipment {
-  id             String   @id @default(cuid())
-  code           String   @unique
-  clientId       String? // người mua (buyer nước ngoài)
-  crop           String? // mặt hàng
-  market         String // thị trường đích: CN | EU | US
-  incoterm       String   @default("FOB") // FOB | CIF | CFR | EXW | DAP | FCA | CPT | CIP
-  transportMode  String   @default("SEA") // SEA | AIR
-  currency       String   @default("USD")
-  fxRate         Float    @default(1)
-  amount         Int      @default(0) // giá trị lô (theo currency)
-  paymentMethod  String   @default("TT") // TT | LC | DP | DA
-  containerType  String? // 20RF | 40HC-RF
-  containerNo    String?
-  sealNo         String?
-  weightKg       Float    @default(0)
-  etd            String? // ngày tàu chạy dự kiến (YYYY-MM-DD)
-  eta            String?
-  blNo           String? // số vận đơn
-  lcNo           String? // số L/C (nếu thanh toán L/C)
-  lcExpiry       String? // ngày hết hạn L/C
+  id              String        @id @default(cuid())
+  code            String        @unique
+  clientId        String? // người mua (buyer nước ngoài)
+  crop            String? // mặt hàng
+  market          String // thị trường đích: CN | EU | US
+  incoterm        String        @default("FOB") // FOB | CIF | CFR | EXW | DAP | FCA | CPT | CIP
+  transportMode   String        @default("SEA") // SEA | AIR
+  currency        String        @default("USD")
+  fxRate          Float         @default(1)
+  amount          Int           @default(0) // giá trị lô (theo currency)
+  paymentMethod   String        @default("TT") // TT | LC | DP | DA
+  containerType   String? // 20RF | 40HC-RF
+  containerNo     String?
+  sealNo          String?
+  weightKg        Float         @default(0)
+  etd             String? // ngày tàu chạy dự kiến (YYYY-MM-DD)
+  eta             String?
+  blNo            String? // số vận đơn
+  lcNo            String? // số L/C (nếu thanh toán L/C)
+  lcExpiry        String? // ngày hết hạn L/C
   presentDeadline String? // hạn xuất trình chứng từ (min(etd+21, lcExpiry))
-  growingAreaId  String? // vùng trồng nguồn (truy xuất)
-  packingHouseId String? // cơ sở đóng gói
-  status         String   @default("draft") // draft | booked | packing | customs | shipped | delivered | paid
-  note           String?
-  createdAt      DateTime @default(now())
-  docs           ShipmentDoc[]
+  growingAreaId   String? // vùng trồng nguồn (truy xuất)
+  packingHouseId  String? // cơ sở đóng gói
+  status          String        @default("draft") // draft | booked | packing | customs | shipped | delivered | paid
+  note            String?
+  createdAt       DateTime      @default(now())
+  docs            ShipmentDoc[]
+
   @@index([status])
   @@index([market])
 }
@@ -747,6 +1531,7 @@ model ShipmentDoc {
   issuedBy   String? // đơn vị cấp
   issuedAt   String?
   note       String?
+
   @@index([shipmentId])
 }
 
@@ -754,8 +1539,8 @@ model ShipmentDoc {
 // Mua nông sản từ nông dân → nhập kho theo LÔ (gắn vùng trồng + ngày thu hoạch + hạn dùng)
 // → xuất kho vào lô hàng xuất. Giá vốn theo lô (đích danh — phù hợp nông sản truy xuất từng lô).
 model StockLot {
-  id            String   @id @default(cuid())
-  code          String   @unique // LOT-2026-001
+  id            String      @id @default(cuid())
+  code          String      @unique // LOT-2026-001
   crop          String // Chanh dây | Chôm chôm | ...
   vendorId      String? // nhà cung cấp / nông dân (Vendor)
   growingAreaId String? // vùng trồng nguồn — TRUY XUẤT NGUỒN GỐC (GrowingArea PUC)
@@ -763,14 +1548,15 @@ model StockLot {
   harvestDate   String? // ngày thu hoạch (YYYY-MM-DD)
   expiryDate    String? // hạn sử dụng / nên xuất trước
   receivedDate  String? // ngày nhập kho
-  qtyIn         Float    @default(0) // kg nhập
-  qtyOut        Float    @default(0) // kg đã xuất (tổng các phiếu xuất)
-  unitCost      Float    @default(0) // giá vốn / kg (theo currency)
-  currency      String   @default("VND")
-  status        String   @default("in_stock") // in_stock | depleted | expired
+  qtyIn         Float       @default(0) // kg nhập
+  qtyOut        Float       @default(0) // kg đã xuất (tổng các phiếu xuất)
+  unitCost      Float       @default(0) // giá vốn / kg (theo currency)
+  currency      String      @default("VND")
+  status        String      @default("in_stock") // in_stock | depleted | expired
   note          String?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime    @default(now())
   moves         StockMove[]
+
   @@index([crop])
   @@index([status])
 }
@@ -788,6 +1574,7 @@ model StockMove {
   refId     String? // shipmentId khi xuất cho lô hàng
   note      String?
   createdAt DateTime @default(now())
+
   @@index([lotId])
   @@index([refId])
 }
@@ -827,6 +1614,7 @@ model LiveSession {
   settledDate   String? // v3.33: ngày tiền sàn THỰC VỀ ví (Shopee ~ngày 4, có hoàn tới ngày 15) — ghi phiếu thu
   note          String?
   createdAt     DateTime @default(now())
+
   @@index([date])
   @@index([status])
   @@index([hostId])
@@ -834,17 +1622,18 @@ model LiveSession {
 
 // Điểm vi phạm nền tảng — tích lũy rolling 180 ngày, 36đ = hạn chế live, 48đ = đóng shop.
 model Violation {
-  id            String   @id @default(cuid())
-  platform      String   @default("tiktok")
-  shop          String?
-  points        Int      @default(0)
-  reason        String
-  category      String? // vận hành | nội dung | sản phẩm
-  occurredAt    String // YYYY-MM-DD
-  expiresAt     String? // occurredAt + 180 ngày
+  id             String   @id @default(cuid())
+  platform       String   @default("tiktok")
+  shop           String?
+  points         Int      @default(0)
+  reason         String
+  category       String? // vận hành | nội dung | sản phẩm
+  occurredAt     String // YYYY-MM-DD
+  expiresAt      String? // occurredAt + 180 ngày
   appealDeadline String?
-  status        String   @default("active") // active | appealing | cleared | expired
-  note          String?
-  createdAt     DateTime @default(now())
+  status         String   @default("active") // active | appealing | cleared | expired
+  note           String?
+  createdAt      DateTime @default(now())
+
   @@index([occurredAt])
 }

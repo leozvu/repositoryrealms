@@ -1,0 +1,660 @@
+{
+  "version": 1,
+  "mode": "components",
+  "source": "public/realms/assets/generated/phase-22/props/realm-office-prop-atlas-v1.png",
+  "sourceWidth": 1536,
+  "sourceHeight": 1024,
+  "alphaThreshold": 16,
+  "padding": 8,
+  "assetCount": 36,
+  "assets": [
+    {
+      "file": "prop-001.png",
+      "sourceBbox": [
+        732,
+        27,
+        907,
+        274
+      ],
+      "cropBbox": [
+        724,
+        19,
+        915,
+        282
+      ],
+      "width": 191,
+      "height": 263,
+      "alphaPixels": 27152
+    },
+    {
+      "file": "prop-002.png",
+      "sourceBbox": [
+        1224,
+        43,
+        1484,
+        236
+      ],
+      "cropBbox": [
+        1216,
+        35,
+        1492,
+        244
+      ],
+      "width": 276,
+      "height": 209,
+      "alphaPixels": 40324
+    },
+    {
+      "file": "prop-003.png",
+      "sourceBbox": [
+        44,
+        44,
+        243,
+        218
+      ],
+      "cropBbox": [
+        36,
+        36,
+        251,
+        226
+      ],
+      "width": 215,
+      "height": 190,
+      "alphaPixels": 25502
+    },
+    {
+      "file": "prop-004.png",
+      "sourceBbox": [
+        984,
+        51,
+        1166,
+        250
+      ],
+      "cropBbox": [
+        976,
+        43,
+        1174,
+        258
+      ],
+      "width": 198,
+      "height": 215,
+      "alphaPixels": 22923
+    },
+    {
+      "file": "prop-005.png",
+      "sourceBbox": [
+        303,
+        52,
+        466,
+        214
+      ],
+      "cropBbox": [
+        295,
+        44,
+        474,
+        222
+      ],
+      "width": 179,
+      "height": 178,
+      "alphaPixels": 18761
+    },
+    {
+      "file": "prop-006.png",
+      "sourceBbox": [
+        514,
+        56,
+        676,
+        238
+      ],
+      "cropBbox": [
+        506,
+        48,
+        684,
+        246
+      ],
+      "width": 178,
+      "height": 198,
+      "alphaPixels": 20352
+    },
+    {
+      "file": "prop-007.png",
+      "sourceBbox": [
+        360,
+        186,
+        412,
+        246
+      ],
+      "cropBbox": [
+        352,
+        178,
+        420,
+        254
+      ],
+      "width": 68,
+      "height": 76,
+      "alphaPixels": 2621
+    },
+    {
+      "file": "prop-008.png",
+      "sourceBbox": [
+        473,
+        257,
+        599,
+        449
+      ],
+      "cropBbox": [
+        465,
+        249,
+        607,
+        457
+      ],
+      "width": 142,
+      "height": 208,
+      "alphaPixels": 21743
+    },
+    {
+      "file": "prop-009.png",
+      "sourceBbox": [
+        1108,
+        277,
+        1283,
+        452
+      ],
+      "cropBbox": [
+        1100,
+        269,
+        1291,
+        460
+      ],
+      "width": 191,
+      "height": 191,
+      "alphaPixels": 23202
+    },
+    {
+      "file": "prop-010.png",
+      "sourceBbox": [
+        897,
+        278,
+        1029,
+        450
+      ],
+      "cropBbox": [
+        889,
+        270,
+        1037,
+        458
+      ],
+      "width": 148,
+      "height": 188,
+      "alphaPixels": 16957
+    },
+    {
+      "file": "prop-011.png",
+      "sourceBbox": [
+        1338,
+        281,
+        1456,
+        455
+      ],
+      "cropBbox": [
+        1330,
+        273,
+        1464,
+        463
+      ],
+      "width": 134,
+      "height": 190,
+      "alphaPixels": 13293
+    },
+    {
+      "file": "prop-012.png",
+      "sourceBbox": [
+        279,
+        282,
+        371,
+        440
+      ],
+      "cropBbox": [
+        271,
+        274,
+        379,
+        448
+      ],
+      "width": 108,
+      "height": 174,
+      "alphaPixels": 11756
+    },
+    {
+      "file": "prop-013.png",
+      "sourceBbox": [
+        673,
+        293,
+        821,
+        440
+      ],
+      "cropBbox": [
+        665,
+        285,
+        829,
+        448
+      ],
+      "width": 164,
+      "height": 163,
+      "alphaPixels": 20980
+    },
+    {
+      "file": "prop-014.png",
+      "sourceBbox": [
+        88,
+        303,
+        167,
+        428
+      ],
+      "cropBbox": [
+        80,
+        295,
+        175,
+        436
+      ],
+      "width": 95,
+      "height": 141,
+      "alphaPixels": 7813
+    },
+    {
+      "file": "prop-015.png",
+      "sourceBbox": [
+        1072,
+        454,
+        1122,
+        634
+      ],
+      "cropBbox": [
+        1064,
+        446,
+        1130,
+        642
+      ],
+      "width": 66,
+      "height": 196,
+      "alphaPixels": 5172
+    },
+    {
+      "file": "prop-016.png",
+      "sourceBbox": [
+        268,
+        478,
+        395,
+        623
+      ],
+      "cropBbox": [
+        260,
+        470,
+        403,
+        631
+      ],
+      "width": 143,
+      "height": 161,
+      "alphaPixels": 17176
+    },
+    {
+      "file": "prop-017.png",
+      "sourceBbox": [
+        1195,
+        486,
+        1281,
+        618
+      ],
+      "cropBbox": [
+        1187,
+        478,
+        1289,
+        626
+      ],
+      "width": 102,
+      "height": 148,
+      "alphaPixels": 6933
+    },
+    {
+      "file": "prop-018.png",
+      "sourceBbox": [
+        62,
+        499,
+        208,
+        606
+      ],
+      "cropBbox": [
+        54,
+        491,
+        216,
+        614
+      ],
+      "width": 162,
+      "height": 123,
+      "alphaPixels": 14929
+    },
+    {
+      "file": "prop-019.png",
+      "sourceBbox": [
+        777,
+        500,
+        938,
+        613
+      ],
+      "cropBbox": [
+        769,
+        492,
+        946,
+        621
+      ],
+      "width": 177,
+      "height": 129,
+      "alphaPixels": 12463
+    },
+    {
+      "file": "prop-020.png",
+      "sourceBbox": [
+        488,
+        502,
+        680,
+        610
+      ],
+      "cropBbox": [
+        480,
+        494,
+        688,
+        618
+      ],
+      "width": 208,
+      "height": 124,
+      "alphaPixels": 17424
+    },
+    {
+      "file": "prop-021.png",
+      "sourceBbox": [
+        1357,
+        506,
+        1447,
+        617
+      ],
+      "cropBbox": [
+        1349,
+        498,
+        1455,
+        625
+      ],
+      "width": 106,
+      "height": 127,
+      "alphaPixels": 6225
+    },
+    {
+      "file": "prop-022.png",
+      "sourceBbox": [
+        254,
+        642,
+        363,
+        796
+      ],
+      "cropBbox": [
+        246,
+        634,
+        371,
+        804
+      ],
+      "width": 125,
+      "height": 170,
+      "alphaPixels": 9582
+    },
+    {
+      "file": "prop-023.png",
+      "sourceBbox": [
+        66,
+        654,
+        167,
+        787
+      ],
+      "cropBbox": [
+        58,
+        646,
+        175,
+        795
+      ],
+      "width": 117,
+      "height": 149,
+      "alphaPixels": 7794
+    },
+    {
+      "file": "prop-024.png",
+      "sourceBbox": [
+        1021,
+        657,
+        1223,
+        785
+      ],
+      "cropBbox": [
+        1013,
+        649,
+        1231,
+        793
+      ],
+      "width": 218,
+      "height": 144,
+      "alphaPixels": 20892
+    },
+    {
+      "file": "prop-025.png",
+      "sourceBbox": [
+        459,
+        661,
+        720,
+        794
+      ],
+      "cropBbox": [
+        451,
+        653,
+        728,
+        802
+      ],
+      "width": 277,
+      "height": 149,
+      "alphaPixels": 33413
+    },
+    {
+      "file": "prop-026.png",
+      "sourceBbox": [
+        1291,
+        668,
+        1471,
+        793
+      ],
+      "cropBbox": [
+        1283,
+        660,
+        1479,
+        801
+      ],
+      "width": 196,
+      "height": 141,
+      "alphaPixels": 16404
+    },
+    {
+      "file": "prop-027.png",
+      "sourceBbox": [
+        784,
+        686,
+        957,
+        774
+      ],
+      "cropBbox": [
+        776,
+        678,
+        965,
+        782
+      ],
+      "width": 189,
+      "height": 104,
+      "alphaPixels": 10334
+    },
+    {
+      "file": "prop-028.png",
+      "sourceBbox": [
+        1039,
+        814,
+        1115,
+        976
+      ],
+      "cropBbox": [
+        1031,
+        806,
+        1123,
+        984
+      ],
+      "width": 92,
+      "height": 178,
+      "alphaPixels": 4955
+    },
+    {
+      "file": "prop-029.png",
+      "sourceBbox": [
+        632,
+        827,
+        790,
+        975
+      ],
+      "cropBbox": [
+        624,
+        819,
+        798,
+        983
+      ],
+      "width": 174,
+      "height": 164,
+      "alphaPixels": 18088
+    },
+    {
+      "file": "prop-030.png",
+      "sourceBbox": [
+        1281,
+        827,
+        1345,
+        975
+      ],
+      "cropBbox": [
+        1273,
+        819,
+        1353,
+        983
+      ],
+      "width": 80,
+      "height": 164,
+      "alphaPixels": 4715
+    },
+    {
+      "file": "prop-031.png",
+      "sourceBbox": [
+        44,
+        829,
+        193,
+        960
+      ],
+      "cropBbox": [
+        36,
+        821,
+        201,
+        968
+      ],
+      "width": 165,
+      "height": 147,
+      "alphaPixels": 13679
+    },
+    {
+      "file": "prop-032.png",
+      "sourceBbox": [
+        406,
+        835,
+        565,
+        975
+      ],
+      "cropBbox": [
+        398,
+        827,
+        573,
+        983
+      ],
+      "width": 175,
+      "height": 156,
+      "alphaPixels": 20091
+    },
+    {
+      "file": "prop-033.png",
+      "sourceBbox": [
+        228,
+        845,
+        358,
+        984
+      ],
+      "cropBbox": [
+        220,
+        837,
+        366,
+        992
+      ],
+      "width": 146,
+      "height": 155,
+      "alphaPixels": 11638
+    },
+    {
+      "file": "prop-034.png",
+      "sourceBbox": [
+        842,
+        845,
+        1000,
+        978
+      ],
+      "cropBbox": [
+        834,
+        837,
+        1008,
+        986
+      ],
+      "width": 174,
+      "height": 149,
+      "alphaPixels": 13765
+    },
+    {
+      "file": "prop-035.png",
+      "sourceBbox": [
+        1169,
+        846,
+        1239,
+        974
+      ],
+      "cropBbox": [
+        1161,
+        838,
+        1247,
+        982
+      ],
+      "width": 86,
+      "height": 144,
+      "alphaPixels": 7127
+    },
+    {
+      "file": "prop-036.png",
+      "sourceBbox": [
+        1387,
+        878,
+        1468,
+        963
+      ],
+      "cropBbox": [
+        1379,
+        870,
+        1476,
+        971
+      ],
+      "width": 97,
+      "height": 101,
+      "alphaPixels": 6642
+    }
+  ]
+}

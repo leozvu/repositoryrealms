@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "routes": 11,
+    "verifiedRoutes": 11,
+    "contracts": 8,
+    "verifiedContracts": 8,
+    "scenarios": 5,
+    "verifiedScenarios": 5
+  },
+  "routeCoverage": [
+    {
+      "id": "operations",
+      "source": "app/api/realm-demo/operations/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "rewards",
+      "source": "app/api/realm-demo/rewards/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "tavern",
+      "source": "app/api/realm-demo/treasury/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "guild",
+      "source": "app/api/realm-demo/guild/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "war-room",
+      "source": "app/api/realm-demo/war-room/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "economy",
+      "source": "app/api/realm-demo/economy/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "embassy",
+      "source": "app/api/realm-demo/embassy/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "token",
+      "source": "app/api/realm-demo/token/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "health",
+      "source": "app/api/realm-demo/health/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "changes",
+      "source": "app/api/realm-demo/changes/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "actions",
+      "source": "app/api/realm-demo/actions/route.js",
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "contracts": [
+    {
+      "id": "request-id-validation",
+      "source": "lib/realm-observability.js",
+      "signals": [
+        "normalizeRealmRequestId",
+        "request?.headers?.get?.('X-Request-Id')",
+        "realm_${idFactory()}"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "latency-headers",
+      "source": "lib/realm-observability.js",
+      "signals": [
+        "'X-Realm-Duration-Ms'",
+        "'Server-Timing'",
+        "'X-Realm-Outcome'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-no-store",
+      "source": "lib/realm-api-response.js",
+      "signals": [
+        "'Cache-Control': 'private, no-cache, no-store, max-age=0'",
+        "Vary: 'Cookie'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "error-support-id",
+      "source": "lib/realm-api-response.js",
+      "signals": [
+        "requestId: observed.event.requestId",
+        "realmErrorResponse"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "safe-exception-log",
+      "source": "lib/realm-observability.js",
+      "signals": [
+        "safeRealmException",
+        "errorName:",
+        "Logging failure is non-fatal"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-health",
+      "source": "app/api/realm-demo/health/route.js",
+      "signals": [
+        "const user = await currentUser()",
+        "inspectRealmSchemaReadiness",
+        "migration: 'ready'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "client-trace-capture",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "function realmTraceFromResponse",
+        "headers?.get('X-Realm-Request-Id')",
+        "headers?.get('X-Realm-Duration-Ms')"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "support-copy-ux",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "copyRealmSupportId",
+        "Copy mã",
+        "Mã hỗ trợ"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "trusted-id-preserved",
+      "expected": "edge_request-12345678",
+      "actual": "edge_request-12345678",
+      "status": "verified"
+    },
+    {
+      "id": "invalid-id-replaced",
+      "expected": "realm_generated-12345678",
+      "actual": "realm_generated-12345678",
+      "status": "verified"
+    },
+    {
+      "id": "latency-rounded",
+      "expected": 12.3,
+      "actual": 12.3,
+      "status": "verified"
+    },
+    {
+      "id": "event-field-allowlist",
+      "expected": "schemaVersion,timestamp,requestId,route,operation,method,status,outcome,code,durationMs",
+      "actual": "schemaVersion,timestamp,requestId,route,operation,method,status,outcome,code,durationMs",
+      "status": "verified"
+    },
+    {
+      "id": "exception-redacted",
+      "expected": false,
+      "actual": false,
+      "status": "verified"
+    }
+  ]
+}

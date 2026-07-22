@@ -1,0 +1,87 @@
+.launcher {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 78;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 14px;
+  border: 1px solid #315b43;
+  border-radius: 999px;
+  color: #fff;
+  background: #315b43;
+  box-shadow: 0 10px 28px rgba(25, 52, 37, .25);
+  font-size: .76rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background-color .18s ease, box-shadow .18s ease;
+}
+
+.launcher:hover { background: #274b37; box-shadow: 0 12px 32px rgba(25, 52, 37, .32); }
+.launcher:focus-visible { outline: 3px solid color-mix(in srgb, #315b43 34%, transparent); outline-offset: 3px; }
+.launcher[data-surface="realm"] { border-color: #c4a95f; color: #171f18; background: #e4c866; box-shadow: 0 10px 30px rgba(0, 0, 0, .36); }
+.launcher[data-surface="realm"]:hover { background: #efd77d; }
+
+.form { display: grid; gap: 16px; }
+.intro { margin: 0; color: var(--muted); font-size: .84rem; line-height: 1.55; }
+.form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.form legend, .field label { display: block; margin-bottom: 7px; color: var(--fg); font-size: .79rem; font-weight: 750; }
+.typeGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.typeGrid label {
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--card);
+  cursor: pointer;
+}
+.typeGrid label:hover { border-color: #77917f; }
+.typeGrid label:focus-within { outline: 3px solid color-mix(in srgb, #315b43 30%, transparent); outline-offset: 2px; }
+.typeGrid input { width: 18px; height: 18px; accent-color: #315b43; }
+.typeGrid strong, .typeGrid small { display: block; }
+.typeGrid strong { font-size: .78rem; }
+.typeGrid small { margin-top: 2px; color: var(--muted); font-size: .68rem; line-height: 1.4; }
+.selected { border-color: #315b43 !important; background: #f0f7f2 !important; }
+
+.field input, .field select, .field textarea { width: 100%; min-height: 44px; font-size: 16px; }
+.field textarea { resize: vertical; line-height: 1.5; }
+.field > small { display: block; margin-top: 5px; color: var(--muted); font-size: .69rem; line-height: 1.4; }
+.contextBox { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 8px; padding: 10px 11px; border: 1px solid #c7d8cc; border-radius: 9px; color: #315b43; background: #f0f7f2; font-size: .7rem; line-height: 1.5; }
+.contextBox code { overflow-wrap: anywhere; }
+.error { margin: 0; padding: 9px 11px; border-radius: 8px; color: var(--danger); background: var(--danger-soft); font-size: .78rem; line-height: 1.45; }
+.actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 2px; }
+.actions button { min-height: 44px; }
+
+.recent { display: grid; gap: 6px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+.recent > strong { font-size: .76rem; }
+.recent a { min-height: 44px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 8px; color: inherit; background: var(--bg); }
+.recent a:hover { background: var(--info-soft); }
+.recent a > span, .recent a > small { color: var(--muted); font-size: .68rem; }
+.recent a > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .72rem; }
+
+.success { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 12px; align-items: start; }
+.successIcon { width: 46px; height: 46px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; background: #315b43; }
+.success strong { display: block; margin-top: 2px; font-size: .94rem; }
+.success p { margin: 5px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
+.successActions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; }
+.successActions a, .successActions button { min-height: 44px; }
+
+@media (max-width: 680px) {
+  .launcher { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  .typeGrid { grid-template-columns: 1fr; }
+  .actions, .successActions { flex-direction: column-reverse; }
+  .actions button, .successActions a, .successActions button { width: 100%; justify-content: center; }
+  .recent a { grid-template-columns: auto minmax(0, 1fr); }
+  .recent a > small { grid-column: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launcher { transition: none; }
+}

@@ -1,0 +1,290 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 19,
+    "verifiedContracts": 19,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "additiveMigrations": 0,
+    "parallelBusinessTables": 0,
+    "previewTtlMinutes": 10,
+    "aggregateOnly": true,
+    "rosterIncluded": false,
+    "performanceTracking": false,
+    "durationTracking": false,
+    "killSwitchRequiresPreview": false
+  },
+  "contracts": [
+    {
+      "id": "hmac-signed-short-lived-preview",
+      "layer": "security",
+      "source": "lib/realm-launch-token.js",
+      "signals": [
+        "createHmac('sha256'",
+        "REALM_LAUNCH_PREVIEW_TTL_MS = 10 * 60 * 1000",
+        "timingSafeEqual"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "actor-version-draft-binding",
+      "layer": "security",
+      "source": "lib/realm-launch-token.js",
+      "signals": [
+        "realm_launch_preview_actor_mismatch",
+        "realm_launch_preview_version_mismatch",
+        "realm_launch_preview_draft_mismatch"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "risk-classification",
+      "layer": "server",
+      "source": "lib/realm-launch-token.js",
+      "signals": [
+        "classifyRealmLaunchChange",
+        "return 'expansion'",
+        "return 'restriction'",
+        "return 'emergency'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "expansion-readiness-gate",
+      "layer": "server",
+      "source": "lib/realm-launch-token.js",
+      "signals": [
+        "risk === 'expansion'",
+        "realm_launch_readiness_blocked"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-only-preview",
+      "layer": "server",
+      "source": "lib/realm-launch.js",
+      "signals": [
+        "isDirector(sessionUser)",
+        "realm_launch_admin_forbidden"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "read-only-live-dry-run",
+      "layer": "server",
+      "source": "lib/realm-launch.js",
+      "signals": [
+        "inspectRealmSchemaReadiness",
+        "loadRealmPilotMetrics",
+        "evaluateRealmLaunchReadiness"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-impact-no-roster",
+      "layer": "privacy",
+      "source": "lib/realm-launch.js",
+      "signals": [
+        "fallbackUsers",
+        "eligibleDelta",
+        "rosterIncluded: false",
+        "performanceTracking: false",
+        "durationTracking: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "active-member-revalidation",
+      "layer": "server",
+      "source": "lib/realm-launch.js",
+      "signals": [
+        "status: 'active'",
+        "userType: 'employee'",
+        "realm_pilot_members_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "preview-api-private-response",
+      "layer": "api",
+      "source": "app/api/realm-demo/launch/route.js",
+      "signals": [
+        "createRealmLaunchPreview",
+        "realmJsonResponse",
+        "realm_launch_preview_ready"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "transactional-preview-verification",
+      "layer": "server",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "verifyLaunchPreview({ db: tx, currentPolicy: currentConfig, draftPolicy: draft })",
+        "isolationLevel: 'Serializable'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "apply-time-readiness-recheck",
+      "layer": "server",
+      "source": "lib/realm-launch.js",
+      "signals": [
+        "preview.risk === 'expansion'",
+        "loadRealmLaunchReadiness(db, draftPolicy, now)",
+        "realm_launch_readiness_stale"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "api-enforces-preview",
+      "layer": "api",
+      "source": "app/api/realm-demo/pilot/route.js",
+      "signals": [
+        "requireLaunchPreview: true",
+        "verifyRealmLaunchApplication",
+        "launchPreviewToken"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "kill-switch-unconditional",
+      "layer": "safety",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "draft.mode !== 'off'",
+        "'kill-switch'",
+        "'emergency'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-audit-evidence",
+      "layer": "audit",
+      "source": "lib/realm-pilot.js",
+      "signals": [
+        "eligible ${launchPreview?.eligibleUsers",
+        "fallback ${launchPreview?.fallbackUsers",
+        "entity: 'realm_pilot'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "progressive-dry-run-ui",
+      "layer": "client",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "signals": [
+        "Controlled launch dry-run",
+        "Chạy dry-run phát hành",
+        "previewAllowsApply",
+        "Dry-run chỉ trả số liệu tổng hợp"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "draft-change-invalidates-preview",
+      "layer": "client",
+      "source": "components/realm/RealmPilotControl.jsx",
+      "signals": [
+        "launch.draftKey === draftKey",
+        "previewValid",
+        "Có thay đổi chưa preview"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-responsive-launch-control",
+      "layer": "style",
+      "source": "components/realm/realm-pilot-control.module.css",
+      "signals": [
+        ".launchActions button",
+        "min-height: 44px",
+        ".previewGrid",
+        "@media (max-width: 680px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "operations-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-14-CONTROLLED-LAUNCH-RUNBOOK.md",
+      "signals": [
+        "crmegoric-realms-demo",
+        "10 phút",
+        "mode = off",
+        "/dashboard",
+        "không tự bật pilot"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-launch-uat",
+      "layer": "test",
+      "source": "tests/e2e/realm-smoke.spec.mjs",
+      "signals": [
+        "Chạy dry-run phát hành",
+        "Tác động rollout tổng hợp",
+        "Fallback ERP"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "off-to-pilot-is-expansion",
+      "expected": "expansion",
+      "actual": "expansion",
+      "status": "verified"
+    },
+    {
+      "id": "open-to-pilot-is-restriction",
+      "expected": "restriction",
+      "actual": "restriction",
+      "status": "verified"
+    },
+    {
+      "id": "kill-switch-is-emergency",
+      "expected": "emergency",
+      "actual": "emergency",
+      "status": "verified"
+    },
+    {
+      "id": "signed-preview-round-trip",
+      "expected": "9217f1260cb9",
+      "actual": "9217f1260cb9",
+      "status": "verified"
+    },
+    {
+      "id": "aggregate-impact-bound",
+      "expected": "4:6",
+      "actual": "4:6",
+      "status": "verified"
+    },
+    {
+      "id": "preview-does-not-contain-roster",
+      "expected": "false",
+      "actual": "false",
+      "status": "verified"
+    }
+  ]
+}

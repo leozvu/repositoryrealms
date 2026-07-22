@@ -1,0 +1,24 @@
+id,layer,source,signals,missingSignals,status
+reuse-pilot-operations-setting,data,lib/realm-pilot-operations.js,realmPilotOperations: | incidents: | tx.setting.upsert,,verified
+bounded-incident-history,data,lib/realm-pilot-operations.js,"REALM_PILOT_INCIDENT_LIMIT = 40 | slice(0, REALM_PILOT_INCIDENT_LIMIT)",,verified
+fixed-incident-taxonomy,privacy,lib/realm-pilot-operations.js,REALM_PILOT_INCIDENT_CATEGORIES | id: 'realm_access' | id: 'sync_integrity' | id: 'erp_fallback',,verified
+critical-category-cannot-downgrade,safety,lib/realm-pilot-operations.js,categoryMeta.defaultSeverity === 'critical' | ? 'critical',,verified
+director-only-incident-command,rbac,lib/realm-pilot-operations.js,requireDirector(sessionUser) | realm_pilot_operations_forbidden,,verified
+critical-atomic-kill-switch,rollback,lib/realm-pilot-operations.js,action === 'report_incident' | severity === 'critical' | mode: 'off' | status: 'paused' | state: 'rolled_back',,verified
+warning-holds-go-no-go,decision,lib/realm-pilot-operations.js,openIncidents === 0 | recommendation = hardStop ? 'no_go' | minimumObserved && openIncidents === 0 ? 'go' : 'hold',,verified
+critical-forces-no-go,decision,lib/realm-pilot-operations.js,criticalIncidents > 0 | id: 'critical-incidents',,verified
+incident-lifecycle,domain,lib/realm-pilot-operations.js,"new Set(['open', 'monitoring', 'resolved']) | action === 'monitor_incident' | action === 'resolve_incident'",,verified
+duplicate-incident-blocked,safety,lib/realm-pilot-operations.js,realm_pilot_incident_duplicate | item.status !== 'resolved',,verified
+resolution-rechecks-safe-state,safety,lib/realm-pilot-operations.js,containedInErp | verifiedRecovery | realm_pilot_incident_resolution_blocked,,verified
+completion-blocked-by-incident,safety,lib/realm-pilot-operations.js,realm_pilot_incident_open | Còn incident chưa khép lại,,verified
+serializable-cas,concurrency,lib/realm-pilot-operations.js,"validateExpectedVersion(operations, input.expectedVersion) | isolationLevel: 'Serializable'",,verified
+aggregate-incident-snapshot,privacy,lib/realm-pilot-operations.js,incidentSnapshot | eligibleUsers: | fallbackUsers: | blockedFeedback:,,verified
+timeline-excludes-actor-history,privacy,lib/realm-pilot-operations.js,actorHistoryIncluded: false | performanceTracking: false | durationTracking: false,,verified
+director-and-cohort-notifications,integration,lib/realm-pilot-operations.js,"await directorIds(tx, sessionUser.id) | Tiếp tục công việc trên ERP · CRM | '/dashboard'",,verified
+incident-alerts,operations,lib/realm-pilot-operations.js,id: 'critical-incident-open' | id: 'warning-incident-open',,verified
+existing-traced-api,api,app/api/realm-demo/pilot/operations/route.js,startRealmApiRequest | transitionRealmPilotWave | safelyPublishRealmChange,,verified
+incident-command-ui,client,components/realm/RealmPilotOperations.jsx,Incident Command · Timeline | Ghi nhận sự cố | Xác nhận đã khống chế | Dòng thời gian incident và rollout,,verified
+semantic-status-icon-text,accessibility,components/realm/RealmPilotOperations.jsx,INCIDENT_STATE | <Icon name={stateIcon} | {stateLabel}</span>,,verified
+responsive-touch-safe-ui,style,components/realm/realm-pilot-operations.module.css,".incidentForm select, .incidentForm button { min-width: 0; min-height: 44px; | .incidentQueue article button { min-height: 44px; | @media (max-width: 680px) | @media (prefers-reduced-motion: reduce)",,verified
+phase19-unit-tests,test,tests/realm-pilot-operations.test.mjs,Phase 19 warning incident holds Go/No-go | Phase 19 critical incident atomically rolls back,,verified
+phase19-runbook,operations,docs/realms/PHASE-19-INCIDENT-COMMAND.md,crmegoric-realms-demo | Critical | mode = off | không tự tái kích hoạt,,verified

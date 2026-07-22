@@ -6,7 +6,7 @@ import { hasAny, isFreelancer } from '@/lib/perm';
 
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user) || !hasAny(user, ['ACCOUNTANT', 'PM', 'LEAD', 'HR'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const payout = await prisma.payout.findUnique({ where: { id: params.id } });
   if (!payout || payout.status === 'paid') return NextResponse.json({ error: 'Không hợp lệ hoặc đã trả' }, { status: 400 });

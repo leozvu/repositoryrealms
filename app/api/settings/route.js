@@ -21,24 +21,51 @@ const DEFAULTS = {
 };
 
 // Các trường bí mật — chỉ Giám đốc đọc được (trang Cài đặt); route server đọc thẳng DB
-const SECRET_KEYS = ['anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPort', 'smtpFrom'];
+const SECRET_KEYS = ['openRouterKey', 'anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPort', 'smtpFrom'];
 
 export async function GET() {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const row = await prisma.setting.findUnique({ where: { id: 1 } });
   const data = { ...DEFAULTS, ...(row ? JSON.parse(row.json) : {}) };
-  if (!isDirector(user)) SECRET_KEYS.forEach(k => delete data[k]);
+  if (!isDirector(user)) {
+    SECRET_KEYS.forEach(k => delete data[k]);
+    // Shell chỉ cần company/modules/role labels. Roster của named cohort và metadata
+    // vận hành wave chỉ được đọc qua các API Director chuyên biệt.
+    delete data.realmPilot;
+    delete data.realmPilotOperations;
+    delete data.realmPilotRehearsal;
+    delete data.realmExperienceTelemetry;
+  }
   return NextResponse.json(data);
 }
 
 export async function PUT(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!isDirector(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const data = await req.json();
-  const json = JSON.stringify({ ...DEFAULTS, ...data });
-  await prisma.setting.upsert({ where: { id: 1 }, create: { id: 1, json }, update: { json } });
-  await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'settings', detail: 'Cập nhật cài đặt công ty' } });
+  await prisma.$transaction(async (tx) => {
+    const row = await tx.setting.findUnique({ where: { id: 1 }, select: { json: true } });
+    let current = {};
+    try { current = JSON.parse(row?.json || '{}'); } catch { current = {}; }
+    // Realm pilot, Pilot Operations, Launch Rehearsal và Experience Pilot có endpoint
+    // riêng để validate control plane / privacy contract. Form công ty dùng snapshot
+    // cũ nên không được ghi đè các trường được bảo vệ này.
+    const next = { ...DEFAULTS, ...data };
+    if (current.realmPilot) next.realmPilot = current.realmPilot;
+    else delete next.realmPilot;
+    if (current.realmPilotOperations) next.realmPilotOperations = current.realmPilotOperations;
+    else delete next.realmPilotOperations;
+    if (current.realmPilotRehearsal) next.realmPilotRehearsal = current.realmPilotRehearsal;
+    else delete next.realmPilotRehearsal;
+    if (current.realmExperienceTelemetry) next.realmExperienceTelemetry = current.realmExperienceTelemetry;
+    else delete next.realmExperienceTelemetry;
+    if (current.ceoFederation) next.ceoFederation = current.ceoFederation;
+    else delete next.ceoFederation;
+    const json = JSON.stringify(next);
+    await tx.setting.upsert({ where: { id: 1 }, create: { id: 1, json }, update: { json } });
+    await tx.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'settings', detail: 'Cập nhật cài đặt công ty' } });
+  }, { isolationLevel: 'Serializable' });
   return NextResponse.json({ ok: true });
 }

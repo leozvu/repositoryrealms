@@ -1,0 +1,77 @@
+.page { max-width: 1480px; margin: 0 auto; padding: 24px; color: var(--text); }
+.hero { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; padding: 28px; border: 1px solid var(--border); border-radius: 18px; background: linear-gradient(135deg, var(--surface), var(--surface-2)); }
+.hero h1 { margin: 2px 0 8px; font-family: var(--font-display); font-size: clamp(1.75rem, 3vw, 2.65rem); }
+.hero p { max-width: 76ch; margin: 0; color: var(--muted); line-height: 1.65; }
+.eyebrow { color: var(--gold, #8b6518) !important; font-size: .72rem; font-weight: 800; letter-spacing: .12em; }
+.heroActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.heroActions > * { min-height: 44px; }
+.policy, .notice, .error { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.policy p { margin: 0; line-height: 1.55; }
+.notice { background: var(--warning-soft, #fff8df); }
+.notice span, .error span { flex: 1; }
+.error { border-color: var(--danger); color: var(--danger); }
+.layout { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); min-height: 680px; margin-top: 18px; overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-sm); }
+.sidebar { min-width: 0; border-right: 1px solid var(--border); background: var(--surface-2); }
+.composer { display: grid; gap: 12px; padding: 18px; border-bottom: 1px solid var(--border); }
+.composer h2, .listHead h2, .threadHead h2 { margin: 0; font-size: 1rem; }
+.composer button { min-height: 44px; width: 100%; }
+.helper, .emptyList { margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
+.listHead { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 8px; }
+.listHead span { min-width: 28px; padding: 3px 8px; border-radius: 99px; background: var(--surface); text-align: center; font-size: .75rem; }
+.conversationList { display: grid; gap: 4px; padding: 0 8px 12px; }
+.conversation { width: 100%; min-height: 72px; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px; border: 1px solid transparent; border-radius: 12px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.conversation:hover, .conversation:focus-visible { background: var(--surface); border-color: var(--border); }
+.conversation.active { background: var(--primary-soft); border-color: var(--primary); }
+.conversation > span:nth-child(2) { min-width: 0; display: grid; gap: 2px; }
+.conversation strong, .conversation small, .conversation em { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conversation small { color: var(--muted); font-size: .72rem; }
+.conversation em { color: var(--muted); font-size: .75rem; font-style: normal; }
+.conversation i { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--warning); color: #18130a; font-style: normal; font-weight: 800; }
+.avatar { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: var(--primary); color: white; font-weight: 800; }
+.emptyList { padding: 14px 18px 24px; }
+.thread { min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.threadHead { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 72px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.threadHead p { margin: 4px 0 0; color: var(--muted); font-size: .8rem; }
+.threadHead button { min-height: 44px; }
+.messages { min-height: 420px; max-height: 62vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 20px; background: var(--bg); }
+.message { max-width: min(76%, 720px); align-self: flex-start; padding: 12px 14px; border: 1px solid var(--border); border-radius: 4px 15px 15px 15px; background: var(--surface); }
+.message.mine { align-self: flex-end; border-radius: 15px 4px 15px 15px; background: var(--primary-soft); border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
+.messageMeta, .delivery { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.messageMeta { justify-content: space-between; font-size: .74rem; }
+.messageMeta time, .delivery { color: var(--muted); }
+.message p { margin: 8px 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+.delivery { font-size: .7rem; }
+.delivery code { overflow-wrap: anywhere; }
+.delivery button { min-height: 36px; }
+.delivered, .read { color: var(--success); font-weight: 700; }
+.pending_confirmation, .dispatching { color: var(--warning-text, #7a5700); font-weight: 700; }
+.failed { color: var(--danger); font-weight: 700; }
+.send { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 16px 18px; border-top: 1px solid var(--border); }
+.send label { grid-column: 1 / -1; font-size: .78rem; font-weight: 700; }
+.send textarea { min-height: 52px; max-height: 180px; resize: vertical; }
+.send button { min-width: 140px; min-height: 48px; }
+.empty { min-height: 680px; display: grid; place-content: center; justify-items: center; padding: 24px; text-align: center; color: var(--muted); }
+.empty h2 { color: var(--text); margin: 12px 0 4px; }
+.empty p { max-width: 48ch; line-height: 1.6; }
+.loading { padding: 32px; }
+
+@media (max-width: 900px) {
+  .page { padding: 14px; }
+  .hero { flex-direction: column; padding: 20px; }
+  .heroActions { justify-content: flex-start; }
+  .layout { grid-template-columns: 1fr; overflow: visible; }
+  .sidebar { border-right: 0; border-bottom: 1px solid var(--border); }
+  .thread { min-height: 620px; }
+  .messages { max-height: none; }
+}
+@media (max-width: 560px) {
+  .page { padding: 8px; }
+  .heroActions, .heroActions > * { width: 100%; }
+  .notice, .error { align-items: flex-start; flex-wrap: wrap; }
+  .notice .btn, .error .btn { width: 100%; }
+  .message { max-width: 92%; }
+  .send { grid-template-columns: 1fr; }
+  .send label { grid-column: auto; }
+  .send button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .conversation { transition: none; } }
