@@ -110,7 +110,8 @@ for (const e of ENTITIES) {
 const identity = await prisma.ceoGlobalIdentity.upsert({
   where: { userId: ceo.id },
   update: { email: ceo.email, displayName: ceo.name, status: 'active' },
-  create: { subject: 'ceo-' + crypto.createHash('sha256').update(ceo.email).digest('hex').slice(0, 16), userId: ceo.id, email: ceo.email, displayName: ceo.name, status: 'active' },
+  // subject PHẢI dạng ceo_<...> (gạch dưới) — entity-side federation regex ^ceo_ từ chối dạng khác
+  create: { subject: 'ceo_' + crypto.createHash('sha256').update(ceo.email).digest('hex').slice(0, 16), userId: ceo.id, email: ceo.email, displayName: ceo.name, status: 'active' },
 });
 for (const pair of env('MEMBERSHIPS', '').split(',').filter(Boolean)) {
   const [entityId, localEmail] = pair.split(':');

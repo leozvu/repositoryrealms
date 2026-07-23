@@ -275,7 +275,7 @@ export default function TeamWorkPage() {
         <div className={styles.taskList}>
           {model.unassigned.map((task) => <article key={task.id} className={styles.task}>
             <div className={styles.taskOrder} aria-hidden="true">—</div>
-            <div className={styles.taskBody}><div className={styles.taskTitle}><h4>{task.title}</h4><span>{task.priority}</span></div><p>{task.project?.name || 'Việc chung'}</p></div>
+            <div className={styles.taskBody}><div className={styles.taskTitle}><h4>{task.title}</h4>{task.dueDate && <span>hạn {task.dueDate}</span>}</div><p>{task.project?.name || 'Việc chung'}</p></div>
             <div className={styles.taskActions}><button className="btn btn-primary btn-sm" onClick={() => setSelected(task)}>Điều phối</button></div>
           </article>)}
         </div>

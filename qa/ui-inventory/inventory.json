@@ -1080,6 +1080,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13427,8 +13428,8 @@
     {
       "elementId": "route.myday.action.ua-viec-len-mot-bac",
       "source": "app/(app)/myday/page.jsx",
-      "line": 97,
-      "column": 13,
+      "line": 95,
+      "column": 11,
       "surface": "route.myday",
       "tag": "button",
       "kind": "action",
@@ -13445,6 +13446,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13453,8 +13455,8 @@
     {
       "elementId": "route.myday.action.ua-viec-xuong-mot-bac",
       "source": "app/(app)/myday/page.jsx",
-      "line": 98,
-      "column": 13,
+      "line": 96,
+      "column": 11,
       "surface": "route.myday",
       "tag": "button",
       "kind": "action",
@@ -13471,6 +13473,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13479,7 +13482,7 @@
     {
       "elementId": "route.myday.navigation.mo-chi-tiet-viec",
       "source": "app/(app)/myday/page.jsx",
-      "line": 102,
+      "line": 99,
       "column": 7,
       "surface": "route.myday",
       "tag": "Link",
@@ -13497,6 +13500,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13505,7 +13509,7 @@
     {
       "elementId": "route.myday.action.cap-nhat-estimate",
       "source": "app/(app)/myday/page.jsx",
-      "line": 110,
+      "line": 106,
       "column": 9,
       "surface": "route.myday",
       "tag": "button",
@@ -13523,6 +13527,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13531,7 +13536,7 @@
     {
       "elementId": "route.myday.action.button",
       "source": "app/(app)/myday/page.jsx",
-      "line": 112,
+      "line": 108,
       "column": 11,
       "surface": "route.myday",
       "tag": "button",
@@ -13549,6 +13554,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13557,7 +13563,7 @@
     {
       "elementId": "route.myday.action.ong-form-estimate",
       "source": "app/(app)/myday/page.jsx",
-      "line": 131,
+      "line": 127,
       "column": 9,
       "surface": "route.myday",
       "tag": "button",
@@ -13575,6 +13581,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13583,7 +13590,7 @@
     {
       "elementId": "route.myday.form-submit.so-gio-uoc-luong-nhom-cong-viec-o-phuc-tap-ghi-chu-pham-vi-khong",
       "source": "app/(app)/myday/page.jsx",
-      "line": 134,
+      "line": 130,
       "column": 7,
       "surface": "route.myday",
       "tag": "form",
@@ -13601,6 +13608,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13609,7 +13617,7 @@
     {
       "elementId": "route.myday.form-control.input",
       "source": "app/(app)/myday/page.jsx",
-      "line": 138,
+      "line": 134,
       "column": 73,
       "surface": "route.myday",
       "tag": "input",
@@ -13627,6 +13635,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13637,7 +13646,7 @@
     {
       "elementId": "route.myday.form-control.select",
       "source": "app/(app)/myday/page.jsx",
-      "line": 139,
+      "line": 135,
       "column": 70,
       "surface": "route.myday",
       "tag": "select",
@@ -13655,6 +13664,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13665,7 +13675,7 @@
     {
       "elementId": "route.myday.form-control.select.2",
       "source": "app/(app)/myday/page.jsx",
-      "line": 140,
+      "line": 136,
       "column": 73,
       "surface": "route.myday",
       "tag": "select",
@@ -13683,6 +13693,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13693,7 +13704,7 @@
     {
       "elementId": "route.myday.form-control.input.2",
       "source": "app/(app)/myday/page.jsx",
-      "line": 141,
+      "line": 137,
       "column": 120,
       "surface": "route.myday",
       "tag": "input",
@@ -13711,6 +13722,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13721,7 +13733,7 @@
     {
       "elementId": "route.myday.action.ang-luu-luu-estimate-co-receipt",
       "source": "app/(app)/myday/page.jsx",
-      "line": 142,
+      "line": 138,
       "column": 125,
       "surface": "route.myday",
       "tag": "button",
@@ -13739,6 +13751,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13747,7 +13760,7 @@
     {
       "elementId": "route.myday.action.huy",
       "source": "app/(app)/myday/page.jsx",
-      "line": 142,
+      "line": 138,
       "column": 45,
       "surface": "route.myday",
       "tag": "button",
@@ -13765,6 +13778,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13773,7 +13787,7 @@
     {
       "elementId": "route.myday.action.lam-moi",
       "source": "app/(app)/myday/page.jsx",
-      "line": 271,
+      "line": 297,
       "column": 11,
       "surface": "route.myday",
       "tag": "button",
@@ -13791,6 +13805,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13799,7 +13814,7 @@
     {
       "elementId": "route.myday.navigation.bang-cong-viec",
       "source": "app/(app)/myday/page.jsx",
-      "line": 272,
+      "line": 298,
       "column": 11,
       "surface": "route.myday",
       "tag": "Link",
@@ -13817,25 +13832,26 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.myday.action.theo-uu-tien",
+      "elementId": "route.myday.action.ang-xep-xep-ca-bang-theo-deadline",
       "source": "app/(app)/myday/page.jsx",
-      "line": 288,
-      "column": 11,
+      "line": 313,
+      "column": 9,
       "surface": "route.myday",
       "tag": "button",
       "kind": "action",
-      "label": "Theo ưu tiên",
+      "label": "Đang xếp… / Xếp cả bảng theo deadline",
       "handlerEvent": "onClick",
-      "handler": "() => setView('priority')",
+      "handler": "sortByDeadline",
       "target": "",
       "insideForm": false,
-      "disabledBinding": "",
+      "disabledBinding": "sortingByDeadline || displayed.length < 2",
       "actionStatus": "handler-candidate",
       "mappingStatus": "unreviewed",
       "businessFeature": "",
@@ -13843,32 +13859,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
-        "POST '/api/execution/actions'"
-      ],
-      "routeCandidates": [],
-      "uxRiskCandidates": []
-    },
-    {
-      "elementId": "route.myday.action.theo-deadline",
-      "source": "app/(app)/myday/page.jsx",
-      "line": 291,
-      "column": 11,
-      "surface": "route.myday",
-      "tag": "button",
-      "kind": "action",
-      "label": "Theo deadline",
-      "handlerEvent": "onClick",
-      "handler": "() => setView('deadline')",
-      "target": "",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "handler-candidate",
-      "mappingStatus": "unreviewed",
-      "businessFeature": "",
-      "resourceCandidates": [],
-      "apiCandidates": [
-        "GET '/api/execution/my-work'",
-        "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13877,7 +13868,7 @@
     {
       "elementId": "route.myday.action.thu-lai",
       "source": "app/(app)/myday/page.jsx",
-      "line": 301,
+      "line": 320,
       "column": 80,
       "surface": "route.myday",
       "tag": "button",
@@ -13895,6 +13886,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -13903,7 +13895,7 @@
     {
       "elementId": "route.myday.navigation.mo-phe-duyet",
       "source": "app/(app)/myday/page.jsx",
-      "line": 347,
+      "line": 366,
       "column": 9,
       "surface": "route.myday",
       "tag": "Link",
@@ -13921,6 +13913,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -17837,42 +17830,9 @@
       ]
     },
     {
-      "elementId": "route.tasks.form-control.select.3",
-      "source": "app/(app)/tasks/page.jsx",
-      "line": 89,
-      "column": 11,
-      "surface": "route.tasks",
-      "tag": "select",
-      "kind": "form-control",
-      "label": "",
-      "handlerEvent": "",
-      "handler": "",
-      "target": "",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "control-candidate",
-      "mappingStatus": "unreviewed",
-      "businessFeature": "",
-      "resourceCandidates": [
-        "phases",
-        "projects",
-        "taskcomments",
-        "taskevents",
-        "tasks",
-        "teams",
-        "timelogs",
-        "users"
-      ],
-      "apiCandidates": [],
-      "routeCandidates": [],
-      "uxRiskCandidates": [
-        "control_binding_unverified"
-      ]
-    },
-    {
       "elementId": "route.tasks.form-control.input.2",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 92,
+      "line": 88,
       "column": 61,
       "surface": "route.tasks",
       "tag": "input",
@@ -17905,7 +17865,7 @@
     {
       "elementId": "route.tasks.form-control.vd-8",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 94,
+      "line": 90,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -17936,9 +17896,9 @@
       ]
     },
     {
-      "elementId": "route.tasks.form-control.select.4",
+      "elementId": "route.tasks.form-control.select.3",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 96,
+      "line": 92,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -17971,7 +17931,7 @@
     {
       "elementId": "route.tasks.form-control.chua-xep",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 100,
+      "line": 96,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -18004,7 +17964,7 @@
     {
       "elementId": "route.tasks.action.lb",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 107,
+      "line": 103,
       "column": 15,
       "surface": "route.tasks",
       "tag": "span",
@@ -18038,7 +17998,7 @@
     {
       "elementId": "route.tasks.form-control.them-nhan-enter",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 109,
+      "line": 105,
       "column": 13,
       "surface": "route.tasks",
       "tag": "input",
@@ -18069,9 +18029,9 @@
       ]
     },
     {
-      "elementId": "route.tasks.form-control.select.5",
+      "elementId": "route.tasks.form-control.select.4",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 113,
+      "line": 109,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -18104,7 +18064,7 @@
     {
       "elementId": "route.tasks.form-control.textarea",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 116,
+      "line": 112,
       "column": 57,
       "surface": "route.tasks",
       "tag": "textarea",
@@ -18137,7 +18097,7 @@
     {
       "elementId": "route.tasks.form-control.input.3",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 123,
+      "line": 119,
       "column": 15,
       "surface": "route.tasks",
       "tag": "input",
@@ -18170,7 +18130,7 @@
     {
       "elementId": "route.tasks.action.set-checklist-f-checklist-filter-j-j-i",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 126,
+      "line": 122,
       "column": 15,
       "surface": "route.tasks",
       "tag": "button",
@@ -18203,7 +18163,7 @@
     {
       "elementId": "route.tasks.form-control.them-buoc-con-enter",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 130,
+      "line": 126,
       "column": 13,
       "surface": "route.tasks",
       "tag": "input",
@@ -18236,7 +18196,7 @@
     {
       "elementId": "route.tasks.action.if-newitem-trim-set-checklist-f-checklist-text-newitem-trim-done",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 132,
+      "line": 128,
       "column": 13,
       "surface": "route.tasks",
       "tag": "button",
@@ -18269,7 +18229,7 @@
     {
       "elementId": "route.tasks.form-control.gio",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 140,
+      "line": 136,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -18302,7 +18262,7 @@
     {
       "elementId": "route.tasks.action.ghi-gio",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 141,
+      "line": 137,
       "column": 11,
       "surface": "route.tasks",
       "tag": "AsyncButton",
@@ -18333,7 +18293,7 @@
     {
       "elementId": "route.tasks.action.xoa-binh-luan",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 161,
+      "line": 157,
       "column": 41,
       "surface": "route.tasks",
       "tag": "button",
@@ -18364,7 +18324,7 @@
     {
       "elementId": "route.tasks.form-control.viet-binh-luan-go-ten-e-nhac-enter-gui",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 167,
+      "line": 163,
       "column": 13,
       "surface": "route.tasks",
       "tag": "input",
@@ -18397,7 +18357,7 @@
     {
       "elementId": "route.tasks.action.gui",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 169,
+      "line": 165,
       "column": 13,
       "surface": "route.tasks",
       "tag": "AsyncButton",
@@ -18426,14 +18386,14 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.tasks.action.selmode-togglesel-t-id-setmodal-mode-edit-row-t",
+      "elementId": "route.tasks.action.viec-chung",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 295,
+      "line": 291,
       "column": 7,
       "surface": "route.tasks",
       "tag": "div",
       "kind": "action",
-      "label": "",
+      "label": "Việc chung",
       "handlerEvent": "onClick",
       "handler": "() => selMode ? toggleSel(t.id) : setModal({ mode: 'edit', row: t })",
       "target": "",
@@ -18462,7 +18422,7 @@
     {
       "elementId": "route.tasks.form-control.input.4",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 299,
+      "line": 295,
       "column": 48,
       "surface": "route.tasks",
       "tag": "input",
@@ -18495,7 +18455,7 @@
     {
       "elementId": "route.tasks.form-control.tat-ca-du-an-viec-chung",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 346,
+      "line": 342,
       "column": 9,
       "surface": "route.tasks",
       "tag": "select",
@@ -18528,7 +18488,7 @@
     {
       "elementId": "route.tasks.form-control.moi-nguoi-phu-trach",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 351,
+      "line": 347,
       "column": 9,
       "surface": "route.tasks",
       "tag": "select",
@@ -18561,7 +18521,7 @@
     {
       "elementId": "route.tasks.form-control.moi-nhan",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 355,
+      "line": 351,
       "column": 34,
       "surface": "route.tasks",
       "tag": "select",
@@ -18594,7 +18554,7 @@
     {
       "elementId": "route.tasks.form-control.nhom-trang-thai-nhom-nguoi-phu-trach-nhom-giai-oan",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 359,
+      "line": 355,
       "column": 9,
       "surface": "route.tasks",
       "tag": "select",
@@ -18627,7 +18587,7 @@
     {
       "elementId": "route.tasks.form-control.input.5",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 365,
+      "line": 361,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -18660,7 +18620,7 @@
     {
       "elementId": "route.tasks.action.xong-chon-nhieu",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 368,
+      "line": 364,
       "column": 20,
       "surface": "route.tasks",
       "tag": "button",
@@ -18691,7 +18651,7 @@
     {
       "elementId": "route.tasks.action.them-cong-viec",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 369,
+      "line": 365,
       "column": 22,
       "surface": "route.tasks",
       "tag": "button",
@@ -18722,7 +18682,7 @@
     {
       "elementId": "route.tasks.action.giao-viec",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 370,
+      "line": 366,
       "column": 32,
       "surface": "route.tasks",
       "tag": "button",
@@ -18753,7 +18713,7 @@
     {
       "elementId": "route.tasks.form-control.gan-cho",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 376,
+      "line": 372,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -18786,7 +18746,7 @@
     {
       "elementId": "route.tasks.form-control.oi-trang-thai",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 380,
+      "line": 376,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -18819,7 +18779,7 @@
     {
       "elementId": "route.tasks.form-control.oi-han-cho-tat-ca",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 384,
+      "line": 380,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -18852,7 +18812,7 @@
     {
       "elementId": "route.tasks.action.bo-chon",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 385,
+      "line": 381,
       "column": 11,
       "surface": "route.tasks",
       "tag": "button",
@@ -30762,19 +30722,19 @@
   "summary": {
     "uiRoutes": 66,
     "apiRoutes": 118,
-    "interactiveElements": 949,
+    "interactiveElements": 947,
     "sourceFilesWithInteractions": 95,
     "routesInPrimaryNavigation": 62,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 553,
-      "form-control": 311,
+      "action": 552,
+      "form-control": 310,
       "form-submit": 15,
       "navigation": 70
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 261,
+      "control_binding_unverified": 260,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 52
     },
@@ -30785,7 +30745,7 @@
       },
       {
         "source": "app/(app)/tasks/page.jsx",
-        "count": 39
+        "count": 38
       },
       {
         "source": "app/(app)/ceo-commands/page.jsx",
@@ -30832,12 +30792,12 @@
         "count": 19
       },
       {
-        "source": "app/(app)/myday/page.jsx",
+        "source": "components/Shell.jsx",
         "count": 19
       },
       {
-        "source": "components/Shell.jsx",
-        "count": 19
+        "source": "app/(app)/ceo-rollout/page.jsx",
+        "count": 18
       }
     ]
   }

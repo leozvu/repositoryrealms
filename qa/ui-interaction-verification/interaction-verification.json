@@ -9,9 +9,9 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 138,
+    "guardedActions": 139,
     "asyncButtonGuards": 73,
-    "disabledBindings": 61,
+    "disabledBindings": 62,
     "localPendingStates": 4,
     "destructiveFlows": 6,
     "destructiveFlowsVerified": 6,
@@ -657,7 +657,7 @@
     {
       "elementId": "route.myday.action.ua-viec-len-mot-bac",
       "source": "app/(app)/myday/page.jsx",
-      "line": 97,
+      "line": 95,
       "label": "Đưa việc lên một bậc",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -669,7 +669,7 @@
     {
       "elementId": "route.myday.action.ua-viec-xuong-mot-bac",
       "source": "app/(app)/myday/page.jsx",
-      "line": 98,
+      "line": 96,
       "label": "Đưa việc xuống một bậc",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -681,7 +681,7 @@
     {
       "elementId": "route.myday.action.button",
       "source": "app/(app)/myday/page.jsx",
-      "line": 112,
+      "line": 108,
       "label": "…",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -693,7 +693,7 @@
     {
       "elementId": "route.myday.form-submit.so-gio-uoc-luong-nhom-cong-viec-o-phuc-tap-ghi-chu-pham-vi-khong",
       "source": "app/(app)/myday/page.jsx",
-      "line": 134,
+      "line": 130,
       "label": "Số giờ ước lượng / Nhóm công việc / Độ phức tạp / Ghi chú phạm vi (không bắt buộc) / Hủy / Đang lưu… / Lưu estimate có receipt",
       "actionType": "data-action",
       "loadingState": "local-state",
@@ -705,8 +705,20 @@
     {
       "elementId": "route.myday.action.ang-luu-luu-estimate-co-receipt",
       "source": "app/(app)/myday/page.jsx",
-      "line": 142,
+      "line": 138,
       "label": "Đang lưu… / Lưu estimate có receipt",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.myday.action.ang-xep-xep-ca-bang-theo-deadline",
+      "source": "app/(app)/myday/page.jsx",
+      "line": 313,
+      "label": "Đang xếp… / Xếp cả bảng theo deadline",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
       "successState": "toast-or-state",
@@ -921,7 +933,7 @@
     {
       "elementId": "route.tasks.action.ghi-gio",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 141,
+      "line": 137,
       "label": "Ghi giờ",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -933,7 +945,7 @@
     {
       "elementId": "route.tasks.action.gui",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 169,
+      "line": 165,
       "label": "Gửi",
       "actionType": "data-action",
       "loadingState": "async-button-guard",

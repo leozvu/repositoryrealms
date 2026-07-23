@@ -30930,8 +30930,8 @@
     {
       "elementId": "route.myday.action.ua-viec-len-mot-bac",
       "source": "app/(app)/myday/page.jsx",
-      "line": 97,
-      "column": 13,
+      "line": 95,
+      "column": 11,
       "surface": "route.myday",
       "tag": "button",
       "kind": "action",
@@ -30948,6 +30948,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -30968,7 +30969,7 @@
         {
           "callback": "onNudge",
           "source": "app/(app)/myday/page.jsx",
-          "line": 308,
+          "line": 327,
           "surface": "route:/myday",
           "apiCalls": [
             "GET /api/execution/my-work",
@@ -31041,8 +31042,8 @@
     {
       "elementId": "route.myday.action.ua-viec-xuong-mot-bac",
       "source": "app/(app)/myday/page.jsx",
-      "line": 98,
-      "column": 13,
+      "line": 96,
+      "column": 11,
       "surface": "route.myday",
       "tag": "button",
       "kind": "action",
@@ -31059,6 +31060,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31079,7 +31081,7 @@
         {
           "callback": "onNudge",
           "source": "app/(app)/myday/page.jsx",
-          "line": 308,
+          "line": 327,
           "surface": "route:/myday",
           "apiCalls": [
             "GET /api/execution/my-work",
@@ -31152,7 +31154,7 @@
     {
       "elementId": "route.myday.navigation.mo-chi-tiet-viec",
       "source": "app/(app)/myday/page.jsx",
-      "line": 102,
+      "line": 99,
       "column": 7,
       "surface": "route.myday",
       "tag": "Link",
@@ -31170,6 +31172,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31204,7 +31207,7 @@
     {
       "elementId": "route.myday.action.cap-nhat-estimate",
       "source": "app/(app)/myday/page.jsx",
-      "line": 110,
+      "line": 106,
       "column": 9,
       "surface": "route.myday",
       "tag": "button",
@@ -31222,6 +31225,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31238,7 +31242,7 @@
         {
           "callback": "onEstimate",
           "source": "app/(app)/myday/page.jsx",
-          "line": 308,
+          "line": 327,
           "surface": "route:/myday",
           "apiCalls": [],
           "resourceOperations": [],
@@ -31272,7 +31276,7 @@
     {
       "elementId": "route.myday.action.button",
       "source": "app/(app)/myday/page.jsx",
-      "line": 112,
+      "line": 108,
       "column": 11,
       "surface": "route.myday",
       "tag": "button",
@@ -31290,6 +31294,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31310,7 +31315,7 @@
         {
           "callback": "onTransition",
           "source": "app/(app)/myday/page.jsx",
-          "line": 308,
+          "line": 327,
           "surface": "route:/myday",
           "apiCalls": [
             "GET /api/execution/my-work",
@@ -31383,7 +31388,7 @@
     {
       "elementId": "route.myday.action.ong-form-estimate",
       "source": "app/(app)/myday/page.jsx",
-      "line": 131,
+      "line": 127,
       "column": 9,
       "surface": "route.myday",
       "tag": "button",
@@ -31401,6 +31406,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31417,7 +31423,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/myday/page.jsx",
-          "line": 303,
+          "line": 322,
           "surface": "route:/myday",
           "apiCalls": [],
           "resourceOperations": [],
@@ -31453,7 +31459,7 @@
     {
       "elementId": "route.myday.form-submit.so-gio-uoc-luong-nhom-cong-viec-o-phuc-tap-ghi-chu-pham-vi-khong",
       "source": "app/(app)/myday/page.jsx",
-      "line": 134,
+      "line": 130,
       "column": 7,
       "surface": "route.myday",
       "tag": "form",
@@ -31471,6 +31477,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31491,7 +31498,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/myday/page.jsx",
-          "line": 303,
+          "line": 322,
           "surface": "route:/myday",
           "apiCalls": [
             "GET /api/execution/my-work",
@@ -31567,7 +31574,7 @@
     {
       "elementId": "route.myday.form-control.input",
       "source": "app/(app)/myday/page.jsx",
-      "line": 138,
+      "line": 134,
       "column": 73,
       "surface": "route.myday",
       "tag": "input",
@@ -31585,6 +31592,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31621,7 +31629,7 @@
     {
       "elementId": "route.myday.form-control.select",
       "source": "app/(app)/myday/page.jsx",
-      "line": 139,
+      "line": 135,
       "column": 70,
       "surface": "route.myday",
       "tag": "select",
@@ -31639,6 +31647,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31675,7 +31684,7 @@
     {
       "elementId": "route.myday.form-control.select.2",
       "source": "app/(app)/myday/page.jsx",
-      "line": 140,
+      "line": 136,
       "column": 73,
       "surface": "route.myday",
       "tag": "select",
@@ -31693,6 +31702,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31729,7 +31739,7 @@
     {
       "elementId": "route.myday.form-control.input.2",
       "source": "app/(app)/myday/page.jsx",
-      "line": 141,
+      "line": 137,
       "column": 120,
       "surface": "route.myday",
       "tag": "input",
@@ -31747,6 +31757,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31783,7 +31794,7 @@
     {
       "elementId": "route.myday.action.ang-luu-luu-estimate-co-receipt",
       "source": "app/(app)/myday/page.jsx",
-      "line": 142,
+      "line": 138,
       "column": 125,
       "surface": "route.myday",
       "tag": "button",
@@ -31801,6 +31812,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31821,7 +31833,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/myday/page.jsx",
-          "line": 303,
+          "line": 322,
           "surface": "route:/myday",
           "apiCalls": [
             "GET /api/execution/my-work",
@@ -31897,7 +31909,7 @@
     {
       "elementId": "route.myday.action.huy",
       "source": "app/(app)/myday/page.jsx",
-      "line": 142,
+      "line": 138,
       "column": 45,
       "surface": "route.myday",
       "tag": "button",
@@ -31915,6 +31927,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -31931,7 +31944,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/myday/page.jsx",
-          "line": 303,
+          "line": 322,
           "surface": "route:/myday",
           "apiCalls": [],
           "resourceOperations": [],
@@ -31967,7 +31980,7 @@
     {
       "elementId": "route.myday.action.lam-moi",
       "source": "app/(app)/myday/page.jsx",
-      "line": 271,
+      "line": 297,
       "column": 11,
       "surface": "route.myday",
       "tag": "button",
@@ -31985,6 +31998,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -32030,7 +32044,7 @@
     {
       "elementId": "route.myday.navigation.bang-cong-viec",
       "source": "app/(app)/myday/page.jsx",
-      "line": 272,
+      "line": 298,
       "column": 11,
       "surface": "route.myday",
       "tag": "Link",
@@ -32048,6 +32062,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -32080,113 +32095,98 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.myday.action.theo-uu-tien",
+      "elementId": "route.myday.action.ang-xep-xep-ca-bang-theo-deadline",
       "source": "app/(app)/myday/page.jsx",
-      "line": 288,
-      "column": 11,
+      "line": 313,
+      "column": 9,
       "surface": "route.myday",
       "tag": "button",
       "kind": "action",
-      "label": "Theo ưu tiên",
+      "label": "Đang xếp… / Xếp cả bảng theo deadline",
       "handlerEvent": "onClick",
-      "handler": "() => setView('priority')",
+      "handler": "sortByDeadline",
       "target": "",
       "insideForm": false,
-      "disabledBinding": "",
+      "disabledBinding": "sortingByDeadline || displayed.length < 2",
       "actionStatus": "handler-candidate",
-      "mappingStatus": "classified-local",
+      "mappingStatus": "handler-resolved",
       "businessFeature": "",
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
       "ownerComponent": "MyDayPage",
       "effectiveHandlerEvent": "onClick",
-      "actionType": "local-state",
+      "actionType": "data-action",
       "mappingConfidence": "high",
-      "handlerChain": [],
-      "delegatedCallbacks": [],
-      "delegatedBindings": [],
-      "usedBySurfaces": [],
-      "routeTargets": [],
-      "apiCalls": [],
-      "resourceOperations": [],
-      "contextResources": [],
-      "prismaModels": [],
-      "contextModels": [],
-      "permissionPolicies": [],
-      "allowedRoles": [],
-      "rowPolicy": false,
-      "scopedRead": false,
-      "browserActions": [],
-      "helperCalls": [],
-      "localMutations": [],
-      "loadingState": "not-required",
-      "successState": "not-required",
-      "errorState": "not-required",
-      "confirmationState": "not-required",
-      "uxStateCandidates": []
-    },
-    {
-      "elementId": "route.myday.action.theo-deadline",
-      "source": "app/(app)/myday/page.jsx",
-      "line": 291,
-      "column": 11,
-      "surface": "route.myday",
-      "tag": "button",
-      "kind": "action",
-      "label": "Theo deadline",
-      "handlerEvent": "onClick",
-      "handler": "() => setView('deadline')",
-      "target": "",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "handler-candidate",
-      "mappingStatus": "classified-local",
-      "businessFeature": "",
-      "resourceCandidates": [],
-      "apiCandidates": [
-        "GET '/api/execution/my-work'",
-        "GET '/api/approvals'",
-        "POST '/api/execution/actions'"
+      "handlerChain": [
+        "load",
+        "sortByDeadline"
       ],
-      "routeCandidates": [],
-      "uxRiskCandidates": [],
-      "ownerComponent": "MyDayPage",
-      "effectiveHandlerEvent": "onClick",
-      "actionType": "local-state",
-      "mappingConfidence": "high",
-      "handlerChain": [],
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
-      "apiCalls": [],
+      "apiCalls": [
+        "GET /api/execution/my-work",
+        "POST /api/execution/actions"
+      ],
       "resourceOperations": [],
       "contextResources": [],
-      "prismaModels": [],
+      "prismaModels": [
+        "AuditLog",
+        "Conversation",
+        "Lead",
+        "Message",
+        "Notification",
+        "Onboarding",
+        "Project",
+        "RealmChangeEvent",
+        "Rule",
+        "Task",
+        "TaskEvent",
+        "TimeLog",
+        "User",
+        "Webhook",
+        "WorkEstimateRevision",
+        "WorkQueueState"
+      ],
       "contextModels": [],
-      "permissionPolicies": [],
-      "allowedRoles": [],
+      "permissionPolicies": [
+        "authenticated-custom",
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "ACCOUNTANT",
+        "AM",
+        "DIRECTOR",
+        "HR",
+        "PM",
+        "STAFF"
+      ],
       "rowPolicy": false,
       "scopedRead": false,
       "browserActions": [],
       "helperCalls": [],
-      "localMutations": [],
-      "loadingState": "not-required",
-      "successState": "not-required",
-      "errorState": "not-required",
+      "localMutations": [
+        "i",
+        "version"
+      ],
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
       "confirmationState": "not-required",
       "uxStateCandidates": []
     },
     {
       "elementId": "route.myday.action.thu-lai",
       "source": "app/(app)/myday/page.jsx",
-      "line": 301,
+      "line": 320,
       "column": 80,
       "surface": "route.myday",
       "tag": "button",
@@ -32204,6 +32204,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -32249,7 +32250,7 @@
     {
       "elementId": "route.myday.navigation.mo-phe-duyet",
       "source": "app/(app)/myday/page.jsx",
-      "line": 347,
+      "line": 366,
       "column": 9,
       "surface": "route.myday",
       "tag": "Link",
@@ -32267,6 +32268,7 @@
       "apiCandidates": [
         "GET '/api/execution/my-work'",
         "GET '/api/approvals'",
+        "POST '/api/execution/actions'",
         "POST '/api/execution/actions'"
       ],
       "routeCandidates": [],
@@ -41022,7 +41024,7 @@
         {
           "callback": "onDelete",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 415,
+          "line": 411,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -41115,7 +41117,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 415,
+          "line": 411,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -41211,7 +41213,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 415,
+          "line": 411,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -41224,7 +41226,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 415,
+          "line": 411,
           "surface": "route:/tasks",
           "apiCalls": [
             "PUT /api/data/tasks/[id]"
@@ -41630,88 +41632,9 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.tasks.form-control.select.3",
-      "source": "app/(app)/tasks/page.jsx",
-      "line": 89,
-      "column": 11,
-      "surface": "route.tasks",
-      "tag": "select",
-      "kind": "form-control",
-      "label": "",
-      "handlerEvent": "",
-      "handler": "",
-      "target": "",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "control-candidate",
-      "mappingStatus": "classified-local",
-      "businessFeature": "",
-      "resourceCandidates": [
-        "phases",
-        "projects",
-        "taskcomments",
-        "taskevents",
-        "tasks",
-        "teams",
-        "timelogs",
-        "users"
-      ],
-      "apiCandidates": [],
-      "routeCandidates": [],
-      "uxRiskCandidates": [
-        "control_binding_unverified"
-      ],
-      "ownerComponent": "TaskDetailModal",
-      "effectiveHandlerEvent": "onChange",
-      "actionType": "form-control",
-      "mappingConfidence": "high",
-      "handlerChain": [
-        "set"
-      ],
-      "delegatedCallbacks": [],
-      "delegatedBindings": [],
-      "usedBySurfaces": [],
-      "routeTargets": [],
-      "apiCalls": [],
-      "resourceOperations": [],
-      "contextResources": [
-        "phases",
-        "projects",
-        "taskcomments",
-        "taskevents",
-        "tasks",
-        "teams",
-        "timelogs",
-        "users"
-      ],
-      "prismaModels": [],
-      "contextModels": [
-        "Phase",
-        "Project",
-        "Task",
-        "TaskComment",
-        "TaskEvent",
-        "Team",
-        "TimeLog",
-        "User"
-      ],
-      "permissionPolicies": [],
-      "allowedRoles": [],
-      "rowPolicy": false,
-      "scopedRead": false,
-      "browserActions": [],
-      "helperCalls": [],
-      "localMutations": [],
-      "loadingState": "not-required",
-      "successState": "not-required",
-      "errorState": "not-required",
-      "confirmationState": "not-required",
-      "uxStateCandidates": []
-    },
-    {
       "elementId": "route.tasks.form-control.input.2",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 92,
+      "line": 88,
       "column": 61,
       "surface": "route.tasks",
       "tag": "input",
@@ -41790,7 +41713,7 @@
     {
       "elementId": "route.tasks.form-control.vd-8",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 94,
+      "line": 90,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -41867,9 +41790,9 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.tasks.form-control.select.4",
+      "elementId": "route.tasks.form-control.select.3",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 96,
+      "line": 92,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -41948,7 +41871,7 @@
     {
       "elementId": "route.tasks.form-control.chua-xep",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 100,
+      "line": 96,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -42027,7 +41950,7 @@
     {
       "elementId": "route.tasks.action.lb",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 107,
+      "line": 103,
       "column": 15,
       "surface": "route.tasks",
       "tag": "span",
@@ -42107,7 +42030,7 @@
     {
       "elementId": "route.tasks.form-control.them-nhan-enter",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 109,
+      "line": 105,
       "column": 13,
       "surface": "route.tasks",
       "tag": "input",
@@ -42182,9 +42105,9 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.tasks.form-control.select.5",
+      "elementId": "route.tasks.form-control.select.4",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 113,
+      "line": 109,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -42263,7 +42186,7 @@
     {
       "elementId": "route.tasks.form-control.textarea",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 116,
+      "line": 112,
       "column": 57,
       "surface": "route.tasks",
       "tag": "textarea",
@@ -42342,7 +42265,7 @@
     {
       "elementId": "route.tasks.form-control.input.3",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 123,
+      "line": 119,
       "column": 15,
       "surface": "route.tasks",
       "tag": "input",
@@ -42421,7 +42344,7 @@
     {
       "elementId": "route.tasks.action.set-checklist-f-checklist-filter-j-j-i",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 126,
+      "line": 122,
       "column": 15,
       "surface": "route.tasks",
       "tag": "button",
@@ -42500,7 +42423,7 @@
     {
       "elementId": "route.tasks.form-control.them-buoc-con-enter",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 130,
+      "line": 126,
       "column": 13,
       "surface": "route.tasks",
       "tag": "input",
@@ -42577,7 +42500,7 @@
     {
       "elementId": "route.tasks.action.if-newitem-trim-set-checklist-f-checklist-text-newitem-trim-done",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 132,
+      "line": 128,
       "column": 13,
       "surface": "route.tasks",
       "tag": "button",
@@ -42656,7 +42579,7 @@
     {
       "elementId": "route.tasks.form-control.gio",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 140,
+      "line": 136,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -42733,7 +42656,7 @@
     {
       "elementId": "route.tasks.action.ghi-gio",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 141,
+      "line": 137,
       "column": 11,
       "surface": "route.tasks",
       "tag": "AsyncButton",
@@ -42849,7 +42772,7 @@
     {
       "elementId": "route.tasks.action.xoa-binh-luan",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 161,
+      "line": 157,
       "column": 41,
       "surface": "route.tasks",
       "tag": "button",
@@ -42924,7 +42847,7 @@
     {
       "elementId": "route.tasks.form-control.viet-binh-luan-go-ten-e-nhac-enter-gui",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 167,
+      "line": 163,
       "column": 13,
       "surface": "route.tasks",
       "tag": "input",
@@ -43001,7 +42924,7 @@
     {
       "elementId": "route.tasks.action.gui",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 169,
+      "line": 165,
       "column": 13,
       "surface": "route.tasks",
       "tag": "AsyncButton",
@@ -43113,14 +43036,14 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.tasks.action.selmode-togglesel-t-id-setmodal-mode-edit-row-t",
+      "elementId": "route.tasks.action.viec-chung",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 295,
+      "line": 291,
       "column": 7,
       "surface": "route.tasks",
       "tag": "div",
       "kind": "action",
-      "label": "",
+      "label": "Việc chung",
       "handlerEvent": "onClick",
       "handler": "() => selMode ? toggleSel(t.id) : setModal({ mode: 'edit', row: t })",
       "target": "",
@@ -43195,7 +43118,7 @@
     {
       "elementId": "route.tasks.form-control.input.4",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 299,
+      "line": 295,
       "column": 48,
       "surface": "route.tasks",
       "tag": "input",
@@ -43272,7 +43195,7 @@
     {
       "elementId": "route.tasks.form-control.tat-ca-du-an-viec-chung",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 346,
+      "line": 342,
       "column": 9,
       "surface": "route.tasks",
       "tag": "select",
@@ -43349,7 +43272,7 @@
     {
       "elementId": "route.tasks.form-control.moi-nguoi-phu-trach",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 351,
+      "line": 347,
       "column": 9,
       "surface": "route.tasks",
       "tag": "select",
@@ -43426,7 +43349,7 @@
     {
       "elementId": "route.tasks.form-control.moi-nhan",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 355,
+      "line": 351,
       "column": 34,
       "surface": "route.tasks",
       "tag": "select",
@@ -43503,7 +43426,7 @@
     {
       "elementId": "route.tasks.form-control.nhom-trang-thai-nhom-nguoi-phu-trach-nhom-giai-oan",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 359,
+      "line": 355,
       "column": 9,
       "surface": "route.tasks",
       "tag": "select",
@@ -43580,7 +43503,7 @@
     {
       "elementId": "route.tasks.form-control.input.5",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 365,
+      "line": 361,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -43657,7 +43580,7 @@
     {
       "elementId": "route.tasks.action.xong-chon-nhieu",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 368,
+      "line": 364,
       "column": 20,
       "surface": "route.tasks",
       "tag": "button",
@@ -43732,7 +43655,7 @@
     {
       "elementId": "route.tasks.action.them-cong-viec",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 369,
+      "line": 365,
       "column": 22,
       "surface": "route.tasks",
       "tag": "button",
@@ -43807,7 +43730,7 @@
     {
       "elementId": "route.tasks.action.giao-viec",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 370,
+      "line": 366,
       "column": 32,
       "surface": "route.tasks",
       "tag": "button",
@@ -43882,7 +43805,7 @@
     {
       "elementId": "route.tasks.form-control.gan-cho",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 376,
+      "line": 372,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -43999,7 +43922,7 @@
     {
       "elementId": "route.tasks.form-control.oi-trang-thai",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 380,
+      "line": 376,
       "column": 11,
       "surface": "route.tasks",
       "tag": "select",
@@ -44116,7 +44039,7 @@
     {
       "elementId": "route.tasks.form-control.oi-han-cho-tat-ca",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 384,
+      "line": 380,
       "column": 11,
       "surface": "route.tasks",
       "tag": "input",
@@ -44231,7 +44154,7 @@
     {
       "elementId": "route.tasks.action.bo-chon",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 385,
+      "line": 381,
       "column": 11,
       "surface": "route.tasks",
       "tag": "button",
@@ -74588,7 +74511,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 141,
+          "line": 137,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/timelogs"
@@ -74607,7 +74530,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 169,
+          "line": 165,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/taskcomments"
@@ -77036,7 +76959,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 185,
+          "line": 181,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -77049,7 +76972,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 429,
+          "line": 425,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -78425,7 +78348,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 185,
+          "line": 181,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -78438,7 +78361,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 185,
+          "line": 181,
           "surface": "route:/tasks",
           "apiCalls": [
             "DELETE /api/data/taskcomments/[id]"
@@ -78453,7 +78376,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 429,
+          "line": 425,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -78466,7 +78389,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 429,
+          "line": 425,
           "surface": "route:/tasks",
           "apiCalls": [
             "DELETE /api/data/tasks/[id]"
@@ -79527,7 +79450,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -79540,7 +79463,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80807,7 +80730,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80820,7 +80743,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -80835,7 +80758,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80848,7 +80771,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -82461,7 +82384,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -82474,7 +82397,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -82489,7 +82412,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -82502,7 +82425,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -84116,7 +84039,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -84129,7 +84052,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -84144,7 +84067,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -84157,7 +84080,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -85771,7 +85694,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -85784,7 +85707,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -85799,7 +85722,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -85812,7 +85735,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -87426,7 +87349,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -87439,7 +87362,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -87454,7 +87377,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -87467,7 +87390,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -89081,7 +89004,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -89094,7 +89017,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 403,
+          "line": 399,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -89109,7 +89032,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [],
           "resourceOperations": [],
@@ -89122,7 +89045,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/tasks/page.jsx",
-          "line": 407,
+          "line": 403,
           "surface": "route:/tasks",
           "apiCalls": [
             "POST /api/data/tasks"
@@ -89705,30 +89628,30 @@
     }
   ],
   "summary": {
-    "elements": 949,
+    "elements": 947,
     "apiContracts": 118,
     "registryResources": 50,
     "byActionType": {
-      "local-state": 253,
-      "data-action": 173,
-      "form-control": 311,
+      "local-state": 251,
+      "data-action": 174,
+      "form-control": 310,
       "delegated-action": 84,
       "navigation": 90,
       "browser-action": 30,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 635,
+      "classified-local": 632,
       "delegated-resolved": 48,
-      "handler-resolved": 182,
+      "handler-resolved": 183,
       "delegated": 84
     },
     "byConfidence": {
-      "high": 901,
+      "high": 899,
       "medium": 48
     },
     "uxStateCandidates": {},
-    "dataActions": 173,
+    "dataActions": 174,
     "delegatedBindings": 1155,
     "actionableUnresolved": 0
   }

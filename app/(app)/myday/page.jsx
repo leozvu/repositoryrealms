@@ -20,7 +20,6 @@ const STATUS = {
   waiting: 'Đang chờ', blocked: 'Bị chặn', done: 'Hoàn tất', merged: 'Đã hợp nhất',
 };
 const OPEN_QUEUES = ['doing', 'blocked', 'waiting', 'planned', 'inbox'];
-const PRIORITY = { urgent: 'Khẩn cấp', high: 'Cao', medium: 'Trung bình', low: 'Thấp' };
 const WORK_TYPES = [
   ['design', 'Thiết kế'], ['content', 'Nội dung'], ['campaign', 'Chiến dịch'], ['development', 'Phát triển'],
   ['operations', 'Vận hành'], ['sales', 'Kinh doanh'], ['finance', 'Tài chính'], ['other', 'Khác'],
@@ -69,10 +68,10 @@ function dueLabel(dueDate, today) {
   return `Hạn ${date}`;
 }
 
-function TaskBlock({ task, index, today, view, busy, dragState, onDragStart, onDragOver, onDrop, onDragEnd, onTransition, onEstimate, onNudge, count }) {
+function TaskBlock({ task, index, today, busy, dragState, onDragStart, onDragOver, onDrop, onDragEnd, onTransition, onEstimate, onNudge, count }) {
   const transition = nextTransition(task);
   const tone = dueTone(task, today);
-  const draggable = view === 'priority' && !busy;
+  const draggable = !busy;
   const isDragging = dragState.dragId === task.id;
   const isOver = dragState.overId === task.id && dragState.dragId !== task.id;
   return (
@@ -83,28 +82,25 @@ function TaskBlock({ task, index, today, view, busy, dragState, onDragStart, onD
       data-dragging={isDragging || undefined}
       data-over={isOver || undefined}
       draggable={draggable}
-      onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; onDragStart(task, index); }}
+      onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', task.id); onDragStart(task, index); }}
       onDragOver={e => { if (draggable && dragState.dragId) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; onDragOver(task, index); } }}
       onDrop={e => { e.preventDefault(); onDrop(task, index); }}
       onDragEnd={onDragEnd}
       aria-label={`${task.title} — ưu tiên vị trí ${index + 1}`}
     >
       <div className={styles.blockHead}>
-        <span className={styles.blockOrder} title="Thứ tự ưu tiên">{index + 1}</span>
+        <span className={styles.blockOrder} title="Thứ tự của bạn">{index + 1}</span>
         <span className={styles.blockStatus}>{STATUS[task.status] || task.status}</span>
-        {view === 'priority' && (
-          <span className={styles.nudge}>
-            <button className="icon-btn" disabled={busy || index === 0} onClick={() => onNudge(task, index, index - 1)} aria-label="Đưa việc lên một bậc"><Icon name="chevron-up" size={14} /></button>
-            <button className="icon-btn" disabled={busy || index === count - 1} onClick={() => onNudge(task, index, index + 1)} aria-label="Đưa việc xuống một bậc"><Icon name="chevron-down" size={14} /></button>
-          </span>
-        )}
+        <span className={styles.nudge}>
+          <button className="icon-btn" disabled={busy || index === 0} onClick={() => onNudge(task, index, index - 1)} aria-label="Đưa việc lên một bậc"><Icon name="chevron-up" size={14} /></button>
+          <button className="icon-btn" disabled={busy || index === count - 1} onClick={() => onNudge(task, index, index + 1)} aria-label="Đưa việc xuống một bậc"><Icon name="chevron-down" size={14} /></button>
+        </span>
       </div>
-      <Link href={`/tasks?focus=${task.id}`} className={styles.blockTitle} title="Mở chi tiết việc">{task.title}</Link>
+      <Link href={`/tasks?focus=${task.id}`} className={styles.blockTitle} title="Mở chi tiết việc" draggable={false}>{task.title}</Link>
       <p className={styles.blockMeta}>{task.project?.name || 'Việc chung'}{task.estHours ? ` · ${task.estHours}h` : ''}</p>
       {task.blockReason && <p className={styles.blockReason} title={task.blockReason}>⛔ {task.blockReason}</p>}
       <div className={styles.blockFoot}>
         <span className={styles.due} data-tone={tone}>{dueLabel(task.dueDate, today)}</span>
-        <span className={styles.priorityTag} data-priority={task.priority}>{PRIORITY[task.priority] || task.priority}</span>
       </div>
       <div className={styles.blockActions}>
         <button className="icon-btn" disabled={busy} onClick={() => onEstimate(task)} title="Cập nhật estimate" aria-label="Cập nhật estimate"><Icon name="clock" size={14} /></button>
@@ -154,7 +150,7 @@ export default function MyDayPage() {
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState('');
   const [estimateTask, setEstimateTask] = useState(null);
-  const [view, setView] = useState('priority'); // mặc định LUÔN là độ quan trọng/ưu tiên
+  const [sortingByDeadline, setSortingByDeadline] = useState(false); // hành động "Xếp theo deadline"
   const [localOrder, setLocalOrder] = useState(null); // optimistic order khi vừa kéo thả
   const [dragState, setDragState] = useState({ dragId: null, dragIndex: -1, overId: null });
   const today = todayISO();
@@ -192,11 +188,7 @@ export default function MyDayPage() {
     return ordered;
   }, [model, localOrder]);
 
-  const displayed = useMemo(() => {
-    if (view !== 'deadline') return openTasks;
-    return [...openTasks].sort((a, b) =>
-      String(a.dueDate || '9999-12-31').localeCompare(String(b.dueDate || '9999-12-31')) || compareWorkItems(a, b));
-  }, [openTasks, view]);
+  const displayed = openTasks;
 
   const completed = model?.queues?.completed || [];
   const ownerId = model?.queue?.ownerId;
@@ -204,7 +196,9 @@ export default function MyDayPage() {
   const act = async (command, okMessage) => {
     setBusyId(command.entityId);
     try {
-      const key = `my-work:${command.action}:${command.entityId}:${crypto.randomUUID()}`;
+      // key chỉ được chứa [a-zA-Z0-9:_-] — dấu chấm trong tên action từng làm server trả 400
+      // "Idempotency key không hợp lệ" khiến toàn bộ kéo thả không lưu được (feedback AIm đợt 3)
+      const key = `my-work:${command.action.replace(/\./g, '-')}:${command.entityId}:${crypto.randomUUID()}`;
       const response = await fetch('/api/execution/actions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key },
@@ -250,9 +244,41 @@ export default function MyDayPage() {
   const onDrop = (targetTask, targetIndex) => {
     const { dragId, dragIndex } = dragState;
     setDragState({ dragId: null, dragIndex: -1, overId: null });
-    if (!dragId || dragId === targetTask.id || view !== 'priority') return;
+    if (!dragId || dragId === targetTask.id) return;
     const dragged = openTasks[dragIndex];
     if (dragged) reorder(dragged, dragIndex, targetIndex);
+  };
+
+  // "Xếp theo deadline" giờ là HÀNH ĐỘNG một phát (không phải chế độ xem): xếp cả bảng
+  // theo hạn rồi LƯU thành thứ tự tay — sau đó kéo thả chỉnh tiếp tùy ý.
+  const sortByDeadline = async () => {
+    if (!ownerId || sortingByDeadline || openTasks.length < 2) return;
+    setSortingByDeadline(true);
+    try {
+      const desired = [...openTasks].sort((a, b) =>
+        String(a.dueDate || '9999-12-31').localeCompare(String(b.dueDate || '9999-12-31')) || String(a.id).localeCompare(String(b.id)));
+      setLocalOrder(desired.map(t => t.id));
+      let version = model?.queue?.version || 0;
+      for (let i = 0; i < desired.length; i++) {
+        const key = `my-work:sort-deadline:${desired[i].id}:${crypto.randomUUID()}`;
+        const response = await fetch('/api/execution/actions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key },
+          body: JSON.stringify({ action: 'task.reprioritize', entityId: desired[i].id, ownerId, expectedQueueVersion: version, targetIndex: i }),
+        });
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error || 'Không thể xếp theo deadline.');
+        version += 1;
+      }
+      toast('Đã xếp cả bảng theo deadline — kéo thả để chỉnh tiếp theo ý bạn.');
+      await load();
+    } catch (requestError) {
+      toast(requestError.message || 'Không thể xếp theo deadline.', 'error');
+      setLocalOrder(null);
+      await load();
+    } finally {
+      setSortingByDeadline(false);
+    }
   };
 
   const toApprove = approvals?.toApprove || [];
@@ -265,7 +291,7 @@ export default function MyDayPage() {
         <div>
           <p className={styles.eyebrow}>Personal execution cockpit</p>
           <h1>{session?.user?.name ? `Việc của ${session.user.name.split(/\s+/).slice(-1)[0]}` : 'Việc của tôi'}</h1>
-          <p>Kéo thả cục việc để sắp thứ tự ưu tiên của bạn — thay đổi ghi thẳng vào Task ERP. Màu nền báo độ gấp: vàng còn 3 ngày, cam còn 2 ngày, hồng còn 1 ngày/quá hạn.</p>
+          <p>Bảng này sắp xếp hoàn toàn theo ý bạn — kéo cục việc đến đâu nằm đó, thay đổi ghi thẳng vào Task ERP. Màu nền báo độ gấp: vàng còn 3 ngày, cam còn 2 ngày, hồng còn 1 ngày/quá hạn.</p>
         </div>
         <div className={styles.heroActions}>
           <button className="btn btn-outline" onClick={load} disabled={loading}><Icon name="repeat" size={16} /> Làm mới</button>
@@ -284,17 +310,10 @@ export default function MyDayPage() {
       </section>
 
       <div className={styles.viewBar}>
-        <div className={styles.viewToggle} role="tablist" aria-label="Cách sắp xếp">
-          <button role="tab" aria-selected={view === 'priority'} className={view === 'priority' ? styles.viewOn : ''} onClick={() => setView('priority')}>
-            <Icon name="tasks" size={14} /> Theo ưu tiên
-          </button>
-          <button role="tab" aria-selected={view === 'deadline'} className={view === 'deadline' ? styles.viewOn : ''} onClick={() => setView('deadline')}>
-            <Icon name="clock" size={14} /> Theo deadline
-          </button>
-        </div>
-        <span className={styles.viewHint}>
-          {view === 'priority' ? 'Kéo thả (hoặc dùng nút ▲▼) để đổi thứ tự ưu tiên.' : 'Việc sát deadline xếp trước — muốn đổi thứ tự hãy quay lại "Theo ưu tiên".'}
-        </span>
+        <button className="btn btn-outline" disabled={sortingByDeadline || displayed.length < 2} onClick={sortByDeadline}>
+          <Icon name="clock" size={14} /> {sortingByDeadline ? 'Đang xếp…' : 'Xếp cả bảng theo deadline'}
+        </button>
+        <span className={styles.viewHint}>Thứ tự là CỦA BẠN — kéo thả (hoặc ▲▼) tùy ý, việc mới tự xếp theo deadline.</span>
       </div>
 
       <div className={styles.live} aria-live="polite">{loading ? 'Đang đồng bộ từ ERP…' : error || `Đã đồng bộ ${metrics.open} việc đang mở.`}</div>
@@ -305,8 +324,8 @@ export default function MyDayPage() {
       {!error && (
         <section className={styles.board} aria-label="Các cục việc đang mở">
           {displayed.map((task, index) => (
-            <TaskBlock key={task.id} task={task} index={index} count={displayed.length} today={today} view={view}
-              busy={busyId === task.id} dragState={dragState}
+            <TaskBlock key={task.id} task={task} index={index} count={displayed.length} today={today}
+              busy={busyId === task.id || sortingByDeadline} dragState={dragState}
               onDragStart={(t, i) => setDragState({ dragId: t.id, dragIndex: i, overId: null })}
               onDragOver={(t) => setDragState((s) => s.overId === t.id ? s : { ...s, overId: t.id })}
               onDrop={onDrop}

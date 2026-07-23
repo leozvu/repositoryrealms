@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, Modal, FormModal, ConfirmDialog, AsyncButton, Badge, useToast } from '@/components/ui';
-import { fmtDate, todayISO, daysFromNow, initials, parseItems, TASK_COLS, BADGE } from '@/lib/format';
+import { fmtDate, todayISO, daysFromNow, initials, parseItems, TASK_COLS } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
 const RECUR_OPTS = [{ value: '', label: 'Không lặp' }, { value: 'weekly', label: 'Hàng tuần' }, { value: 'monthly', label: 'Hàng tháng' }];
@@ -80,10 +80,6 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
         <div className="field"><label>Người phụ trách</label>
           <select value={f.assigneeId} onChange={e => set('assigneeId', e.target.value)} disabled={!isMgmt && task.assigneeId !== me?.id}>
             {users.filter(u => u.status === 'active').map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-          </select></div>
-        <div className="field"><label>Ưu tiên</label>
-          <select value={f.priority} onChange={e => set('priority', e.target.value)}>
-            {Object.entries(BADGE.priority).map(([v, [l]]) => <option key={v} value={v}>{l}</option>)}
           </select></div>
         <div className="field"><label>Trạng thái</label>
           <select value={f.status} onChange={e => set('status', e.target.value)}>
@@ -241,23 +237,23 @@ export default function TasksPage() {
   const subordinates = (isCompanyMgmt ? activeStaff : activeStaff.filter(u => myTeamIds.has(u.teamId)))
     .filter(u => u.id !== user?.id);
 
+  // Feedback AIm đợt 3 (07/2026): form nhập việc chỉ cần đúng 3 trường — tên việc,
+  // việc chung/dự án nào, deadline. Không hỏi độ ưu tiên (bỏ hẳn khái niệm này khỏi
+  // luồng người dùng); giờ ước lượng / lặp lại / mô tả vẫn chỉnh được trong modal chi tiết.
   const BASE_FIELDS = [
     { key: 'title', label: 'Tên công việc', required: true, full: true },
-    { key: 'projectId', label: 'Dự án', type: 'select', options: [{ value: '', label: '— Việc chung —' }, ...projects.rows.map(p => ({ value: p.id, label: p.name }))] },
-    { key: 'priority', label: 'Ưu tiên', type: 'select', options: Object.entries(BADGE.priority).map(([v, [l]]) => ({ value: v, label: l })) },
-    { key: 'dueDate', label: 'Hạn hoàn thành', type: 'date' },
-    { key: 'estHours', label: 'Giờ ước lượng', type: 'number' },
-    { key: 'recur', label: 'Lặp lại', type: 'select', options: RECUR_OPTS },
-    { key: 'note', label: 'Mô tả', type: 'textarea', full: true },
+    { key: 'projectId', label: 'Việc chung hay dự án nào?', type: 'select', options: [{ value: '', label: '— Việc chung —' }, ...projects.rows.map(p => ({ value: p.id, label: p.name }))] },
+    { key: 'dueDate', label: 'Deadline', type: 'date' },
   ];
   // Thêm công việc: quản lý chọn được người phụ trách bất kỳ; nhân viên tự thêm cho MÌNH.
   const ADD_FIELDS = isMgmt
-    ? [BASE_FIELDS[0], BASE_FIELDS[1], { key: 'assigneeId', label: 'Người phụ trách', type: 'select', options: activeStaff.map(u => ({ value: u.id, label: u.name })) }, ...BASE_FIELDS.slice(2)]
+    ? [BASE_FIELDS[0], BASE_FIELDS[1], { key: 'assigneeId', label: 'Người phụ trách', type: 'select', options: activeStaff.map(u => ({ value: u.id, label: u.name })) }, BASE_FIELDS[2]]
     : BASE_FIELDS;
   const ASSIGN_FIELDS = [
     BASE_FIELDS[0],
     { key: 'assigneeId', label: 'Giao cho', required: true, type: 'select', options: [{ value: '', label: '— Chọn người thuộc quyền bạn —' }, ...subordinates.map(u => ({ value: u.id, label: u.name }))] },
-    ...BASE_FIELDS.slice(1),
+    BASE_FIELDS[1],
+    BASE_FIELDS[2],
   ];
   const allLabels = [...new Set(rows.flatMap(t => parseItems(t.labels)))];
   const visible = rows.filter(t => (proj === 'all' || String(t.projectId || '') === proj)
@@ -305,7 +301,7 @@ export default function TasksPage() {
         {parseItems(t.labels).length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, margin: '4px 0' }}>
           {parseItems(t.labels).map(lb => <span key={lb} className="badge b-violet" style={{ fontSize: '.7rem', padding: '1px 6px' }}>{lb}</span>)}</div>}
         <div className="kan-foot">
-          <Badge map="priority" k={t.priority} />
+          <span style={{ fontSize: '.7rem', color: 'var(--muted)' }}>{projName(t.projectId) === 'Việc chung' ? 'Việc chung' : ''}</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             <small style={{ fontSize: '.7rem', color: late ? 'var(--danger)' : 'var(--muted)', fontWeight: late ? 700 : 400 }}>{fmtDate(t.dueDate)}</small>
             <span className="avatar" title={userName(t.assigneeId)}>{initials(userName(t.assigneeId))}</span>
