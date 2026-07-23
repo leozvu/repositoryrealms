@@ -5,7 +5,7 @@ Báo cáo này được sinh tự động bằng `npm run audit:ui:actions`. Map
 ## Phạm vi
 
 - Element definitions: **947**
-- API route contracts: **118**
+- API route contracts: **119**
 - Registry resources: **50**
 - Data-bound actions: **174**
 - Delegated callback bindings: **1155**

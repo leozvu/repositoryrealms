@@ -5,7 +5,7 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 ## Phạm vi
 
 - UI routes: **66**
-- API routes: **118**
+- API routes: **119**
 - Interactive element definitions: **947**
 - Source files có interaction: **95**
 - Routes có ERP resource candidate: **42**
@@ -61,16 +61,16 @@ Các candidate ưu tiên accessibility, keyboard, semantic control và possible 
 | route.automation.action.e-e-stoppropagation-setmodal-mode-del-row-r | app/(app)/automation/page.jsx:127 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.calendar.action.setdaymodal-label-dow-i-fmtdm-d-evs | app/(app)/calendar/page.jsx:141 | (không có nhãn tĩnh) | clickable_non_semantic, keyboard_path_unverified |
 | route.calendar.action.d | app/(app)/calendar/page.jsx:163 | {d} | clickable_non_semantic, keyboard_path_unverified |
-| route.ceo-inbox.action.load | app/(app)/ceo-inbox/page.jsx:153 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-inbox.form-control.select | app/(app)/ceo-inbox/page.jsx:159 | — | control_binding_unverified |
-| route.ceo-inbox.form-control.select.2 | app/(app)/ceo-inbox/page.jsx:160 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.ceo-inbox.action.button | app/(app)/ceo-inbox/page.jsx:162 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-inbox.action.setselectedid-conversation-id | app/(app)/ceo-inbox/page.jsx:166 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-inbox.action.button.2 | app/(app)/ceo-inbox/page.jsx:179 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-inbox.form-control.textarea | app/(app)/ceo-inbox/page.jsx:179 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.ceo-overview.action.setfilter-all | app/(app)/ceo-overview/page.jsx:195 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-overview.action.setfilter-entity-id | app/(app)/ceo-overview/page.jsx:196 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-overview.action.load-filter | app/(app)/ceo-overview/page.jsx:200 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.action.load | app/(app)/ceo-inbox/page.jsx:167 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.form-control.select | app/(app)/ceo-inbox/page.jsx:173 | — | control_binding_unverified |
+| route.ceo-inbox.form-control.select.2 | app/(app)/ceo-inbox/page.jsx:174 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.ceo-inbox.action.button | app/(app)/ceo-inbox/page.jsx:176 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.action.setselectedid-conversation-id | app/(app)/ceo-inbox/page.jsx:180 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.action.button.2 | app/(app)/ceo-inbox/page.jsx:193 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.form-control.textarea | app/(app)/ceo-inbox/page.jsx:193 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.ceo-overview.action.setfilter-all | app/(app)/ceo-overview/page.jsx:197 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-overview.action.setfilter-entity-id | app/(app)/ceo-overview/page.jsx:198 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-overview.action.load-filter | app/(app)/ceo-overview/page.jsx:215 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-registry.action.load | app/(app)/ceo-registry/page.jsx:265 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-registry.action.loadidentity | app/(app)/ceo-registry/page.jsx:288 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-registry.form-control.input | app/(app)/ceo-registry/page.jsx:294 | (không có nhãn tĩnh) | control_binding_unverified |

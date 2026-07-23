@@ -81,6 +81,20 @@ export default function CeoInboxPage() {
   }, [c.loadError]);
 
   useEffect(() => { if (sessionStatus === 'authenticated') load(); }, [load, sessionStatus]);
+  // Đợt 1: tự đồng bộ danh bạ lần đầu khi trống (bỏ 1 bước bấm tay) — chỉ thử 1 lần/phiên
+  const autoSynced = useRef(false);
+  useEffect(() => {
+    if (loading || autoSynced.current || directory.length > 0 || !identity?.active) return;
+    autoSynced.current = true;
+    sync().catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, directory.length, identity?.active]);
+  // Đợt 1: polling hội thoại đang mở mỗi 20s — reply từ công ty tự hiện, khỏi bấm "Nhận phản hồi"
+  useEffect(() => {
+    if (!selectedId) return;
+    const timer = setInterval(() => { loadThread(selectedId); }, 20_000);
+    return () => clearInterval(timer);
+  }, [selectedId, loadThread]);
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get('entity')?.trim().toLowerCase() || '';
     if (requested && directory.some((profile) => profile.targetEntityId === requested)) setEntityId((current) => current || requested);

@@ -12,6 +12,7 @@
 "/api/ceo/v1/commands","app/api/ceo/v1/commands/route.js","false","POST","unreviewed"
 "/api/ceo/v1/commands/receipts","app/api/ceo/v1/commands/receipts/route.js","false","GET","unreviewed"
 "/api/ceo/v1/dashboard","app/api/ceo/v1/dashboard/route.js","false","GET","unreviewed"
+"/api/ceo/v1/dashboard/cron","app/api/ceo/v1/dashboard/cron/route.js","false","GET","unreviewed"
 "/api/ceo/v1/dashboard/refresh","app/api/ceo/v1/dashboard/refresh/route.js","false","POST","unreviewed"
 "/api/ceo/v1/directory","app/api/ceo/v1/directory/route.js","false","GET","unreviewed"
 "/api/ceo/v1/directory/profile","app/api/ceo/v1/directory/profile/route.js","false","GET | PUT","unreviewed"

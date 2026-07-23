@@ -22,7 +22,13 @@ export async function GET(request) {
   }
   try {
     const entityId = request.nextUrl.searchParams.get('entity') || 'all';
-    return NextResponse.json(await loadCeoUnifiedDashboard(prisma, user, { entityId }), { headers });
+    const model = await loadCeoUnifiedDashboard(prisma, user, { entityId });
+    // Đợt 1: kèm ring rollout từng entity — Tổng quan hiển thị banner chẩn đoán
+    // "công ty nào đang ở mức quyền nào" thay vì các trang trống một cách khó hiểu.
+    const rings = Object.fromEntries((await prisma.ceoRolloutState.findMany({
+      select: { entityId: true, currentRing: true, status: true },
+    })).map((row) => [row.entityId, { ring: row.currentRing, status: row.status }]));
+    return NextResponse.json({ ...model, rings }, { headers });
   } catch (error) {
     const status = error instanceof CeoDashboardError ? error.status : 503;
     const code = error instanceof CeoDashboardError ? error.code : 'ceo_dashboard_unavailable';
