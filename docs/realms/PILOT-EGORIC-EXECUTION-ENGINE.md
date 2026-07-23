@@ -1,40 +1,26 @@
-# Pilot Execution Engine — Egoric (cohort có tên, thu evidence 2 tuần)
+# Evidence vận hành Execution Engine — đo thụ động trên người dùng THẬT (không cohort)
 
-Trạng thái: chờ founder điền tên cohort · Cập nhật: 2026-07-24
+Cập nhật: 2026-07-24 · Quyết định founder: mọi entity đã vận hành thật với tài khoản thật — KHÔNG lập cohort riêng, không nghi thức pilot. Evidence thu thụ động từ dữ liệu hệ thống đã ghi sẵn.
 
-## Bối cảnh & phạm vi
+## Cách đo (0 công vận hành, 0 code mới)
 
-Execution Engine (Việc của tôi + Quản lý công việc, v3.39) đã **live cho toàn bộ người dùng 4 công ty** từ đợt deploy 23/7. Pilot này vì vậy KHÔNG phải bật/tắt tính năng, mà là **thu bằng chứng có cấu trúc trên một cohort có tên** để quyết định bước tiếp theo (mở ring commands cho các công ty còn lại, tinh chỉnh UX, hay dừng đầu tư thêm).
+Hệ thống đã tự ghi mọi thứ cần thiết. Sau **2 tuần** (từ 24/7 → 07/8/2026), chạy script read-only tổng hợp trên cả 4 schema công ty:
 
-- **Entity pilot:** Egoric (14 tài khoản thật, ring `commands`, nhân sự đang tương tác qua 3 đợt feedback).
-- **Cohort:** 1 quản lý + 3–7 nhân viên — *founder điền tên tại đây trước khi bắt đầu:*
-  - Quản lý: `__________` (gợi ý: Trần Khánh Linh — Account Manager, người có nhiều lead WIP nhất theo CRM snapshot)
-  - Thành viên: `__________` (3–7 người)
-- **Cửa sổ:** 14 ngày kể từ ngày founder xác nhận cohort.
-- **Không tính năng lớn mới trong cửa sổ pilot** (đúng chỉ thị #8) — chỉ sửa lỗi chặn (hotfix) nếu phát sinh.
+| Chỉ số | Nguồn có sẵn |
+|---|---|
+| Số lần nhân sự tự sắp thứ tự (kéo thả/▲▼/Xếp theo deadline) | `RealmActionReceipt` action `task.reprioritize` |
+| Chuyển trạng thái việc qua cockpit | `WorkItemEvent` |
+| Điều phối của quản lý (giao/block/escalate/split/merge) | Receipts tương ứng |
+| Việc trễ hạn trước/sau | `Task.dueDate` vs `completedAt`, so tuần −2 với tuần +2 |
+| Lệnh liên công ty từ CEO Terminal | `CeoCommandDelivery` + receipts 2 đầu |
+| Phản hồi định tính | Nút "Phản hồi pilot" (đã có ở góc màn hình) — ai vướng gì bấm thẳng |
 
-## Nguồn evidence (đều đã có sẵn trong hệ thống — không cần code mới)
+**Ranh giới giữ nguyên theo policy trong code:** số liệu đánh giá TÍNH NĂNG, không xếp hạng/chấm điểm cá nhân; không đo thời gian online; TimeLog là tự khai báo.
 
-| Bằng chứng | Nguồn | Trả lời câu hỏi |
-|---|---|---|
-| Số lần tự sắp thứ tự (kéo thả/▲▼) | `RealmActionReceipt` action `task.reprioritize` + `WorkQueueState.version` | Nhân viên có thật sự dùng bảng tự sắp không? |
-| Chuyển trạng thái việc qua cockpit | `WorkItemEvent` (transition) | Luồng Bắt đầu→Review→Hoàn tất có được dùng thay kanban cũ? |
-| Điều phối của quản lý | Receipts `task.assign/block/escalate/split/merge` | Quản lý có điều phối qua Quản lý công việc không? |
-| Việc trễ hạn trước/sau | So sánh `Task.dueDate` vs `completedAt` tuần −2 với tuần +2 | Có dịch chuyển kết quả thật không? |
-| Phản hồi định tính | Nút "Phản hồi pilot" (RealmFeedbackLauncher) + phỏng vấn 15' cuối kỳ với quản lý | Đau ở đâu, giữ hay bỏ gì |
+## Ngưỡng quyết định sau 2 tuần (07/8)
 
-**Ranh giới đạo đức (theo policy sẵn có trong code):** dữ liệu chỉ đánh giá TÍNH NĂNG, không xếp hạng/chấm điểm cá nhân; TimeLog là tự khai báo, không dùng làm thước năng suất; không đo thời gian online.
+- **Đầu tư tiếp** (mở ring commands cho AIm/Vnecom/Egolive, làm Đợt 1 tối ưu terminal sâu hơn): có sử dụng thật đều đặn ở ≥2 công ty và không bug chặn mới.
+- **Tinh chỉnh**: dùng lác đác + phản hồi chỉ ra ma sát cụ thể.
+- **Dừng đầu tư thêm phần này**: nhân sự quay về thói quen cũ (Zalo/kanban) — dữ liệu receipts ≈ 0.
 
-## Tiêu chí quyết định sau 14 ngày
-
-- **Tiếp tục mở rộng** nếu: ≥60% cohort có ≥1 lần tự sắp thứ tự/tuần VÀ quản lý dùng điều phối ≥3 lần/tuần VÀ không có bug chặn mới.
-- **Tinh chỉnh rồi đo lại** nếu: dùng lác đác nhưng phản hồi định tính tích cực.
-- **Dừng đầu tư thêm** nếu: cohort quay lại nhắn Zalo/kanban cũ và phản hồi cho thấy bảng không thay được thói quen.
-
-## Việc vận hành trong kỳ
-
-1. Ngày 0: founder điền cohort → thông báo cho cohort (mẫu tin ở dưới) → chốt số liệu baseline (việc trễ 2 tuần trước).
-2. Ngày 7: đọc receipts giữa kỳ (script read-only) — nếu 0 hoạt động, hỏi cohort ngay thay vì đợi hết kỳ.
-3. Ngày 14: tổng hợp bảng evidence + phỏng vấn quản lý → báo cáo quyết định cho founder.
-
-Mẫu tin gửi cohort: *"Trong 2 tuần tới, nhóm mình dùng 'Việc của tôi' để tự sắp thứ tự việc (kéo thả) và quản lý dùng 'Quản lý công việc' để giao/điều phối. Hệ thống chỉ ghi nhận thao tác trên tính năng để đánh giá tính năng — không chấm điểm cá nhân. Gặp gì vướng bấm nút Phản hồi pilot ở góc phải."*
+Trong cửa sổ này: **không thêm tính năng lớn mới** (đúng chỉ thị); hotfix lỗi chặn vẫn làm bình thường.
