@@ -3,6 +3,7 @@
 // Chặn cứng ma trận thị trường (chanh dây/chôm chôm không đi được Nhật/Hàn/…), sinh checklist
 // chứng từ theo thị trường, tính hạn xuất trình L/C, cảnh báo điều kiện đặc thù.
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
 import { moneyC, money, fmtDate, todayISO } from '@/lib/format';
 import {
@@ -202,7 +203,8 @@ function ShipmentDetail({ s, docs, area, sourceLots = [], allAreas = [], onToggl
   const notes = marketNotes(s.crop, s.market);
   const aName = id => area.find(a => a.id === id)?.name || '—';
   const DOC_LABEL = { invoice: 'Commercial Invoice', packing: 'Packing List', bl: 'Bill of Lading / AWB', phyto: 'Giấy kiểm dịch thực vật', co: 'C/O', irradiation: 'Chứng nhận chiếu xạ', customs: 'Tờ khai hải quan' };
-  return (
+  // v3.37: portal ra body như Modal chung — thoát stacking context của #view (theme Realm)
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
         <div className="modal-head"><span className="modal-title">Lô {s.code} — {s.crop} đi {MARKETS[s.market] || s.market}</span>
@@ -259,6 +261,7 @@ function ShipmentDetail({ s, docs, area, sourceLots = [], allAreas = [], onToggl
         </div>
         <div className="modal-foot"><button className="btn btn-primary" onClick={onClose}>Đóng</button></div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

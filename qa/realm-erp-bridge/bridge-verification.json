@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 58,
-    "mappedNavigationRoutes": 58,
-    "verifiedNavigationRoutes": 58,
+    "erpNavigationRoutes": 59,
+    "mappedNavigationRoutes": 59,
+    "verifiedNavigationRoutes": 59,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -100,6 +100,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/calendar/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "docs",
+      "erpLabel": "Tài liệu công ty",
+      "realmLabel": "Royal Archive",
+      "realmSurface": "Kho lưu trữ",
+      "group": "Tổng quan",
+      "href": "/docs",
+      "icon": "download",
+      "roles": "PM | AM | ACCOUNTANT | HR | LEAD | STAFF",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/docs/page.jsx",
       "routeExists": true,
       "status": "verified"
     },
@@ -270,7 +285,7 @@
     },
     {
       "key": "teamwork",
-      "erpLabel": "Điều phối công việc",
+      "erpLabel": "Quản lý công việc",
       "realmLabel": "Guild Orchestrator",
       "realmSurface": "Phòng điều phối",
       "group": "Vận hành",

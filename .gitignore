@@ -16,3 +16,7 @@ CREDENTIALS-NOI-BO.txt
 
 # Phase 0: sao lưu DB (dữ liệu thật — KHÔNG commit)
 backups/
+
+# file tạm phiên làm việc — chứa secret, KHÔNG commit
+*.tmp
+.tmp-*.mjs

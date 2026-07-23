@@ -18,6 +18,9 @@ const DEFAULTS = {
   // v3.17: phân hệ bật/tắt theo công ty. null = chưa cấu hình → client hiểu là BẬT HẾT
   // (giữ nguyên hành vi 3 công ty cũ). Mảng = danh sách phân hệ đang bật.
   modules: null,
+  // v3.37 (feedback Egoric): "mảng dịch vụ" chỉnh được theo công ty thay vì hard-code —
+  // dùng cho dropdown Dịch vụ ở Dự án, cột/lọc ở Khách hàng và Bảng giá dịch vụ.
+  serviceLines: ['Digital Ads', 'Social Media', 'Branding', 'Web & SEO', 'Production', 'PR / Event', 'Seeding', 'Livestream', 'Khác'],
 };
 
 // Các trường bí mật — chỉ Giám đốc đọc được (trang Cài đặt); route server đọc thẳng DB

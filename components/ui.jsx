@@ -1,6 +1,7 @@
 'use client';
 // UI kit dùng chung: icon, toast, modal, form động, hook dữ liệu — port từ v1
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { BADGE } from '@/lib/format';
 import { ROLE_LABEL } from '@/lib/perm';
 
@@ -14,6 +15,61 @@ export const useRoleLabels = () => useContext(RoleLabelsCtx) || ROLE_LABEL;
 // mà không phải fetch lại. Giá trị: mảng mod đang bật | null (công ty cũ = coi như bật hết agency).
 export const ModulesCtx = createContext(null);
 export const useModules = () => useContext(ModulesCtx);
+
+/* ---------- v3.37: mảng dịch vụ theo công ty (Setting.serviceLines) ---------- */
+// Feedback Egoric 07/2026: danh sách mảng dịch vụ từng hard-code (thiếu Seeding/Livestream).
+// Nay đọc từ Cài đặt; fallback đúng bộ mặc định của /api/settings khi chưa tải xong.
+export const DEFAULT_SERVICE_LINES = ['Digital Ads', 'Social Media', 'Branding', 'Web & SEO', 'Production', 'PR / Event', 'Seeding', 'Livestream', 'Khác'];
+export function useServiceLines() {
+  const [lines, setLines] = useState(DEFAULT_SERVICE_LINES);
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/settings').then(r => r.ok ? r.json() : null).then(s => {
+      if (alive && Array.isArray(s?.serviceLines) && s.serviceLines.length) setLines(s.serviceLines);
+    }).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  return lines;
+}
+
+/* ---------- v3.38: Avatar thật — ảnh upload của từng người, fallback chữ cái đầu ---------- */
+// Dùng thay cho <span className="avatar">{initials(...)}</span> ở những chỗ quan trọng.
+// Ảnh lấy từ /api/avatar/<userId>?v=<version>; 404 (chưa upload) → hiện chữ cái đầu như cũ.
+// Nạp ảnh bằng fetch (không phải <img src> trần): người chưa có ảnh / ngữ cảnh chưa đăng nhập
+// trả 404/401 — fetch nuốt êm trong JS, không xả console.error "Failed to load resource"
+// (gate e2e coi mọi console.error là runtime issue). Cache theo phiên để không gọi lặp.
+const AVATAR_CACHE = new Map(); // `${userId}:${version}` -> objectURL | null (null = không có ảnh)
+export function useAvatarUrl(userId, version = 0) {
+  const cacheKey = `${userId}:${version}`;
+  const [url, setUrl] = useState(() => (userId ? AVATAR_CACHE.get(cacheKey) ?? undefined : null));
+  useEffect(() => {
+    if (!userId) { setUrl(null); return; }
+    if (AVATAR_CACHE.has(cacheKey)) { setUrl(AVATAR_CACHE.get(cacheKey)); return; }
+    let alive = true;
+    fetch(`/api/avatar/${userId}?v=${version}`)
+      .then(r => (r.status === 200 ? r.blob() : null))
+      .then(blob => {
+        const value = blob ? URL.createObjectURL(blob) : null;
+        AVATAR_CACHE.set(cacheKey, value);
+        if (alive) setUrl(value);
+      })
+      .catch(() => { AVATAR_CACHE.set(cacheKey, null); if (alive) setUrl(null); });
+    return () => { alive = false; };
+  }, [userId, version, cacheKey]);
+  return url; // undefined = đang tải · null = không có ảnh · string = objectURL
+}
+
+export function Avatar({ userId, name = '', version = 0, size, className = 'avatar', title, style: styleProp }) {
+  const url = useAvatarUrl(userId, version);
+  const init = String(name).split(/\s+/).filter(Boolean).slice(-2).map(w => w[0]).join('').toUpperCase() || '?';
+  const style = { ...(size ? { width: size, height: size } : {}), ...styleProp };
+  if (!url) return <span className={className} style={style} title={title || name}>{init}</span>;
+  return (
+    <span className={className} style={{ ...style, overflow: 'hidden', padding: 0 }} title={title || name}>
+      <img src={url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit', display: 'block' }} />
+    </span>
+  );
+}
 
 /* ---------- Icons (Lucide-style, giữ nguyên từ v1) ---------- */
 const RAW = {
@@ -62,6 +118,8 @@ const RAW = {
   cake: '<path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s1-1 2.5-1 2.5 2 5 2 3.5-2 5-2 2.5 1 2.5 1"/><path d="M2 21h20"/><path d="M12 4v3"/><path d="M8 5v2"/><path d="M16 5v2"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="m17.7 17.7 1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.3 17.7-1.4 1.4"/><path d="m19.1 4.9-1.4 1.4"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  'chevron-up': '<polyline points="18 15 12 9 6 15"/>',
+  'chevron-down': '<polyline points="6 9 12 15 18 9"/>',
 };
 export function Icon({ name, size = 20 }) {
   return (
@@ -138,7 +196,7 @@ export function Modal({ title, children, footer, large, className = '', onClose 
     document.addEventListener('keydown', h);
     return () => document.removeEventListener('keydown', h);
   }, [onClose]);
-  return (
+  const dialog = (
     <div className="modal-overlay" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className={`modal ${large ? 'modal-lg' : ''} ${className}`.trim()} role="dialog" aria-modal="true" aria-label={title}>
         <div className="modal-head">
@@ -150,6 +208,12 @@ export function Modal({ title, children, footer, large, className = '', onClose 
       </div>
     </div>
   );
+  // v3.37 (feedback Egoric): PORTAL ra document.body. Modal từng render bên trong #view —
+  // #view của theme Realm có isolation:isolate nên z-index 100 của modal bị NHỐT trong
+  // stacking context đó: topbar (z 30) đè lên đầu modal, lớp phủ mờ không che nổi
+  // topbar/sidebar → nhìn như modal "dính" vào bảng phía sau. Ra body là thoát hết.
+  if (typeof document === 'undefined') return dialog; // SSR không render modal — giữ an toàn
+  return createPortal(dialog, document.body);
 }
 
 export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa', modalClassName = '' }) {

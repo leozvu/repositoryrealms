@@ -9,9 +9,9 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 134,
+    "guardedActions": 139,
     "asyncButtonGuards": 73,
-    "disabledBindings": 57,
+    "disabledBindings": 62,
     "localPendingStates": 4,
     "destructiveFlows": 6,
     "destructiveFlowsVerified": 6,
@@ -655,10 +655,34 @@
       "status": "verified"
     },
     {
-      "elementId": "route.myday.action.ang-cap-nhat",
+      "elementId": "route.myday.action.ua-viec-len-mot-bac",
       "source": "app/(app)/myday/page.jsx",
-      "line": 88,
-      "label": "Đang cập nhật…",
+      "line": 95,
+      "label": "Đưa việc lên một bậc",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.myday.action.ua-viec-xuong-mot-bac",
+      "source": "app/(app)/myday/page.jsx",
+      "line": 96,
+      "label": "Đưa việc xuống một bậc",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.myday.action.button",
+      "source": "app/(app)/myday/page.jsx",
+      "line": 108,
+      "label": "…",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
       "successState": "toast-or-state",
@@ -669,7 +693,7 @@
     {
       "elementId": "route.myday.form-submit.so-gio-uoc-luong-nhom-cong-viec-o-phuc-tap-ghi-chu-pham-vi-khong",
       "source": "app/(app)/myday/page.jsx",
-      "line": 111,
+      "line": 130,
       "label": "Số giờ ước lượng / Nhóm công việc / Độ phức tạp / Ghi chú phạm vi (không bắt buộc) / Hủy / Đang lưu… / Lưu estimate có receipt",
       "actionType": "data-action",
       "loadingState": "local-state",
@@ -681,8 +705,20 @@
     {
       "elementId": "route.myday.action.ang-luu-luu-estimate-co-receipt",
       "source": "app/(app)/myday/page.jsx",
-      "line": 119,
+      "line": 138,
       "label": "Đang lưu… / Lưu estimate có receipt",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.myday.action.ang-xep-xep-ca-bang-theo-deadline",
+      "source": "app/(app)/myday/page.jsx",
+      "line": 313,
+      "label": "Đang xếp… / Xếp cả bảng theo deadline",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
       "successState": "toast-or-state",
@@ -763,6 +799,30 @@
       "status": "verified"
     },
     {
+      "elementId": "route.services.action.ua-len",
+      "source": "app/(app)/services/page.jsx",
+      "line": 78,
+      "label": "Đưa lên",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "hook-refresh",
+      "errorState": "hook-error-toast",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "route.services.action.ua-xuong",
+      "source": "app/(app)/services/page.jsx",
+      "line": 79,
+      "label": "Đưa xuống",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "hook-refresh",
+      "errorState": "hook-error-toast",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
       "elementId": "route.settings.action.khoa-mo",
       "source": "app/(app)/settings/page.jsx",
       "line": 72,
@@ -825,7 +885,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 249,
+      "line": 259,
       "label": "Lưu & gửi email thử tới chính hộp thư này",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -837,7 +897,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 263,
+      "line": 273,
       "label": "Lưu cài đặt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -873,7 +933,7 @@
     {
       "elementId": "route.tasks.action.ghi-gio",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 141,
+      "line": 137,
       "label": "Ghi giờ",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -885,7 +945,7 @@
     {
       "elementId": "route.tasks.action.gui",
       "source": "app/(app)/tasks/page.jsx",
-      "line": 169,
+      "line": 165,
       "label": "Gửi",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -897,7 +957,7 @@
     {
       "elementId": "route.teamwork.action.len",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 46,
+      "line": 56,
       "label": "Lên",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -909,7 +969,7 @@
     {
       "elementId": "route.teamwork.action.xuong",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 47,
+      "line": 57,
       "label": "Xuống",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -921,7 +981,7 @@
     {
       "elementId": "route.teamwork.action.go-chan",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 49,
+      "line": 59,
       "label": "Gỡ chặn",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -933,7 +993,7 @@
     {
       "elementId": "route.teamwork.action.giao-viec",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 112,
+      "line": 122,
       "label": "Giao việc",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -945,7 +1005,7 @@
     {
       "elementId": "route.teamwork.action.anh-dau-bi-chan",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 123,
+      "line": 133,
       "label": "Đánh dấu bị chặn",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -957,7 +1017,7 @@
     {
       "elementId": "route.teamwork.action.escalate",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 127,
+      "line": 137,
       "label": "Escalate",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -969,7 +1029,7 @@
     {
       "elementId": "route.teamwork.action.tach-task",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 134,
+      "line": 144,
       "label": "Tách Task",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -981,7 +1041,7 @@
     {
       "elementId": "route.teamwork.action.hop-nhat-task",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 144,
+      "line": 154,
       "label": "Hợp nhất Task",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -993,7 +1053,7 @@
     {
       "elementId": "route.teamwork.action.luu-hieu-chinh-co-receipt",
       "source": "app/(app)/teamwork/page.jsx",
-      "line": 159,
+      "line": 169,
       "label": "Lưu hiệu chỉnh có receipt",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1185,7 +1245,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.go-cua-erp-nguoi-nhan-ang-offline-loi-nhan-van-uoc-luu-trong-not",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2296,
+      "line": 2307,
       "label": "Gõ cửa ERP / Người nhận đang offline; lời nhắn vẫn được lưu trong Notification và Lantern Mail.",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1197,7 +1257,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2309,
+      "line": 2320,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1209,7 +1269,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2340,
+      "line": 2351,
       "label": "Tên hiển thị / Class trong Realm / Màu huy hiệu / Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1221,7 +1281,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2360,
+      "line": 2372,
       "label": "Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1233,7 +1293,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2396,
+      "line": 2408,
       "label": "Nhận / Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1245,7 +1305,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 3009,
+      "line": 3022,
       "label": "Đang ghi… / Ghi nhận Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1557,7 +1617,7 @@
     {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 153,
+      "line": 155,
       "label": "Đọc tất cả",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1569,7 +1629,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 197,
+      "line": 199,
       "label": "Tắt 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1581,7 +1641,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 198,
+      "line": 200,
       "label": "Bật 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1593,7 +1653,7 @@
     {
       "elementId": "component.components-ui.action.ang-xu-ly",
       "source": "components/ui.jsx",
-      "line": 178,
+      "line": 221,
       "label": "Đang xử lý…",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1605,7 +1665,7 @@
     {
       "elementId": "component.components-ui.action.ang-luu-luu",
       "source": "components/ui.jsx",
-      "line": 225,
+      "line": 268,
       "label": "Đang lưu… / Lưu",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1617,7 +1677,7 @@
     {
       "elementId": "component.components-ui.form-submit.e-e-preventdefault-submit",
       "source": "components/ui.jsx",
-      "line": 229,
+      "line": 272,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Icon, useToast } from '@/components/ui';
+import { Icon, Avatar, useToast } from '@/components/ui';
 import styles from './team-work.module.css';
 
 const OPEN = new Set(['todo', 'doing', 'in_progress', 'review', 'waiting', 'blocked']);
@@ -31,9 +31,19 @@ function IntelligenceBadge({ value }) {
   );
 }
 
-function TaskRow({ task, row, index, count, busy, onMove, onSelect, onUnblock }) {
+function TaskRow({ task, row, index, count, busy, onMove, onSelect, onUnblock, drag, setDrag }) {
+  // Feedback AIm 07/2026: cấp trên kéo thả đổi thẳng vị trí việc của nhân viên
+  // (bổ sung cho nút Lên/Xuống — cả hai cùng gọi task.reprioritize).
+  const draggable = OPEN.has(task.status) && !busy;
+  const isDragging = drag?.task?.id === task.id;
+  const isOver = drag && drag.memberId === row.member.id && drag.task.id !== task.id && drag.overId === task.id;
   return (
-    <article className={styles.task} data-state={task.status}>
+    <article className={styles.task} data-state={task.status} data-dragging={isDragging || undefined} data-over={isOver || undefined}
+      draggable={draggable}
+      onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; setDrag({ memberId: row.member.id, task, index, overId: null }); }}
+      onDragOver={e => { if (drag && drag.memberId === row.member.id && drag.task.id !== task.id) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (drag.overId !== task.id) setDrag({ ...drag, overId: task.id }); } }}
+      onDrop={e => { e.preventDefault(); if (drag && drag.memberId === row.member.id && drag.task.id !== task.id) onMove(drag.task, row, index); setDrag(null); }}
+      onDragEnd={() => setDrag(null)}>
       <div className={styles.taskOrder} aria-label={`Ưu tiên ${index + 1}`}><strong>{index + 1}</strong></div>
       <div className={styles.taskBody}>
         <div className={styles.taskTitle}><h4>{task.title}</h4><span>{STATUS[task.status] || task.status}</span></div>
@@ -170,6 +180,7 @@ export default function TeamWorkPage() {
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState('');
   const [selected, setSelected] = useState(null);
+  const [drag, setDrag] = useState(null); // {memberId, task, index, overId} — kéo thả trong hàng đợi 1 nhân viên
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -220,7 +231,7 @@ export default function TeamWorkPage() {
   return (
     <div className={styles.page}>
       <header className={styles.hero}>
-        <div><p className={styles.eyebrow}>Team work orchestrator</p><h1>Điều phối công việc</h1><p>Nhìn luồng công việc và blocker để hỗ trợ team; không xếp hạng con người và không suy diễn năng suất từ trạng thái online.</p></div>
+        <div><p className={styles.eyebrow}>Team work orchestrator</p><h1>Quản lý công việc</h1><p>Nhìn tất cả nhân viên thuộc quyền và hàng đợi việc của từng người. Kéo thả (hoặc nút Lên/Xuống) để sắp lại thứ tự ưu tiên cho nhân viên khi thấy chưa hợp lý; không xếp hạng con người và không suy diễn năng suất từ trạng thái online.</p></div>
         <button className="btn btn-outline" onClick={load} disabled={loading}><Icon name="repeat" size={16} /> Làm mới</button>
       </header>
       <section className={styles.metrics} aria-label="Tóm tắt team">
@@ -248,11 +259,11 @@ export default function TeamWorkPage() {
         return (
           <section key={row.member.id} className={styles.member} aria-labelledby={`member-${row.member.id}`}>
             <header className={styles.memberHead}>
-              <div className={styles.identity}><span className={styles.avatar}>{row.member.name.split(/\s+/).slice(-2).map((part) => part[0]).join('').toUpperCase()}</span><div><h2 id={`member-${row.member.id}`}>{row.member.name}</h2><p>{row.member.title || row.member.realmProfile?.realmClass || 'Thành viên'}</p></div></div>
+              <div className={styles.identity}><Avatar className={styles.avatar} userId={row.member.id} name={row.member.name} /><div><h2 id={`member-${row.member.id}`}>{row.member.name}</h2><p>{row.member.title || row.member.realmProfile?.realmClass || 'Thành viên'}</p></div></div>
               <div className={styles.memberMetrics}><span>Open <strong>{row.metrics.open}</strong></span><span>WIP <strong>{row.metrics.wip}/{row.queue.wipLimit}</strong></span><span>Blocked <strong>{row.metrics.blocked}</strong></span><span className={styles[row.capacity.key]}>{row.capacity.label}</span></div>
             </header>
             <div className={styles.taskList}>
-              {openTasks.map((task, index) => <TaskRow key={task.id} task={task} row={row} index={index} count={openTasks.length} busy={busyId === task.id} onMove={move} onSelect={setSelected} onUnblock={unblock} />)}
+              {openTasks.map((task, index) => <TaskRow key={task.id} task={task} row={row} index={index} count={openTasks.length} busy={busyId === task.id} onMove={move} onSelect={setSelected} onUnblock={unblock} drag={drag} setDrag={setDrag} />)}
               {!openTasks.length && <p className={styles.empty}>Không có việc đang mở.</p>}
             </div>
           </section>
@@ -264,7 +275,7 @@ export default function TeamWorkPage() {
         <div className={styles.taskList}>
           {model.unassigned.map((task) => <article key={task.id} className={styles.task}>
             <div className={styles.taskOrder} aria-hidden="true">—</div>
-            <div className={styles.taskBody}><div className={styles.taskTitle}><h4>{task.title}</h4><span>{task.priority}</span></div><p>{task.project?.name || 'Việc chung'}</p></div>
+            <div className={styles.taskBody}><div className={styles.taskTitle}><h4>{task.title}</h4>{task.dueDate && <span>hạn {task.dueDate}</span>}</div><p>{task.project?.name || 'Việc chung'}</p></div>
             <div className={styles.taskActions}><button className="btn btn-primary btn-sm" onClick={() => setSelected(task)}>Điều phối</button></div>
           </article>)}
         </div>
