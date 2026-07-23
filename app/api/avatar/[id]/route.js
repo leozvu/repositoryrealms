@@ -8,11 +8,14 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET(_req, { params }) {
+  // 204 (không phải 401/404) khi chưa đăng nhập hoặc chưa có ảnh: trình duyệt log console.error
+  // cho MỌI request lỗi (kể cả fetch) — 204 giữ console sạch mà vẫn không lộ ảnh cho người lạ
+  // (chỉ user đã đăng nhập + có ảnh mới nhận 200 kèm dữ liệu).
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
+  if (!user) return new NextResponse(null, { status: 204, headers: { 'Cache-Control': 'private, no-store' } });
   const { id } = await params;
   const row = await prisma.user.findUnique({ where: { id }, select: { avatar: true, avatarMime: true } });
-  if (!row?.avatar) return NextResponse.json({ error: 'no avatar' }, { status: 404 });
+  if (!row?.avatar) return new NextResponse(null, { status: 204, headers: { 'Cache-Control': 'private, max-age=60' } });
   return new NextResponse(Buffer.from(row.avatar), {
     headers: {
       'Content-Type': row.avatarMime || 'image/jpeg',

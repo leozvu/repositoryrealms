@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Icon, Avatar, ToastProvider, useToast } from '@/components/ui';
+import { Icon, Avatar, useAvatarUrl, ToastProvider, useToast } from '@/components/ui';
 import {
   DEFAULT_WORLD_POSITION,
   INITIAL_LEDGER,
@@ -215,12 +215,11 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const initials = (name) => name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
 
 // v3.38: ảnh avatar THẬT của nhân sự đè lên portrait vẽ sẵn (yêu cầu "avatar thật từng người").
-// Chưa upload ảnh → im lặng rút lui, portrait sinh sẵn + chữ cái đầu hiện như cũ.
+// Chưa upload ảnh → im lặng rút lui (fetch qua useAvatarUrl, không xả console.error).
 function RealPortrait({ userId, className }) {
-  const [broken, setBroken] = useState(false);
-  useEffect(() => { setBroken(false); }, [userId]);
-  if (!userId || broken) return null;
-  return <img className={className} src={`/api/avatar/${userId}`} alt="" aria-hidden="true" style={{ objectFit: 'cover' }} onError={() => setBroken(true)} />;
+  const url = useAvatarUrl(userId);
+  if (!url) return null;
+  return <img className={className} src={url} alt="" aria-hidden="true" style={{ objectFit: 'cover' }} />;
 }
 
 function loadRealmImage(url) {

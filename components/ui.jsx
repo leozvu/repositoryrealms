@@ -35,17 +35,38 @@ export function useServiceLines() {
 /* ---------- v3.38: Avatar thật — ảnh upload của từng người, fallback chữ cái đầu ---------- */
 // Dùng thay cho <span className="avatar">{initials(...)}</span> ở những chỗ quan trọng.
 // Ảnh lấy từ /api/avatar/<userId>?v=<version>; 404 (chưa upload) → hiện chữ cái đầu như cũ.
+// Nạp ảnh bằng fetch (không phải <img src> trần): người chưa có ảnh / ngữ cảnh chưa đăng nhập
+// trả 404/401 — fetch nuốt êm trong JS, không xả console.error "Failed to load resource"
+// (gate e2e coi mọi console.error là runtime issue). Cache theo phiên để không gọi lặp.
+const AVATAR_CACHE = new Map(); // `${userId}:${version}` -> objectURL | null (null = không có ảnh)
+export function useAvatarUrl(userId, version = 0) {
+  const cacheKey = `${userId}:${version}`;
+  const [url, setUrl] = useState(() => (userId ? AVATAR_CACHE.get(cacheKey) ?? undefined : null));
+  useEffect(() => {
+    if (!userId) { setUrl(null); return; }
+    if (AVATAR_CACHE.has(cacheKey)) { setUrl(AVATAR_CACHE.get(cacheKey)); return; }
+    let alive = true;
+    fetch(`/api/avatar/${userId}?v=${version}`)
+      .then(r => (r.status === 200 ? r.blob() : null))
+      .then(blob => {
+        const value = blob ? URL.createObjectURL(blob) : null;
+        AVATAR_CACHE.set(cacheKey, value);
+        if (alive) setUrl(value);
+      })
+      .catch(() => { AVATAR_CACHE.set(cacheKey, null); if (alive) setUrl(null); });
+    return () => { alive = false; };
+  }, [userId, version, cacheKey]);
+  return url; // undefined = đang tải · null = không có ảnh · string = objectURL
+}
+
 export function Avatar({ userId, name = '', version = 0, size, className = 'avatar', title, style: styleProp }) {
-  const [broken, setBroken] = useState(false);
-  useEffect(() => { setBroken(false); }, [userId, version]);
+  const url = useAvatarUrl(userId, version);
   const init = String(name).split(/\s+/).filter(Boolean).slice(-2).map(w => w[0]).join('').toUpperCase() || '?';
   const style = { ...(size ? { width: size, height: size } : {}), ...styleProp };
-  if (!userId || broken) return <span className={className} style={style} title={title || name}>{init}</span>;
+  if (!url) return <span className={className} style={style} title={title || name}>{init}</span>;
   return (
     <span className={className} style={{ ...style, overflow: 'hidden', padding: 0 }} title={title || name}>
-      <img src={`/api/avatar/${userId}?v=${version}`} alt={name}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit', display: 'block' }}
-        onError={() => setBroken(true)} />
+      <img src={url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit', display: 'block' }} />
     </span>
   );
 }
