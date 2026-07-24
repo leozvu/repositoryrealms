@@ -750,6 +750,16 @@ model Attendance {
   otHours  Float   @default(0) // v3.11: giờ làm thêm
   note     String?
 
+  // v3.41 (Chương 1 — chấm công chặt): bằng chứng NGỮ CẢNH của lần bấm.
+  // Feedback Egoric 07/2026: "nhân viên nhấn ở đâu cũng được, đang đi du lịch vẫn chấm
+  // công". Nay mỗi lần bấm ghi lại nơi bấm để quản lý nhìn thấy sự thật; công ty chọn
+  // mức siết trong Cài đặt (ghi nhận / cảnh báo / chặn ngoài mạng công ty).
+  checkInIp     String? // IP lúc vào ca (rút gọn, không lưu dấu vết duyệt web)
+  checkOutIp    String?
+  checkInPlace  String? // office | remote | unknown — đối chiếu allowlist IP công ty
+  checkOutPlace String?
+  contextNote   String? // ghi chú tự động khi lệch: "vào ca ngoài mạng công ty"
+
   @@unique([userId, date])
   @@index([date])
 }

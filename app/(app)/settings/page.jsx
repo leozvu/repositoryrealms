@@ -129,9 +129,11 @@ export default function SettingsPage() {
 
   const save = async () => {
     // v3.37: serviceLines soạn dạng text mỗi dòng một mảng → chuẩn hóa thành mảng khi lưu
-    const serviceLines = (Array.isArray(s.serviceLines) ? s.serviceLines : String(s.serviceLines || '').split('\n'))
+    const toList = (value) => (Array.isArray(value) ? value : String(value || '').split(/[\n,]/))
       .map(x => String(x).trim()).filter(Boolean);
-    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...s, serviceLines }) });
+    const serviceLines = toList(s.serviceLines);
+    const officeNetworks = toList(s.officeNetworks); // v3.41: mạng công ty cũng soạn theo dòng
+    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...s, serviceLines, officeNetworks }) });
     toast(res.ok ? 'Đã lưu cài đặt' : 'Có lỗi khi lưu', res.ok ? 'success' : 'error');
   };
 
@@ -181,6 +183,22 @@ export default function SettingsPage() {
             <F k="approveExpenseDirectorOver" label="Chi cần thêm Giám đốc duyệt từ (đ)" type="number" />
             <F k="commissionRate" label="Tỷ lệ hoa hồng mặc định (%)" type="number" />
             <F k="leaveQuota" label="Ngày phép năm / nhân sự" type="number" />
+            {/* v3.41: siết chấm công theo ngữ cảnh — công ty tự chọn mức */}
+            <div className="field">
+              <label>Siết chấm công theo nơi bấm</label>
+              <select value={s.attendanceStrictness || 'off'} onChange={e => setS({ ...s, attendanceStrictness: e.target.value })}>
+                <option value="off">Không siết — chỉ ghi nhận nơi bấm</option>
+                <option value="warn">Cảnh báo — vẫn cho bấm, ghi chú nếu ngoài mạng công ty</option>
+                <option value="strict">Chặn — khai "đi làm" phải bấm trong mạng công ty</option>
+              </select>
+            </div>
+            <div className="field full">
+              <label>Mạng công ty (mỗi dòng một IP hoặc tiền tố, VD 113.161.10.)</label>
+              <textarea rows={3} value={Array.isArray(s.officeNetworks) ? s.officeNetworks.join('\n') : (s.officeNetworks ?? '')}
+                onChange={e => setS({ ...s, officeNetworks: e.target.value })}
+                placeholder={'113.161.10.\n27.72.88.145'} />
+              <div className="hint">Bỏ trống = không kiểm tra nơi bấm (mọi thứ như cũ). Xem IP văn phòng bằng cách tra "what is my ip" tại công ty.</div>
+            </div>
             <F k="workStart" label="Giờ vào ca chuẩn (HH:MM)" />
             <F k="workEnd" label="Giờ tan ca chuẩn (HH:MM)" />
             <F k="otMultiplier" label="Hệ số lương làm thêm (OT)" type="number" />
