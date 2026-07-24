@@ -71,8 +71,8 @@ route.settings.action.delkey-k,app/(app)/settings/page.jsx,73,,data-action,async
 route.settings.action.tao-key,app/(app)/settings/page.jsx,81,Tạo key,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.settings.action.tat-bat,app/(app)/settings/page.jsx,92,Tắt / Bật,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.settings.action.them,app/(app)/settings/page.jsx,101,Thêm,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
-route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay,app/(app)/settings/page.jsx,277,Lưu & gửi email thử tới chính hộp thư này,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.settings.action.luu-cai-at,app/(app)/settings/page.jsx,291,Lưu cài đặt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay,app/(app)/settings/page.jsx,303,Lưu & gửi email thử tới chính hộp thư này,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+route.settings.action.luu-cai-at,app/(app)/settings/page.jsx,317,Lưu cài đặt,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.staff.action.luu,app/(app)/staff/page.jsx,22,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.ang-luu-luu,app/(app)/tasks/page.jsx,71,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
 route.tasks.action.ghi-gio,app/(app)/tasks/page.jsx,137,Ghi giờ,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified

@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { clientIpFrom, evaluateAttendanceContext } from '@/lib/attendance-context';
+import { awardGoldForAttendance } from '@/lib/gold-earning-admin';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -50,5 +51,11 @@ export async function POST(request) {
     detail: `${time} · ${context.place}${context.note ? ` · ${context.note}` : ''}`,
   } }).catch(() => {});
 
-  return NextResponse.json({ ok: true, attendance: row, place: context.place, note: context.note });
+  // v3.41 (Chương 2): tan ca đủ giờ → tự cộng Gold ngày công. Lỗi Gold không chặn chấm công.
+  let gold = null;
+  if (action === 'out') {
+    try { gold = await awardGoldForAttendance(row); } catch (error) { console.error('gold_award_attendance_failed', error?.code); }
+  }
+
+  return NextResponse.json({ ok: true, attendance: row, place: context.place, note: context.note, gold: gold?.awarded || 0 });
 }

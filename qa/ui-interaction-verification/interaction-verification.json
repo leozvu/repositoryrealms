@@ -885,7 +885,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 277,
+      "line": 303,
       "label": "Lưu & gửi email thử tới chính hộp thư này",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -897,7 +897,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 291,
+      "line": 317,
       "label": "Lưu cài đặt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",

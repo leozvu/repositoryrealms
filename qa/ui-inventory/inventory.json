@@ -16393,7 +16393,7 @@
     {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 211,
+      "line": 205,
       "column": 17,
       "surface": "route.settings",
       "tag": "input",
@@ -16429,7 +16429,79 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 220,
+      "line": 217,
+      "column": 19,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.input.4",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 237,
+      "column": 17,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.input.5",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 246,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -16465,7 +16537,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 236,
+      "line": 262,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -16499,7 +16571,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 239,
+      "line": 265,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -16531,9 +16603,9 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.settings.form-control.input.4",
+      "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 249,
+      "line": 275,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -16567,9 +16639,9 @@
       ]
     },
     {
-      "elementId": "route.settings.form-control.input.5",
+      "elementId": "route.settings.form-control.input.7",
       "source": "app/(app)/settings/page.jsx",
-      "line": 273,
+      "line": 299,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -16605,7 +16677,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 277,
+      "line": 303,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -16639,7 +16711,7 @@
     {
       "elementId": "route.settings.form-control.sk-or-v1-tao-tai-openrouter-ai-keys",
       "source": "app/(app)/settings/page.jsx",
-      "line": 287,
+      "line": 313,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -16675,7 +16747,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 291,
+      "line": 317,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -16709,7 +16781,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 309,
+      "line": 335,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -16741,9 +16813,9 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.settings.form-control.input.6",
+      "elementId": "route.settings.form-control.input.8",
       "source": "app/(app)/settings/page.jsx",
-      "line": 312,
+      "line": 338,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -30969,19 +31041,19 @@
   "summary": {
     "uiRoutes": 66,
     "apiRoutes": 127,
-    "interactiveElements": 950,
+    "interactiveElements": 952,
     "sourceFilesWithInteractions": 95,
     "routesInPrimaryNavigation": 62,
     "routesWithResourceCandidates": 42,
     "byKind": {
       "action": 553,
-      "form-control": 312,
+      "form-control": 314,
       "form-submit": 15,
       "navigation": 70
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 262,
+      "control_binding_unverified": 264,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 52
     },
@@ -31000,7 +31072,7 @@
       },
       {
         "source": "app/(app)/settings/page.jsx",
-        "count": 27
+        "count": 29
       },
       {
         "source": "app/(app)/teamwork/page.jsx",

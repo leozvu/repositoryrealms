@@ -33,6 +33,7 @@ const DEFAULTS = {
   goldPayoutEnabled: false,
   goldPerOnTimeTask: 10, // việc hoàn thành đúng hạn
   goldPerFullAttendanceDay: 5, // ngày công đủ giờ
+  goldDailyEarnCap: 60, // trần Gold tự động mỗi người mỗi ngày — chặn cày điểm bằng việc vụn
   goldToVndRate: 1000, // 1 Gold = ? đồng khi bật quy đổi
   goldMonthlyCapVnd: 2000000, // trần thưởng Gold mỗi người mỗi tháng
 };
