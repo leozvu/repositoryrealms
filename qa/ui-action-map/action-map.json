@@ -518,6 +518,7 @@
             "CeoEntitySnapshotCache",
             "CeoRolloutState",
             "Notification",
+            "PushSubscription",
             "RealmChangeEvent",
             "User"
           ],
@@ -1843,6 +1844,142 @@
             503
           ],
           "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/staff/links",
+      "source": "app/api/ceo/v1/staff/links/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoStaffLink"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityRegistry",
+            "CeoStaffLink"
+          ],
+          "roles": [
+            "STAFF"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "DELETE": {
+          "models": [
+            "AuditLog",
+            "CeoStaffLink"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/staff/message",
+      "source": "app/api/ceo/v1/staff/message/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityRegistry",
+            "CeoStaffLink"
+          ],
+          "roles": [],
+          "guards": [],
+          "statuses": [
+            400,
+            401,
+            403,
+            500,
+            503
+          ],
+          "permissionPolicy": "public-or-unverified",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/staff/sso",
+      "source": "app/api/ceo/v1/staff/sso/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityRegistry",
+            "CeoStaffLink",
+            "CeoStaffSsoCode"
+          ],
+          "roles": [],
+          "guards": [],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "public-or-unverified",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "PUT": {
+          "models": [
+            "CeoEntityRegistry",
+            "CeoStaffLink",
+            "CeoStaffSsoCode"
+          ],
+          "roles": [],
+          "guards": [],
+          "statuses": [
+            401,
+            403,
+            409,
+            503
+          ],
+          "permissionPolicy": "public-or-unverified",
           "usesModuleGuard": false,
           "hasErrorHandling": true
         }
@@ -3307,6 +3444,43 @@
       }
     },
     {
+      "route": "/api/push/subscribe",
+      "source": "app/api/push/subscribe/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "PushSubscription"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser"
+          ],
+          "statuses": [
+            400,
+            401
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": false
+        },
+        "DELETE": {
+          "models": [
+            "PushSubscription"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser"
+          ],
+          "statuses": [
+            401
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": false
+        }
+      }
+    },
+    {
       "route": "/api/quotes/[id]/convert",
       "source": "app/api/quotes/[id]/convert/route.js",
       "methods": {
@@ -4686,6 +4860,87 @@
           "permissionPolicy": "explicit-rbac",
           "usesModuleGuard": false,
           "hasErrorHandling": false
+        }
+      }
+    },
+    {
+      "route": "/api/staff-message/deliver",
+      "source": "app/api/staff-message/deliver/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "ApiKey",
+            "AuditLog",
+            "CeoApiRateLimitBucket",
+            "ConvMember",
+            "Conversation",
+            "Message",
+            "Notification",
+            "RealmChangeEvent",
+            "Setting",
+            "User"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            429,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/staff-sso/callback",
+      "source": "app/api/staff-sso/callback/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "AuditLog",
+            "User"
+          ],
+          "roles": [
+            "ACCOUNTANT",
+            "AM",
+            "PM",
+            "STAFF"
+          ],
+          "guards": [],
+          "statuses": [
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/staff-sso/start",
+      "source": "app/api/staff-sso/start/route.js",
+      "methods": {
+        "POST": {
+          "models": [],
+          "roles": [],
+          "guards": [
+            "currentUser"
+          ],
+          "statuses": [
+            401,
+            503
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
         }
       }
     },
@@ -13677,7 +13932,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-world",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 180,
+      "line": 182,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13734,7 +13989,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-commands",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 181,
+      "line": 183,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13791,7 +14046,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-workforce",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 182,
+      "line": 184,
       "column": 67,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13848,7 +14103,7 @@
     {
       "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 183,
+      "line": 185,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13905,7 +14160,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 184,
+      "line": 186,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -13973,7 +14228,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-all",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 197,
+      "line": 199,
       "column": 9,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -14032,7 +14287,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-entity-id",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 198,
+      "line": 200,
       "column": 40,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -14091,7 +14346,7 @@
     {
       "elementId": "route.ceo-overview.action.load-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 215,
+      "line": 217,
       "column": 111,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -14160,7 +14415,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-registry",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 227,
+      "line": 229,
       "column": 161,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -14217,7 +14472,7 @@
     {
       "elementId": "route.ceo-overview.action.opendetail-entity-domain",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 279,
+      "line": 281,
       "column": 216,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -71975,6 +72230,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72049,6 +72305,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72085,7 +72342,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 389,
+          "line": 430,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72125,10 +72382,93 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "component.components-shell.action.bat-thong-bao-thiet-bi",
+      "source": "components/Shell.jsx",
+      "line": 177,
+      "column": 11,
+      "surface": "component.components-shell",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Bật thông báo thiết bị",
+      "handlerEvent": "onClick",
+      "handler": "async () => { const state = await subscribePush(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY); toast(state === 'granted' ? 'Đã bật thông báo trên thiết bị này' : state === 'denied' ? 'Trình duyệt đang chặn thông báo — bật lại trong cài đặt tra…",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
+        "GET '/api/notifications'",
+        "PUT '/api/notifications'",
+        "PUT '/api/notifications'",
+        "GET '/api/users/2fa'",
+        "method '/api/users/2fa'",
+        "GET '/api/settings'",
+        "GET '/api/approvals'",
+        "GET '/api/chat'",
+        "GET '/api/notifications'",
+        "POST '/api/avatar'"
+      ],
+      "routeCandidates": [
+        "'/dashboard'",
+        "'/freelancer'",
+        "'/login'",
+        "g.href(r)",
+        "n.route"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "NotificationsModal",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "subscribePush"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "'/dashboard'",
+        "'/freelancer'",
+        "'/login'",
+        "g.href(r)",
+        "n.route"
+      ],
+      "apiCalls": [
+        "POST /api/push/subscribe"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "PushSubscription"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "authenticated-custom"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "navigator.userAgent.slice"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 155,
-      "column": 17,
+      "line": 188,
+      "column": 9,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
       "kind": "action",
@@ -72144,6 +72484,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72179,7 +72520,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 390,
+          "line": 431,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -72251,7 +72592,7 @@
     {
       "elementId": "component.components-shell.action.ong",
       "source": "components/Shell.jsx",
-      "line": 156,
+      "line": 189,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -72268,6 +72609,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72299,7 +72641,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 390,
+          "line": 431,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72341,7 +72683,7 @@
     {
       "elementId": "component.components-shell.action.truoc-mo",
       "source": "components/Shell.jsx",
-      "line": 159,
+      "line": 192,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "button",
@@ -72358,6 +72700,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72393,7 +72736,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 390,
+          "line": 431,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -72413,7 +72756,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 390,
+          "line": 431,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72478,7 +72821,7 @@
     {
       "elementId": "component.components-shell.action.ong.2",
       "source": "components/Shell.jsx",
-      "line": 197,
+      "line": 230,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -72495,6 +72838,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72526,7 +72870,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 388,
+          "line": 429,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72568,7 +72912,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 199,
+      "line": 232,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -72585,6 +72929,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72618,7 +72963,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 388,
+          "line": 429,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72667,7 +73012,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 200,
+      "line": 233,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -72684,6 +73029,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72717,7 +73063,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 388,
+          "line": 429,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72766,7 +73112,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so",
       "source": "components/Shell.jsx",
-      "line": 205,
+      "line": 238,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -72783,6 +73129,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72840,7 +73187,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so.2",
       "source": "components/Shell.jsx",
-      "line": 215,
+      "line": 248,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -72857,6 +73204,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72914,7 +73262,7 @@
     {
       "elementId": "component.components-shell.navigation.item-href-item-key",
       "source": "components/Shell.jsx",
-      "line": 352,
+      "line": 393,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -72931,6 +73279,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72986,7 +73335,7 @@
     {
       "elementId": "component.components-shell.action.oi-anh-ai-dien",
       "source": "components/Shell.jsx",
-      "line": 362,
+      "line": 403,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73003,6 +73352,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73060,7 +73410,7 @@
     {
       "elementId": "component.components-shell.form-control.input",
       "source": "components/Shell.jsx",
-      "line": 366,
+      "line": 407,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "input",
@@ -73077,6 +73427,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73145,7 +73496,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 380,
+      "line": 421,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73162,6 +73513,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73217,7 +73569,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 383,
+      "line": 424,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73234,6 +73586,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73292,7 +73645,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 392,
+      "line": 433,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -73309,6 +73662,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73367,7 +73721,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 395,
+      "line": 436,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73384,6 +73738,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73439,7 +73794,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 400,
+      "line": 441,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73456,6 +73811,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73511,7 +73867,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 403,
+      "line": 444,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73528,6 +73884,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73666,6 +74023,7 @@
         "submitLog",
         "submitRotation",
         "submitTransition",
+        "subscribePush",
         "suspend",
         "sync",
         "toast",
@@ -73866,7 +74224,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 184,
+          "line": 186,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/dashboard/refresh"
@@ -73882,7 +74240,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 279,
+          "line": 281,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/sso/authorize"
@@ -75031,7 +75389,20 @@
         {
           "callback": "onClick",
           "source": "components/Shell.jsx",
-          "line": 155,
+          "line": 177,
+          "surface": "component:Shell",
+          "apiCalls": [
+            "POST /api/push/subscribe"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        },
+        {
+          "callback": "onClick",
+          "source": "components/Shell.jsx",
+          "line": 188,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/notifications",
@@ -75045,7 +75416,7 @@
         {
           "callback": "onClick",
           "source": "components/Shell.jsx",
-          "line": 199,
+          "line": 232,
           "surface": "component:Shell",
           "apiCalls": [
             "DYNAMIC /api/users/2fa"
@@ -75060,7 +75431,7 @@
         {
           "callback": "onClick",
           "source": "components/Shell.jsx",
-          "line": 200,
+          "line": 233,
           "surface": "component:Shell",
           "apiCalls": [
             "DYNAMIC /api/users/2fa"
@@ -75167,6 +75538,7 @@
         "POST /api/freelancer/timelog",
         "POST /api/payouts/*/pay",
         "POST /api/payroll",
+        "POST /api/push/subscribe",
         "POST /api/realm-demo/actions",
         "POST /api/realm-demo/launch",
         "POST /api/realm-demo/launch/approvals",
@@ -75243,6 +75615,7 @@
         "Payroll",
         "Project",
         "ProjectMember",
+        "PushSubscription",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -75279,6 +75652,7 @@
       "scopedRead": false,
       "browserActions": [
         "navigator.clipboard.writeText",
+        "navigator.userAgent.slice",
         "window.dispatchEvent",
         "window.location.assign"
       ],
@@ -75787,7 +76161,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 154,
+          "line": 173,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -75798,7 +76172,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 195,
+          "line": 228,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76365,7 +76739,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 154,
+          "line": 173,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76376,7 +76750,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 195,
+          "line": 228,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -89675,12 +90049,12 @@
     }
   ],
   "summary": {
-    "elements": 947,
-    "apiContracts": 119,
+    "elements": 948,
+    "apiContracts": 126,
     "registryResources": 50,
     "byActionType": {
       "local-state": 251,
-      "data-action": 174,
+      "data-action": 175,
       "form-control": 310,
       "delegated-action": 84,
       "navigation": 90,
@@ -89690,16 +90064,16 @@
     "byMappingStatus": {
       "classified-local": 632,
       "delegated-resolved": 48,
-      "handler-resolved": 183,
+      "handler-resolved": 184,
       "delegated": 84
     },
     "byConfidence": {
-      "high": 899,
+      "high": 900,
       "medium": 48
     },
     "uxStateCandidates": {},
-    "dataActions": 174,
-    "delegatedBindings": 1155,
+    "dataActions": 175,
+    "delegatedBindings": 1156,
     "actionableUnresolved": 0
   }
 }

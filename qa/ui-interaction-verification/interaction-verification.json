@@ -9,8 +9,8 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 139,
-    "asyncButtonGuards": 73,
+    "guardedActions": 140,
+    "asyncButtonGuards": 74,
     "disabledBindings": 62,
     "localPendingStates": 4,
     "destructiveFlows": 6,
@@ -237,7 +237,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 184,
+      "line": 186,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1615,9 +1615,21 @@
       "status": "verified"
     },
     {
+      "elementId": "component.components-shell.action.bat-thong-bao-thiet-bi",
+      "source": "components/Shell.jsx",
+      "line": 177,
+      "label": "Bật thông báo thiết bị",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 155,
+      "line": 188,
       "label": "Đọc tất cả",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1629,7 +1641,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 199,
+      "line": 232,
       "label": "Tắt 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1641,7 +1653,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 200,
+      "line": 233,
       "label": "Bật 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",

@@ -2195,6 +2195,36 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/api/ceo/v1/staff/links",
+      "source": "app/api/ceo/v1/staff/links/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/staff/message",
+      "source": "app/api/ceo/v1/staff/message/route.js",
+      "dynamic": false,
+      "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/ceo/v1/staff/sso",
+      "source": "app/api/ceo/v1/staff/sso/route.js",
+      "dynamic": false,
+      "methods": [
+        "POST",
+        "PUT"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/api/chat",
       "source": "app/api/chat/route.js",
       "dynamic": false,
@@ -2526,6 +2556,16 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/api/push/subscribe",
+      "source": "app/api/push/subscribe/route.js",
+      "dynamic": false,
+      "methods": [
+        "POST",
+        "DELETE"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/api/quotes/[id]/convert",
       "source": "app/api/quotes/[id]/convert/route.js",
       "dynamic": true,
@@ -2776,6 +2816,33 @@
       "route": "/api/shipments/[id]/pay",
       "source": "app/api/shipments/[id]/pay/route.js",
       "dynamic": true,
+      "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/staff-message/deliver",
+      "source": "app/api/staff-message/deliver/route.js",
+      "dynamic": false,
+      "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/staff-sso/callback",
+      "source": "app/api/staff-sso/callback/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/staff-sso/start",
+      "source": "app/api/staff-sso/start/route.js",
+      "dynamic": false,
       "methods": [
         "POST"
       ],
@@ -5827,7 +5894,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-world",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 180,
+      "line": 182,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -5856,7 +5923,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-commands",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 181,
+      "line": 183,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -5885,7 +5952,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-workforce",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 182,
+      "line": 184,
       "column": 67,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -5914,7 +5981,7 @@
     {
       "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 183,
+      "line": 185,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -5943,7 +6010,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 184,
+      "line": 186,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -5972,7 +6039,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-all",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 197,
+      "line": 199,
       "column": 9,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -6003,7 +6070,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-entity-id",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 198,
+      "line": 200,
       "column": 40,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -6034,7 +6101,7 @@
     {
       "elementId": "route.ceo-overview.action.load-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 215,
+      "line": 217,
       "column": 111,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -6065,7 +6132,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-registry",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 227,
+      "line": 229,
       "column": 161,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -6094,7 +6161,7 @@
     {
       "elementId": "route.ceo-overview.action.opendetail-entity-domain",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 279,
+      "line": 281,
       "column": 216,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -29630,6 +29697,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -29672,6 +29740,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -29696,10 +29765,51 @@
       ]
     },
     {
+      "elementId": "component.components-shell.action.bat-thong-bao-thiet-bi",
+      "source": "components/Shell.jsx",
+      "line": 177,
+      "column": 11,
+      "surface": "component.components-shell",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Bật thông báo thiết bị",
+      "handlerEvent": "onClick",
+      "handler": "async () => { const state = await subscribePush(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY); toast(state === 'granted' ? 'Đã bật thông báo trên thiết bị này' : state === 'denied' ? 'Trình duyệt đang chặn thông báo — bật lại trong cài đặt tra…",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
+        "GET '/api/notifications'",
+        "PUT '/api/notifications'",
+        "PUT '/api/notifications'",
+        "GET '/api/users/2fa'",
+        "method '/api/users/2fa'",
+        "GET '/api/settings'",
+        "GET '/api/approvals'",
+        "GET '/api/chat'",
+        "GET '/api/notifications'",
+        "POST '/api/avatar'"
+      ],
+      "routeCandidates": [
+        "'/dashboard'",
+        "'/freelancer'",
+        "'/login'",
+        "g.href(r)",
+        "n.route"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 155,
-      "column": 17,
+      "line": 188,
+      "column": 9,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
       "kind": "action",
@@ -29715,6 +29825,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -29738,7 +29849,7 @@
     {
       "elementId": "component.components-shell.action.ong",
       "source": "components/Shell.jsx",
-      "line": 156,
+      "line": 189,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -29755,6 +29866,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -29778,7 +29890,7 @@
     {
       "elementId": "component.components-shell.action.truoc-mo",
       "source": "components/Shell.jsx",
-      "line": 159,
+      "line": 192,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "button",
@@ -29795,6 +29907,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -29818,7 +29931,7 @@
     {
       "elementId": "component.components-shell.action.ong.2",
       "source": "components/Shell.jsx",
-      "line": 197,
+      "line": 230,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -29835,6 +29948,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -29858,7 +29972,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 199,
+      "line": 232,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -29875,6 +29989,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -29898,7 +30013,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 200,
+      "line": 233,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -29915,6 +30030,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -29938,7 +30054,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so",
       "source": "components/Shell.jsx",
-      "line": 205,
+      "line": 238,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -29955,6 +30071,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -29980,7 +30097,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so.2",
       "source": "components/Shell.jsx",
-      "line": 215,
+      "line": 248,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -29997,6 +30114,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30022,7 +30140,7 @@
     {
       "elementId": "component.components-shell.navigation.item-href-item-key",
       "source": "components/Shell.jsx",
-      "line": 352,
+      "line": 393,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -30039,6 +30157,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30062,7 +30181,7 @@
     {
       "elementId": "component.components-shell.action.oi-anh-ai-dien",
       "source": "components/Shell.jsx",
-      "line": 362,
+      "line": 403,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -30079,6 +30198,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30102,7 +30222,7 @@
     {
       "elementId": "component.components-shell.form-control.input",
       "source": "components/Shell.jsx",
-      "line": 366,
+      "line": 407,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "input",
@@ -30119,6 +30239,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30144,7 +30265,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 380,
+      "line": 421,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -30161,6 +30282,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30184,7 +30306,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 383,
+      "line": 424,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -30201,6 +30323,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30224,7 +30347,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 392,
+      "line": 433,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -30241,6 +30364,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30267,7 +30391,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 395,
+      "line": 436,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -30284,6 +30408,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30307,7 +30432,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 400,
+      "line": 441,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -30324,6 +30449,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30347,7 +30473,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 403,
+      "line": 444,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -30364,6 +30490,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -30743,13 +30870,13 @@
   ],
   "summary": {
     "uiRoutes": 66,
-    "apiRoutes": 119,
-    "interactiveElements": 947,
+    "apiRoutes": 126,
+    "interactiveElements": 948,
     "sourceFilesWithInteractions": 95,
     "routesInPrimaryNavigation": 62,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 552,
+      "action": 553,
       "form-control": 310,
       "form-submit": 15,
       "navigation": 70
@@ -30806,15 +30933,15 @@
         "count": 20
       },
       {
+        "source": "components/Shell.jsx",
+        "count": 20
+      },
+      {
         "source": "app/(app)/ceo-registry/page.jsx",
         "count": 19
       },
       {
         "source": "app/(app)/invoices/page.jsx",
-        "count": 19
-      },
-      {
-        "source": "components/Shell.jsx",
         "count": 19
       },
       {

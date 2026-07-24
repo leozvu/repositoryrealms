@@ -8,6 +8,24 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { notify } from '@/lib/events';
 import { refreshCeoUnifiedDashboard } from '@/lib/ceo-unified-dashboard-admin';
+import { sendPushTickle, vapidConfigured } from '@/lib/webpush';
+
+// v3.40: sau khi tạo notification trong DB, đánh thức các thiết bị đã bật thông báo nền.
+// Push gửi rỗng; service worker tự lấy nội dung → không có dữ liệu nghiệp vụ ra ngoài.
+async function pushToDevices(userIds) {
+  if (!vapidConfigured() || !userIds.length) return 0;
+  const subs = await prisma.pushSubscription.findMany({ where: { userId: { in: userIds } } });
+  let sent = 0;
+  for (const sub of subs) {
+    const result = await sendPushTickle(sub.endpoint);
+    if (result.gone) { await prisma.pushSubscription.delete({ where: { id: sub.id } }).catch(() => {}); continue; }
+    if (result.ok) {
+      sent += 1;
+      await prisma.pushSubscription.update({ where: { id: sub.id }, data: { lastSentAt: new Date() } }).catch(() => {});
+    }
+  }
+  return sent;
+}
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -31,7 +49,7 @@ export async function GET(request) {
     select: { id: true },
   })).map(u => u.id);
 
-  const result = { refreshed: null, alerts: 0, digest: false, keyWarning: false };
+  const result = { refreshed: null, alerts: 0, digest: false, keyWarning: false, pushed: 0 };
   const nowVN = new Date(Date.now() + 7 * 3600_000); // giờ VN cho digest thứ Hai
 
   // 1. Force refresh toàn bộ snapshot
@@ -74,6 +92,11 @@ export async function GET(request) {
         '/ceo-security');
       result.keyWarning = true;
     }
+  }
+
+  // Có tin đáng chú ý thì đánh thức thiết bị (một lần cho cả cụm, tránh spam)
+  if (result.alerts > 0 || result.digest || result.keyWarning) {
+    result.pushed = await pushToDevices(directorIds);
   }
 
   return NextResponse.json({ ok: true, at: new Date().toISOString(), ...result });
