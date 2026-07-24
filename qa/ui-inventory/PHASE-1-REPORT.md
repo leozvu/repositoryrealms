@@ -5,7 +5,7 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 ## Phạm vi
 
 - UI routes: **66**
-- API routes: **127**
+- API routes: **128**
 - Interactive element definitions: **952**
 - Source files có interaction: **95**
 - Routes có ERP resource candidate: **42**

@@ -3441,6 +3441,38 @@
       }
     },
     {
+      "route": "/api/projects/apply-template",
+      "source": "app/api/projects/apply-template/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "Milestone",
+            "Phase",
+            "Project",
+            "ProjectTemplate",
+            "Task"
+          ],
+          "roles": [
+            "LEAD",
+            "PM"
+          ],
+          "guards": [
+            "currentUser",
+            "hasAny"
+          ],
+          "statuses": [
+            401,
+            403,
+            404
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/projects/stats",
       "source": "app/api/projects/stats/route.js",
       "methods": {
@@ -34038,7 +34070,7 @@
     {
       "elementId": "route.projects.form-control.tim-du-an",
       "source": "app/(app)/projects/page.jsx",
-      "line": 65,
+      "line": 63,
       "column": 69,
       "surface": "route.projects",
       "tag": "input",
@@ -34059,9 +34091,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -34105,7 +34135,7 @@
     {
       "elementId": "route.projects.form-control.tat-ca-trang-thai",
       "source": "app/(app)/projects/page.jsx",
-      "line": 66,
+      "line": 64,
       "column": 9,
       "surface": "route.projects",
       "tag": "select",
@@ -34126,9 +34156,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -34172,7 +34200,7 @@
     {
       "elementId": "route.projects.navigation.so-chi-huy",
       "source": "app/(app)/projects/page.jsx",
-      "line": 71,
+      "line": 69,
       "column": 20,
       "surface": "route.projects",
       "tag": "Link",
@@ -34193,9 +34221,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34237,7 +34263,7 @@
     {
       "elementId": "route.projects.action.them-du-an",
       "source": "app/(app)/projects/page.jsx",
-      "line": 72,
+      "line": 70,
       "column": 20,
       "surface": "route.projects",
       "tag": "button",
@@ -34258,9 +34284,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34302,7 +34326,7 @@
     {
       "elementId": "route.projects.navigation.projects-p-id",
       "source": "app/(app)/projects/page.jsx",
-      "line": 95,
+      "line": 93,
       "column": 23,
       "surface": "route.projects",
       "tag": "Link",
@@ -34323,9 +34347,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34367,7 +34389,7 @@
     {
       "elementId": "route.projects.action.tai-lieu-drive-notion",
       "source": "app/(app)/projects/page.jsx",
-      "line": 111,
+      "line": 109,
       "column": 23,
       "surface": "route.projects",
       "tag": "button",
@@ -34388,9 +34410,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34432,7 +34452,7 @@
     {
       "elementId": "route.projects.action.setmodal-mode-edit-row-p",
       "source": "app/(app)/projects/page.jsx",
-      "line": 112,
+      "line": 110,
       "column": 23,
       "surface": "route.projects",
       "tag": "button",
@@ -34453,9 +34473,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34497,7 +34515,7 @@
     {
       "elementId": "route.projects.action.setmodal-mode-del-row-p",
       "source": "app/(app)/projects/page.jsx",
-      "line": 113,
+      "line": 111,
       "column": 23,
       "surface": "route.projects",
       "tag": "button",
@@ -34518,9 +34536,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34562,7 +34578,7 @@
     {
       "elementId": "route.projects.form-control.khong-dung-mau",
       "source": "app/(app)/projects/page.jsx",
-      "line": 129,
+      "line": 127,
       "column": 51,
       "surface": "route.projects",
       "tag": "select",
@@ -34583,9 +34599,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -53523,7 +53537,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 136,
+          "line": 134,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -77539,7 +77553,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 137,
+          "line": 135,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -78732,7 +78746,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 137,
+          "line": 135,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -78745,7 +78759,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/projects/page.jsx",
-          "line": 137,
+          "line": 135,
           "surface": "route:/projects",
           "apiCalls": [
             "DELETE /api/data/projects/[id]"
@@ -80058,7 +80072,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80071,7 +80085,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80415,7 +80429,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -81154,7 +81167,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -81167,29 +81180,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -81197,7 +81200,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -81210,7 +81213,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -81855,6 +81858,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -81963,6 +81967,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -82013,13 +82018,10 @@
         "import:todayISO"
       ],
       "localMutations": [
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -82070,7 +82072,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -82809,7 +82810,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -82822,29 +82823,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -82852,7 +82843,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -82865,7 +82856,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -83510,6 +83501,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -83618,6 +83610,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -83669,13 +83662,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -83726,7 +83716,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -84465,7 +84454,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -84478,29 +84467,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -84508,7 +84487,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -84521,7 +84500,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -85166,6 +85145,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -85274,6 +85254,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -85325,13 +85306,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -85382,7 +85360,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -86121,7 +86098,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -86134,29 +86111,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -86164,7 +86131,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -86177,7 +86144,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -86822,6 +86789,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -86930,6 +86898,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -86981,13 +86950,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -87038,7 +87004,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -87777,7 +87742,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -87790,29 +87755,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -87820,7 +87775,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -87833,7 +87788,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -88478,6 +88433,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -88586,6 +88542,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -88637,13 +88594,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -88694,7 +88648,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -89433,7 +89386,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -89446,29 +89399,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -89476,7 +89419,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -89489,7 +89432,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -90134,6 +90077,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -90242,6 +90186,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -90293,13 +90238,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -90374,7 +90316,7 @@
   ],
   "summary": {
     "elements": 952,
-    "apiContracts": 127,
+    "apiContracts": 128,
     "registryResources": 50,
     "byActionType": {
       "local-state": 251,

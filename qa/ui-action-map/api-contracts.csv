@@ -121,6 +121,7 @@
 "/api/payroll","PUT","app/api/payroll/route.js","Attendance | AuditLog | Payroll | RealmGoldEntry | Setting | User","ACCOUNTANT | HR","currentUser | hasAny","explicit-rbac","false","true","400 | 401 | 403 | 404"
 "/api/payroll/[id]/finalize","POST","app/api/payroll/[id]/finalize/route.js","AuditLog | Payroll | Transaction","ACCOUNTANT | HR","currentUser | hasAny","explicit-rbac","false","true","400 | 401 | 403 | 404"
 "/api/projects/[id]/execution-health","GET","app/api/projects/[id]/execution-health/route.js","Invoice | Milestone | Phase | Project | Task | TimeLog | User | VendorBill | WorkQueueState","ACCOUNTANT | LEAD | PM","currentUser | hasAny | isFreelancer","explicit-rbac","false","true","400 | 401 | 403 | 404 | 500"
+"/api/projects/apply-template","POST","app/api/projects/apply-template/route.js","AuditLog | Milestone | Phase | Project | ProjectTemplate | Task","LEAD | PM","currentUser | hasAny","explicit-rbac","false","true","401 | 403 | 404"
 "/api/projects/stats","GET","app/api/projects/stats/route.js","Invoice | Milestone | Phase | Project | Task | TimeLog | User | VendorBill | WorkQueueState","ACCOUNTANT | LEAD | PM","currentUser | hasAny | isFreelancer","explicit-rbac","false","true","401 | 403"
 "/api/push/subscribe","POST","app/api/push/subscribe/route.js","PushSubscription","","currentUser","authenticated-custom","false","false","400 | 401"
 "/api/push/subscribe","DELETE","app/api/push/subscribe/route.js","PushSubscription","","currentUser","authenticated-custom","false","false","401"

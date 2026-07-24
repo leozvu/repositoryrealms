@@ -87,6 +87,7 @@
 "/api/payroll","app/api/payroll/route.js","false","GET | POST | PUT","unreviewed"
 "/api/payroll/[id]/finalize","app/api/payroll/[id]/finalize/route.js","true","POST","unreviewed"
 "/api/projects/[id]/execution-health","app/api/projects/[id]/execution-health/route.js","true","GET","unreviewed"
+"/api/projects/apply-template","app/api/projects/apply-template/route.js","false","POST","unreviewed"
 "/api/projects/stats","app/api/projects/stats/route.js","false","GET","unreviewed"
 "/api/push/subscribe","app/api/push/subscribe/route.js","false","POST | DELETE","unreviewed"
 "/api/quotes/[id]/convert","app/api/quotes/[id]/convert/route.js","true","POST","unreviewed"
