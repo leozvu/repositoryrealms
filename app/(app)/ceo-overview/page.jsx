@@ -121,7 +121,9 @@ export default function CeoOverviewPage() {
       if (!quiet) toast(body.error || c.loadError, 'error');
       return false;
     }
-    setDashboard(body);
+    // Giữ lại rings từ lần load trước: response của POST /refresh không kèm rings,
+    // nếu ghi đè nguyên khối thì banner chẩn đoán ring biến mất ngay sau lần tự làm mới.
+    setDashboard((previous) => ({ ...body, rings: body.rings || previous?.rings }));
     const partial = body.refresh?.failed > 0;
     setRefreshNotice(partial ? c.partialRefresh : '');
     if (!quiet) toast(partial ? c.partialRefresh : c.refreshSuccess, partial ? 'error' : 'success');

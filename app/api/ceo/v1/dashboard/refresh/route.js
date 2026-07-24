@@ -26,10 +26,15 @@ export async function POST(request) {
   }
   try {
     const body = await request.json().catch(() => ({}));
-    return NextResponse.json(await refreshCeoUnifiedDashboard(prisma, user, {
+    const model = await refreshCeoUnifiedDashboard(prisma, user, {
       entityId: body.entityId || 'all',
       force: body.force === true,
-    }), { headers });
+    });
+    // Kèm ring như GET /dashboard để banner chẩn đoán không mất sau mỗi lần làm mới
+    const rings = Object.fromEntries((await prisma.ceoRolloutState.findMany({
+      select: { entityId: true, currentRing: true, status: true },
+    })).map((row) => [row.entityId, { ring: row.currentRing, status: row.status }]));
+    return NextResponse.json({ ...model, rings }, { headers });
   } catch (error) {
     const status = error instanceof CeoDashboardError ? error.status : 503;
     const code = error instanceof CeoDashboardError ? error.code : 'ceo_dashboard_refresh_failed';
