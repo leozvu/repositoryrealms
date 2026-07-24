@@ -124,7 +124,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "mappingStatus": "unreviewed"
@@ -1760,6 +1761,15 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/api/attendance/punch",
+      "source": "app/api/attendance/punch/route.js",
+      "dynamic": false,
+      "methods": [
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/api/audit",
       "source": "app/api/audit/route.js",
       "dynamic": false,
@@ -3107,7 +3117,7 @@
     {
       "elementId": "route.attendance.action.label",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 62,
+      "line": 78,
       "column": 13,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -3127,7 +3137,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3135,7 +3146,7 @@
     {
       "elementId": "route.attendance.action.tan-ca",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 64,
+      "line": 80,
       "column": 72,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -3155,7 +3166,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3163,7 +3175,7 @@
     {
       "elementId": "route.attendance.form-control.select",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 73,
+      "line": 89,
       "column": 9,
       "surface": "route.attendance",
       "tag": "select",
@@ -3183,7 +3195,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -3193,7 +3206,7 @@
     {
       "elementId": "route.attendance.action.ngay-le",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 78,
+      "line": 94,
       "column": 18,
       "surface": "route.attendance",
       "tag": "button",
@@ -3213,7 +3226,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3221,7 +3235,7 @@
     {
       "elementId": "route.attendance.action.ghi-ot",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 79,
+      "line": 95,
       "column": 18,
       "surface": "route.attendance",
       "tag": "button",
@@ -3241,7 +3255,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3249,7 +3264,7 @@
     {
       "elementId": "route.attendance.action.xoa",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 115,
+      "line": 131,
       "column": 32,
       "surface": "route.attendance",
       "tag": "button",
@@ -3269,7 +3284,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3277,7 +3293,7 @@
     {
       "elementId": "route.attendance.action.ong",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 144,
+      "line": 160,
       "column": 62,
       "surface": "route.attendance",
       "tag": "button",
@@ -3297,7 +3313,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3305,7 +3322,7 @@
     {
       "elementId": "route.attendance.form-control.input",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 146,
+      "line": 162,
       "column": 9,
       "surface": "route.attendance",
       "tag": "input",
@@ -3325,7 +3342,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -3335,7 +3353,7 @@
     {
       "elementId": "route.attendance.form-control.ten-ngay-le-vd-quoc-khanh",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 147,
+      "line": 163,
       "column": 9,
       "surface": "route.attendance",
       "tag": "input",
@@ -3355,7 +3373,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -3365,7 +3384,7 @@
     {
       "elementId": "route.attendance.action.them",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 148,
+      "line": 164,
       "column": 9,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -3385,7 +3404,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3393,7 +3413,7 @@
     {
       "elementId": "route.attendance.action.setdeleting-h",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 153,
+      "line": 169,
       "column": 11,
       "surface": "route.attendance",
       "tag": "button",
@@ -3413,7 +3433,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3421,7 +3442,7 @@
     {
       "elementId": "route.attendance.action.huy",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 169,
+      "line": 185,
       "column": 17,
       "surface": "route.attendance",
       "tag": "button",
@@ -3441,7 +3462,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3449,7 +3471,7 @@
     {
       "elementId": "route.attendance.action.luu-ot",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 170,
+      "line": 186,
       "column": 9,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -3469,7 +3491,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -3477,7 +3500,7 @@
     {
       "elementId": "route.attendance.form-control.chon",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 173,
+      "line": 189,
       "column": 11,
       "surface": "route.attendance",
       "tag": "select",
@@ -3497,7 +3520,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -3507,7 +3531,7 @@
     {
       "elementId": "route.attendance.form-control.input.2",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 177,
+      "line": 193,
       "column": 51,
       "surface": "route.attendance",
       "tag": "input",
@@ -3527,7 +3551,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -3537,7 +3562,7 @@
     {
       "elementId": "route.attendance.form-control.input.3",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 178,
+      "line": 194,
       "column": 56,
       "surface": "route.attendance",
       "tag": "input",
@@ -3557,7 +3582,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -16223,7 +16249,7 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 154,
+      "line": 156,
       "column": 7,
       "surface": "route.settings",
       "tag": "input",
@@ -16259,7 +16285,7 @@
     {
       "elementId": "route.settings.form-control.digital-ads-social-media-seeding-livestream",
       "source": "app/(app)/settings/page.jsx",
-      "line": 174,
+      "line": 176,
       "column": 15,
       "surface": "route.settings",
       "tag": "textarea",
@@ -16293,9 +16319,81 @@
       ]
     },
     {
+      "elementId": "route.settings.form-control.khong-siet-chi-ghi-nhan-noi-bam-canh-bao-van-cho-bam-ghi-chu-neu",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 189,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Không siết — chỉ ghi nhận nơi bấm / Cảnh báo — vẫn cho bấm, ghi chú nếu ngoài mạng công ty / Chặn — khai \"đi làm\" phải bấm trong mạng công ty",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.113-161-10-27-72-88-145",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 197,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "113.161.10. 27.72.88.145",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 193,
+      "line": 211,
       "column": 17,
       "surface": "route.settings",
       "tag": "input",
@@ -16331,7 +16429,7 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 202,
+      "line": 220,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -16367,7 +16465,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 218,
+      "line": 236,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -16401,7 +16499,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 221,
+      "line": 239,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -16435,7 +16533,7 @@
     {
       "elementId": "route.settings.form-control.input.4",
       "source": "app/(app)/settings/page.jsx",
-      "line": 231,
+      "line": 249,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -16471,7 +16569,7 @@
     {
       "elementId": "route.settings.form-control.input.5",
       "source": "app/(app)/settings/page.jsx",
-      "line": 255,
+      "line": 273,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -16507,7 +16605,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 259,
+      "line": 277,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -16541,7 +16639,7 @@
     {
       "elementId": "route.settings.form-control.sk-or-v1-tao-tai-openrouter-ai-keys",
       "source": "app/(app)/settings/page.jsx",
-      "line": 269,
+      "line": 287,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -16577,7 +16675,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 273,
+      "line": 291,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -16611,7 +16709,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 291,
+      "line": 309,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -16645,7 +16743,7 @@
     {
       "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 294,
+      "line": 312,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -30870,20 +30968,20 @@
   ],
   "summary": {
     "uiRoutes": 66,
-    "apiRoutes": 126,
-    "interactiveElements": 948,
+    "apiRoutes": 127,
+    "interactiveElements": 950,
     "sourceFilesWithInteractions": 95,
     "routesInPrimaryNavigation": 62,
     "routesWithResourceCandidates": 42,
     "byKind": {
       "action": 553,
-      "form-control": 310,
+      "form-control": 312,
       "form-submit": 15,
       "navigation": 70
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 260,
+      "control_binding_unverified": 262,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 52
     },
@@ -30901,12 +30999,12 @@
         "count": 30
       },
       {
-        "source": "app/(app)/teamwork/page.jsx",
-        "count": 26
+        "source": "app/(app)/settings/page.jsx",
+        "count": 27
       },
       {
-        "source": "app/(app)/settings/page.jsx",
-        "count": 25
+        "source": "app/(app)/teamwork/page.jsx",
+        "count": 26
       },
       {
         "source": "app/(app)/automation/page.jsx",

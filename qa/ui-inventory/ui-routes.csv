@@ -3,7 +3,7 @@
 "/analytics","app/(app)/analytics/page.jsx","false","authenticated","true","Analytics (MRR/LTV)","Công ty","DIRECTOR | ACCOUNTANT | AM | PM","analytics","clients | csat | invoices | leads | nps | transactions","","","unreviewed"
 "/approvals","app/(app)/approvals/page.jsx","false","authenticated","true","Phê duyệt","Tổng quan","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","","GET '/api/approvals' | POST `/api/approvals/${ap.id}/decide`","","unreviewed"
 "/assets","app/(app)/assets/page.jsx","false","authenticated","true","Tài sản","Công ty","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","assets | users","","","unreviewed"
-"/attendance","app/(app)/attendance/page.jsx","false","authenticated","true","Chấm công ngày","Nhân sự","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","attendance | holidays | users","GET '/api/settings'","","unreviewed"
+"/attendance","app/(app)/attendance/page.jsx","false","authenticated","true","Chấm công ngày","Nhân sự","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","attendance | holidays | users","GET '/api/settings' | POST '/api/attendance/punch'","","unreviewed"
 "/audit","app/(app)/audit/page.jsx","false","authenticated","true","Nhật ký hệ thống","Công ty","DIRECTOR","","","GET '/api/audit'","","unreviewed"
 "/automation","app/(app)/automation/page.jsx","false","authenticated","true","Tự động hóa","Công ty","DIRECTOR","","rules | users","","","unreviewed"
 "/calendar","app/(app)/calendar/page.jsx","false","authenticated","true","Lịch làm việc","Tổng quan","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","activities | contracts | invoices | leaves | projects | tasks | users","GET '/api/ics'","","unreviewed"

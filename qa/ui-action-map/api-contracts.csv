@@ -5,6 +5,7 @@
 "/api/apikeys","DELETE","app/api/apikeys/route.js","ApiKey | AuditLog","","currentUser | isDirector","explicit-rbac","false","false","401 | 403"
 "/api/approvals","GET","app/api/approvals/route.js","Approval","ACCOUNTANT | AM | PM | STAFF","currentUser | isDirector","explicit-rbac","false","true","401"
 "/api/approvals/[id]/decide","POST","app/api/approvals/[id]/decide/route.js","Approval | AuditLog | CollaborationPresenceSession | Conversation | Lead | Leave | Message | Notification | Onboarding | Project | Quote | RealmChangeEvent | RealmGoldEntry | Rule | Setting | Task | TaskEvent | Ticket | Transaction | User | VendorBill | Webhook","ACCOUNTANT | AM | DIRECTOR | HR | PM | STAFF","currentUser | isDirector | isFreelancer","explicit-rbac","false","true","400 | 401 | 403 | 409 | 500 | 503"
+"/api/attendance/punch","POST","app/api/attendance/punch/route.js","Attendance | AuditLog | Setting","","currentUser","authenticated-custom","false","false","401 | 403"
 "/api/audit","GET","app/api/audit/route.js","AuditLog","","currentUser | isDirector","explicit-rbac","false","false","401 | 403"
 "/api/auth/[...nextauth]","GET","app/api/auth/[...nextauth]/route.js","","","","public-or-unverified","false","false",""
 "/api/auth/[...nextauth]","POST","app/api/auth/[...nextauth]/route.js","","","","public-or-unverified","false","false",""

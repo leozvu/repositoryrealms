@@ -167,6 +167,30 @@
       }
     },
     {
+      "route": "/api/attendance/punch",
+      "source": "app/api/attendance/punch/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "Attendance",
+            "AuditLog",
+            "Setting"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser"
+          ],
+          "statuses": [
+            401,
+            403
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": false
+        }
+      }
+    },
+    {
       "route": "/api/audit",
       "source": "app/api/audit/route.js",
       "methods": {
@@ -7163,7 +7187,7 @@
     {
       "elementId": "route.attendance.action.label",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 62,
+      "line": 78,
       "column": 13,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -7183,7 +7207,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7193,19 +7218,19 @@
       "mappingConfidence": "high",
       "handlerChain": [
         "clockIn",
-        "nowHM"
+        "nowHM",
+        "punch"
       ],
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [
-        "POST /api/data/attendance",
-        "PUT /api/data/attendance/[id]"
+        "GET /api/data/attendance",
+        "POST /api/attendance/punch"
       ],
       "resourceOperations": [
-        "create:attendance",
-        "update:attendance"
+        "read:attendance"
       ],
       "contextResources": [
         "attendance",
@@ -7213,28 +7238,9 @@
         "users"
       ],
       "prismaModels": [
-        "Approval",
         "Attendance",
         "AuditLog",
-        "Conversation",
-        "Lead",
-        "Leave",
-        "Message",
-        "Notification",
-        "Onboarding",
-        "Project",
-        "Quote",
-        "RealmChangeEvent",
-        "RealmGoldEntry",
-        "Rule",
-        "Setting",
-        "Task",
-        "TaskEvent",
-        "Team",
-        "Transaction",
-        "User",
-        "VendorBill",
-        "Webhook"
+        "Setting"
       ],
       "contextModels": [
         "Attendance",
@@ -7242,6 +7248,7 @@
         "User"
       ],
       "permissionPolicies": [
+        "authenticated-custom",
         "registry-rbac"
       ],
       "allowedRoles": [
@@ -7253,12 +7260,10 @@
         "PM",
         "STAFF"
       ],
-      "rowPolicy": true,
-      "scopedRead": false,
+      "rowPolicy": false,
+      "scopedRead": true,
       "browserActions": [],
-      "helperCalls": [
-        "import:todayISO"
-      ],
+      "helperCalls": [],
       "localMutations": [],
       "loadingState": "async-button-guard",
       "successState": "hook-refresh",
@@ -7269,7 +7274,7 @@
     {
       "elementId": "route.attendance.action.tan-ca",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 64,
+      "line": 80,
       "column": 72,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -7289,7 +7294,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7299,17 +7305,18 @@
       "mappingConfidence": "high",
       "handlerChain": [
         "clockOut",
-        "nowHM"
+        "punch"
       ],
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [
-        "PUT /api/data/attendance/[id]"
+        "GET /api/data/attendance",
+        "POST /api/attendance/punch"
       ],
       "resourceOperations": [
-        "update:attendance"
+        "read:attendance"
       ],
       "contextResources": [
         "attendance",
@@ -7317,28 +7324,9 @@
         "users"
       ],
       "prismaModels": [
-        "Approval",
         "Attendance",
         "AuditLog",
-        "Conversation",
-        "Lead",
-        "Leave",
-        "Message",
-        "Notification",
-        "Onboarding",
-        "Project",
-        "Quote",
-        "RealmChangeEvent",
-        "RealmGoldEntry",
-        "Rule",
-        "Setting",
-        "Task",
-        "TaskEvent",
-        "Team",
-        "Transaction",
-        "User",
-        "VendorBill",
-        "Webhook"
+        "Setting"
       ],
       "contextModels": [
         "Attendance",
@@ -7346,6 +7334,7 @@
         "User"
       ],
       "permissionPolicies": [
+        "authenticated-custom",
         "registry-rbac"
       ],
       "allowedRoles": [
@@ -7357,8 +7346,8 @@
         "PM",
         "STAFF"
       ],
-      "rowPolicy": true,
-      "scopedRead": false,
+      "rowPolicy": false,
+      "scopedRead": true,
       "browserActions": [],
       "helperCalls": [],
       "localMutations": [],
@@ -7371,7 +7360,7 @@
     {
       "elementId": "route.attendance.form-control.select",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 73,
+      "line": 89,
       "column": 9,
       "surface": "route.attendance",
       "tag": "select",
@@ -7391,7 +7380,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -7435,7 +7425,7 @@
     {
       "elementId": "route.attendance.action.ngay-le",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 78,
+      "line": 94,
       "column": 18,
       "surface": "route.attendance",
       "tag": "button",
@@ -7455,7 +7445,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7497,7 +7488,7 @@
     {
       "elementId": "route.attendance.action.ghi-ot",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 79,
+      "line": 95,
       "column": 18,
       "surface": "route.attendance",
       "tag": "button",
@@ -7517,7 +7508,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7559,7 +7551,7 @@
     {
       "elementId": "route.attendance.action.xoa",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 115,
+      "line": 131,
       "column": 32,
       "surface": "route.attendance",
       "tag": "button",
@@ -7579,7 +7571,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7621,7 +7614,7 @@
     {
       "elementId": "route.attendance.action.ong",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 144,
+      "line": 160,
       "column": 62,
       "surface": "route.attendance",
       "tag": "button",
@@ -7641,7 +7634,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7657,7 +7651,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 124,
+          "line": 140,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -7701,7 +7695,7 @@
     {
       "elementId": "route.attendance.form-control.input",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 146,
+      "line": 162,
       "column": 9,
       "surface": "route.attendance",
       "tag": "input",
@@ -7721,7 +7715,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -7765,7 +7760,7 @@
     {
       "elementId": "route.attendance.form-control.ten-ngay-le-vd-quoc-khanh",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 147,
+      "line": 163,
       "column": 9,
       "surface": "route.attendance",
       "tag": "input",
@@ -7785,7 +7780,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -7829,7 +7825,7 @@
     {
       "elementId": "route.attendance.action.them",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 148,
+      "line": 164,
       "column": 9,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -7849,7 +7845,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7928,7 +7925,7 @@
     {
       "elementId": "route.attendance.action.setdeleting-h",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 153,
+      "line": 169,
       "column": 11,
       "surface": "route.attendance",
       "tag": "button",
@@ -7948,7 +7945,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7990,7 +7988,7 @@
     {
       "elementId": "route.attendance.action.huy",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 169,
+      "line": 185,
       "column": 17,
       "surface": "route.attendance",
       "tag": "button",
@@ -8010,7 +8008,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -8026,7 +8025,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 125,
+          "line": 141,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -8070,7 +8069,7 @@
     {
       "elementId": "route.attendance.action.luu-ot",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 170,
+      "line": 186,
       "column": 9,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -8090,7 +8089,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -8107,7 +8107,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 125,
+          "line": 141,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -8120,7 +8120,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 125,
+          "line": 141,
           "surface": "route:/attendance",
           "apiCalls": [
             "POST /api/data/attendance",
@@ -8207,7 +8207,7 @@
     {
       "elementId": "route.attendance.form-control.chon",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 173,
+      "line": 189,
       "column": 11,
       "surface": "route.attendance",
       "tag": "select",
@@ -8227,7 +8227,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -8271,7 +8272,7 @@
     {
       "elementId": "route.attendance.form-control.input.2",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 177,
+      "line": 193,
       "column": 51,
       "surface": "route.attendance",
       "tag": "input",
@@ -8291,7 +8292,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -8335,7 +8337,7 @@
     {
       "elementId": "route.attendance.form-control.input.3",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 178,
+      "line": 194,
       "column": 56,
       "surface": "route.attendance",
       "tag": "input",
@@ -8355,7 +8357,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -37980,7 +37983,7 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 154,
+      "line": 156,
       "column": 7,
       "surface": "route.settings",
       "tag": "input",
@@ -38046,7 +38049,7 @@
     {
       "elementId": "route.settings.form-control.digital-ads-social-media-seeding-livestream",
       "source": "app/(app)/settings/page.jsx",
-      "line": 174,
+      "line": 176,
       "column": 15,
       "surface": "route.settings",
       "tag": "textarea",
@@ -38110,9 +38113,141 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "route.settings.form-control.khong-siet-chi-ghi-nhan-noi-bam-canh-bao-van-cho-bam-ghi-chu-neu",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 189,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Không siết — chỉ ghi nhận nơi bấm / Cảnh báo — vẫn cho bấm, ghi chú nếu ngoài mạng công ty / Chặn — khai \"đi làm\" phải bấm trong mạng công ty",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "SettingsPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.113-161-10-27-72-88-145",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 197,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "113.161.10. 27.72.88.145",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "SettingsPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 193,
+      "line": 211,
       "column": 17,
       "surface": "route.settings",
       "tag": "input",
@@ -38178,7 +38313,7 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 202,
+      "line": 220,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -38244,7 +38379,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 218,
+      "line": 236,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -38308,7 +38443,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 221,
+      "line": 239,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -38372,7 +38507,7 @@
     {
       "elementId": "route.settings.form-control.input.4",
       "source": "app/(app)/settings/page.jsx",
-      "line": 231,
+      "line": 249,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -38438,7 +38573,7 @@
     {
       "elementId": "route.settings.form-control.input.5",
       "source": "app/(app)/settings/page.jsx",
-      "line": 255,
+      "line": 273,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -38504,7 +38639,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 259,
+      "line": 277,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -38581,7 +38716,7 @@
     {
       "elementId": "route.settings.form-control.sk-or-v1-tao-tai-openrouter-ai-keys",
       "source": "app/(app)/settings/page.jsx",
-      "line": 269,
+      "line": 287,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -38647,7 +38782,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 273,
+      "line": 291,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -38682,7 +38817,8 @@
       "actionType": "data-action",
       "mappingConfidence": "high",
       "handlerChain": [
-        "save"
+        "save",
+        "toList"
       ],
       "delegatedCallbacks": [],
       "delegatedBindings": [],
@@ -38720,7 +38856,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 291,
+      "line": 309,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -38786,7 +38922,7 @@
     {
       "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 294,
+      "line": 312,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -74002,6 +74138,7 @@
         "openRound",
         "payNow",
         "postAction",
+        "punch",
         "quickLog",
         "readAll",
         "reconcile",
@@ -74026,6 +74163,7 @@
         "subscribePush",
         "suspend",
         "sync",
+        "toList",
         "toast",
         "toggle",
         "toggleKey",
@@ -74048,32 +74186,14 @@
         {
           "callback": "onClick",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 62,
+          "line": 78,
           "surface": "route:/attendance",
           "apiCalls": [
-            "POST /api/data/attendance",
-            "PUT /api/data/attendance/[id]"
+            "GET /api/data/attendance",
+            "POST /api/attendance/punch"
           ],
           "resourceOperations": [
-            "create:attendance",
-            "update:attendance"
-          ],
-          "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
-          "localState": []
-        },
-        {
-          "callback": "onClick",
-          "source": "app/(app)/attendance/page.jsx",
-          "line": 64,
-          "surface": "route:/attendance",
-          "apiCalls": [
-            "PUT /api/data/attendance/[id]"
-          ],
-          "resourceOperations": [
-            "update:attendance"
+            "read:attendance"
           ],
           "routeTargets": [],
           "helperCalls": [],
@@ -74082,7 +74202,23 @@
         {
           "callback": "onClick",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 148,
+          "line": 80,
+          "surface": "route:/attendance",
+          "apiCalls": [
+            "GET /api/data/attendance",
+            "POST /api/attendance/punch"
+          ],
+          "resourceOperations": [
+            "read:attendance"
+          ],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/attendance/page.jsx",
+          "line": 164,
           "surface": "route:/attendance",
           "apiCalls": [
             "POST /api/data/holidays"
@@ -74099,7 +74235,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 170,
+          "line": 186,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -74866,7 +75002,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 259,
+          "line": 277,
           "surface": "route:/settings",
           "apiCalls": [
             "POST /api/email/send",
@@ -74880,7 +75016,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 273,
+          "line": 291,
           "surface": "route:/settings",
           "apiCalls": [
             "PUT /api/settings"
@@ -75495,6 +75631,7 @@
         "GET /api/ceo/v1/messaging/directory",
         "GET /api/ceo/v1/rollout",
         "GET /api/ceo/v1/security/control-plane",
+        "GET /api/data/attendance",
         "GET /api/data/payouts",
         "GET /api/freelancer/home",
         "GET /api/notifications",
@@ -75506,6 +75643,7 @@
         "PATCH /api/realm-demo/feedback",
         "PATCH /api/realm-demo/pilot",
         "POST /api/apikeys",
+        "POST /api/attendance/punch",
         "POST /api/ceo/v1/command-gateway/*/reconcile",
         "POST /api/ceo/v1/dashboard/refresh",
         "POST /api/ceo/v1/identity/recovery",
@@ -75524,7 +75662,6 @@
         "POST /api/ceo/v1/sso/authorize",
         "POST /api/chat",
         "POST /api/data/activities",
-        "POST /api/data/attendance",
         "POST /api/data/clients",
         "POST /api/data/commissions",
         "POST /api/data/doclinks",
@@ -75546,7 +75683,6 @@
         "PUT /api/apikeys",
         "PUT /api/ceo/v1/federation/policy",
         "PUT /api/data/activities/[id]",
-        "PUT /api/data/attendance/[id]",
         "PUT /api/data/commissions/[id]",
         "PUT /api/data/rules/[id]",
         "PUT /api/data/tasks/[id]",
@@ -75558,7 +75694,6 @@
       ],
       "resourceOperations": [
         "create:activities",
-        "create:attendance",
         "create:clients",
         "create:commissions",
         "create:doclinks",
@@ -75568,9 +75703,9 @@
         "create:taskcomments",
         "create:timelogs",
         "create:webhooks",
+        "read:attendance",
         "read:payouts",
         "update:activities",
-        "update:attendance",
         "update:commissions",
         "update:rules",
         "update:tasks",
@@ -75649,7 +75784,7 @@
         "STAFF"
       ],
       "rowPolicy": true,
-      "scopedRead": false,
+      "scopedRead": true,
       "browserActions": [
         "navigator.clipboard.writeText",
         "navigator.userAgent.slice",
@@ -75722,7 +75857,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 144,
+          "line": 160,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -75733,7 +75868,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 168,
+          "line": 184,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76300,7 +76435,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 144,
+          "line": 160,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76311,7 +76446,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 168,
+          "line": 184,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76903,7 +77038,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 132,
+          "line": 148,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76916,7 +77051,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 157,
+          "line": 173,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -77712,7 +77847,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 132,
+          "line": 148,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -77725,7 +77860,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 132,
+          "line": 148,
           "surface": "route:/attendance",
           "apiCalls": [
             "DELETE /api/data/attendance/[id]"
@@ -77740,7 +77875,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 157,
+          "line": 173,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -77753,7 +77888,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 157,
+          "line": 173,
           "surface": "route:/attendance",
           "apiCalls": [
             "DELETE /api/data/holidays/[id]"
@@ -90049,26 +90184,26 @@
     }
   ],
   "summary": {
-    "elements": 948,
-    "apiContracts": 126,
+    "elements": 950,
+    "apiContracts": 127,
     "registryResources": 50,
     "byActionType": {
       "local-state": 251,
       "data-action": 175,
-      "form-control": 310,
+      "form-control": 312,
       "delegated-action": 84,
       "navigation": 90,
       "browser-action": 30,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 632,
+      "classified-local": 634,
       "delegated-resolved": 48,
       "handler-resolved": 184,
       "delegated": 84
     },
     "byConfidence": {
-      "high": 900,
+      "high": 902,
       "medium": 48
     },
     "uxStateCandidates": {},

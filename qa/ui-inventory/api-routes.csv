@@ -2,6 +2,7 @@
 "/api/apikeys","app/api/apikeys/route.js","false","GET | POST | PUT | DELETE","unreviewed"
 "/api/approvals","app/api/approvals/route.js","false","GET","unreviewed"
 "/api/approvals/[id]/decide","app/api/approvals/[id]/decide/route.js","true","POST","unreviewed"
+"/api/attendance/punch","app/api/attendance/punch/route.js","false","POST","unreviewed"
 "/api/audit","app/api/audit/route.js","false","GET","unreviewed"
 "/api/auth/[...nextauth]","app/api/auth/[...nextauth]/route.js","true","GET | POST","unreviewed"
 "/api/avatar","app/api/avatar/route.js","false","POST | DELETE","unreviewed"

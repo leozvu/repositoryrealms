@@ -5,8 +5,8 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 ## Phạm vi
 
 - UI routes: **66**
-- API routes: **126**
-- Interactive element definitions: **948**
+- API routes: **127**
+- Interactive element definitions: **950**
 - Source files có interaction: **95**
 - Routes có ERP resource candidate: **42**
 - Parse errors: **0**
@@ -16,7 +16,7 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 | Loại | Số lượng |
 | --- | --- |
 | action | 553 |
-| form-control | 310 |
+| form-control | 312 |
 | form-submit | 15 |
 | navigation | 70 |
 
@@ -25,7 +25,7 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 | Candidate | Số lượng |
 | --- | --- |
 | clickable_non_semantic | 18 |
-| control_binding_unverified | 260 |
+| control_binding_unverified | 262 |
 | keyboard_path_unverified | 18 |
 | unlabelled_button_candidate | 52 |
 
@@ -36,12 +36,12 @@ Các candidate ưu tiên accessibility, keyboard, semantic control và possible 
 | Element ID | Source | Nhãn | Candidates |
 | --- | --- | --- | --- |
 | route.analytics.action.setmodal-mode-del-row-r | app/(app)/analytics/page.jsx:168 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.attendance.form-control.select | app/(app)/attendance/page.jsx:73 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.attendance.form-control.input | app/(app)/attendance/page.jsx:146 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.attendance.form-control.ten-ngay-le-vd-quoc-khanh | app/(app)/attendance/page.jsx:147 | Tên ngày lễ (VD: Quốc khánh) | control_binding_unverified |
-| route.attendance.form-control.chon | app/(app)/attendance/page.jsx:173 | — Chọn — | control_binding_unverified |
-| route.attendance.form-control.input.2 | app/(app)/attendance/page.jsx:177 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.attendance.form-control.input.3 | app/(app)/attendance/page.jsx:178 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.attendance.form-control.select | app/(app)/attendance/page.jsx:89 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.attendance.form-control.input | app/(app)/attendance/page.jsx:162 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.attendance.form-control.ten-ngay-le-vd-quoc-khanh | app/(app)/attendance/page.jsx:163 | Tên ngày lễ (VD: Quốc khánh) | control_binding_unverified |
+| route.attendance.form-control.chon | app/(app)/attendance/page.jsx:189 | — Chọn — | control_binding_unverified |
+| route.attendance.form-control.input.2 | app/(app)/attendance/page.jsx:193 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.attendance.form-control.input.3 | app/(app)/attendance/page.jsx:194 | (không có nhãn tĩnh) | control_binding_unverified |
 | route.audit.form-control.tim-theo-nguoi-oi-tuong | app/(app)/audit/page.jsx:37 | Tìm theo người, đối tượng… | control_binding_unverified |
 | route.automation.form-control.vd-bao-tin-khi-thang-deal | app/(app)/automation/page.jsx:37 | VD: Báo tin khi thắng deal | control_binding_unverified |
 | route.automation.form-control.select | app/(app)/automation/page.jsx:40 | (không có nhãn tĩnh) | control_binding_unverified |

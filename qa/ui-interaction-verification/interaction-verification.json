@@ -45,7 +45,7 @@
     {
       "elementId": "route.attendance.action.label",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 62,
+      "line": 78,
       "label": "{label}",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -57,7 +57,7 @@
     {
       "elementId": "route.attendance.action.tan-ca",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 64,
+      "line": 80,
       "label": "🚪 Tan ca",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -69,7 +69,7 @@
     {
       "elementId": "route.attendance.action.them",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 148,
+      "line": 164,
       "label": "Thêm",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -81,7 +81,7 @@
     {
       "elementId": "route.attendance.action.luu-ot",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 170,
+      "line": 186,
       "label": "Lưu OT",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -885,7 +885,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 259,
+      "line": 277,
       "label": "Lưu & gửi email thử tới chính hộp thư này",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -897,7 +897,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 273,
+      "line": 291,
       "label": "Lưu cài đặt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
