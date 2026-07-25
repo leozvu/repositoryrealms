@@ -9,8 +9,8 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 139,
-    "asyncButtonGuards": 73,
+    "guardedActions": 140,
+    "asyncButtonGuards": 74,
     "disabledBindings": 62,
     "localPendingStates": 4,
     "destructiveFlows": 6,
@@ -45,7 +45,7 @@
     {
       "elementId": "route.attendance.action.label",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 62,
+      "line": 78,
       "label": "{label}",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -57,7 +57,7 @@
     {
       "elementId": "route.attendance.action.tan-ca",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 64,
+      "line": 80,
       "label": "🚪 Tan ca",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -69,7 +69,7 @@
     {
       "elementId": "route.attendance.action.them",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 148,
+      "line": 164,
       "label": "Thêm",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -81,7 +81,7 @@
     {
       "elementId": "route.attendance.action.luu-ot",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 170,
+      "line": 186,
       "label": "Lưu OT",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -153,7 +153,7 @@
     {
       "elementId": "route.ceo-inbox.action.sync",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 149,
+      "line": 163,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -165,7 +165,7 @@
     {
       "elementId": "route.ceo-inbox.form-submit.form",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 157,
+      "line": 171,
       "label": "—",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -177,7 +177,7 @@
     {
       "elementId": "route.ceo-inbox.action.button",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 162,
+      "line": 176,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -189,7 +189,7 @@
     {
       "elementId": "route.ceo-inbox.action.refresh",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 174,
+      "line": 188,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -201,7 +201,7 @@
     {
       "elementId": "route.ceo-inbox.action.reconcile-message",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 177,
+      "line": 191,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -213,7 +213,7 @@
     {
       "elementId": "route.ceo-inbox.action.button.2",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 179,
+      "line": 193,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -225,7 +225,7 @@
     {
       "elementId": "route.ceo-inbox.form-submit.send",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 179,
+      "line": 193,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -237,7 +237,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 182,
+      "line": 186,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -885,7 +885,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 259,
+      "line": 303,
       "label": "Lưu & gửi email thử tới chính hộp thư này",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -897,7 +897,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 273,
+      "line": 317,
       "label": "Lưu cài đặt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1245,7 +1245,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.go-cua-erp-nguoi-nhan-ang-offline-loi-nhan-van-uoc-luu-trong-not",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2307,
+      "line": 2306,
       "label": "Gõ cửa ERP / Người nhận đang offline; lời nhắn vẫn được lưu trong Notification và Lantern Mail.",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1257,7 +1257,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2320,
+      "line": 2319,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1269,7 +1269,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2351,
+      "line": 2350,
       "label": "Tên hiển thị / Class trong Realm / Màu huy hiệu / Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1281,7 +1281,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2372,
+      "line": 2371,
       "label": "Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1293,7 +1293,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2408,
+      "line": 2407,
       "label": "Nhận / Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1305,7 +1305,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 3022,
+      "line": 3021,
       "label": "Đang ghi… / Ghi nhận Gold",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1615,9 +1615,21 @@
       "status": "verified"
     },
     {
+      "elementId": "component.components-shell.action.bat-thong-bao-thiet-bi",
+      "source": "components/Shell.jsx",
+      "line": 177,
+      "label": "Bật thông báo thiết bị",
+      "actionType": "data-action",
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 155,
+      "line": 188,
       "label": "Đọc tất cả",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1629,7 +1641,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 199,
+      "line": 232,
       "label": "Tắt 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1641,7 +1653,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 200,
+      "line": 233,
       "label": "Bật 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1653,7 +1665,7 @@
     {
       "elementId": "component.components-ui.action.ang-xu-ly",
       "source": "components/ui.jsx",
-      "line": 221,
+      "line": 242,
       "label": "Đang xử lý…",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1665,7 +1677,7 @@
     {
       "elementId": "component.components-ui.action.ang-luu-luu",
       "source": "components/ui.jsx",
-      "line": 268,
+      "line": 289,
       "label": "Đang lưu… / Lưu",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -1677,7 +1689,7 @@
     {
       "elementId": "component.components-ui.form-submit.e-e-preventdefault-submit",
       "source": "components/ui.jsx",
-      "line": 272,
+      "line": 293,
       "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",

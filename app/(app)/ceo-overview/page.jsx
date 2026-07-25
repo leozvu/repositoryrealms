@@ -121,7 +121,9 @@ export default function CeoOverviewPage() {
       if (!quiet) toast(body.error || c.loadError, 'error');
       return false;
     }
-    setDashboard(body);
+    // Giữ lại rings từ lần load trước: response của POST /refresh không kèm rings,
+    // nếu ghi đè nguyên khối thì banner chẩn đoán ring biến mất ngay sau lần tự làm mới.
+    setDashboard((previous) => ({ ...body, rings: body.rings || previous?.rings }));
     const partial = body.refresh?.failed > 0;
     setRefreshNotice(partial ? c.partialRefresh : '');
     if (!quiet) toast(partial ? c.partialRefresh : c.refreshSuccess, partial ? 'error' : 'success');
@@ -137,7 +139,9 @@ export default function CeoOverviewPage() {
         refresh(filter, true);
       }
     });
-    return () => { active = false; };
+    // Đợt 1: tự làm mới mỗi 5 phút khi CEO đang mở Tổng quan — số liệu sống mà không cần bấm
+    const timer = setInterval(() => { refresh(filter, true).then(() => load(filter)); }, 5 * 60_000);
+    return () => { active = false; clearInterval(timer); };
   }, [filter, load, loadIdentity, refresh, sessionStatus]);
 
   const entityOptions = useMemo(() => {
@@ -197,6 +201,19 @@ export default function CeoOverviewPage() {
       </nav>
 
       {(refreshNotice || dashboard?.health?.stale > 0) && <div className={styles.notice} role="status"><Icon name="alert" size={18} /><span>{refreshNotice || c.staleNotice}</span></div>}
+      {/* Đợt 1: banner chẩn đoán ring — giải thích công ty nào đang ở mức quyền nào */}
+      {dashboard?.rings && (
+        <div className={styles.notice} role="note" style={{ opacity: .9 }}>
+          <Icon name="shield" size={16} />
+          <span>
+            Mức quyền hiện tại: {Object.entries(dashboard.rings)
+              .filter(([id]) => id !== 'fretas')
+              .map(([id, r]) => `${id} = ${r.ring}${r.status !== 'active' ? ` (${r.status})` : ''}`)
+              .join(' · ')}
+            {' — '}ring quyết định trang nào có dữ liệu: read_only=Tổng quan · ceo_sso=Bản đồ/SSO · messaging=Hộp thư · commands=Điều phối.
+          </span>
+        </div>
+      )}
       {error && <div className={styles.error} role="alert"><Icon name="alert" size={18} /><span>{error}</span><button type="button" className="btn btn-outline" onClick={() => load(filter)}>{c.retry}</button></div>}
       {!dashboard && !error && <div className={styles.loading} role="status">{c.loading}</div>}
 

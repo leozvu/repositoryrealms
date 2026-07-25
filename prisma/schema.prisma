@@ -750,6 +750,16 @@ model Attendance {
   otHours  Float   @default(0) // v3.11: giờ làm thêm
   note     String?
 
+  // v3.41 (Chương 1 — chấm công chặt): bằng chứng NGỮ CẢNH của lần bấm.
+  // Feedback Egoric 07/2026: "nhân viên nhấn ở đâu cũng được, đang đi du lịch vẫn chấm
+  // công". Nay mỗi lần bấm ghi lại nơi bấm để quản lý nhìn thấy sự thật; công ty chọn
+  // mức siết trong Cài đặt (ghi nhận / cảnh báo / chặn ngoài mạng công ty).
+  checkInIp     String? // IP lúc vào ca (rút gọn, không lưu dấu vết duyệt web)
+  checkOutIp    String?
+  checkInPlace  String? // office | remote | unknown — đối chiếu allowlist IP công ty
+  checkOutPlace String?
+  contextNote   String? // ghi chú tự động khi lệch: "vào ca ngoài mạng công ty"
+
   @@unique([userId, date])
   @@index([date])
 }
@@ -957,6 +967,20 @@ model CsatResponse {
 }
 
 // ===== v3.5: Thông báo trong app (chuông) =====
+// v3.40: Web Push — thiết bị đã bật thông báo nền (dùng cho CEO Terminal, và mọi
+// deployment khác nếu bật VAPID). Push gửi RỖNG, service worker tự lấy nội dung từ
+// /api/notifications nên bảng này không chứa dữ liệu nghiệp vụ.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  device    String? // nhãn thiết bị do trình duyệt gợi ý (userAgent rút gọn)
+  createdAt DateTime @default(now())
+  lastSentAt DateTime?
+
+  @@index([userId])
+}
+
 model Notification {
   id        String    @id @default(cuid())
   userId    String // người nhận
@@ -1265,6 +1289,39 @@ model CeoRecoveryCode {
   createdAt  DateTime          @default(now())
 
   @@index([identityId, version, usedAt])
+}
+
+// v3.40 (Đợt 3b): SSO NHÂN SỰ đa công ty — một người làm cho nhiều công ty chỉ cần đăng
+// nhập ở một nơi rồi chuyển sang nơi khác. Khác CEO SSO ở chỗ KHÔNG cần phiên CEO Portal:
+// công ty nguồn xác thực bằng service key của chính mình rồi xin mã cho nhân sự của họ.
+// Portal chỉ môi giới danh tính; quyền tại mỗi công ty vẫn do công ty đó quyết định.
+model CeoStaffLink {
+  id             String   @id @default(cuid())
+  personKey      String // email chuẩn hóa — khóa nhận diện một CON NGƯỜI xuyên công ty
+  entityId       String
+  localUserEmail String
+  localRole      String   @default("STAFF") // vai trò tại công ty này (thông tin, entity vẫn tự quyết)
+  status         String   @default("active") // active | suspended
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([personKey, entityId])
+  @@index([entityId, status])
+}
+
+model CeoStaffSsoCode {
+  id           String    @id @default(cuid())
+  codeHash     String    @unique
+  personKey    String
+  sourceEntity String
+  targetEntity String
+  localUserEmail String // email tại công ty ĐÍCH
+  redirectPath String    @default("/dashboard")
+  expiresAt    DateTime
+  consumedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([targetEntity, expiresAt, consumedAt])
 }
 
 model CeoSsoAuthorizationCode {

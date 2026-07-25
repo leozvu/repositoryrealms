@@ -44,19 +44,17 @@ export default function ProjectsPage() {
   const norm = d => ({ ...d, budget: +d.budget || 0, budgetHours: +d.budgetHours || 0, progress: +d.progress || 0, autoProgress: d.autoProgress === '1' || d.autoProgress === true });
   const filtered = rows.filter(p => (f === 'all' || p.status === f) && (!q || (p.name + clientName(p.clientId)).toLowerCase().includes(q.toLowerCase())));
 
-  const applyTemplate = async (tpl, projectId, startDate) => {
-    const base = new Date((startDate || todayISO()) + 'T00:00:00');
-    const off = n => { const d = new Date(base); d.setDate(d.getDate() + (+n || 0)); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
-    let phases = []; try { phases = JSON.parse(tpl.phases || '[]'); } catch {}
-    let ms = []; try { ms = JSON.parse(tpl.milestones || '[]'); } catch {}
-    let order = 0;
-    for (const ph of phases) {
-      const phase = await fetch('/api/data/phases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId, name: ph.name, order: order++ }) }).then(r => r.json());
-      for (const t of (ph.tasks || [])) {
-        await fetch('/api/data/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId, phaseId: phase.id, title: t.title, status: 'todo', priority: t.priority || 'medium', estHours: +t.estHours || 0, dueDate: t.offsetDays != null ? off(t.offsetDays) : null }) });
-      }
-    }
-    for (const m of ms) await fetch('/api/data/milestones', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId, name: m.name, date: off(m.offsetDays), done: false }) });
+  // v3.41: áp mẫu chạy TRỌN GÓI ở server (một giao dịch). Trước đây chạy ở trình duyệt bằng
+  // vài chục request nối nhau — mất mạng giữa chừng để lại dự án dở dang phải dọn tay.
+  const applyTemplate = async (tpl, projectId) => {
+    const response = await fetch('/api/projects/apply-template', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectId, templateId: tpl.id }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || 'Không áp được mẫu dự án', 'error'); return false; }
+    toast(`Đã áp mẫu "${tpl.name}": ${body.phaseCount} giai đoạn · ${body.taskCount} việc · ${body.milestoneCount} mốc`);
+    return true;
   };
 
   return (
@@ -123,7 +121,7 @@ export default function ProjectsPage() {
       {modal?.mode === 'add' && <FormModal title="Thêm dự án" fields={FIELDS} data={{ status: 'planning', progress: 0, autoProgress: '1', startDate: todayISO() }}
         onClose={() => setModal(null)} onSave={async d => {
           const p = await create(norm(d));
-          if (p && modal.template) { await applyTemplate(modal.template, p.id, d.startDate); toast(`Đã tạo dự án + áp mẫu "${modal.template.name}"`); loadStats(); }
+          if (p && modal.template) { await applyTemplate(modal.template, p.id); loadStats(); }
           else toast('Đã thêm dự án');
         }}
         extraFooter={templates.rows.length > 0 && <select value={modal.template?.id || ''} onChange={e => setModal(m => ({ ...m, template: templates.rows.find(t => t.id === e.target.value) }))}

@@ -5,8 +5,8 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 ## Phạm vi
 
 - UI routes: **66**
-- API routes: **118**
-- Interactive element definitions: **947**
+- API routes: **128**
+- Interactive element definitions: **952**
 - Source files có interaction: **95**
 - Routes có ERP resource candidate: **42**
 - Parse errors: **0**
@@ -15,8 +15,8 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 | Loại | Số lượng |
 | --- | --- |
-| action | 552 |
-| form-control | 310 |
+| action | 553 |
+| form-control | 314 |
 | form-submit | 15 |
 | navigation | 70 |
 
@@ -25,7 +25,7 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 | Candidate | Số lượng |
 | --- | --- |
 | clickable_non_semantic | 18 |
-| control_binding_unverified | 260 |
+| control_binding_unverified | 264 |
 | keyboard_path_unverified | 18 |
 | unlabelled_button_candidate | 52 |
 
@@ -36,12 +36,12 @@ Các candidate ưu tiên accessibility, keyboard, semantic control và possible 
 | Element ID | Source | Nhãn | Candidates |
 | --- | --- | --- | --- |
 | route.analytics.action.setmodal-mode-del-row-r | app/(app)/analytics/page.jsx:168 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.attendance.form-control.select | app/(app)/attendance/page.jsx:73 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.attendance.form-control.input | app/(app)/attendance/page.jsx:146 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.attendance.form-control.ten-ngay-le-vd-quoc-khanh | app/(app)/attendance/page.jsx:147 | Tên ngày lễ (VD: Quốc khánh) | control_binding_unverified |
-| route.attendance.form-control.chon | app/(app)/attendance/page.jsx:173 | — Chọn — | control_binding_unverified |
-| route.attendance.form-control.input.2 | app/(app)/attendance/page.jsx:177 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.attendance.form-control.input.3 | app/(app)/attendance/page.jsx:178 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.attendance.form-control.select | app/(app)/attendance/page.jsx:89 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.attendance.form-control.input | app/(app)/attendance/page.jsx:162 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.attendance.form-control.ten-ngay-le-vd-quoc-khanh | app/(app)/attendance/page.jsx:163 | Tên ngày lễ (VD: Quốc khánh) | control_binding_unverified |
+| route.attendance.form-control.chon | app/(app)/attendance/page.jsx:189 | — Chọn — | control_binding_unverified |
+| route.attendance.form-control.input.2 | app/(app)/attendance/page.jsx:193 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.attendance.form-control.input.3 | app/(app)/attendance/page.jsx:194 | (không có nhãn tĩnh) | control_binding_unverified |
 | route.audit.form-control.tim-theo-nguoi-oi-tuong | app/(app)/audit/page.jsx:37 | Tìm theo người, đối tượng… | control_binding_unverified |
 | route.automation.form-control.vd-bao-tin-khi-thang-deal | app/(app)/automation/page.jsx:37 | VD: Báo tin khi thắng deal | control_binding_unverified |
 | route.automation.form-control.select | app/(app)/automation/page.jsx:40 | (không có nhãn tĩnh) | control_binding_unverified |
@@ -61,16 +61,16 @@ Các candidate ưu tiên accessibility, keyboard, semantic control và possible 
 | route.automation.action.e-e-stoppropagation-setmodal-mode-del-row-r | app/(app)/automation/page.jsx:127 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.calendar.action.setdaymodal-label-dow-i-fmtdm-d-evs | app/(app)/calendar/page.jsx:141 | (không có nhãn tĩnh) | clickable_non_semantic, keyboard_path_unverified |
 | route.calendar.action.d | app/(app)/calendar/page.jsx:163 | {d} | clickable_non_semantic, keyboard_path_unverified |
-| route.ceo-inbox.action.load | app/(app)/ceo-inbox/page.jsx:153 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-inbox.form-control.select | app/(app)/ceo-inbox/page.jsx:159 | — | control_binding_unverified |
-| route.ceo-inbox.form-control.select.2 | app/(app)/ceo-inbox/page.jsx:160 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.ceo-inbox.action.button | app/(app)/ceo-inbox/page.jsx:162 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-inbox.action.setselectedid-conversation-id | app/(app)/ceo-inbox/page.jsx:166 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-inbox.action.button.2 | app/(app)/ceo-inbox/page.jsx:179 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-inbox.form-control.textarea | app/(app)/ceo-inbox/page.jsx:179 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.ceo-overview.action.setfilter-all | app/(app)/ceo-overview/page.jsx:195 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-overview.action.setfilter-entity-id | app/(app)/ceo-overview/page.jsx:196 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-overview.action.load-filter | app/(app)/ceo-overview/page.jsx:200 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.action.load | app/(app)/ceo-inbox/page.jsx:167 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.form-control.select | app/(app)/ceo-inbox/page.jsx:173 | — | control_binding_unverified |
+| route.ceo-inbox.form-control.select.2 | app/(app)/ceo-inbox/page.jsx:174 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.ceo-inbox.action.button | app/(app)/ceo-inbox/page.jsx:176 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.action.setselectedid-conversation-id | app/(app)/ceo-inbox/page.jsx:180 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.action.button.2 | app/(app)/ceo-inbox/page.jsx:193 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-inbox.form-control.textarea | app/(app)/ceo-inbox/page.jsx:193 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.ceo-overview.action.setfilter-all | app/(app)/ceo-overview/page.jsx:199 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-overview.action.setfilter-entity-id | app/(app)/ceo-overview/page.jsx:200 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-overview.action.load-filter | app/(app)/ceo-overview/page.jsx:217 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-registry.action.load | app/(app)/ceo-registry/page.jsx:265 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-registry.action.loadidentity | app/(app)/ceo-registry/page.jsx:288 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-registry.form-control.input | app/(app)/ceo-registry/page.jsx:294 | (không có nhãn tĩnh) | control_binding_unverified |

@@ -15,7 +15,7 @@ export default function AttendancePage() {
   const { data: session } = useSession();
   const user = session?.user;
   const isHR = hasAny(user, ['HR']);
-  const { rows, create, update, remove, mutating } = useResource('attendance');
+  const { rows, create, update, remove, mutating, refresh } = useResource('attendance');
   const holidays = useResource('holidays');
   const users = useResource('users');
   const [m, setM] = useState(thisMonth());
@@ -32,14 +32,30 @@ export default function AttendancePage() {
   const isLate = r => r.checkIn && r.checkIn > cfg.workStart;
   const holidaysThisMonth = holidays.rows.filter(h => monthKey(h.date) === m);
 
+  // v3.41: Vào ca / Tan ca đi qua route riêng để server ghi bằng chứng ngữ cảnh (nơi bấm).
+  // Công ty chưa khai mạng văn phòng thì hành vi y như cũ — không ai bị chặn bất ngờ.
+  const punch = async (action, status = 'present') => {
+    const response = await fetch('/api/attendance/punch', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, status }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || 'Không chấm công được', 'error'); return false; }
+    await refresh();
+    return body;
+  };
   const clockIn = async status => {
-    const t = nowHM();
-    if (myToday) { await update(myToday.id, { status, checkIn: myToday.checkIn || t }); toast('Đã cập nhật'); }
-    else { await create({ date: todayISO(), status, checkIn: t }); toast(t > cfg.workStart ? `Vào ca ${t} — hơi muộn so với ${cfg.workStart} nhé!` : `Vào ca ${t} — đúng giờ 👍`); }
+    const result = await punch('in', status);
+    if (!result) return;
+    const t = result.attendance?.checkIn || nowHM();
+    toast(result.note ? `Vào ca ${t} — ${result.note}`
+      : t > cfg.workStart ? `Vào ca ${t} — hơi muộn so với ${cfg.workStart} nhé!`
+      : `Vào ca ${t} — đúng giờ 👍`, result.note ? 'error' : 'success');
   };
   const clockOut = async () => {
     if (!myToday) return toast('Chưa vào ca hôm nay', 'error');
-    await update(myToday.id, { checkOut: nowHM() }); toast('Đã tan ca — nghỉ ngơi nhé!');
+    const result = await punch('out', myToday.status);
+    if (result) toast('Đã tan ca — nghỉ ngơi nhé!');
   };
 
   // Tổng hợp tháng theo người

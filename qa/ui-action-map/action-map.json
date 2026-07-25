@@ -167,6 +167,32 @@
       }
     },
     {
+      "route": "/api/attendance/punch",
+      "source": "app/api/attendance/punch/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "Attendance",
+            "AuditLog",
+            "RealmGoldEntry",
+            "Setting"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser"
+          ],
+          "statuses": [
+            401,
+            403,
+            500
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/audit",
       "source": "app/api/audit/route.js",
       "methods": {
@@ -274,10 +300,7 @@
           "guards": [
             "currentUser"
           ],
-          "statuses": [
-            401,
-            404
-          ],
+          "statuses": [],
           "permissionPolicy": "authenticated-custom",
           "usesModuleGuard": false,
           "hasErrorHandling": false
@@ -489,7 +512,8 @@
         "GET": {
           "models": [
             "CeoEntityRegistry",
-            "CeoEntitySnapshotCache"
+            "CeoEntitySnapshotCache",
+            "CeoRolloutState"
           ],
           "roles": [],
           "guards": [
@@ -501,6 +525,42 @@
             401,
             403,
             404,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/dashboard/cron",
+      "source": "app/api/ceo/v1/dashboard/cron/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "AuditLog",
+            "CeoEntityRegistry",
+            "CeoEntitySnapshotCache",
+            "CeoRolloutState",
+            "Notification",
+            "PushSubscription",
+            "RealmChangeEvent",
+            "User"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            409,
+            500,
             503
           ],
           "permissionPolicy": "explicit-rbac",
@@ -1816,6 +1876,142 @@
       }
     },
     {
+      "route": "/api/ceo/v1/staff/links",
+      "source": "app/api/ceo/v1/staff/links/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoStaffLink"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityRegistry",
+            "CeoStaffLink"
+          ],
+          "roles": [
+            "STAFF"
+          ],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "DELETE": {
+          "models": [
+            "AuditLog",
+            "CeoStaffLink"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/staff/message",
+      "source": "app/api/ceo/v1/staff/message/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityRegistry",
+            "CeoStaffLink"
+          ],
+          "roles": [],
+          "guards": [],
+          "statuses": [
+            400,
+            401,
+            403,
+            500,
+            503
+          ],
+          "permissionPolicy": "public-or-unverified",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/staff/sso",
+      "source": "app/api/ceo/v1/staff/sso/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "CeoEntityRegistry",
+            "CeoStaffLink",
+            "CeoStaffSsoCode"
+          ],
+          "roles": [],
+          "guards": [],
+          "statuses": [
+            400,
+            401,
+            403,
+            503
+          ],
+          "permissionPolicy": "public-or-unverified",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "PUT": {
+          "models": [
+            "CeoEntityRegistry",
+            "CeoStaffLink",
+            "CeoStaffSsoCode"
+          ],
+          "roles": [],
+          "guards": [],
+          "statuses": [
+            401,
+            403,
+            409,
+            503
+          ],
+          "permissionPolicy": "public-or-unverified",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/chat",
       "source": "app/api/chat/route.js",
       "methods": {
@@ -2219,6 +2415,7 @@
             "Onboarding",
             "Project",
             "RealmChangeEvent",
+            "RealmGoldEntry",
             "Rule",
             "Setting",
             "Task",
@@ -2408,7 +2605,9 @@
             "Onboarding",
             "Project",
             "RealmChangeEvent",
+            "RealmGoldEntry",
             "Rule",
+            "Setting",
             "Task",
             "TaskEvent",
             "User",
@@ -2575,7 +2774,9 @@
             "Project",
             "ProjectMember",
             "RealmChangeEvent",
+            "RealmGoldEntry",
             "Rule",
+            "Setting",
             "Task",
             "TaskEvent",
             "User",
@@ -3120,6 +3321,7 @@
             "Attendance",
             "AuditLog",
             "Payroll",
+            "RealmGoldEntry",
             "Setting",
             "User"
           ],
@@ -3145,6 +3347,7 @@
             "Attendance",
             "AuditLog",
             "Payroll",
+            "RealmGoldEntry",
             "Setting",
             "User"
           ],
@@ -3238,6 +3441,38 @@
       }
     },
     {
+      "route": "/api/projects/apply-template",
+      "source": "app/api/projects/apply-template/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "AuditLog",
+            "Milestone",
+            "Phase",
+            "Project",
+            "ProjectTemplate",
+            "Task"
+          ],
+          "roles": [
+            "LEAD",
+            "PM"
+          ],
+          "guards": [
+            "currentUser",
+            "hasAny"
+          ],
+          "statuses": [
+            401,
+            403,
+            404
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/projects/stats",
       "source": "app/api/projects/stats/route.js",
       "methods": {
@@ -3270,6 +3505,43 @@
           "permissionPolicy": "explicit-rbac",
           "usesModuleGuard": false,
           "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/push/subscribe",
+      "source": "app/api/push/subscribe/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "PushSubscription"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser"
+          ],
+          "statuses": [
+            400,
+            401
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": false
+        },
+        "DELETE": {
+          "models": [
+            "PushSubscription"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser"
+          ],
+          "statuses": [
+            401
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": false
         }
       }
     },
@@ -3321,6 +3593,7 @@
             "Onboarding",
             "Project",
             "RealmChangeEvent",
+            "RealmGoldEntry",
             "Rule",
             "Setting",
             "Task",
@@ -3683,6 +3956,7 @@
             "Onboarding",
             "Project",
             "RealmChangeEvent",
+            "RealmGoldEntry",
             "Rule",
             "Setting",
             "Task",
@@ -3726,6 +4000,7 @@
             "Onboarding",
             "Project",
             "RealmChangeEvent",
+            "RealmGoldEntry",
             "Rule",
             "Setting",
             "Task",
@@ -4657,6 +4932,87 @@
       }
     },
     {
+      "route": "/api/staff-message/deliver",
+      "source": "app/api/staff-message/deliver/route.js",
+      "methods": {
+        "POST": {
+          "models": [
+            "ApiKey",
+            "AuditLog",
+            "CeoApiRateLimitBucket",
+            "ConvMember",
+            "Conversation",
+            "Message",
+            "Notification",
+            "RealmChangeEvent",
+            "Setting",
+            "User"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            429,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/staff-sso/callback",
+      "source": "app/api/staff-sso/callback/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "AuditLog",
+            "User"
+          ],
+          "roles": [
+            "ACCOUNTANT",
+            "AM",
+            "PM",
+            "STAFF"
+          ],
+          "guards": [],
+          "statuses": [
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/staff-sso/start",
+      "source": "app/api/staff-sso/start/route.js",
+      "methods": {
+        "POST": {
+          "models": [],
+          "roles": [],
+          "guards": [
+            "currentUser"
+          ],
+          "statuses": [
+            401,
+            503
+          ],
+          "permissionPolicy": "authenticated-custom",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/stocklots/[id]/issue",
       "source": "app/api/stocklots/[id]/issue/route.js",
       "methods": {
@@ -4949,7 +5305,9 @@
             "Onboarding",
             "Project",
             "RealmChangeEvent",
+            "RealmGoldEntry",
             "Rule",
+            "Setting",
             "Task",
             "TaskEvent",
             "User",
@@ -6875,7 +7233,7 @@
     {
       "elementId": "route.attendance.action.label",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 62,
+      "line": 78,
       "column": 13,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -6895,7 +7253,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -6905,19 +7264,19 @@
       "mappingConfidence": "high",
       "handlerChain": [
         "clockIn",
-        "nowHM"
+        "nowHM",
+        "punch"
       ],
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [
-        "POST /api/data/attendance",
-        "PUT /api/data/attendance/[id]"
+        "GET /api/data/attendance",
+        "POST /api/attendance/punch"
       ],
       "resourceOperations": [
-        "create:attendance",
-        "update:attendance"
+        "read:attendance"
       ],
       "contextResources": [
         "attendance",
@@ -6925,28 +7284,10 @@
         "users"
       ],
       "prismaModels": [
-        "Approval",
         "Attendance",
         "AuditLog",
-        "Conversation",
-        "Lead",
-        "Leave",
-        "Message",
-        "Notification",
-        "Onboarding",
-        "Project",
-        "Quote",
-        "RealmChangeEvent",
         "RealmGoldEntry",
-        "Rule",
-        "Setting",
-        "Task",
-        "TaskEvent",
-        "Team",
-        "Transaction",
-        "User",
-        "VendorBill",
-        "Webhook"
+        "Setting"
       ],
       "contextModels": [
         "Attendance",
@@ -6954,6 +7295,7 @@
         "User"
       ],
       "permissionPolicies": [
+        "authenticated-custom",
         "registry-rbac"
       ],
       "allowedRoles": [
@@ -6965,12 +7307,10 @@
         "PM",
         "STAFF"
       ],
-      "rowPolicy": true,
-      "scopedRead": false,
+      "rowPolicy": false,
+      "scopedRead": true,
       "browserActions": [],
-      "helperCalls": [
-        "import:todayISO"
-      ],
+      "helperCalls": [],
       "localMutations": [],
       "loadingState": "async-button-guard",
       "successState": "hook-refresh",
@@ -6981,7 +7321,7 @@
     {
       "elementId": "route.attendance.action.tan-ca",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 64,
+      "line": 80,
       "column": 72,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -7001,7 +7341,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7011,17 +7352,18 @@
       "mappingConfidence": "high",
       "handlerChain": [
         "clockOut",
-        "nowHM"
+        "punch"
       ],
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [
-        "PUT /api/data/attendance/[id]"
+        "GET /api/data/attendance",
+        "POST /api/attendance/punch"
       ],
       "resourceOperations": [
-        "update:attendance"
+        "read:attendance"
       ],
       "contextResources": [
         "attendance",
@@ -7029,28 +7371,10 @@
         "users"
       ],
       "prismaModels": [
-        "Approval",
         "Attendance",
         "AuditLog",
-        "Conversation",
-        "Lead",
-        "Leave",
-        "Message",
-        "Notification",
-        "Onboarding",
-        "Project",
-        "Quote",
-        "RealmChangeEvent",
         "RealmGoldEntry",
-        "Rule",
-        "Setting",
-        "Task",
-        "TaskEvent",
-        "Team",
-        "Transaction",
-        "User",
-        "VendorBill",
-        "Webhook"
+        "Setting"
       ],
       "contextModels": [
         "Attendance",
@@ -7058,6 +7382,7 @@
         "User"
       ],
       "permissionPolicies": [
+        "authenticated-custom",
         "registry-rbac"
       ],
       "allowedRoles": [
@@ -7069,8 +7394,8 @@
         "PM",
         "STAFF"
       ],
-      "rowPolicy": true,
-      "scopedRead": false,
+      "rowPolicy": false,
+      "scopedRead": true,
       "browserActions": [],
       "helperCalls": [],
       "localMutations": [],
@@ -7083,7 +7408,7 @@
     {
       "elementId": "route.attendance.form-control.select",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 73,
+      "line": 89,
       "column": 9,
       "surface": "route.attendance",
       "tag": "select",
@@ -7103,7 +7428,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -7147,7 +7473,7 @@
     {
       "elementId": "route.attendance.action.ngay-le",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 78,
+      "line": 94,
       "column": 18,
       "surface": "route.attendance",
       "tag": "button",
@@ -7167,7 +7493,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7209,7 +7536,7 @@
     {
       "elementId": "route.attendance.action.ghi-ot",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 79,
+      "line": 95,
       "column": 18,
       "surface": "route.attendance",
       "tag": "button",
@@ -7229,7 +7556,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7271,7 +7599,7 @@
     {
       "elementId": "route.attendance.action.xoa",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 115,
+      "line": 131,
       "column": 32,
       "surface": "route.attendance",
       "tag": "button",
@@ -7291,7 +7619,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7333,7 +7662,7 @@
     {
       "elementId": "route.attendance.action.ong",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 144,
+      "line": 160,
       "column": 62,
       "surface": "route.attendance",
       "tag": "button",
@@ -7353,7 +7682,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7369,7 +7699,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 124,
+          "line": 140,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -7413,7 +7743,7 @@
     {
       "elementId": "route.attendance.form-control.input",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 146,
+      "line": 162,
       "column": 9,
       "surface": "route.attendance",
       "tag": "input",
@@ -7433,7 +7763,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -7477,7 +7808,7 @@
     {
       "elementId": "route.attendance.form-control.ten-ngay-le-vd-quoc-khanh",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 147,
+      "line": 163,
       "column": 9,
       "surface": "route.attendance",
       "tag": "input",
@@ -7497,7 +7828,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -7541,7 +7873,7 @@
     {
       "elementId": "route.attendance.action.them",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 148,
+      "line": 164,
       "column": 9,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -7561,7 +7893,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7640,7 +7973,7 @@
     {
       "elementId": "route.attendance.action.setdeleting-h",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 153,
+      "line": 169,
       "column": 11,
       "surface": "route.attendance",
       "tag": "button",
@@ -7660,7 +7993,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7702,7 +8036,7 @@
     {
       "elementId": "route.attendance.action.huy",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 169,
+      "line": 185,
       "column": 17,
       "surface": "route.attendance",
       "tag": "button",
@@ -7722,7 +8056,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7738,7 +8073,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 125,
+          "line": 141,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -7782,7 +8117,7 @@
     {
       "elementId": "route.attendance.action.luu-ot",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 170,
+      "line": 186,
       "column": 9,
       "surface": "route.attendance",
       "tag": "AsyncButton",
@@ -7802,7 +8137,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -7819,7 +8155,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 125,
+          "line": 141,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -7832,7 +8168,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 125,
+          "line": 141,
           "surface": "route:/attendance",
           "apiCalls": [
             "POST /api/data/attendance",
@@ -7919,7 +8255,7 @@
     {
       "elementId": "route.attendance.form-control.chon",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 173,
+      "line": 189,
       "column": 11,
       "surface": "route.attendance",
       "tag": "select",
@@ -7939,7 +8275,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -7983,7 +8320,7 @@
     {
       "elementId": "route.attendance.form-control.input.2",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 177,
+      "line": 193,
       "column": 51,
       "surface": "route.attendance",
       "tag": "input",
@@ -8003,7 +8340,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -8047,7 +8385,7 @@
     {
       "elementId": "route.attendance.form-control.input.3",
       "source": "app/(app)/attendance/page.jsx",
-      "line": 178,
+      "line": 194,
       "column": 56,
       "surface": "route.attendance",
       "tag": "input",
@@ -8067,7 +8405,8 @@
         "users"
       ],
       "apiCandidates": [
-        "GET '/api/settings'"
+        "GET '/api/settings'",
+        "POST '/api/attendance/punch'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -12525,7 +12864,7 @@
     {
       "elementId": "route.ceo-inbox.action.sync",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 149,
+      "line": 163,
       "column": 148,
       "surface": "route.ceo-inbox",
       "tag": "AsyncButton",
@@ -12596,7 +12935,7 @@
     {
       "elementId": "route.ceo-inbox.navigation.api-ceo-v1-messaging-export",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 149,
+      "line": 163,
       "column": 283,
       "surface": "route.ceo-inbox",
       "tag": "a",
@@ -12654,7 +12993,7 @@
     {
       "elementId": "route.ceo-inbox.navigation.ceo-overview",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 149,
+      "line": 163,
       "column": 43,
       "surface": "route.ceo-inbox",
       "tag": "Link",
@@ -12712,7 +13051,7 @@
     {
       "elementId": "route.ceo-inbox.navigation.ceo-registry",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 152,
+      "line": 166,
       "column": 119,
       "surface": "route.ceo-inbox",
       "tag": "Link",
@@ -12770,7 +13109,7 @@
     {
       "elementId": "route.ceo-inbox.action.load",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 153,
+      "line": 167,
       "column": 78,
       "surface": "route.ceo-inbox",
       "tag": "button",
@@ -12847,7 +13186,7 @@
     {
       "elementId": "route.ceo-inbox.form-submit.form",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 157,
+      "line": 171,
       "column": 9,
       "surface": "route.ceo-inbox",
       "tag": "form",
@@ -12922,7 +13261,7 @@
     {
       "elementId": "route.ceo-inbox.form-control.select",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 159,
+      "line": 173,
       "column": 84,
       "surface": "route.ceo-inbox",
       "tag": "select",
@@ -12982,7 +13321,7 @@
     {
       "elementId": "route.ceo-inbox.form-control.select.2",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 160,
+      "line": 174,
       "column": 78,
       "surface": "route.ceo-inbox",
       "tag": "select",
@@ -13042,7 +13381,7 @@
     {
       "elementId": "route.ceo-inbox.form-control.select.3",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 161,
+      "line": 175,
       "column": 106,
       "surface": "route.ceo-inbox",
       "tag": "select",
@@ -13117,7 +13456,7 @@
     {
       "elementId": "route.ceo-inbox.action.button",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 162,
+      "line": 176,
       "column": 11,
       "surface": "route.ceo-inbox",
       "tag": "button",
@@ -13194,7 +13533,7 @@
     {
       "elementId": "route.ceo-inbox.action.setselectedid-conversation-id",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 166,
+      "line": 180,
       "column": 87,
       "surface": "route.ceo-inbox",
       "tag": "button",
@@ -13254,7 +13593,7 @@
     {
       "elementId": "route.ceo-inbox.action.refresh",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 174,
+      "line": 188,
       "column": 159,
       "surface": "route.ceo-inbox",
       "tag": "AsyncButton",
@@ -13335,7 +13674,7 @@
     {
       "elementId": "route.ceo-inbox.action.reconcile-message",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 177,
+      "line": 191,
       "column": 336,
       "surface": "route.ceo-inbox",
       "tag": "AsyncButton",
@@ -13410,7 +13749,7 @@
     {
       "elementId": "route.ceo-inbox.action.button.2",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 179,
+      "line": 193,
       "column": 312,
       "surface": "route.ceo-inbox",
       "tag": "button",
@@ -13498,7 +13837,7 @@
     {
       "elementId": "route.ceo-inbox.form-control.textarea",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 179,
+      "line": 193,
       "column": 144,
       "surface": "route.ceo-inbox",
       "tag": "textarea",
@@ -13558,7 +13897,7 @@
     {
       "elementId": "route.ceo-inbox.form-submit.send",
       "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 179,
+      "line": 193,
       "column": 11,
       "surface": "route.ceo-inbox",
       "tag": "form",
@@ -13644,7 +13983,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-world",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 178,
+      "line": 182,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13701,7 +14040,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-commands",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 179,
+      "line": 183,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13758,7 +14097,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-workforce",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 180,
+      "line": 184,
       "column": 67,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13815,7 +14154,7 @@
     {
       "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 181,
+      "line": 185,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -13872,7 +14211,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 182,
+      "line": 186,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -13940,7 +14279,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-all",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 195,
+      "line": 199,
       "column": 9,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -13999,7 +14338,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-entity-id",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 196,
+      "line": 200,
       "column": 40,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -14058,7 +14397,7 @@
     {
       "elementId": "route.ceo-overview.action.load-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 200,
+      "line": 217,
       "column": 111,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -14105,7 +14444,8 @@
       "contextResources": [],
       "prismaModels": [
         "CeoEntityRegistry",
-        "CeoEntitySnapshotCache"
+        "CeoEntitySnapshotCache",
+        "CeoRolloutState"
       ],
       "contextModels": [],
       "permissionPolicies": [
@@ -14126,7 +14466,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-registry",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 212,
+      "line": 229,
       "column": 161,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -14183,7 +14523,7 @@
     {
       "elementId": "route.ceo-overview.action.opendetail-entity-domain",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 264,
+      "line": 281,
       "column": 216,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -23789,7 +24129,9 @@
         "Project",
         "ProjectMember",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -23877,7 +24219,9 @@
         "Project",
         "ProjectMember",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -31006,7 +31350,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -31118,7 +31464,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -31352,7 +31700,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -31536,7 +31886,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -31871,7 +32223,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -32147,7 +32501,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -32635,6 +32991,7 @@
         "Attendance",
         "AuditLog",
         "Payroll",
+        "RealmGoldEntry",
         "Setting",
         "User"
       ],
@@ -32760,6 +33117,7 @@
         "Attendance",
         "AuditLog",
         "Payroll",
+        "RealmGoldEntry",
         "Setting",
         "User"
       ],
@@ -33712,7 +34070,7 @@
     {
       "elementId": "route.projects.form-control.tim-du-an",
       "source": "app/(app)/projects/page.jsx",
-      "line": 65,
+      "line": 63,
       "column": 69,
       "surface": "route.projects",
       "tag": "input",
@@ -33733,9 +34091,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -33779,7 +34135,7 @@
     {
       "elementId": "route.projects.form-control.tat-ca-trang-thai",
       "source": "app/(app)/projects/page.jsx",
-      "line": 66,
+      "line": 64,
       "column": 9,
       "surface": "route.projects",
       "tag": "select",
@@ -33800,9 +34156,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -33846,7 +34200,7 @@
     {
       "elementId": "route.projects.navigation.so-chi-huy",
       "source": "app/(app)/projects/page.jsx",
-      "line": 71,
+      "line": 69,
       "column": 20,
       "surface": "route.projects",
       "tag": "Link",
@@ -33867,9 +34221,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -33911,7 +34263,7 @@
     {
       "elementId": "route.projects.action.them-du-an",
       "source": "app/(app)/projects/page.jsx",
-      "line": 72,
+      "line": 70,
       "column": 20,
       "surface": "route.projects",
       "tag": "button",
@@ -33932,9 +34284,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -33976,7 +34326,7 @@
     {
       "elementId": "route.projects.navigation.projects-p-id",
       "source": "app/(app)/projects/page.jsx",
-      "line": 95,
+      "line": 93,
       "column": 23,
       "surface": "route.projects",
       "tag": "Link",
@@ -33997,9 +34347,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34041,7 +34389,7 @@
     {
       "elementId": "route.projects.action.tai-lieu-drive-notion",
       "source": "app/(app)/projects/page.jsx",
-      "line": 111,
+      "line": 109,
       "column": 23,
       "surface": "route.projects",
       "tag": "button",
@@ -34062,9 +34410,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34106,7 +34452,7 @@
     {
       "elementId": "route.projects.action.setmodal-mode-edit-row-p",
       "source": "app/(app)/projects/page.jsx",
-      "line": 112,
+      "line": 110,
       "column": 23,
       "surface": "route.projects",
       "tag": "button",
@@ -34127,9 +34473,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34171,7 +34515,7 @@
     {
       "elementId": "route.projects.action.setmodal-mode-del-row-p",
       "source": "app/(app)/projects/page.jsx",
-      "line": 113,
+      "line": 111,
       "column": 23,
       "surface": "route.projects",
       "tag": "button",
@@ -34192,9 +34536,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [],
@@ -34236,7 +34578,7 @@
     {
       "elementId": "route.projects.form-control.khong-dung-mau",
       "source": "app/(app)/projects/page.jsx",
-      "line": 129,
+      "line": 127,
       "column": 51,
       "surface": "route.projects",
       "tag": "select",
@@ -34257,9 +34599,7 @@
       ],
       "apiCandidates": [
         "GET '/api/projects/stats'",
-        "POST '/api/data/phases'",
-        "POST '/api/data/tasks'",
-        "POST '/api/data/milestones'"
+        "POST '/api/projects/apply-template'"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": [
@@ -37691,7 +38031,7 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 154,
+      "line": 156,
       "column": 7,
       "surface": "route.settings",
       "tag": "input",
@@ -37757,7 +38097,7 @@
     {
       "elementId": "route.settings.form-control.digital-ads-social-media-seeding-livestream",
       "source": "app/(app)/settings/page.jsx",
-      "line": 174,
+      "line": 176,
       "column": 15,
       "surface": "route.settings",
       "tag": "textarea",
@@ -37821,9 +38161,141 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "route.settings.form-control.khong-siet-chi-ghi-nhan-noi-bam-canh-bao-van-cho-bam-ghi-chu-neu",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 189,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Không siết — chỉ ghi nhận nơi bấm / Cảnh báo — vẫn cho bấm, ghi chú nếu ngoài mạng công ty / Chặn — khai \"đi làm\" phải bấm trong mạng công ty",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "SettingsPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.113-161-10-27-72-88-145",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 197,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "113.161.10. 27.72.88.145",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "SettingsPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 193,
+      "line": 205,
       "column": 17,
       "surface": "route.settings",
       "tag": "input",
@@ -37889,7 +38361,139 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 202,
+      "line": 217,
+      "column": 19,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "SettingsPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.input.4",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 237,
+      "column": 17,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "SettingsPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.input.5",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 246,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -37955,7 +38559,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 218,
+      "line": 262,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -38019,7 +38623,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 221,
+      "line": 265,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -38081,9 +38685,9 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.settings.form-control.input.4",
+      "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 231,
+      "line": 275,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -38147,9 +38751,9 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.settings.form-control.input.5",
+      "elementId": "route.settings.form-control.input.7",
       "source": "app/(app)/settings/page.jsx",
-      "line": 255,
+      "line": 299,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -38215,7 +38819,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 259,
+      "line": 303,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -38292,7 +38896,7 @@
     {
       "elementId": "route.settings.form-control.sk-or-v1-tao-tai-openrouter-ai-keys",
       "source": "app/(app)/settings/page.jsx",
-      "line": 269,
+      "line": 313,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -38358,7 +38962,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 273,
+      "line": 317,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -38393,7 +38997,8 @@
       "actionType": "data-action",
       "mappingConfidence": "high",
       "handlerChain": [
-        "save"
+        "save",
+        "toList"
       ],
       "delegatedCallbacks": [],
       "delegatedBindings": [],
@@ -38431,7 +39036,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 291,
+      "line": 335,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -38495,9 +39100,9 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.settings.form-control.input.6",
+      "elementId": "route.settings.form-control.input.8",
       "source": "app/(app)/settings/page.jsx",
-      "line": 294,
+      "line": 338,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -44303,7 +44908,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -44413,7 +45020,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -44523,7 +45132,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -44822,7 +45433,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -45038,7 +45651,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -45199,7 +45814,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -45362,7 +45979,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -45578,7 +46197,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -45953,7 +46574,9 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
+        "Setting",
         "Task",
         "TaskEvent",
         "TimeLog",
@@ -52914,7 +53537,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 136,
+          "line": 134,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54893,7 +55516,7 @@
         {
           "callback": "onOpenEmbassy",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2434,
+          "line": 2433,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -54910,7 +55533,7 @@
         {
           "callback": "onOpenEmbassy",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2935,
+          "line": 2934,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -55079,6 +55702,7 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
         "Setting",
         "Task",
@@ -55293,6 +55917,7 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
         "Setting",
         "Task",
@@ -55825,6 +56450,7 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
         "Setting",
         "Task",
@@ -56232,6 +56858,7 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
         "Setting",
         "Task",
@@ -56877,6 +57504,7 @@
         "Onboarding",
         "Project",
         "RealmChangeEvent",
+        "RealmGoldEntry",
         "Rule",
         "Setting",
         "Task",
@@ -57235,7 +57863,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ban-o-van-phong-ao-crmegoric-realms-dung-wasd-hoac-phim-mui-ten-",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 981,
+      "line": 980,
       "column": 7,
       "surface": "component.components-realm-realmoffice",
       "tag": "canvas",
@@ -57319,7 +57947,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.onemote-emote-id",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1002,
+      "line": 1001,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -57368,7 +57996,7 @@
         {
           "callback": "onEmote",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2675,
+          "line": 2674,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -57428,7 +58056,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-len",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1008,
+      "line": 1007,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -57508,7 +58136,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-sang-trai",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1009,
+      "line": 1008,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -57588,7 +58216,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-xuong",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1010,
+      "line": 1009,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -57668,7 +58296,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-sang-phai",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1011,
+      "line": 1010,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -57748,7 +58376,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.onselect-person",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1029,
+      "line": 1028,
       "column": 5,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -57795,7 +58423,7 @@
         {
           "callback": "onSelect",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 1098,
+          "line": 1097,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -57839,7 +58467,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tat-mic-bat-mic",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1101,
+      "line": 1100,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -57888,7 +58516,7 @@
         {
           "callback": "onMic",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2695,
+          "line": 2694,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -57948,7 +58576,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tat-camera-camera",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1102,
+      "line": 1101,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -57997,7 +58625,7 @@
         {
           "callback": "onCamera",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2695,
+          "line": 2694,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -58057,7 +58685,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.dung-chia-se-chia-se",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 1103,
+      "line": 1102,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58105,7 +58733,7 @@
         {
           "callback": "onShare",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2695,
+          "line": 2694,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -58159,7 +58787,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.loai",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2157,
+      "line": 2156,
       "column": 25,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58233,7 +58861,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.thu-hoi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2172,
+      "line": 2171,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58309,7 +58937,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.invitetoparty-person",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2182,
+      "line": 2181,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58387,7 +59015,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.huy",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2205,
+      "line": 2204,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58461,7 +59089,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.xac-nhan",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2206,
+      "line": 2205,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58540,7 +59168,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ket-thuc-party-roi-party",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2210,
+      "line": 2209,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58614,7 +59242,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.thu-hoi-loi-moi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2217,
+      "line": 2216,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58690,7 +59318,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.invitetoparty-person.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2227,
+      "line": 2226,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58768,7 +59396,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-toi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2282,
+      "line": 2281,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58846,7 +59474,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.hi-vay-chao",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2283,
+      "line": 2282,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -58932,7 +59560,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.partyactionlabel",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2286,
+      "line": 2285,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -59008,7 +59636,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.thi-tham-rieng-chi-nhan-uoc-tin-nhan-nay",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2297,
+      "line": 2296,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -59089,7 +59717,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.viet-loi-nhan-rieng",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2301,
+      "line": 2300,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -59165,7 +59793,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2302,
+      "line": 2301,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -59246,7 +59874,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.go-cua-erp-nguoi-nhan-ang-offline-loi-nhan-van-uoc-luu-trong-not",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2307,
+      "line": 2306,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -59339,7 +59967,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.ban-muon-trao-oi-viec-gi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2313,
+      "line": 2312,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -59415,7 +60043,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.button.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2320,
+      "line": 2319,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -59508,7 +60136,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-lantern-mail",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2331,
+      "line": 2330,
       "column": 21,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -59582,7 +60210,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2351,
+      "line": 2350,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -59695,7 +60323,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.input",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2361,
+      "line": 2360,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -59771,7 +60399,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.select",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2364,
+      "line": 2363,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "select",
@@ -59847,7 +60475,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.input.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2369,
+      "line": 2368,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -59923,7 +60551,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2372,
+      "line": 2371,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -60036,7 +60664,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2408,
+      "line": 2407,
       "column": 44,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -60149,7 +60777,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-task-erp",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2410,
+      "line": 2409,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -60223,7 +60851,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.cap-nhat-tien-o-demo",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2411,
+      "line": 2410,
       "column": 19,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -60304,7 +60932,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.buyitem-item",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2494,
+      "line": 2493,
       "column": 15,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -60382,7 +61010,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-submit.nhan-vao-tavern",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2521,
+      "line": 2520,
       "column": 9,
       "surface": "component.components-realm-realmoffice",
       "tag": "form",
@@ -60462,7 +61090,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.gui-tin-nhan",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2523,
+      "line": 2522,
       "column": 143,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -60542,7 +61170,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.viet-tin-nhan",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2523,
+      "line": 2522,
       "column": 16,
       "surface": "component.components-realm-realmoffice",
       "tag": "input",
@@ -60618,7 +61246,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.i-toi.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2544,
+      "line": 2543,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -60699,7 +61327,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.bo-qua-ieu-huong-toi-noi-dung-realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2560,
+      "line": 2559,
       "column": 7,
       "surface": "component.components-realm-realmoffice",
       "tag": "a",
@@ -60773,7 +61401,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2568,
+      "line": 2567,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -60847,7 +61475,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-workspace-erp-crm-goc",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2569,
+      "line": 2568,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -60944,7 +61572,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.so-realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2570,
+      "line": 2569,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -61018,7 +61646,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.trang-thai-hien-dien",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2578,
+      "line": 2577,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "select",
@@ -61094,7 +61722,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tu-choi",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2597,
+      "line": 2596,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -61170,7 +61798,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.tham-gia",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2598,
+      "line": 2597,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -61248,7 +61876,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.level",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2605,
+      "line": 2604,
       "column": 11,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -61322,7 +61950,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.ho-so-nhan-vat-so-nhan-vat-guild-hall-so-realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2616,
+      "line": 2615,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "select",
@@ -61405,7 +62033,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.movetoobject-item-id",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2643,
+      "line": 2642,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -61486,7 +62114,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ho-so-nhan-vat",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2653,
+      "line": 2652,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -61560,7 +62188,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.ang-mo-erp-crm-mo-erp-crm-goc",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2654,
+      "line": 2653,
       "column": 25,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -61657,7 +62285,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.so-realm-tavern-so-realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2655,
+      "line": 2654,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -61731,7 +62359,7 @@
     {
       "elementId": "component.components-realm-realmoffice.form-control.oi-phong-cach-ban-o-lau-ai",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2668,
+      "line": 2667,
       "column": 51,
       "surface": "component.components-realm-realmoffice",
       "tag": "select",
@@ -61812,7 +62440,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.e",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2691,
+      "line": 2690,
       "column": 17,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -61891,7 +62519,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-kiem-tra-thu-ong-bo",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2817,
+      "line": 2816,
       "column": 37,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -61938,7 +62566,7 @@
         {
           "callback": "onRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2902,
+          "line": 2901,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -61949,7 +62577,7 @@
         {
           "callback": "onRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 3079,
+          "line": 3078,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -61993,7 +62621,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.copy-ma",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2818,
+      "line": 2817,
       "column": 48,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -62039,7 +62667,7 @@
         {
           "callback": "onCopySupportId",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2902,
+          "line": 2901,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -62050,7 +62678,7 @@
         {
           "callback": "onCopySupportId",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 3079,
+          "line": 3078,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -62094,7 +62722,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.onledgerviewchange-tab-key-if-tab-key-guild-setwarroomcampaign-n",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2894,
+      "line": 2893,
       "column": 18,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -62140,7 +62768,7 @@
         {
           "callback": "onLedgerViewChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2716,
+          "line": 2715,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -62184,7 +62812,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-ho-so-erp",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2977,
+      "line": 2976,
       "column": 40,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -62258,7 +62886,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.link",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 2990,
+      "line": 2989,
       "column": 13,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -62332,7 +62960,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-task-erp.2",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 3020,
+      "line": 3019,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -62406,7 +63034,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.cap-nhat-1",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 3021,
+      "line": 3020,
       "column": 23,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -62454,7 +63082,7 @@
         {
           "callback": "onAdvanceQuest",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2716,
+          "line": 2715,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -62510,7 +63138,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 3022,
+      "line": 3021,
       "column": 48,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -62561,7 +63189,7 @@
         {
           "callback": "onClaimQuest",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2716,
+          "line": 2715,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [
             "POST /api/realm-demo/operations"
@@ -62659,7 +63287,7 @@
     {
       "elementId": "component.components-realm-realmoffice.navigation.mo-ho-so-nhan-su-goc",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 3080,
+      "line": 3079,
       "column": 38,
       "surface": "component.components-realm-realmoffice",
       "tag": "Link",
@@ -62733,7 +63361,7 @@
     {
       "elementId": "component.components-realm-realmoffice.action.mo-goc-nhin-realm",
       "source": "components/realm/RealmOffice.jsx",
-      "line": 3081,
+      "line": 3080,
       "column": 7,
       "surface": "component.components-realm-realmoffice",
       "tag": "button",
@@ -62779,7 +63407,7 @@
         {
           "callback": "onOpenRealm",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2751,
+          "line": 2750,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -66337,7 +66965,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -66348,7 +66976,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -66445,7 +67073,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -66456,7 +67084,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -66660,7 +67288,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -66671,7 +67299,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -66980,7 +67608,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -66991,7 +67619,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -67249,7 +67877,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -67260,7 +67888,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -67412,7 +68040,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -67423,7 +68051,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -67574,7 +68202,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -67585,7 +68213,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -67682,7 +68310,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -67693,7 +68321,7 @@
         {
           "callback": "onRewardChanged",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2956,
+          "line": 2955,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69468,7 +70096,7 @@
         {
           "callback": "onBack",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2456,
+          "line": 2455,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69481,7 +70109,7 @@
         {
           "callback": "onBack",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2925,
+          "line": 2924,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69549,7 +70177,7 @@
         {
           "callback": "onOpenLeads",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2456,
+          "line": 2455,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69562,7 +70190,7 @@
         {
           "callback": "onOpenLeads",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2925,
+          "line": 2924,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69634,7 +70262,7 @@
         {
           "callback": "onOpenLead",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2456,
+          "line": 2455,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -69649,7 +70277,7 @@
         {
           "callback": "onOpenLead",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2925,
+          "line": 2924,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70377,7 +71005,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2477,
+          "line": 2476,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70395,7 +71023,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2477,
+          "line": 2476,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [
             "GET /api/realm-demo/operations"
@@ -70431,7 +71059,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2946,
+          "line": 2945,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70442,7 +71070,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2946,
+          "line": 2945,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70566,7 +71194,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2477,
+          "line": 2476,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70584,7 +71212,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2946,
+          "line": 2945,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70661,7 +71289,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2477,
+          "line": 2476,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70679,7 +71307,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2946,
+          "line": 2945,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70761,7 +71389,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2477,
+          "line": 2476,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70779,7 +71407,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2477,
+          "line": 2476,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [
             "GET /api/realm-demo/operations"
@@ -70815,7 +71443,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2946,
+          "line": 2945,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70826,7 +71454,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2946,
+          "line": 2945,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70954,7 +71582,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2477,
+          "line": 2476,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -70972,7 +71600,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2477,
+          "line": 2476,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [
             "GET /api/realm-demo/operations"
@@ -71008,7 +71636,7 @@
         {
           "callback": "onLocalDashboardChange",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2946,
+          "line": 2945,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -71019,7 +71647,7 @@
         {
           "callback": "onOperationsRefresh",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2946,
+          "line": 2945,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -71503,7 +72131,7 @@
         {
           "callback": "onBack",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2420,
+          "line": 2419,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -71516,7 +72144,7 @@
         {
           "callback": "onBack",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2915,
+          "line": 2914,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -71584,7 +72212,7 @@
         {
           "callback": "onOpenProject",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2420,
+          "line": 2419,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -71599,7 +72227,7 @@
         {
           "callback": "onOpenProject",
           "source": "components/realm/RealmOffice.jsx",
-          "line": 2915,
+          "line": 2914,
           "surface": "component:realm/RealmOffice",
           "apiCalls": [],
           "resourceOperations": [],
@@ -71941,6 +72569,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72015,6 +72644,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72051,7 +72681,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 389,
+          "line": 430,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72091,10 +72721,93 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "component.components-shell.action.bat-thong-bao-thiet-bi",
+      "source": "components/Shell.jsx",
+      "line": 177,
+      "column": 11,
+      "surface": "component.components-shell",
+      "tag": "AsyncButton",
+      "kind": "action",
+      "label": "Bật thông báo thiết bị",
+      "handlerEvent": "onClick",
+      "handler": "async () => { const state = await subscribePush(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY); toast(state === 'granted' ? 'Đã bật thông báo trên thiết bị này' : state === 'denied' ? 'Trình duyệt đang chặn thông báo — bật lại trong cài đặt tra…",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
+        "GET '/api/notifications'",
+        "PUT '/api/notifications'",
+        "PUT '/api/notifications'",
+        "GET '/api/users/2fa'",
+        "method '/api/users/2fa'",
+        "GET '/api/settings'",
+        "GET '/api/approvals'",
+        "GET '/api/chat'",
+        "GET '/api/notifications'",
+        "POST '/api/avatar'"
+      ],
+      "routeCandidates": [
+        "'/dashboard'",
+        "'/freelancer'",
+        "'/login'",
+        "g.href(r)",
+        "n.route"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "NotificationsModal",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "subscribePush"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "'/dashboard'",
+        "'/freelancer'",
+        "'/login'",
+        "g.href(r)",
+        "n.route"
+      ],
+      "apiCalls": [
+        "POST /api/push/subscribe"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "PushSubscription"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "authenticated-custom"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "navigator.userAgent.slice"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "async-button-guard",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 155,
-      "column": 17,
+      "line": 188,
+      "column": 9,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
       "kind": "action",
@@ -72110,6 +72823,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72145,7 +72859,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 390,
+          "line": 431,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -72217,7 +72931,7 @@
     {
       "elementId": "component.components-shell.action.ong",
       "source": "components/Shell.jsx",
-      "line": 156,
+      "line": 189,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -72234,6 +72948,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72265,7 +72980,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 390,
+          "line": 431,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72307,7 +73022,7 @@
     {
       "elementId": "component.components-shell.action.truoc-mo",
       "source": "components/Shell.jsx",
-      "line": 159,
+      "line": 192,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "button",
@@ -72324,6 +73039,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72359,7 +73075,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 390,
+          "line": 431,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -72379,7 +73095,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 390,
+          "line": 431,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72444,7 +73160,7 @@
     {
       "elementId": "component.components-shell.action.ong.2",
       "source": "components/Shell.jsx",
-      "line": 197,
+      "line": 230,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "button",
@@ -72461,6 +73177,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72492,7 +73209,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 388,
+          "line": 429,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72534,7 +73251,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 199,
+      "line": 232,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -72551,6 +73268,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72584,7 +73302,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 388,
+          "line": 429,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72633,7 +73351,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 200,
+      "line": 233,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "AsyncButton",
@@ -72650,6 +73368,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72683,7 +73402,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 388,
+          "line": 429,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -72732,7 +73451,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so",
       "source": "components/Shell.jsx",
-      "line": 205,
+      "line": 238,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -72749,6 +73468,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72806,7 +73526,7 @@
     {
       "elementId": "component.components-shell.form-control.ma-6-so.2",
       "source": "components/Shell.jsx",
-      "line": 215,
+      "line": 248,
       "column": 11,
       "surface": "component.components-shell",
       "tag": "input",
@@ -72823,6 +73543,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72880,7 +73601,7 @@
     {
       "elementId": "component.components-shell.navigation.item-href-item-key",
       "source": "components/Shell.jsx",
-      "line": 352,
+      "line": 393,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -72897,6 +73618,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -72952,7 +73674,7 @@
     {
       "elementId": "component.components-shell.action.oi-anh-ai-dien",
       "source": "components/Shell.jsx",
-      "line": 362,
+      "line": 403,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -72969,6 +73691,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73026,7 +73749,7 @@
     {
       "elementId": "component.components-shell.form-control.input",
       "source": "components/Shell.jsx",
-      "line": 366,
+      "line": 407,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "input",
@@ -73043,6 +73766,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73111,7 +73835,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 380,
+      "line": 421,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73128,6 +73852,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73183,7 +73908,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 383,
+      "line": 424,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73200,6 +73925,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73258,7 +73984,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 392,
+      "line": 433,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -73275,6 +74001,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73333,7 +74060,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 395,
+      "line": 436,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73350,6 +74077,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73405,7 +74133,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 400,
+      "line": 441,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73422,6 +74150,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73477,7 +74206,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 403,
+      "line": 444,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -73494,6 +74223,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
         "GET '/api/notifications'",
         "PUT '/api/notifications'",
         "PUT '/api/notifications'",
@@ -73549,7 +74279,7 @@
     {
       "elementId": "component.components-ui.action.run",
       "source": "components/ui.jsx",
-      "line": 165,
+      "line": 186,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "button",
@@ -73566,6 +74296,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -73610,6 +74341,7 @@
         "openRound",
         "payNow",
         "postAction",
+        "punch",
         "quickLog",
         "readAll",
         "reconcile",
@@ -73631,8 +74363,10 @@
         "submitLog",
         "submitRotation",
         "submitTransition",
+        "subscribePush",
         "suspend",
         "sync",
+        "toList",
         "toast",
         "toggle",
         "toggleKey",
@@ -73655,32 +74389,14 @@
         {
           "callback": "onClick",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 62,
+          "line": 78,
           "surface": "route:/attendance",
           "apiCalls": [
-            "POST /api/data/attendance",
-            "PUT /api/data/attendance/[id]"
+            "GET /api/data/attendance",
+            "POST /api/attendance/punch"
           ],
           "resourceOperations": [
-            "create:attendance",
-            "update:attendance"
-          ],
-          "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
-          "localState": []
-        },
-        {
-          "callback": "onClick",
-          "source": "app/(app)/attendance/page.jsx",
-          "line": 64,
-          "surface": "route:/attendance",
-          "apiCalls": [
-            "PUT /api/data/attendance/[id]"
-          ],
-          "resourceOperations": [
-            "update:attendance"
+            "read:attendance"
           ],
           "routeTargets": [],
           "helperCalls": [],
@@ -73689,7 +74405,23 @@
         {
           "callback": "onClick",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 148,
+          "line": 80,
+          "surface": "route:/attendance",
+          "apiCalls": [
+            "GET /api/data/attendance",
+            "POST /api/attendance/punch"
+          ],
+          "resourceOperations": [
+            "read:attendance"
+          ],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        },
+        {
+          "callback": "onClick",
+          "source": "app/(app)/attendance/page.jsx",
+          "line": 164,
           "surface": "route:/attendance",
           "apiCalls": [
             "POST /api/data/holidays"
@@ -73706,7 +74438,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 170,
+          "line": 186,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -73775,7 +74507,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-inbox/page.jsx",
-          "line": 149,
+          "line": 163,
           "surface": "route:/ceo-inbox",
           "apiCalls": [
             "POST /api/ceo/v1/messaging/directory"
@@ -73790,7 +74522,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-inbox/page.jsx",
-          "line": 174,
+          "line": 188,
           "surface": "route:/ceo-inbox",
           "apiCalls": [
             "GET /api/ceo/v1/identity/session",
@@ -73814,7 +74546,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-inbox/page.jsx",
-          "line": 177,
+          "line": 191,
           "surface": "route:/ceo-inbox",
           "apiCalls": [
             "GET /api/ceo/v1/messaging/conversations/*",
@@ -73831,7 +74563,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 182,
+          "line": 186,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/dashboard/refresh"
@@ -73847,7 +74579,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/ceo-overview/page.jsx",
-          "line": 264,
+          "line": 281,
           "surface": "route:/ceo-overview",
           "apiCalls": [
             "POST /api/ceo/v1/sso/authorize"
@@ -74473,7 +75205,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 259,
+          "line": 303,
           "surface": "route:/settings",
           "apiCalls": [
             "POST /api/email/send",
@@ -74487,7 +75219,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 273,
+          "line": 317,
           "surface": "route:/settings",
           "apiCalls": [
             "PUT /api/settings"
@@ -74996,7 +75728,20 @@
         {
           "callback": "onClick",
           "source": "components/Shell.jsx",
-          "line": 155,
+          "line": 177,
+          "surface": "component:Shell",
+          "apiCalls": [
+            "POST /api/push/subscribe"
+          ],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        },
+        {
+          "callback": "onClick",
+          "source": "components/Shell.jsx",
+          "line": 188,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/notifications",
@@ -75010,7 +75755,7 @@
         {
           "callback": "onClick",
           "source": "components/Shell.jsx",
-          "line": 199,
+          "line": 232,
           "surface": "component:Shell",
           "apiCalls": [
             "DYNAMIC /api/users/2fa"
@@ -75025,7 +75770,7 @@
         {
           "callback": "onClick",
           "source": "components/Shell.jsx",
-          "line": 200,
+          "line": 233,
           "surface": "component:Shell",
           "apiCalls": [
             "DYNAMIC /api/users/2fa"
@@ -75089,6 +75834,7 @@
         "GET /api/ceo/v1/messaging/directory",
         "GET /api/ceo/v1/rollout",
         "GET /api/ceo/v1/security/control-plane",
+        "GET /api/data/attendance",
         "GET /api/data/payouts",
         "GET /api/freelancer/home",
         "GET /api/notifications",
@@ -75100,6 +75846,7 @@
         "PATCH /api/realm-demo/feedback",
         "PATCH /api/realm-demo/pilot",
         "POST /api/apikeys",
+        "POST /api/attendance/punch",
         "POST /api/ceo/v1/command-gateway/*/reconcile",
         "POST /api/ceo/v1/dashboard/refresh",
         "POST /api/ceo/v1/identity/recovery",
@@ -75118,7 +75865,6 @@
         "POST /api/ceo/v1/sso/authorize",
         "POST /api/chat",
         "POST /api/data/activities",
-        "POST /api/data/attendance",
         "POST /api/data/clients",
         "POST /api/data/commissions",
         "POST /api/data/doclinks",
@@ -75132,6 +75878,7 @@
         "POST /api/freelancer/timelog",
         "POST /api/payouts/*/pay",
         "POST /api/payroll",
+        "POST /api/push/subscribe",
         "POST /api/realm-demo/actions",
         "POST /api/realm-demo/launch",
         "POST /api/realm-demo/launch/approvals",
@@ -75139,7 +75886,6 @@
         "PUT /api/apikeys",
         "PUT /api/ceo/v1/federation/policy",
         "PUT /api/data/activities/[id]",
-        "PUT /api/data/attendance/[id]",
         "PUT /api/data/commissions/[id]",
         "PUT /api/data/rules/[id]",
         "PUT /api/data/tasks/[id]",
@@ -75151,7 +75897,6 @@
       ],
       "resourceOperations": [
         "create:activities",
-        "create:attendance",
         "create:clients",
         "create:commissions",
         "create:doclinks",
@@ -75161,9 +75906,9 @@
         "create:taskcomments",
         "create:timelogs",
         "create:webhooks",
+        "read:attendance",
         "read:payouts",
         "update:activities",
-        "update:attendance",
         "update:commissions",
         "update:rules",
         "update:tasks",
@@ -75208,6 +75953,7 @@
         "Payroll",
         "Project",
         "ProjectMember",
+        "PushSubscription",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -75241,9 +75987,10 @@
         "STAFF"
       ],
       "rowPolicy": true,
-      "scopedRead": false,
+      "scopedRead": true,
       "browserActions": [
         "navigator.clipboard.writeText",
+        "navigator.userAgent.slice",
         "window.dispatchEvent",
         "window.location.assign"
       ],
@@ -75272,7 +76019,7 @@
     {
       "elementId": "component.components-ui.action.title-children",
       "source": "components/ui.jsx",
-      "line": 179,
+      "line": 200,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "div",
@@ -75289,6 +76036,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -75312,7 +76060,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 144,
+          "line": 160,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -75323,7 +76071,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 168,
+          "line": 184,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -75751,7 +76499,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 154,
+          "line": 173,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -75762,7 +76510,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 195,
+          "line": 228,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -75773,7 +76521,7 @@
         {
           "callback": "onClose",
           "source": "components/ui.jsx",
-          "line": 218,
+          "line": 239,
           "surface": "component:ui",
           "apiCalls": [],
           "resourceOperations": [],
@@ -75784,7 +76532,7 @@
         {
           "callback": "onClose",
           "source": "components/ui.jsx",
-          "line": 264,
+          "line": 285,
           "surface": "component:ui",
           "apiCalls": [],
           "resourceOperations": [],
@@ -75852,7 +76600,7 @@
     {
       "elementId": "component.components-ui.action.ong",
       "source": "components/ui.jsx",
-      "line": 183,
+      "line": 204,
       "column": 11,
       "surface": "component.components-ui",
       "tag": "button",
@@ -75869,6 +76617,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -75889,7 +76638,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 144,
+          "line": 160,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -75900,7 +76649,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 168,
+          "line": 184,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76328,7 +77077,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 154,
+          "line": 173,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76339,7 +77088,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 195,
+          "line": 228,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76350,7 +77099,7 @@
         {
           "callback": "onClose",
           "source": "components/ui.jsx",
-          "line": 218,
+          "line": 239,
           "surface": "component:ui",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76361,7 +77110,7 @@
         {
           "callback": "onClose",
           "source": "components/ui.jsx",
-          "line": 264,
+          "line": 285,
           "surface": "component:ui",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76429,7 +77178,7 @@
     {
       "elementId": "component.components-ui.action.huy",
       "source": "components/ui.jsx",
-      "line": 220,
+      "line": 241,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -76446,6 +77195,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -76491,7 +77241,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 132,
+          "line": 148,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76504,7 +77254,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 157,
+          "line": 173,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -76803,7 +77553,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 137,
+          "line": 135,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -77188,7 +77938,7 @@
     {
       "elementId": "component.components-ui.action.ang-xu-ly",
       "source": "components/ui.jsx",
-      "line": 221,
+      "line": 242,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -77205,6 +77955,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -77299,7 +78050,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 132,
+          "line": 148,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -77312,7 +78063,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 132,
+          "line": 148,
           "surface": "route:/attendance",
           "apiCalls": [
             "DELETE /api/data/attendance/[id]"
@@ -77327,7 +78078,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 157,
+          "line": 173,
           "surface": "route:/attendance",
           "apiCalls": [],
           "resourceOperations": [],
@@ -77340,7 +78091,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/attendance/page.jsx",
-          "line": 157,
+          "line": 173,
           "surface": "route:/attendance",
           "apiCalls": [
             "DELETE /api/data/holidays/[id]"
@@ -77995,7 +78746,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 137,
+          "line": 135,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -78008,7 +78759,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/projects/page.jsx",
-          "line": 137,
+          "line": 135,
           "surface": "route:/projects",
           "apiCalls": [
             "DELETE /api/data/projects/[id]"
@@ -78972,7 +79723,7 @@
     {
       "elementId": "component.components-ui.action.huy.2",
       "source": "components/ui.jsx",
-      "line": 267,
+      "line": 288,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -78989,6 +79740,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -79320,7 +80072,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -79333,7 +80085,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -79639,7 +80391,7 @@
     {
       "elementId": "component.components-ui.action.ang-luu-luu",
       "source": "components/ui.jsx",
-      "line": 268,
+      "line": 289,
       "column": 9,
       "surface": "component.components-ui",
       "tag": "button",
@@ -79656,6 +80408,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -79676,7 +80429,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -80415,7 +81167,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80428,29 +81180,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -80458,7 +81200,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80471,7 +81213,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -81116,6 +81858,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -81224,6 +81967,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -81274,13 +82018,10 @@
         "import:todayISO"
       ],
       "localMutations": [
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -81293,7 +82034,7 @@
     {
       "elementId": "component.components-ui.form-submit.e-e-preventdefault-submit",
       "source": "components/ui.jsx",
-      "line": 272,
+      "line": 293,
       "column": 7,
       "surface": "component.components-ui",
       "tag": "form",
@@ -81310,6 +82051,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -81330,7 +82072,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -82069,7 +82810,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -82082,29 +82823,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -82112,7 +82843,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -82125,7 +82856,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -82770,6 +83501,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -82878,6 +83610,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -82929,13 +83662,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -82948,7 +83678,7 @@
     {
       "elementId": "component.components-ui.form-control.select",
       "source": "components/ui.jsx",
-      "line": 279,
+      "line": 300,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "select",
@@ -82965,6 +83695,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -82985,7 +83716,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -83724,7 +84454,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -83737,29 +84467,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -83767,7 +84487,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -83780,7 +84500,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -84425,6 +85145,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -84533,6 +85254,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -84584,13 +85306,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -84603,7 +85322,7 @@
     {
       "elementId": "component.components-ui.form-control.select.2",
       "source": "components/ui.jsx",
-      "line": 283,
+      "line": 304,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "select",
@@ -84620,6 +85339,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -84640,7 +85360,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -85379,7 +86098,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -85392,29 +86111,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -85422,7 +86131,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -85435,7 +86144,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -86080,6 +86789,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -86188,6 +86898,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -86239,13 +86950,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -86258,7 +86966,7 @@
     {
       "elementId": "component.components-ui.form-control.textarea",
       "source": "components/ui.jsx",
-      "line": 288,
+      "line": 309,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "textarea",
@@ -86275,6 +86983,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -86295,7 +87004,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -87034,7 +87742,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -87047,29 +87755,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -87077,7 +87775,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -87090,7 +87788,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -87735,6 +88433,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -87843,6 +88542,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -87894,13 +88594,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -87913,7 +88610,7 @@
     {
       "elementId": "component.components-ui.form-control.input",
       "source": "components/ui.jsx",
-      "line": 290,
+      "line": 311,
       "column": 17,
       "surface": "component.components-ui",
       "tag": "input",
@@ -87930,6 +88627,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -87950,7 +88648,6 @@
         "loadWorkload",
         "nextCode",
         "norm",
-        "off",
         "payShipment",
         "payload",
         "save",
@@ -88689,7 +89386,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -88702,29 +89399,19 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 123,
+          "line": 121,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
-            "POST /api/data/milestones",
-            "POST /api/data/phases",
             "POST /api/data/projects",
-            "POST /api/data/tasks"
+            "POST /api/projects/apply-template"
           ],
           "resourceOperations": [
-            "create:milestones",
-            "create:phases",
-            "create:projects",
-            "create:tasks"
+            "create:projects"
           ],
           "routeTargets": [],
-          "helperCalls": [
-            "import:todayISO"
-          ],
+          "helperCalls": [],
           "localState": [
-            "ms",
-            "order",
-            "phases",
             "setCanMoney",
             "setStats"
           ]
@@ -88732,7 +89419,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [],
           "resourceOperations": [],
@@ -88745,7 +89432,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/projects/page.jsx",
-          "line": 134,
+          "line": 132,
           "surface": "route:/projects",
           "apiCalls": [
             "GET /api/projects/stats",
@@ -89390,6 +90077,7 @@
         "POST /api/data/vendors",
         "POST /api/data/violations",
         "POST /api/livesessions/*/reconcile",
+        "POST /api/projects/apply-template",
         "POST /api/shipments/*/pay",
         "POST /api/stocklots/*/issue",
         "PUT /api/data/assets/[id]",
@@ -89498,6 +90186,7 @@
         "Payout",
         "Phase",
         "Project",
+        "ProjectTemplate",
         "Quote",
         "RealmChangeEvent",
         "RealmGoldEntry",
@@ -89549,13 +90238,10 @@
       ],
       "localMutations": [
         "event.preventDefault",
-        "ms",
-        "order",
         "out.code",
         "out.dueAt",
         "out.resolvedAt",
         "out[f.key]",
-        "phases",
         "submittingRef.current",
         "v"
       ],
@@ -89568,7 +90254,7 @@
     {
       "elementId": "component.components-ui.action.csv",
       "source": "components/ui.jsx",
-      "line": 401,
+      "line": 422,
       "column": 5,
       "surface": "component.components-ui",
       "tag": "button",
@@ -89585,6 +90271,7 @@
       "resourceCandidates": [],
       "apiCandidates": [
         "GET '/api/settings'",
+        "GET `/api/avatar/${userId}?v=${version}`",
         "GET `/api/data/${name}${qs ? '?' + qs : ''}`",
         "method url"
       ],
@@ -89628,31 +90315,31 @@
     }
   ],
   "summary": {
-    "elements": 947,
-    "apiContracts": 118,
+    "elements": 952,
+    "apiContracts": 128,
     "registryResources": 50,
     "byActionType": {
       "local-state": 251,
-      "data-action": 174,
-      "form-control": 310,
+      "data-action": 175,
+      "form-control": 314,
       "delegated-action": 84,
       "navigation": 90,
       "browser-action": 30,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 632,
+      "classified-local": 636,
       "delegated-resolved": 48,
-      "handler-resolved": 183,
+      "handler-resolved": 184,
       "delegated": 84
     },
     "byConfidence": {
-      "high": 899,
+      "high": 904,
       "medium": 48
     },
     "uxStateCandidates": {},
-    "dataActions": 174,
-    "delegatedBindings": 1155,
+    "dataActions": 175,
+    "delegatedBindings": 1156,
     "actionableUnresolved": 0
   }
 }

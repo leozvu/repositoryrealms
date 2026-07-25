@@ -21,6 +21,21 @@ const DEFAULTS = {
   // v3.37 (feedback Egoric): "mảng dịch vụ" chỉnh được theo công ty thay vì hard-code —
   // dùng cho dropdown Dịch vụ ở Dự án, cột/lọc ở Khách hàng và Bảng giá dịch vụ.
   serviceLines: ['Digital Ads', 'Social Media', 'Branding', 'Web & SEO', 'Production', 'PR / Event', 'Seeding', 'Livestream', 'Khác'],
+  // v3.41 (Chương 1): siết chấm công theo ngữ cảnh. off = giữ nguyên như cũ (mặc định),
+  // warn = vẫn cho bấm nhưng ghi chú ngoài mạng công ty, strict = chặn khai "đi làm" khi
+  // bấm ngoài mạng công ty. officeNetworks: mỗi dòng một IP hoặc tiền tố ("113.161.10.").
+  attendanceStrictness: 'off',
+  officeNetworks: [],
+  // v3.41 (Chương 2+3): Gold. goldEnabled bật lớp trải nghiệm (điểm/huy hiệu, KHÔNG ra tiền).
+  // goldPayoutEnabled mới là công tắc quy Gold thành thưởng trong bảng lương — mặc định TẮT
+  // theo cảnh báo của nhân sự "quản lý theo hiệu suất phải có quá trình".
+  goldEnabled: false,
+  goldPayoutEnabled: false,
+  goldPerOnTimeTask: 10, // việc hoàn thành đúng hạn
+  goldPerFullAttendanceDay: 5, // ngày công đủ giờ
+  goldDailyEarnCap: 60, // trần Gold tự động mỗi người mỗi ngày — chặn cày điểm bằng việc vụn
+  goldToVndRate: 1000, // 1 Gold = ? đồng khi bật quy đổi
+  goldMonthlyCapVnd: 2000000, // trần thưởng Gold mỗi người mỗi tháng
 };
 
 // Các trường bí mật — chỉ Giám đốc đọc được (trang Cài đặt); route server đọc thẳng DB

@@ -129,9 +129,11 @@ export default function SettingsPage() {
 
   const save = async () => {
     // v3.37: serviceLines soạn dạng text mỗi dòng một mảng → chuẩn hóa thành mảng khi lưu
-    const serviceLines = (Array.isArray(s.serviceLines) ? s.serviceLines : String(s.serviceLines || '').split('\n'))
+    const toList = (value) => (Array.isArray(value) ? value : String(value || '').split(/[\n,]/))
       .map(x => String(x).trim()).filter(Boolean);
-    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...s, serviceLines }) });
+    const serviceLines = toList(s.serviceLines);
+    const officeNetworks = toList(s.officeNetworks); // v3.41: mạng công ty cũng soạn theo dòng
+    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...s, serviceLines, officeNetworks }) });
     toast(res.ok ? 'Đã lưu cài đặt' : 'Có lỗi khi lưu', res.ok ? 'success' : 'error');
   };
 
@@ -181,6 +183,48 @@ export default function SettingsPage() {
             <F k="approveExpenseDirectorOver" label="Chi cần thêm Giám đốc duyệt từ (đ)" type="number" />
             <F k="commissionRate" label="Tỷ lệ hoa hồng mặc định (%)" type="number" />
             <F k="leaveQuota" label="Ngày phép năm / nhân sự" type="number" />
+            {/* v3.41: siết chấm công theo ngữ cảnh — công ty tự chọn mức */}
+            <div className="field">
+              <label>Siết chấm công theo nơi bấm</label>
+              <select value={s.attendanceStrictness || 'off'} onChange={e => setS({ ...s, attendanceStrictness: e.target.value })}>
+                <option value="off">Không siết — chỉ ghi nhận nơi bấm</option>
+                <option value="warn">Cảnh báo — vẫn cho bấm, ghi chú nếu ngoài mạng công ty</option>
+                <option value="strict">Chặn — khai "đi làm" phải bấm trong mạng công ty</option>
+              </select>
+            </div>
+            <div className="field full">
+              <label>Mạng công ty (mỗi dòng một IP hoặc tiền tố, VD 113.161.10.)</label>
+              <textarea rows={3} value={Array.isArray(s.officeNetworks) ? s.officeNetworks.join('\n') : (s.officeNetworks ?? '')}
+                onChange={e => setS({ ...s, officeNetworks: e.target.value })}
+                placeholder={'113.161.10.\n27.72.88.145'} />
+              <div className="hint">Bỏ trống = không kiểm tra nơi bấm (mọi thứ như cũ). Xem IP văn phòng bằng cách tra "what is my ip" tại công ty.</div>
+            </div>
+            {/* v3.41 (Chương 2+3): Gold — hai công tắc tách bạch */}
+            <div className="field full" style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <input type="checkbox" style={{ width: 'auto' }} checked={s.goldEnabled === true}
+                  onChange={e => setS({ ...s, goldEnabled: e.target.checked })} />
+                <b>Bật Gold (điểm ghi nhận) — việc xong đúng hạn &amp; ngày công đủ giờ tự cộng điểm</b>
+              </label>
+              <div className="hint">Gold hiện trong Realm như điểm/huy hiệu. Chưa liên quan tiền bạc.</div>
+            </div>
+            {s.goldEnabled && <>
+              <F k="goldPerOnTimeTask" label="Gold mỗi việc hoàn thành đúng hạn" type="number" />
+              <F k="goldPerFullAttendanceDay" label="Gold mỗi ngày công đủ giờ" type="number" />
+              <F k="goldDailyEarnCap" label="Trần Gold tự động / người / ngày" type="number" />
+              <div className="field full">
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <input type="checkbox" style={{ width: 'auto' }} checked={s.goldPayoutEnabled === true}
+                    onChange={e => setS({ ...s, goldPayoutEnabled: e.target.checked })} />
+                  <b style={{ color: 'var(--danger)' }}>Quy Gold thành THƯỞNG TIỀN trong bảng lương</b>
+                </label>
+                <div className="hint">⚠ Chỉ bật khi đã chạy Gold đủ lâu để số liệu công bằng. Bật xong, Gold tháng sẽ thành một dòng thưởng thật trong phiếu lương.</div>
+              </div>
+              {s.goldPayoutEnabled && <>
+                <F k="goldToVndRate" label="1 Gold = ? đồng" type="number" />
+                <F k="goldMonthlyCapVnd" label="Trần thưởng Gold / người / tháng (đ)" type="number" />
+              </>}
+            </>}
             <F k="workStart" label="Giờ vào ca chuẩn (HH:MM)" />
             <F k="workEnd" label="Giờ tan ca chuẩn (HH:MM)" />
             <F k="otMultiplier" label="Hệ số lương làm thêm (OT)" type="number" />

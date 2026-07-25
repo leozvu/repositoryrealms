@@ -123,6 +123,25 @@ function GlobalSearch({ onClose }) {
 }
 
 // v3.5: chuông thông báo — gom gán việc, phê duyệt, kết quả duyệt một chỗ
+/* v3.40: đăng ký thiết bị nhận thông báo nền (Web Push).
+   Trả 'granted' | 'denied' | 'unsupported' | 'error'. Push gửi rỗng — service worker tự
+   lấy nội dung từ /api/notifications, nên không có dữ liệu nghiệp vụ đi qua máy chủ đẩy. */
+async function subscribePush(vapidPublicKey) {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) return 'unsupported';
+  const permission = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+  if (permission !== 'granted') return permission === 'denied' ? 'denied' : 'error';
+  const registration = await navigator.serviceWorker.ready;
+  const raw = atob(vapidPublicKey.replace(/-/g, '+').replace(/_/g, '/'));
+  const applicationServerKey = Uint8Array.from(raw, char => char.charCodeAt(0));
+  const subscription = await registration.pushManager.getSubscription()
+    || await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });
+  const response = await fetch('/api/push/subscribe', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ endpoint: subscription.endpoint, device: navigator.userAgent.slice(0, 120) }),
+  });
+  return response.ok ? 'granted' : 'error';
+}
+
 function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
   const [data, setData] = useState(null);
   const router = useRouter();
@@ -152,7 +171,21 @@ function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
   };
   return (
     <Modal title="Raven Inbox · Thông báo ERP" onClose={onClose}
-      footer={<><AsyncButton className="btn btn-outline" onClick={readAll}>Đọc tất cả</AsyncButton>
+      footer={<>
+        {/* v3.40: bật thông báo nền cho thiết bị này (PWA đã cài thì báo cả khi đóng app) */}
+        {process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && (
+          <AsyncButton className="btn btn-outline" style={{ marginRight: 'auto' }} pendingLabel="Đang bật…"
+            onClick={async () => {
+              const state = await subscribePush(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY);
+              toast(state === 'granted' ? 'Đã bật thông báo trên thiết bị này'
+                : state === 'denied' ? 'Trình duyệt đang chặn thông báo — bật lại trong cài đặt trang'
+                : state === 'unsupported' ? 'Thiết bị/trình duyệt này chưa hỗ trợ thông báo nền'
+                : 'Không bật được thông báo', state === 'granted' ? 'success' : 'error');
+            }}>
+            <Icon name="bell" size={15} /> Bật thông báo thiết bị
+          </AsyncButton>
+        )}
+        <AsyncButton className="btn btn-outline" onClick={readAll}>Đọc tất cả</AsyncButton>
         <button className="btn btn-primary" onClick={onClose}>Đóng</button></>}>
       <div className="notification-inbox-list" aria-live="polite">
         {(data?.rows || []).map(n => (
@@ -310,6 +343,14 @@ export default function Shell({ user, company, realmPilot, children }) {
 
   useEffect(() => { // PWA: đăng ký service worker
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }, []);
+
+  // v3.40: thông báo nền. Nếu người dùng ĐÃ cho phép ở lần trước thì tự đăng ký lại
+  // subscription (đổi máy/xóa cache là mất) — không tự hỏi quyền, chỉ hỏi khi bấm nút 🔔.
+  useEffect(() => {
+    const key = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!key || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+    subscribePush(key).catch(() => {});
   }, []);
 
   useEffect(() => { // v3.4: Ctrl+K mở tìm kiếm toàn cục
