@@ -134,7 +134,7 @@ function LeadIntakeSection({ s, setS }) {
   const [origin, setOrigin] = useState('');
   useEffect(() => { setOrigin(window.location.origin); }, []);
 
-  const ams = (users.data || []).filter(u => {
+  const ams = (users.rows || []).filter(u => {
     let roles = [];
     try { roles = JSON.parse(u.roles || '[]'); } catch { roles = []; }
     return u.status === 'active' && (roles.includes('AM') || u.role === 'AM');
