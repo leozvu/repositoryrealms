@@ -110,6 +110,8 @@
 "/api/invoices/[id]/pay","POST","app/api/invoices/[id]/pay/route.js","AuditLog | Invoice | Transaction","ACCOUNTANT","currentUser | hasAny","explicit-rbac","false","true","400 | 401 | 403 | 404"
 "/api/invoices/from-hours","GET","app/api/invoices/from-hours/route.js","TimeLog","ACCOUNTANT | AM","currentUser | hasAny | isFreelancer","explicit-rbac","false","false","400 | 401 | 403"
 "/api/invoices/from-hours","POST","app/api/invoices/from-hours/route.js","AuditLog | Invoice | Project | Setting | TimeLog","ACCOUNTANT | AM","currentUser | hasAny | isFreelancer","explicit-rbac","false","true","400 | 401 | 403 | 404"
+"/api/lead-intake","GET","app/api/lead-intake/route.js","Setting","","","public-or-unverified","false","true","404"
+"/api/lead-intake","POST","app/api/lead-intake/route.js","AuditLog | Conversation | Lead | Message | Notification | Onboarding | Project | RealmChangeEvent | RealmGoldEntry | Rule | Setting | Task | TaskEvent | User | Webhook","ACCOUNTANT | AM | DIRECTOR | HR | PM | STAFF","","explicit-rbac","false","true","400 | 404 | 500"
 "/api/leads/workload","GET","app/api/leads/workload/route.js","Activity | Lead | Setting | User","ACCOUNTANT | AM | PM | STAFF","currentUser | isDirector | isFreelancer","explicit-rbac","false","true","401 | 403 | 500"
 "/api/livesessions/[id]/reconcile","POST","app/api/livesessions/[id]/reconcile/route.js","AuditLog | LiveSession | Payout","ACCOUNTANT | LEAD | PM","currentUser | hasAny | isFreelancer","explicit-rbac","false","false","401 | 403 | 404"
 "/api/livesessions/[id]/settle","POST","app/api/livesessions/[id]/settle/route.js","AuditLog | LiveSession | Transaction","ACCOUNTANT | LEAD | PM","currentUser | hasAny | isFreelancer","explicit-rbac","false","false","400 | 401 | 403 | 404"

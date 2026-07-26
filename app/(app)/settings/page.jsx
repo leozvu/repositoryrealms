@@ -116,6 +116,106 @@ function ApiSection() {
   );
 }
 
+/* ---------- v3.42 (cụm Lead): cổng nhận lead tự động + chia sale thông minh ----------
+   Trước đây lead phải nhập tay: mở Facebook, landing, website rồi chép về. Khối này bật
+   một địa chỉ nhận lead riêng của công ty để các nền tảng đẩy thẳng vào pipeline, và cho
+   Giám đốc chọn cách chia (ít tải nhất / luân phiên / khu vực / mảng dịch vụ / chiến dịch). */
+const ASSIGN_LABELS = [
+  ['least_load', 'Ai đang ít lead mở nhất (mặc định)'],
+  ['round_robin', 'Luân phiên đều tay'],
+  ['region', 'Theo khu vực khách'],
+  ['service_line', 'Theo mảng dịch vụ khách quan tâm'],
+  ['campaign', 'Theo chiến dịch marketing'],
+];
+
+function LeadIntakeSection({ s, setS }) {
+  const users = useResource('users');
+  const toast = useToast();
+  const [origin, setOrigin] = useState('');
+  useEffect(() => { setOrigin(window.location.origin); }, []);
+
+  const ams = (users.data || []).filter(u => {
+    let roles = [];
+    try { roles = JSON.parse(u.roles || '[]'); } catch { roles = []; }
+    return u.status === 'active' && (roles.includes('AM') || u.role === 'AM');
+  });
+  const routing = s.leadRouting || {};
+  const setRouting = (id, key, value) => setS({
+    ...s,
+    leadRouting: { ...routing, [id]: { ...(routing[id] || {}), [key]: value.split(',').map(x => x.trim()).filter(Boolean) } },
+  });
+  const url = `${origin}/api/lead-intake`;
+  const byAttribute = ['region', 'service_line', 'campaign'].includes(s.leadAssignStrategy);
+
+  return (
+    <div className="card">
+      <div className="card-head"><span className="card-title">Cổng nhận lead tự động</span></div>
+      <div className="card-body" style={{ display: 'grid', gap: 12, fontSize: '.83rem' }}>
+        <div className="hint">
+          Bật cổng để Facebook Lead Ads, TikTok Lead, form landing page hoặc website đẩy thẳng khách vào mục
+          Khách hàng tiềm năng — không phải chép tay về Excel. Mỗi lead vào sẽ tự chia cho sale và bắn thông báo ngay.
+        </div>
+
+        <div className="field full">
+          <label>Địa chỉ nhận lead (dán vào nền tảng quảng cáo / form)</label>
+          <input readOnly value={s.leadIntakeToken ? url : '— chưa bật —'} onFocus={e => e.target.select()} />
+          <div className="hint">Gửi <code>POST</code> kèm header <code>x-intake-token</code> (hoặc <code>?token=</code>). Nội dung tối thiểu: <code>{'{ "name": "...", "phone": "0912...", "source": "Facebook", "campaign": "4_MKT_Landing_ThaoVietAn" }'}</code></div>
+        </div>
+
+        <div className="field full">
+          <label>Mã bí mật của cổng</label>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <input style={{ flex: 1, minWidth: 200, fontFamily: 'monospace' }} value={s.leadIntakeToken || ''}
+              onChange={e => setS({ ...s, leadIntakeToken: e.target.value.trim() })} placeholder="Trống = cổng đóng" />
+            <button type="button" className="btn btn-outline btn-sm"
+              onClick={() => { setS({ ...s, leadIntakeToken: crypto.randomUUID().replace(/-/g, '') }); toast('Đã sinh mã mới — nhớ Lưu rồi cập nhật lại bên nền tảng'); }}>Sinh mã mới</button>
+            {s.leadIntakeToken && <button type="button" className="btn btn-ghost btn-sm"
+              onClick={() => setS({ ...s, leadIntakeToken: '' })} style={{ color: 'var(--danger)' }}>Đóng cổng</button>}
+          </div>
+          <div className="hint">⚠ Ai cầm mã này là bơm được lead vào công ty. Chỉ đưa cho bên chạy quảng cáo. Đổi mã sẽ làm luồng cũ ngừng chảy tới khi cập nhật lại.</div>
+        </div>
+
+        <div className="field full">
+          <label>Cách chia lead cho sale</label>
+          <select value={s.leadAssignStrategy || 'least_load'} onChange={e => setS({ ...s, leadAssignStrategy: e.target.value })}>
+            {ASSIGN_LABELS.map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+          </select>
+          <div className="hint">Áp dụng cho cả lead nhập tay lẫn lead chảy về tự động (cần bật &quot;Tự chia lead chưa gán&quot; ở khối bên trái). Không ai khớp tiêu chí thì hệ thống vẫn chia cho người ít tải nhất — không bao giờ bỏ rơi lead.</div>
+        </div>
+
+        {byAttribute && (
+          <div className="field full">
+            <label>Phân vùng phụ trách của từng sale</label>
+            {!ams.length && <div className="hint">Chưa có ai mang vai trò Account/Sales đang hoạt động.</div>}
+            {ams.map(am => (
+              <div key={am.id} style={{ display: 'grid', gap: 4, padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                <b>{am.name}</b>
+                <input placeholder="Khu vực (cách nhau dấu phẩy) — VD: Miền Bắc, Hà Nội"
+                  value={(routing[am.id]?.regions || []).join(', ')} onChange={e => setRouting(am.id, 'regions', e.target.value)} />
+                <input placeholder="Mảng dịch vụ — VD: Seeding, Livestream"
+                  value={(routing[am.id]?.serviceLines || []).join(', ')} onChange={e => setRouting(am.id, 'serviceLines', e.target.value)} />
+                <input placeholder="Từ khóa chiến dịch — VD: Landing, Fanpage"
+                  value={(routing[am.id]?.campaigns || []).join(', ')} onChange={e => setRouting(am.id, 'campaigns', e.target.value)} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="field full">
+          <label>Khu vực dùng chung (mỗi dòng một khu vực)</label>
+          <textarea rows={3} value={Array.isArray(s.leadRegions) ? s.leadRegions.join('\n') : (s.leadRegions ?? '')}
+            onChange={e => setS({ ...s, leadRegions: e.target.value })} placeholder={'Miền Bắc\nMiền Trung\nMiền Nam'} />
+        </div>
+
+        <div className="hint" style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+          <b>Quy ước đặt tên chiến dịch</b> — đặt theo dạng <code>&lt;số&gt;_&lt;kênh&gt;_&lt;nội dung&gt;</code>, VD <code>4_MKT_Landing_ThaoVietAn</code>.
+          Nhờ vậy báo cáo tách được doanh thu về từ đúng chiến dịch, và luật chia theo chiến dịch chỉ cần khớp một từ khóa (&quot;Landing&quot;).
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const { data: session } = useSession();
   const [s, setS] = useState(null);
@@ -133,7 +233,8 @@ export default function SettingsPage() {
       .map(x => String(x).trim()).filter(Boolean);
     const serviceLines = toList(s.serviceLines);
     const officeNetworks = toList(s.officeNetworks); // v3.41: mạng công ty cũng soạn theo dòng
-    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...s, serviceLines, officeNetworks }) });
+    const leadRegions = toList(s.leadRegions); // v3.42: khu vực chia lead cũng soạn theo dòng
+    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...s, serviceLines, officeNetworks, leadRegions }) });
     toast(res.ok ? 'Đã lưu cài đặt' : 'Có lỗi khi lưu', res.ok ? 'success' : 'error');
   };
 
@@ -339,6 +440,7 @@ export default function SettingsPage() {
               onChange={e => e.target.files[0] && importV1(e.target.files[0])} />
           </div>
         </div>
+        <LeadIntakeSection s={s} setS={setS} />
         <ApiSection />
         <div className="card">
           <div className="card-body" style={{ fontSize: '.8rem', color: 'var(--muted)' }}>

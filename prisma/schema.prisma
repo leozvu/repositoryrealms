@@ -237,6 +237,15 @@ model Lead {
   note          String?
   createdAt     String?
   expectedClose String? // v3.4: tháng/ngày dự kiến chốt (YYYY-MM-DD) — cho forecast
+  // v3.42 (cụm Lead): lead tự chảy về từ Facebook/TikTok/landing thay vì nhập tay
+  campaign    String? // nhãn chiến dịch marketing, VD "4_MKT_Landing_ThaoVietAn"
+  region      String? // khu vực khách — dùng để chia sale theo vùng
+  serviceLine String? // mảng dịch vụ khách quan tâm — chia sale theo chuyên môn
+  intakeKey   String? @unique // khóa chống trùng: liên hệ + chiến dịch
+  intakeAt    DateTime? // thời điểm hệ thống nhận, tách khỏi createdAt (chuỗi) cũ
+
+  @@index([campaign])
+  @@index([ownerId, stage])
 }
 
 model Service {

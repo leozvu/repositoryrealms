@@ -597,7 +597,7 @@
     {
       "elementId": "route.leads.action.chuyen-thanh-khach-hang",
       "source": "app/(app)/leads/page.jsx",
-      "line": 258,
+      "line": 304,
       "label": "Chuyển thành khách hàng",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -885,7 +885,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 303,
+      "line": 404,
       "label": "Lưu & gửi email thử tới chính hộp thư này",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -897,7 +897,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 317,
+      "line": 418,
       "label": "Lưu cài đặt",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
