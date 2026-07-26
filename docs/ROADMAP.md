@@ -32,6 +32,27 @@ Ba quyết định này khóa vào nhau: **giờ giấc → chấm công chặt 
 ### Chương 4 — Chuẩn bị bán ra 🔄
 Xem `docs/ARCHITECTURE-CORE-VS-CUSTOM.md`.
 
+### Cụm Lead — nhận lead tự động ✅ (v3.42)
+Đối chiếu với một sản phẩm cùng thị trường (Sandbox ERP Cloud) cho thấy bên mình đã có pipeline,
+lưu vết chăm sóc, nhắc follow-up và forecast — chỉ hụt đúng khâu đầu: **lead vẫn phải nhập tay**,
+và cơ chế chia duy nhất là "AM ít lead nhất". Đúng thứ nhân sự AIm đã báo trước ("khi đẩy mạnh
+bán hàng sẽ cần tính năng nhập lead").
+
+- `POST /api/lead-intake` — cổng công khai của từng công ty, fail-closed: chưa sinh mã thì trả 404.
+  Nhận được tên trường của Facebook / TikTok / form Việt, chuẩn hóa SĐT VN, chống trùng theo
+  liên hệ + chiến dịch, tự chia + báo sale ngay. `GET` trả `hub.challenge` để Meta xác minh webhook.
+- 5 cách chia: ít tải nhất (mặc định, giữ hành vi cũ), luân phiên, khu vực, mảng dịch vụ, chiến dịch.
+  Không khớp ai thì vẫn chia cho người ít tải nhất — **không bao giờ bỏ rơi lead**.
+- Lead nhập tay và lead tự động đi chung một bộ chia (`lib/lead-intake.js`), tránh hai luật khác nhau.
+- Bảng **Hiệu quả theo chiến dịch** ở trang Lead: mỗi chiến dịch mang về bao nhiêu lead, chốt bao
+  nhiêu, ra bao nhiêu tiền.
+- Hướng dẫn nối nền tảng: `docs/HUONG-DAN-NHAN-LEAD-TU-DONG.md`.
+
+**Nghiệm thu trên `erp-crm-test`** (26/7/2026): sai mã → 404 · Meta verify → trả đúng challenge ·
+lead Facebook (`full_name`/`phone_number`/`+84…`) → tạo + chia + thông báo · bắn lại → báo trùng,
+không tạo lead thứ hai · lead không có liên hệ → 400 · lead TikTok không tên → tự đặt "Khách 4321".
+Tiếng Việt có dấu round-trip nguyên vẹn. Số lead trước/sau migration: 7 → 7 (không mất dòng nào).
+
 ## Nhịp làm việc đã chứng minh đúng — giữ nguyên
 
 Vòng lặp **feedback thật → sửa → deploy → bot nghiệm thu → giữ nguyên dữ liệu** đã chạy qua 3 đợt AIm + 2 đợt Egoric. Đây là tài sản lớn nhất của dự án, hơn cả số lượng tính năng: nhân sự tin rằng phản hồi của họ được sửa thật. **Không đánh đổi nhịp này lấy tốc độ ra tính năng.**

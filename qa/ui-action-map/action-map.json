@@ -3127,6 +3127,61 @@
       }
     },
     {
+      "route": "/api/lead-intake",
+      "source": "app/api/lead-intake/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "Setting"
+          ],
+          "roles": [],
+          "guards": [],
+          "statuses": [
+            404
+          ],
+          "permissionPolicy": "public-or-unverified",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        },
+        "POST": {
+          "models": [
+            "AuditLog",
+            "Conversation",
+            "Lead",
+            "Message",
+            "Notification",
+            "Onboarding",
+            "Project",
+            "RealmChangeEvent",
+            "RealmGoldEntry",
+            "Rule",
+            "Setting",
+            "Task",
+            "TaskEvent",
+            "User",
+            "Webhook"
+          ],
+          "roles": [
+            "ACCOUNTANT",
+            "AM",
+            "DIRECTOR",
+            "HR",
+            "PM",
+            "STAFF"
+          ],
+          "guards": [],
+          "statuses": [
+            400,
+            404,
+            500
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/leads/workload",
       "source": "app/api/leads/workload/route.js",
       "methods": {
@@ -29301,7 +29356,7 @@
     {
       "elementId": "route.leads.action.them-khach-tiem-nang",
       "source": "app/(app)/leads/page.jsx",
-      "line": 122,
+      "line": 145,
       "column": 9,
       "surface": "route.leads",
       "tag": "button",
@@ -29364,7 +29419,7 @@
     {
       "elementId": "route.leads.action.thu-lai",
       "source": "app/(app)/leads/page.jsx",
-      "line": 139,
+      "line": 185,
       "column": 98,
       "surface": "route.leads",
       "tag": "button",
@@ -29443,7 +29498,7 @@
     {
       "elementId": "route.leads.action.review-lead",
       "source": "app/(app)/leads/page.jsx",
-      "line": 161,
+      "line": 207,
       "column": 32,
       "surface": "route.leads",
       "tag": "button",
@@ -29506,7 +29561,7 @@
     {
       "elementId": "route.leads.action.nhat-ky-follow-up",
       "source": "app/(app)/leads/page.jsx",
-      "line": 162,
+      "line": 208,
       "column": 32,
       "surface": "route.leads",
       "tag": "button",
@@ -29569,7 +29624,7 @@
     {
       "elementId": "route.leads.action.button",
       "source": "app/(app)/leads/page.jsx",
-      "line": 226,
+      "line": 272,
       "column": 17,
       "surface": "route.leads",
       "tag": "button",
@@ -29632,7 +29687,7 @@
     {
       "elementId": "route.leads.action.xoa",
       "source": "app/(app)/leads/page.jsx",
-      "line": 255,
+      "line": 301,
       "column": 11,
       "surface": "route.leads",
       "tag": "button",
@@ -29695,7 +29750,7 @@
     {
       "elementId": "route.leads.action.nhat-ky-hen",
       "source": "app/(app)/leads/page.jsx",
-      "line": 257,
+      "line": 303,
       "column": 11,
       "surface": "route.leads",
       "tag": "button",
@@ -29758,7 +29813,7 @@
     {
       "elementId": "route.leads.action.chuyen-thanh-khach-hang",
       "source": "app/(app)/leads/page.jsx",
-      "line": 258,
+      "line": 304,
       "column": 41,
       "surface": "route.leads",
       "tag": "AsyncButton",
@@ -37157,6 +37212,7 @@
       "mappingStatus": "handler-resolved",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37190,6 +37246,7 @@
       ],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [
@@ -37197,6 +37254,7 @@
         "AuditLog"
       ],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [
@@ -37232,6 +37290,7 @@
       "mappingStatus": "handler-resolved",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37265,6 +37324,7 @@
       ],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [
@@ -37272,6 +37332,7 @@
         "AuditLog"
       ],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [
@@ -37307,6 +37368,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37336,10 +37398,12 @@
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -37373,6 +37437,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37402,10 +37467,12 @@
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -37439,6 +37506,7 @@
       "mappingStatus": "handler-resolved",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37472,6 +37540,7 @@
       ],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [
@@ -37479,6 +37548,7 @@
         "AuditLog"
       ],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [
@@ -37516,6 +37586,7 @@
       "mappingStatus": "handler-resolved",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37547,6 +37618,7 @@
         "update:webhooks"
       ],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [
@@ -37573,6 +37645,7 @@
         "Webhook"
       ],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [
@@ -37616,6 +37689,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37643,10 +37717,12 @@
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -37680,6 +37756,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37709,10 +37786,12 @@
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -37746,6 +37825,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37775,10 +37855,12 @@
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -37812,6 +37894,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37841,10 +37924,12 @@
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -37878,6 +37963,7 @@
       "mappingStatus": "handler-resolved",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -37911,6 +37997,7 @@
         "create:webhooks"
       ],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [
@@ -37937,6 +38024,7 @@
         "Webhook"
       ],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [
@@ -37980,6 +38068,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38007,10 +38096,12 @@
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38031,7 +38122,758 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 156,
+      "line": 161,
+      "column": 11,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "LeadIntakeSection",
+      "effectiveHandlerEvent": "",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.trong-cong-ong",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 168,
+      "column": 13,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "Trống = cổng đóng",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "LeadIntakeSection",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [
+        {
+          "callback": "setS",
+          "source": "app/(app)/settings/page.jsx",
+          "line": 443,
+          "surface": "route:/settings",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        }
+      ],
+      "usedBySurfaces": [
+        "route:/settings"
+      ],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.action.sinh-ma-moi",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 170,
+      "column": 13,
+      "surface": "route.settings",
+      "tag": "button",
+      "kind": "action",
+      "label": "Sinh mã mới",
+      "handlerEvent": "onClick",
+      "handler": "() => { setS({ ...s, leadIntakeToken: crypto.randomUUID().replace(/-/g, '') }); toast('Đã sinh mã mới — nhớ Lưu rồi cập nhật lại bên nền tảng'); }",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "delegated",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "LeadIntakeSection",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "delegated-action",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [
+        {
+          "callback": "setS",
+          "source": "app/(app)/settings/page.jsx",
+          "line": 443,
+          "surface": "route:/settings",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        }
+      ],
+      "usedBySurfaces": [
+        "route:/settings"
+      ],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.action.ong-cong",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 172,
+      "column": 35,
+      "surface": "route.settings",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đóng cổng",
+      "handlerEvent": "onClick",
+      "handler": "() => setS({ ...s, leadIntakeToken: '' })",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "delegated",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "LeadIntakeSection",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "delegated-action",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [
+        {
+          "callback": "setS",
+          "source": "app/(app)/settings/page.jsx",
+          "line": 443,
+          "surface": "route:/settings",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        }
+      ],
+      "usedBySurfaces": [
+        "route:/settings"
+      ],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.select",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 180,
+      "column": 11,
+      "surface": "route.settings",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "LeadIntakeSection",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [
+        {
+          "callback": "setS",
+          "source": "app/(app)/settings/page.jsx",
+          "line": 443,
+          "surface": "route:/settings",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        }
+      ],
+      "usedBySurfaces": [
+        "route:/settings"
+      ],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.khu-vuc-cach-nhau-dau-phay-vd-mien-bac-ha-noi",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 193,
+      "column": 17,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "Khu vực (cách nhau dấu phẩy) — VD: Miền Bắc, Hà Nội",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "LeadIntakeSection",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "setRouting"
+      ],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [
+        {
+          "callback": "setS",
+          "source": "app/(app)/settings/page.jsx",
+          "line": 443,
+          "surface": "route:/settings",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        }
+      ],
+      "usedBySurfaces": [
+        "route:/settings"
+      ],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.mang-dich-vu-vd-seeding-livestream",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 195,
+      "column": 17,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "Mảng dịch vụ — VD: Seeding, Livestream",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "LeadIntakeSection",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "setRouting"
+      ],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [
+        {
+          "callback": "setS",
+          "source": "app/(app)/settings/page.jsx",
+          "line": 443,
+          "surface": "route:/settings",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        }
+      ],
+      "usedBySurfaces": [
+        "route:/settings"
+      ],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.tu-khoa-chien-dich-vd-landing-fanpage",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 197,
+      "column": 17,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "Từ khóa chiến dịch — VD: Landing, Fanpage",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "LeadIntakeSection",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "setRouting"
+      ],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [
+        {
+          "callback": "setS",
+          "source": "app/(app)/settings/page.jsx",
+          "line": 443,
+          "surface": "route:/settings",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        }
+      ],
+      "usedBySurfaces": [
+        "route:/settings"
+      ],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.mien-bac-mien-trung-mien-nam",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 206,
+      "column": 11,
+      "surface": "route.settings",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "Miền Bắc Miền Trung Miền Nam",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "LeadIntakeSection",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [
+        {
+          "callback": "setS",
+          "source": "app/(app)/settings/page.jsx",
+          "line": 443,
+          "surface": "route:/settings",
+          "apiCalls": [],
+          "resourceOperations": [],
+          "routeTargets": [],
+          "helperCalls": [],
+          "localState": []
+        }
+      ],
+      "usedBySurfaces": [
+        "route:/settings"
+      ],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.input.2",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 257,
       "column": 7,
       "surface": "route.settings",
       "tag": "input",
@@ -38046,6 +38888,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38068,17 +38911,21 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38097,7 +38944,7 @@
     {
       "elementId": "route.settings.form-control.digital-ads-social-media-seeding-livestream",
       "source": "app/(app)/settings/page.jsx",
-      "line": 176,
+      "line": 277,
       "column": 15,
       "surface": "route.settings",
       "tag": "textarea",
@@ -38112,6 +38959,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38134,17 +38982,21 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38163,7 +39015,7 @@
     {
       "elementId": "route.settings.form-control.khong-siet-chi-ghi-nhan-noi-bam-canh-bao-van-cho-bam-ghi-chu-neu",
       "source": "app/(app)/settings/page.jsx",
-      "line": 189,
+      "line": 290,
       "column": 15,
       "surface": "route.settings",
       "tag": "select",
@@ -38178,6 +39030,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38200,17 +39053,21 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38229,7 +39086,7 @@
     {
       "elementId": "route.settings.form-control.113-161-10-27-72-88-145",
       "source": "app/(app)/settings/page.jsx",
-      "line": 197,
+      "line": 298,
       "column": 15,
       "surface": "route.settings",
       "tag": "textarea",
@@ -38244,6 +39101,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38266,83 +39124,21 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
-        "Webhook"
-      ],
-      "permissionPolicies": [],
-      "allowedRoles": [],
-      "rowPolicy": false,
-      "scopedRead": false,
-      "browserActions": [],
-      "helperCalls": [],
-      "localMutations": [],
-      "loadingState": "not-required",
-      "successState": "not-required",
-      "errorState": "not-required",
-      "confirmationState": "not-required",
-      "uxStateCandidates": []
-    },
-    {
-      "elementId": "route.settings.form-control.input.2",
-      "source": "app/(app)/settings/page.jsx",
-      "line": 205,
-      "column": 17,
-      "surface": "route.settings",
-      "tag": "input",
-      "kind": "form-control",
-      "label": "",
-      "handlerEvent": "",
-      "handler": "",
-      "target": "",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "control-candidate",
-      "mappingStatus": "classified-local",
-      "businessFeature": "",
-      "resourceCandidates": [
-        "webhooks"
-      ],
-      "apiCandidates": [
-        "GET '/api/apikeys'",
-        "POST '/api/apikeys'",
-        "PUT '/api/apikeys'",
-        "DELETE '/api/apikeys'",
-        "GET '/api/settings'",
-        "PUT '/api/settings'",
-        "POST '/api/import'",
-        "PUT '/api/settings'",
-        "POST '/api/email/send'"
-      ],
-      "routeCandidates": [],
-      "uxRiskCandidates": [
-        "control_binding_unverified"
-      ],
-      "ownerComponent": "SettingsPage",
-      "effectiveHandlerEvent": "onChange",
-      "actionType": "form-control",
-      "mappingConfidence": "high",
-      "handlerChain": [],
-      "delegatedCallbacks": [],
-      "delegatedBindings": [],
-      "usedBySurfaces": [],
-      "routeTargets": [],
-      "apiCalls": [],
-      "resourceOperations": [],
-      "contextResources": [
-        "webhooks"
-      ],
-      "prismaModels": [],
-      "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38361,8 +39157,8 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 217,
-      "column": 19,
+      "line": 306,
+      "column": 17,
       "surface": "route.settings",
       "tag": "input",
       "kind": "form-control",
@@ -38376,6 +39172,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38398,17 +39195,21 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38427,8 +39228,8 @@
     {
       "elementId": "route.settings.form-control.input.4",
       "source": "app/(app)/settings/page.jsx",
-      "line": 237,
-      "column": 17,
+      "line": 318,
+      "column": 19,
       "surface": "route.settings",
       "tag": "input",
       "kind": "form-control",
@@ -38442,6 +39243,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38464,17 +39266,21 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38493,8 +39299,8 @@
     {
       "elementId": "route.settings.form-control.input.5",
       "source": "app/(app)/settings/page.jsx",
-      "line": 246,
-      "column": 19,
+      "line": 338,
+      "column": 17,
       "surface": "route.settings",
       "tag": "input",
       "kind": "form-control",
@@ -38508,6 +39314,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38530,145 +39337,21 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
-        "Webhook"
-      ],
-      "permissionPolicies": [],
-      "allowedRoles": [],
-      "rowPolicy": false,
-      "scopedRead": false,
-      "browserActions": [],
-      "helperCalls": [],
-      "localMutations": [],
-      "loadingState": "not-required",
-      "successState": "not-required",
-      "errorState": "not-required",
-      "confirmationState": "not-required",
-      "uxStateCandidates": []
-    },
-    {
-      "elementId": "route.settings.action.mau",
-      "source": "app/(app)/settings/page.jsx",
-      "line": 262,
-      "column": 19,
-      "surface": "route.settings",
-      "tag": "button",
-      "kind": "action",
-      "label": "Mẫu:",
-      "handlerEvent": "onClick",
-      "handler": "() => setS({ ...s, modules: [...p.mods] })",
-      "target": "",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "handler-candidate",
-      "mappingStatus": "classified-local",
-      "businessFeature": "",
-      "resourceCandidates": [
-        "webhooks"
-      ],
-      "apiCandidates": [
-        "GET '/api/apikeys'",
-        "POST '/api/apikeys'",
-        "PUT '/api/apikeys'",
-        "DELETE '/api/apikeys'",
-        "GET '/api/settings'",
-        "PUT '/api/settings'",
-        "POST '/api/import'",
-        "PUT '/api/settings'",
-        "POST '/api/email/send'"
-      ],
-      "routeCandidates": [],
-      "uxRiskCandidates": [],
-      "ownerComponent": "SettingsPage",
-      "effectiveHandlerEvent": "onClick",
-      "actionType": "local-state",
-      "mappingConfidence": "high",
-      "handlerChain": [],
-      "delegatedCallbacks": [],
-      "delegatedBindings": [],
-      "usedBySurfaces": [],
-      "routeTargets": [],
-      "apiCalls": [],
-      "resourceOperations": [],
-      "contextResources": [
-        "webhooks"
-      ],
-      "prismaModels": [],
-      "contextModels": [
-        "Webhook"
-      ],
-      "permissionPolicies": [],
-      "allowedRoles": [],
-      "rowPolicy": false,
-      "scopedRead": false,
-      "browserActions": [],
-      "helperCalls": [],
-      "localMutations": [],
-      "loadingState": "not-required",
-      "successState": "not-required",
-      "errorState": "not-required",
-      "confirmationState": "not-required",
-      "uxStateCandidates": []
-    },
-    {
-      "elementId": "route.settings.action.bat-tat-ca",
-      "source": "app/(app)/settings/page.jsx",
-      "line": 265,
-      "column": 17,
-      "surface": "route.settings",
-      "tag": "button",
-      "kind": "action",
-      "label": "Bật tất cả",
-      "handlerEvent": "onClick",
-      "handler": "() => setS({ ...s, modules: MODULE_GROUPS.filter(g => !g.soon).map(g => g.mod) })",
-      "target": "",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "handler-candidate",
-      "mappingStatus": "classified-local",
-      "businessFeature": "",
-      "resourceCandidates": [
-        "webhooks"
-      ],
-      "apiCandidates": [
-        "GET '/api/apikeys'",
-        "POST '/api/apikeys'",
-        "PUT '/api/apikeys'",
-        "DELETE '/api/apikeys'",
-        "GET '/api/settings'",
-        "PUT '/api/settings'",
-        "POST '/api/import'",
-        "PUT '/api/settings'",
-        "POST '/api/email/send'"
-      ],
-      "routeCandidates": [],
-      "uxRiskCandidates": [],
-      "ownerComponent": "SettingsPage",
-      "effectiveHandlerEvent": "onClick",
-      "actionType": "local-state",
-      "mappingConfidence": "high",
-      "handlerChain": [],
-      "delegatedCallbacks": [],
-      "delegatedBindings": [],
-      "usedBySurfaces": [],
-      "routeTargets": [],
-      "apiCalls": [],
-      "resourceOperations": [],
-      "contextResources": [
-        "webhooks"
-      ],
-      "prismaModels": [],
-      "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38687,8 +39370,8 @@
     {
       "elementId": "route.settings.form-control.input.6",
       "source": "app/(app)/settings/page.jsx",
-      "line": 275,
-      "column": 23,
+      "line": 347,
+      "column": 19,
       "surface": "route.settings",
       "tag": "input",
       "kind": "form-control",
@@ -38702,6 +39385,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38724,17 +39408,159 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.action.mau",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 363,
+      "column": 19,
+      "surface": "route.settings",
+      "tag": "button",
+      "kind": "action",
+      "label": "Mẫu:",
+      "handlerEvent": "onClick",
+      "handler": "() => setS({ ...s, modules: [...p.mods] })",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "delegated",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "SettingsPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "delegated-action",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.action.bat-tat-ca",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 366,
+      "column": 17,
+      "surface": "route.settings",
+      "tag": "button",
+      "kind": "action",
+      "label": "Bật tất cả",
+      "handlerEvent": "onClick",
+      "handler": "() => setS({ ...s, modules: MODULE_GROUPS.filter(g => !g.soon).map(g => g.mod) })",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "delegated",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "SettingsPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "delegated-action",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38753,12 +39579,12 @@
     {
       "elementId": "route.settings.form-control.input.7",
       "source": "app/(app)/settings/page.jsx",
-      "line": 299,
-      "column": 15,
+      "line": 376,
+      "column": 23,
       "surface": "route.settings",
       "tag": "input",
       "kind": "form-control",
-      "label": "••••••••",
+      "label": "",
       "handlerEvent": "",
       "handler": "",
       "target": "",
@@ -38768,6 +39594,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38790,17 +39617,92 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
+        "Webhook"
+      ],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.input.8",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 400,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "••••••••",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "SettingsPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [
+        "users",
+        "webhooks"
+      ],
+      "prismaModels": [],
+      "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38819,7 +39721,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 303,
+      "line": 404,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -38834,6 +39736,7 @@
       "mappingStatus": "handler-resolved",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38864,6 +39767,7 @@
       ],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [
@@ -38873,6 +39777,7 @@
         "Setting"
       ],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [
@@ -38896,7 +39801,7 @@
     {
       "elementId": "route.settings.form-control.sk-or-v1-tao-tai-openrouter-ai-keys",
       "source": "app/(app)/settings/page.jsx",
-      "line": 313,
+      "line": 414,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -38911,6 +39816,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -38933,17 +39839,21 @@
       "actionType": "form-control",
       "mappingConfidence": "high",
       "handlerChain": [],
-      "delegatedCallbacks": [],
+      "delegatedCallbacks": [
+        "setS"
+      ],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [],
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -38962,7 +39872,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 317,
+      "line": 418,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -38977,6 +39887,7 @@
       "mappingStatus": "handler-resolved",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -39009,6 +39920,7 @@
       ],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [
@@ -39016,6 +39928,7 @@
         "Setting"
       ],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [
@@ -39036,7 +39949,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 335,
+      "line": 436,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -39051,6 +39964,7 @@
       "mappingStatus": "classified-local",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -39078,10 +39992,12 @@
       "apiCalls": [],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [],
@@ -39100,9 +40016,9 @@
       "uxStateCandidates": []
     },
     {
-      "elementId": "route.settings.form-control.input.8",
+      "elementId": "route.settings.form-control.input.9",
       "source": "app/(app)/settings/page.jsx",
-      "line": 338,
+      "line": 439,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -39117,6 +40033,7 @@
       "mappingStatus": "handler-resolved",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -39150,6 +40067,7 @@
       ],
       "resourceOperations": [],
       "contextResources": [
+        "users",
         "webhooks"
       ],
       "prismaModels": [
@@ -39168,6 +40086,7 @@
         "User"
       ],
       "contextModels": [
+        "User",
         "Webhook"
       ],
       "permissionPolicies": [
@@ -51681,7 +52600,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 260,
+          "line": 306,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload"
@@ -75006,7 +75925,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/leads/page.jsx",
-          "line": 258,
+          "line": 304,
           "surface": "route:/leads",
           "apiCalls": [
             "POST /api/data/clients"
@@ -75205,7 +76124,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 303,
+          "line": 404,
           "surface": "route:/settings",
           "apiCalls": [
             "POST /api/email/send",
@@ -75219,7 +76138,7 @@
         {
           "callback": "onClick",
           "source": "app/(app)/settings/page.jsx",
-          "line": 317,
+          "line": 418,
           "surface": "route:/settings",
           "apiCalls": [
             "PUT /api/settings"
@@ -77475,7 +78394,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 261,
+          "line": 307,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -78561,7 +79480,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 261,
+          "line": 307,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -78574,7 +79493,7 @@
         {
           "callback": "onYes",
           "source": "app/(app)/leads/page.jsx",
-          "line": 261,
+          "line": 307,
           "surface": "route:/leads",
           "apiCalls": [
             "DELETE /api/data/leads/[id]",
@@ -79981,7 +80900,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -79994,7 +80913,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80947,7 +81866,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80960,7 +81879,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -80982,7 +81901,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -80995,7 +81914,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -82590,7 +83509,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -82603,7 +83522,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -82625,7 +83544,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -82638,7 +83557,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -84234,7 +85153,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -84247,7 +85166,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -84269,7 +85188,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -84282,7 +85201,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -85878,7 +86797,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -85891,7 +86810,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -85913,7 +86832,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -85926,7 +86845,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -87522,7 +88441,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -87535,7 +88454,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -87557,7 +88476,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -87570,7 +88489,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -89166,7 +90085,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -89179,7 +90098,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 250,
+          "line": 296,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -89201,7 +90120,7 @@
         {
           "callback": "onClose",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [],
           "resourceOperations": [],
@@ -89214,7 +90133,7 @@
         {
           "callback": "onSave",
           "source": "app/(app)/leads/page.jsx",
-          "line": 252,
+          "line": 298,
           "surface": "route:/leads",
           "apiCalls": [
             "GET /api/leads/workload",
@@ -90315,31 +91234,31 @@
     }
   ],
   "summary": {
-    "elements": 952,
-    "apiContracts": 128,
+    "elements": 961,
+    "apiContracts": 129,
     "registryResources": 50,
     "byActionType": {
-      "local-state": 251,
+      "local-state": 249,
       "data-action": 175,
-      "form-control": 314,
-      "delegated-action": 84,
+      "form-control": 321,
+      "delegated-action": 88,
       "navigation": 90,
       "browser-action": 30,
       "helper-action": 8
     },
     "byMappingStatus": {
-      "classified-local": 636,
+      "classified-local": 641,
       "delegated-resolved": 48,
       "handler-resolved": 184,
-      "delegated": 84
+      "delegated": 88
     },
     "byConfidence": {
-      "high": 904,
+      "high": 913,
       "medium": 48
     },
     "uxStateCandidates": {},
     "dataActions": 175,
-    "delegatedBindings": 1156,
+    "delegatedBindings": 1164,
     "actionableUnresolved": 0
   }
 }

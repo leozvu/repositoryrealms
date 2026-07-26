@@ -1,6 +1,6 @@
-# Đồng bộ schema Prisma lên CẢ 5 schema Postgres (khi sửa prisma/schema.prisma).
-#   .\db-push-all.ps1                → push cả 5
-#   .\db-push-all.ps1 -Only egoric   → chỉ 1 schema (aim | egoric | vnecom | fretas | egolive)
+﻿# Đồng bộ schema Prisma lên CẢ 4 schema Postgres (khi sửa prisma/schema.prisma).
+#   .\db-push-all.ps1                → push cả 4
+#   .\db-push-all.ps1 -Only egoric   → chỉ 1 schema (aim | egoric | vnecom | egolive)
 # ⚠ Dừng dev server trước khi chạy (prisma generate cần ghi DLL — dev server giữ file này).
 #
 # v3.13: mật khẩu Postgres KHÔNG còn nằm trong file này nữa (file này được git theo dõi).
@@ -22,7 +22,8 @@ $schemas = @(
   @{ key = 'aim';     schema = 'public' },
   @{ key = 'egoric';  schema = 'egoric' },
   @{ key = 'vnecom';  schema = 'vnecom' },
-  @{ key = 'fretas';  schema = 'fretas' },
+  # fretas ĐÃ GỠ (v3.42): thuộc một đơn vị khác, không nằm trong nhóm 4 công ty của Leoz Group.
+  # Để lại trong danh sách là mỗi lần đổi schema lại vô tình ghi vào cơ sở dữ liệu của họ.
   @{ key = 'egolive'; schema = 'egolive' }
 )
 foreach ($s in $schemas) {
@@ -34,4 +35,4 @@ foreach ($s in $schemas) {
 }
 Remove-Item Env:DATABASE_URL, Env:DIRECT_URL -ErrorAction SilentlyContinue
 npx prisma generate 2>&1 | Select-Object -Last 1
-Write-Host "`n✔ Xong — nhớ chạy .\deploy-all.ps1 để code mới lên cả 3." -ForegroundColor Green
+Write-Host "`n✔ Xong — nhớ chạy .\deploy-all.ps1 để code mới lên cả 4." -ForegroundColor Green

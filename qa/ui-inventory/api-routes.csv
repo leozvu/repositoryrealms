@@ -79,6 +79,7 @@
 "/api/insights","app/api/insights/route.js","false","GET","unreviewed"
 "/api/invoices/[id]/pay","app/api/invoices/[id]/pay/route.js","true","POST","unreviewed"
 "/api/invoices/from-hours","app/api/invoices/from-hours/route.js","false","GET | POST","unreviewed"
+"/api/lead-intake","app/api/lead-intake/route.js","false","GET | POST","unreviewed"
 "/api/leads/workload","app/api/leads/workload/route.js","false","GET","unreviewed"
 "/api/livesessions/[id]/reconcile","app/api/livesessions/[id]/reconcile/route.js","true","POST","unreviewed"
 "/api/livesessions/[id]/settle","app/api/livesessions/[id]/settle/route.js","true","POST","unreviewed"

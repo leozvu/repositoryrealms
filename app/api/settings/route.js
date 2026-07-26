@@ -10,6 +10,12 @@ const DEFAULTS = {
   // v3.4: xác suất chốt theo giai đoạn pipeline (%) — cho forecast doanh thu
   probNew: 10, probContacted: 20, probProposal: 40, probNegotiation: 60,
   autoAssignLeads: false, // v3.4: tự chia lead chưa gán cho AM ít lead mở nhất
+  // v3.42 (cụm Lead): cổng nhận lead tự động từ Facebook/TikTok/landing + chia sale thông minh.
+  // leadIntakeToken rỗng = cổng ĐÓNG (endpoint trả 404). Sinh bằng nút trong Cài đặt.
+  leadIntakeToken: '',
+  leadAssignStrategy: 'least_load', // least_load | round_robin | region | service_line | campaign
+  leadRouting: {}, // { [userId]: { regions: [], serviceLines: [], campaigns: [] } }
+  leadRegions: ['Miền Bắc', 'Miền Trung', 'Miền Nam'],
   roleLabels: {}, // v3.6: đổi tên chức danh theo công ty (quyền giữ nguyên theo nhóm)
   leaveQuota: 12, // v3.7: số ngày phép năm mỗi nhân sự
   workStart: '09:00', workEnd: '18:00', otMultiplier: 1.5, // v3.11: ca làm chuẩn + hệ số OT
@@ -39,7 +45,8 @@ const DEFAULTS = {
 };
 
 // Các trường bí mật — chỉ Giám đốc đọc được (trang Cài đặt); route server đọc thẳng DB
-const SECRET_KEYS = ['openRouterKey', 'anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPort', 'smtpFrom'];
+// leadIntakeToken nằm ở đây vì ai cầm được nó là bơm được lead vào pipeline công ty.
+const SECRET_KEYS = ['openRouterKey', 'anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPort', 'smtpFrom', 'leadIntakeToken'];
 
 export async function GET() {
   const user = await currentUser();

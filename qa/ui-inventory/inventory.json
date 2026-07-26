@@ -1437,6 +1437,7 @@
       ],
       "module": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -2472,6 +2473,16 @@
     {
       "route": "/api/invoices/from-hours",
       "source": "app/api/invoices/from-hours/route.js",
+      "dynamic": false,
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
+      "route": "/api/lead-intake",
+      "source": "app/api/lead-intake/route.js",
       "dynamic": false,
       "methods": [
         "GET",
@@ -12637,7 +12648,7 @@
     {
       "elementId": "route.leads.action.them-khach-tiem-nang",
       "source": "app/(app)/leads/page.jsx",
-      "line": 122,
+      "line": 145,
       "column": 9,
       "surface": "route.leads",
       "tag": "button",
@@ -12666,7 +12677,7 @@
     {
       "elementId": "route.leads.action.thu-lai",
       "source": "app/(app)/leads/page.jsx",
-      "line": 139,
+      "line": 185,
       "column": 98,
       "surface": "route.leads",
       "tag": "button",
@@ -12695,7 +12706,7 @@
     {
       "elementId": "route.leads.action.review-lead",
       "source": "app/(app)/leads/page.jsx",
-      "line": 161,
+      "line": 207,
       "column": 32,
       "surface": "route.leads",
       "tag": "button",
@@ -12724,7 +12735,7 @@
     {
       "elementId": "route.leads.action.nhat-ky-follow-up",
       "source": "app/(app)/leads/page.jsx",
-      "line": 162,
+      "line": 208,
       "column": 32,
       "surface": "route.leads",
       "tag": "button",
@@ -12753,7 +12764,7 @@
     {
       "elementId": "route.leads.action.button",
       "source": "app/(app)/leads/page.jsx",
-      "line": 226,
+      "line": 272,
       "column": 17,
       "surface": "route.leads",
       "tag": "button",
@@ -12782,7 +12793,7 @@
     {
       "elementId": "route.leads.action.xoa",
       "source": "app/(app)/leads/page.jsx",
-      "line": 255,
+      "line": 301,
       "column": 11,
       "surface": "route.leads",
       "tag": "button",
@@ -12811,7 +12822,7 @@
     {
       "elementId": "route.leads.action.nhat-ky-hen",
       "source": "app/(app)/leads/page.jsx",
-      "line": 257,
+      "line": 303,
       "column": 11,
       "surface": "route.leads",
       "tag": "button",
@@ -12840,7 +12851,7 @@
     {
       "elementId": "route.leads.action.chuyen-thanh-khach-hang",
       "source": "app/(app)/leads/page.jsx",
-      "line": 258,
+      "line": 304,
       "column": 41,
       "surface": "route.leads",
       "tag": "AsyncButton",
@@ -15835,6 +15846,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -15869,6 +15881,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -15903,6 +15916,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -15939,6 +15953,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -15975,6 +15990,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16009,6 +16025,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16043,6 +16060,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16077,6 +16095,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16113,6 +16132,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16149,6 +16169,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16185,6 +16206,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16219,6 +16241,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16238,8 +16261,8 @@
     {
       "elementId": "route.settings.form-control.input",
       "source": "app/(app)/settings/page.jsx",
-      "line": 156,
-      "column": 7,
+      "line": 161,
+      "column": 11,
       "surface": "route.settings",
       "tag": "input",
       "kind": "form-control",
@@ -16253,6 +16276,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16272,14 +16296,14 @@
       ]
     },
     {
-      "elementId": "route.settings.form-control.digital-ads-social-media-seeding-livestream",
+      "elementId": "route.settings.form-control.trong-cong-ong",
       "source": "app/(app)/settings/page.jsx",
-      "line": 176,
-      "column": 15,
+      "line": 168,
+      "column": 13,
       "surface": "route.settings",
-      "tag": "textarea",
+      "tag": "input",
       "kind": "form-control",
-      "label": "Digital Ads Social Media Seeding Livestream…",
+      "label": "Trống = cổng đóng",
       "handlerEvent": "",
       "handler": "",
       "target": "",
@@ -16289,6 +16313,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16308,14 +16333,84 @@
       ]
     },
     {
-      "elementId": "route.settings.form-control.khong-siet-chi-ghi-nhan-noi-bam-canh-bao-van-cho-bam-ghi-chu-neu",
+      "elementId": "route.settings.action.sinh-ma-moi",
       "source": "app/(app)/settings/page.jsx",
-      "line": 189,
-      "column": 15,
+      "line": 170,
+      "column": 13,
+      "surface": "route.settings",
+      "tag": "button",
+      "kind": "action",
+      "label": "Sinh mã mới",
+      "handlerEvent": "onClick",
+      "handler": "() => { setS({ ...s, leadIntakeToken: crypto.randomUUID().replace(/-/g, '') }); toast('Đã sinh mã mới — nhớ Lưu rồi cập nhật lại bên nền tảng'); }",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.settings.action.ong-cong",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 172,
+      "column": 35,
+      "surface": "route.settings",
+      "tag": "button",
+      "kind": "action",
+      "label": "Đóng cổng",
+      "handlerEvent": "onClick",
+      "handler": "() => setS({ ...s, leadIntakeToken: '' })",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.settings.form-control.select",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 180,
+      "column": 11,
       "surface": "route.settings",
       "tag": "select",
       "kind": "form-control",
-      "label": "Không siết — chỉ ghi nhận nơi bấm / Cảnh báo — vẫn cho bấm, ghi chú nếu ngoài mạng công ty / Chặn — khai \"đi làm\" phải bấm trong mạng công ty",
+      "label": "",
       "handlerEvent": "",
       "handler": "",
       "target": "",
@@ -16325,6 +16420,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16344,14 +16440,14 @@
       ]
     },
     {
-      "elementId": "route.settings.form-control.113-161-10-27-72-88-145",
+      "elementId": "route.settings.form-control.khu-vuc-cach-nhau-dau-phay-vd-mien-bac-ha-noi",
       "source": "app/(app)/settings/page.jsx",
-      "line": 197,
-      "column": 15,
+      "line": 193,
+      "column": 17,
       "surface": "route.settings",
-      "tag": "textarea",
+      "tag": "input",
       "kind": "form-control",
-      "label": "113.161.10. 27.72.88.145",
+      "label": "Khu vực (cách nhau dấu phẩy) — VD: Miền Bắc, Hà Nội",
       "handlerEvent": "",
       "handler": "",
       "target": "",
@@ -16361,6 +16457,118 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.mang-dich-vu-vd-seeding-livestream",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 195,
+      "column": 17,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "Mảng dịch vụ — VD: Seeding, Livestream",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.tu-khoa-chien-dich-vd-landing-fanpage",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 197,
+      "column": 17,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "Từ khóa chiến dịch — VD: Landing, Fanpage",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.mien-bac-mien-trung-mien-nam",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 206,
+      "column": 11,
+      "surface": "route.settings",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "Miền Bắc Miền Trung Miền Nam",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16382,8 +16590,8 @@
     {
       "elementId": "route.settings.form-control.input.2",
       "source": "app/(app)/settings/page.jsx",
-      "line": 205,
-      "column": 17,
+      "line": 257,
+      "column": 7,
       "surface": "route.settings",
       "tag": "input",
       "kind": "form-control",
@@ -16397,6 +16605,118 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.digital-ads-social-media-seeding-livestream",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 277,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "Digital Ads Social Media Seeding Livestream…",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.khong-siet-chi-ghi-nhan-noi-bam-canh-bao-van-cho-bam-ghi-chu-neu",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 290,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "select",
+      "kind": "form-control",
+      "label": "Không siết — chỉ ghi nhận nơi bấm / Cảnh báo — vẫn cho bấm, ghi chú nếu ngoài mạng công ty / Chặn — khai \"đi làm\" phải bấm trong mạng công ty",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.113-161-10-27-72-88-145",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 298,
+      "column": 15,
+      "surface": "route.settings",
+      "tag": "textarea",
+      "kind": "form-control",
+      "label": "113.161.10. 27.72.88.145",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16418,8 +16738,8 @@
     {
       "elementId": "route.settings.form-control.input.3",
       "source": "app/(app)/settings/page.jsx",
-      "line": 217,
-      "column": 19,
+      "line": 306,
+      "column": 17,
       "surface": "route.settings",
       "tag": "input",
       "kind": "form-control",
@@ -16433,6 +16753,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16454,8 +16775,8 @@
     {
       "elementId": "route.settings.form-control.input.4",
       "source": "app/(app)/settings/page.jsx",
-      "line": 237,
-      "column": 17,
+      "line": 318,
+      "column": 19,
       "surface": "route.settings",
       "tag": "input",
       "kind": "form-control",
@@ -16469,6 +16790,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16490,7 +16812,44 @@
     {
       "elementId": "route.settings.form-control.input.5",
       "source": "app/(app)/settings/page.jsx",
-      "line": 246,
+      "line": 338,
+      "column": 17,
+      "surface": "route.settings",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [
+        "users",
+        "webhooks"
+      ],
+      "apiCandidates": [
+        "GET '/api/apikeys'",
+        "POST '/api/apikeys'",
+        "PUT '/api/apikeys'",
+        "DELETE '/api/apikeys'",
+        "GET '/api/settings'",
+        "PUT '/api/settings'",
+        "POST '/api/import'",
+        "PUT '/api/settings'",
+        "POST '/api/email/send'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.settings.form-control.input.6",
+      "source": "app/(app)/settings/page.jsx",
+      "line": 347,
       "column": 19,
       "surface": "route.settings",
       "tag": "input",
@@ -16505,6 +16864,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16526,7 +16886,7 @@
     {
       "elementId": "route.settings.action.mau",
       "source": "app/(app)/settings/page.jsx",
-      "line": 262,
+      "line": 363,
       "column": 19,
       "surface": "route.settings",
       "tag": "button",
@@ -16541,6 +16901,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16560,7 +16921,7 @@
     {
       "elementId": "route.settings.action.bat-tat-ca",
       "source": "app/(app)/settings/page.jsx",
-      "line": 265,
+      "line": 366,
       "column": 17,
       "surface": "route.settings",
       "tag": "button",
@@ -16575,6 +16936,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16592,9 +16954,9 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.settings.form-control.input.6",
+      "elementId": "route.settings.form-control.input.7",
       "source": "app/(app)/settings/page.jsx",
-      "line": 275,
+      "line": 376,
       "column": 23,
       "surface": "route.settings",
       "tag": "input",
@@ -16609,6 +16971,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16628,9 +16991,9 @@
       ]
     },
     {
-      "elementId": "route.settings.form-control.input.7",
+      "elementId": "route.settings.form-control.input.8",
       "source": "app/(app)/settings/page.jsx",
-      "line": 299,
+      "line": 400,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -16645,6 +17008,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16666,7 +17030,7 @@
     {
       "elementId": "route.settings.action.luu-gui-email-thu-toi-chinh-hop-thu-nay",
       "source": "app/(app)/settings/page.jsx",
-      "line": 303,
+      "line": 404,
       "column": 15,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -16681,6 +17045,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16700,7 +17065,7 @@
     {
       "elementId": "route.settings.form-control.sk-or-v1-tao-tai-openrouter-ai-keys",
       "source": "app/(app)/settings/page.jsx",
-      "line": 313,
+      "line": 414,
       "column": 15,
       "surface": "route.settings",
       "tag": "input",
@@ -16715,6 +17080,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16736,7 +17102,7 @@
     {
       "elementId": "route.settings.action.luu-cai-at",
       "source": "app/(app)/settings/page.jsx",
-      "line": 317,
+      "line": 418,
       "column": 42,
       "surface": "route.settings",
       "tag": "AsyncButton",
@@ -16751,6 +17117,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16770,7 +17137,7 @@
     {
       "elementId": "route.settings.action.ang-import-chon-file-json-v1",
       "source": "app/(app)/settings/page.jsx",
-      "line": 335,
+      "line": 436,
       "column": 13,
       "surface": "route.settings",
       "tag": "button",
@@ -16785,6 +17152,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -16802,9 +17170,9 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.settings.form-control.input.8",
+      "elementId": "route.settings.form-control.input.9",
       "source": "app/(app)/settings/page.jsx",
-      "line": 338,
+      "line": 439,
       "column": 13,
       "surface": "route.settings",
       "tag": "input",
@@ -16819,6 +17187,7 @@
       "mappingStatus": "unreviewed",
       "businessFeature": "",
       "resourceCandidates": [
+        "users",
         "webhooks"
       ],
       "apiCandidates": [
@@ -31029,20 +31398,20 @@
   ],
   "summary": {
     "uiRoutes": 66,
-    "apiRoutes": 128,
-    "interactiveElements": 952,
+    "apiRoutes": 129,
+    "interactiveElements": 961,
     "sourceFilesWithInteractions": 95,
     "routesInPrimaryNavigation": 62,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 553,
-      "form-control": 314,
+      "action": 555,
+      "form-control": 321,
       "form-submit": 15,
       "navigation": 70
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 18,
-      "control_binding_unverified": 264,
+      "control_binding_unverified": 271,
       "keyboard_path_unverified": 18,
       "unlabelled_button_candidate": 52
     },
@@ -31052,16 +31421,16 @@
         "count": 66
       },
       {
+        "source": "app/(app)/settings/page.jsx",
+        "count": 38
+      },
+      {
         "source": "app/(app)/tasks/page.jsx",
         "count": 38
       },
       {
         "source": "app/(app)/ceo-commands/page.jsx",
         "count": 30
-      },
-      {
-        "source": "app/(app)/settings/page.jsx",
-        "count": 29
       },
       {
         "source": "app/(app)/teamwork/page.jsx",

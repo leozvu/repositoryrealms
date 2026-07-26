@@ -4,6 +4,7 @@ import { useResource, Icon, FormModal, ConfirmDialog, Forbidden, ExportCsv, Asyn
 import { ActivitiesModal } from '@/components/Activities';
 import { BarChart } from '@/components/charts';
 import { money, moneyShort, initials, todayISO, localISO, LEAD_STAGES } from '@/lib/format';
+import { LEAD_SOURCES } from '@/lib/lead-intake';
 import styles from './crm-workload.module.css';
 
 const LIFECYCLE_TONE = { active: 'active', stale: 'stale', dormant: 'dormant', decided: 'decided' };
@@ -76,7 +77,12 @@ export default function LeadsPage() {
     { key: 'company', label: 'Công ty' },
     { key: 'email', label: 'Email', type: 'email' },
     { key: 'phone', label: 'Điện thoại' },
-    { key: 'source', label: 'Nguồn', type: 'select', options: ['Facebook', 'Instagram', 'TikTok', 'Website', 'Giới thiệu', 'Khác'].map(s => ({ value: s, label: s })) },
+    // v3.42: cùng danh sách nguồn với cổng nhận lead tự động, để lead nhập tay và lead
+    // chảy về từ Facebook/TikTok gộp báo cáo được với nhau
+    { key: 'source', label: 'Nguồn', type: 'select', options: LEAD_SOURCES.map(s => ({ value: s, label: s })) },
+    { key: 'campaign', label: 'Chiến dịch (VD 4_MKT_Landing_ThaoVietAn)' },
+    { key: 'region', label: 'Khu vực', type: 'select', options: [{ value: '', label: '—' }, ...(settings?.leadRegions || []).map(r => ({ value: r, label: r }))] },
+    { key: 'serviceLine', label: 'Mảng dịch vụ quan tâm', type: 'select', options: [{ value: '', label: '—' }, ...(settings?.serviceLines || []).map(x => ({ value: x, label: x }))] },
     { key: 'value', label: 'Giá trị dự kiến (đ)', type: 'number' },
     { key: 'stage', label: 'Giai đoạn', type: 'select', options: LEAD_STAGES.map(s => ({ value: s.key, label: s.label })) },
     { key: 'expectedClose', label: 'Ngày dự kiến chốt (cho dự báo)', type: 'date' },
@@ -87,6 +93,22 @@ export default function LeadsPage() {
   const open = rows.filter(l => !['won', 'lost'].includes(l.stage));
   const workload = workloadPayload?.workloadIntelligence;
   const workloadByLead = useMemo(() => new Map((workload?.leads || []).map((lead) => [lead.id, lead])), [workload]);
+
+  // v3.42: hiệu quả theo chiến dịch — trả lời "tiền quảng cáo đổ vào đâu thì ra khách thật".
+  // Chỉ dựng khi có ít nhất một lead gắn nhãn chiến dịch, để công ty chưa dùng không bị rác màn hình.
+  const campaigns = useMemo(() => {
+    const map = new Map();
+    rows.forEach(l => {
+      const key = l.campaign || '(không gắn chiến dịch)';
+      const c = map.get(key) || { key, total: 0, won: 0, wonValue: 0, openValue: 0, source: l.source || '' };
+      c.total += 1;
+      if (l.stage === 'won') { c.won += 1; c.wonValue += l.value || 0; }
+      else if (l.stage !== 'lost') c.openValue += l.value || 0;
+      map.set(key, c);
+    });
+    return [...map.values()].sort((a, b) => b.wonValue - a.wonValue || b.total - a.total).slice(0, 10);
+  }, [rows]);
+  const hasCampaigns = rows.some(l => l.campaign);
 
   const drop = async stage => {
     setOverCol(null);
@@ -117,10 +139,34 @@ export default function LeadsPage() {
         <ExportCsv rows={rows} name="pipeline" cols={[
           { label: 'Deal', value: l => l.company || l.name }, { key: 'name', label: 'Người liên hệ' },
           { key: 'stage', label: 'Giai đoạn' }, { key: 'value', label: 'Giá trị' }, { key: 'source', label: 'Nguồn' },
+          { key: 'campaign', label: 'Chiến dịch' }, { key: 'region', label: 'Khu vực' }, { key: 'serviceLine', label: 'Mảng dịch vụ' },
           { key: 'expectedClose', label: 'Dự kiến chốt' }, { label: 'Phụ trách', value: l => userName(l.ownerId) },
         ]} />
         <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm khách tiềm năng</span></button>
       </div>
+
+      {hasCampaigns && (
+        <div className="card">
+          <div className="card-head"><span className="card-title">Hiệu quả theo chiến dịch</span></div>
+          <div className="card-body" style={{ overflowX: 'auto' }}>
+            <table className="table">
+              <thead><tr><th>Chiến dịch</th><th style={{ textAlign: 'right' }}>Lead</th><th style={{ textAlign: 'right' }}>Chốt</th><th style={{ textAlign: 'right' }}>Tỷ lệ chốt</th><th style={{ textAlign: 'right' }}>Doanh thu đã chốt</th><th style={{ textAlign: 'right' }}>Đang mở</th></tr></thead>
+              <tbody>
+                {campaigns.map(c => (
+                  <tr key={c.key}>
+                    <td>{c.key}</td>
+                    <td style={{ textAlign: 'right' }}>{c.total}</td>
+                    <td style={{ textAlign: 'right' }}>{c.won}</td>
+                    <td style={{ textAlign: 'right' }}>{c.total ? Math.round(c.won / c.total * 100) : 0}%</td>
+                    <td style={{ textAlign: 'right' }}>{money(c.wonValue)}</td>
+                    <td style={{ textAlign: 'right' }}>{money(c.openValue)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       <section className={styles.dashboard} aria-labelledby="crm-workload-title">
         <header className={styles.dashboardHead}>
