@@ -85,6 +85,29 @@ Không thêm `REALMS_STAGING_RESET_CONFIRM` hoặc mật khẩu demo vào runtim
 7. Kiểm tra log staging không có credential, dữ liệu thật hoặc request tới production database/domain.
 8. Ghi nhận UAT sign-off; production vẫn giữ nguyên sau khi staging được duyệt.
 
+## Backup và restore rehearsal cô lập
+
+Backup staging mới phải qua ba gate riêng. `verify` chỉ kiểm checksum, shape, identity và drift so với source; `rehearse` mới thực sự dựng schema tạm, restore, đối chiếu và dọn schema đó:
+
+```powershell
+$env:REALMS_STAGING_BACKUP_PATH='<đường dẫn tuyệt đối ngoài Git>/snapshot.json.gz'
+npm run staging:backup:create
+npm run staging:backup:verify
+
+$env:REALMS_STAGING_DIRECT_URL='<direct URL của staging, không phải production>'
+$env:REALMS_STAGING_RESTORE_CONFIRMATION='CREATE_AND_DROP_ISOLATED_RESTORE_TEST_SCHEMA'
+npm run staging:backup:rehearse
+```
+
+Để rehearsal một bộ backup production cũ mà không ghi vào production, chỉ định thư mục có `manifest.json` định dạng `repositoryrealms-generic-json-v1` rồi chạy trên database staging:
+
+```powershell
+$env:REALMS_STAGING_LEGACY_BACKUP_DIR='<thư mục backup đã verify checksum>'
+npm run staging:backup:rehearse:legacy
+```
+
+Gate legacy chỉ nhận đúng bốn schema `public`, `egoric`, `vnecom`, `egolive`. Mỗi entity dùng một schema ngẫu nhiên có prefix `restore_test_`; schema source không bị thay đổi và schema rehearsal được `DROP ... CASCADE` trong `finally`. Sau lượt chạy phải xác minh không còn schema `restore_test_%`.
+
 ## CI/CD và rollback
 
 - Pull request chạy fresh-database migration chain trên PostgreSQL 16 trước các quality gate khác.

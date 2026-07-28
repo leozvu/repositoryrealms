@@ -10,7 +10,7 @@ Release ứng dụng đang chạy: v3.42, được ghi trong manifest tại `64e
 
 Kết luận: **CONDITIONAL GO cho vận hành hiện tại; HOLD mọi release đổi schema cho tới khi backup và restore-test đạt**.
 
-Không có deployment mới hoặc database mutation trong lần kiểm chứng này.
+Không có deployment mới hoặc production database mutation trong lần kiểm chứng này. Restore rehearsal chỉ tạo rồi xóa các schema tạm có prefix `restore_test_` trên database staging đã phê duyệt.
 
 ## 1. Production và rollback target
 
@@ -28,7 +28,7 @@ Các domain chuẩn đang trỏ đúng deployment READY tương ứng. Truy vấ
 
 - `npm ci`: đạt; dependency audit không có vulnerability.
 - `npm run qa`: đạt toàn bộ governance, ERP, Realm, CEO, collaboration, build và audit contract.
-- Node test suite: **676/676 pass**, không fail, skip hoặc cancel.
+- Node test suite: **679/679 pass**, không fail, skip hoặc cancel.
 - Production build: đạt.
 - UI inventory: 66 UI routes, 129 API routes, 961 elements; artifact hiện hành.
 - UI action audit: 175 data actions, 0 unresolved.
@@ -37,7 +37,7 @@ Các domain chuẩn đang trỏ đúng deployment READY tương ứng. Truy vấ
 - CEO security: 10/10 scoped routes, 7/7 chaos scenarios, 0 secret findings.
 - CEO rollout contract: 5/5 rings, 5/5 evidence kinds, 5/5 adapters, fail-closed.
 
-Artifact `qa/ceo-security/ceo-security-audit.json` được tái sinh sau khi đồng bộ canonical; thay đổi duy nhất là số file được quét từ 703 lên 751, số secret finding vẫn bằng 0.
+Artifact `qa/ceo-security/ceo-security-audit.json` được tái sinh sau khi đồng bộ canonical; thay đổi duy nhất là số file được quét từ 703 lên 752, số secret finding vẫn bằng 0.
 
 ## 3. Smoke production không đăng nhập
 
@@ -80,6 +80,21 @@ Vì vậy hiện chưa thể:
 2. restore bốn schema vào môi trường cô lập;
 3. đối chiếu row/table count sau restore;
 4. tuyên bố disaster-recovery gate đã đạt.
+
+### Restore rehearsal đã thực hiện
+
+Bộ backup production gần nhất còn giữ tại workspace (`20260722-production-pre-realms-release`) đã được xác minh checksum và restore thật vào database staging bằng bốn schema cô lập. Kết quả:
+
+| Schema nguồn | Models trong schema hiện tại | Rows restore | Kết quả cleanup |
+|---|---:|---:|---|
+| `public` | 95 | 109 | schema tạm đã xóa |
+| `egoric` | 95 | 345 | schema tạm đã xóa |
+| `vnecom` | 95 | 11 | schema tạm đã xóa |
+| `egolive` | 95 | 11 | schema tạm đã xóa |
+
+Mỗi lượt kiểm archive SHA-256, manifest counts, model shape, primary identities và row counts sau restore. Truy vấn cuối xác nhận còn **0** schema `restore_test_%`. Điều này chứng minh cơ chế restore hoạt động, nhưng **không thay thế yêu cầu backup production mới** vì snapshot được tạo ngày 22/7.
+
+Trong quá trình chạy, gate cũng phát hiện source staging hiện tại bị schema drift (`User.avatar` và một số additive tables/columns chưa tồn tại). Script đã dừng fail-closed; không tự ý migrate hoặc reset source staging.
 
 ### Điều kiện gỡ HOLD
 

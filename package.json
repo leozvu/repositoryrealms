@@ -111,6 +111,8 @@
     "staging:smoke:execution": "node scripts/staging-execution-smoke.mjs",
     "staging:backup:create": "node scripts/backup-realms-staging.mjs create",
     "staging:backup:verify": "node scripts/backup-realms-staging.mjs verify",
+    "staging:backup:rehearse": "node scripts/backup-realms-staging.mjs rehearse",
+    "staging:backup:rehearse:legacy": "node scripts/backup-realms-staging.mjs rehearse-legacy",
     "staging:identities:reconcile": "node scripts/reconcile-phase25-staging-identities.mjs",
     "staging:acceptance:roles": "node scripts/staging-role-acceptance.mjs",
     "staging:pilot:plan": "node scripts/launch-phase25-pilot.mjs plan",
