@@ -18,6 +18,28 @@ npm run observe:production
 
 Có thể đặt `PRODUCTION_OBSERVATION_OUTPUT` thành một file JSON mới. Script dùng `flag=wx`, nên không ghi đè evidence cũ.
 
+## Tổng hợp evidence
+
+Tải các artifact GitHub của khoảng thời gian cần review, giải nén vào một thư mục, sau đó chạy:
+
+```powershell
+$env:PRODUCTION_OBSERVATION_INPUT_DIR='<thư mục chứa các JSON đã tải>'
+$env:PRODUCTION_OBSERVATION_REPORT_MIN_DAYS='30'
+$env:PRODUCTION_OBSERVATION_WINDOW_START='2026-07-28'
+$env:PRODUCTION_OBSERVATION_WINDOW_END='2026-08-26'
+npm run observe:production:report
+```
+
+Rollup sinh cả JSON và Markdown trong `qa/production-observation/reports/` (đã gitignore). Nó:
+
+- xác minh đúng format v2, topology 4 entity + CEO Terminal và đủ probe theo từng surface;
+- từ chối artifact chứa body/header/cookie/token/email/payload;
+- loại evidence sai format hoặc trùng timestamp và ghi rõ lý do;
+- phát hiện ngày thiếu, contract pass rate, probe pass rate, latency p50/p95/max và incident;
+- trả `INSUFFICIENT_EVIDENCE`, `ATTENTION_REQUIRED` hoặc tối đa `READY_FOR_HUMAN_REVIEW`.
+
+Không có trạng thái `GO`. Quyết định phát hành luôn cần backup/restore, authenticated UAT và maker/checker độc lập.
+
 ## Contract mỗi lượt
 
 - `GET /login`: `200`, HTML và có Content-Security-Policy.

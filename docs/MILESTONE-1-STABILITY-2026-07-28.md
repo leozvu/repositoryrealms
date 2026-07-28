@@ -28,7 +28,7 @@ Các domain chuẩn đang trỏ đúng deployment READY tương ứng. Truy vấ
 
 - `npm ci`: đạt; dependency audit không có vulnerability.
 - `npm run qa`: đạt toàn bộ governance, ERP, Realm, CEO, collaboration, build và audit contract.
-- Node test suite: **689/689 pass**, không fail, skip hoặc cancel.
+- Node test suite: **694/694 pass**, không fail, skip hoặc cancel.
 - Production build: đạt.
 - UI inventory: 66 UI routes, 129 API routes, 961 elements; artifact hiện hành.
 - UI action audit: 175 data actions, 0 unresolved.
@@ -37,7 +37,7 @@ Các domain chuẩn đang trỏ đúng deployment READY tương ứng. Truy vấ
 - CEO security: 10/10 scoped routes, 7/7 chaos scenarios, 0 secret findings.
 - CEO rollout contract: 5/5 rings, 5/5 evidence kinds, 5/5 adapters, fail-closed.
 
-Artifact `qa/ceo-security/ceo-security-audit.json` được tái sinh sau khi đồng bộ canonical, backup safety gate và production observation; **758 file** được quét, số secret finding vẫn bằng 0.
+Artifact `qa/ceo-security/ceo-security-audit.json` được tái sinh sau khi đồng bộ canonical, backup safety gate và production observation; **760 file** được quét, số secret finding vẫn bằng 0.
 
 ## 3. Smoke production không đăng nhập
 
@@ -78,6 +78,8 @@ Baseline ngày 28/7 đạt **35/35 probe**, không probe nào vượt ngưỡng 
 | CEO Terminal | 7/7 | 506 ms |
 
 Workflow hằng ngày chỉ bắt đầu sau khi được duyệt vào default branch, upload evidence với retention 30 ngày và fail để báo động khi contract lệch. Nó không tự rollback, redeploy hoặc thay đổi release gate. Runbook: `docs/30-DAY-PRODUCTION-OBSERVATION.md`.
+
+Rollup v1 cho observation v2 cũng đã được kiểm chứng: tự phát hiện ngày thiếu, evidence cũ/trùng, incident, contract pass rate và latency p50/p95/max. Baseline hiện tại đúng trạng thái **`INSUFFICIENT_EVIDENCE`** với 1/30 ngày v2, 0 incident; hai artifact thử nghiệm format cũ bị loại rõ ràng. Kể cả đủ 30 ngày sạch, trạng thái cao nhất chỉ là `READY_FOR_HUMAN_REVIEW`, không có quyết định GO tự động.
 
 ## 4. Security cleanup
 

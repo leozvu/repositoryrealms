@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const command = process.argv[2] || 'plan';
-const FORMAT = 'repositoryrealms-production-observation-v1';
+export const PRODUCTION_OBSERVATION_FORMAT = 'repositoryrealms-production-observation-v2';
 const RUN_CONFIRMATION = 'PUBLIC_READ_ONLY_GETS_ONLY';
 
 export const PRODUCTION_SURFACES = Object.freeze([
@@ -25,6 +25,10 @@ export const PUBLIC_PROBES = Object.freeze([
   { id: 'ceo-api-fail-closed', path: '/api/ceo/v1/health', method: 'GET', kind: 'json', statuses: [401] },
   { id: 'web-manifest', path: '/manifest.webmanifest', method: 'GET', kind: 'manifest', statuses: [200] },
 ]);
+
+export function applicableProductionProbes(surface) {
+  return PUBLIC_PROBES.filter((probe) => !probe.surfaceKinds || probe.surfaceKinds.includes(surface.kind));
+}
 
 function fail(message) {
   throw new Error(message);
@@ -136,7 +140,7 @@ async function runProbe(surface, probe, timeoutMs) {
 
 async function runSurface(surface, timeoutMs) {
   const probes = [];
-  const applicable = PUBLIC_PROBES.filter((probe) => !probe.surfaceKinds || probe.surfaceKinds.includes(surface.kind));
+  const applicable = applicableProductionProbes(surface);
   for (const probe of applicable) probes.push(await runProbe(surface, probe, timeoutMs));
   return {
     id: surface.id,
@@ -175,7 +179,8 @@ async function run() {
   for (const surface of PRODUCTION_SURFACES) surfaces.push(await runSurface(surface, timeoutMs));
   const summary = summarizeObservation(surfaces, slowThresholdMs);
   const artifact = {
-    format: FORMAT,
+    format: PRODUCTION_OBSERVATION_FORMAT,
+    catalogVersion: 2,
     observedAt: new Date().toISOString(),
     scope: 'public-read-only',
     releaseGate: 'informational; does not unlock backup or migration HOLD',
