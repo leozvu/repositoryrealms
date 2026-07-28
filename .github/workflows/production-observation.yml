@@ -1,0 +1,31 @@
+name: Production public observation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 1 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PRODUCTION_OBSERVATION_CONFIRM: PUBLIC_READ_ONLY_GETS_ONLY
+      PRODUCTION_OBSERVATION_OUTPUT: qa/production-observation/runs/github-${{ github.run_id }}-${{ github.run_attempt }}.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm run observe:production
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: production-observation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: qa/production-observation/runs/*.json
+          if-no-files-found: error
+          retention-days: 30
