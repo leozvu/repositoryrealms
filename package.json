@@ -118,6 +118,9 @@
     "staging:smoke:performance": "node scripts/staging-performance-smoke.mjs",
     "staging:hardening:record": "node scripts/record-phase25-hardening.mjs",
     "backup": "node scripts/backup-db.js",
+    "observe:production:plan": "node scripts/production-observation.mjs plan",
+    "observe:production": "node scripts/production-observation.mjs run",
+    "observe:production:report": "node scripts/summarize-production-observations.mjs",
     "restore": "node scripts/restore-db.js"
   },
   "dependencies": {
