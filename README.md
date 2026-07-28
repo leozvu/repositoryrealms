@@ -1,6 +1,6 @@
 # RepositoryRealms — ERP/CRM đa doanh nghiệp (v3.36)
 
-Next.js 14 + Prisma + NextAuth + **Supabase Postgres**. Một codebase phục vụ **5 doanh nghiệp** (agency, xuất nhập khẩu, livestream) + Master Dashboard, tách dữ liệu bằng Postgres schema, bật/tắt phân hệ theo từng công ty.
+Next.js + Prisma + NextAuth + **Postgres**. Một codebase phục vụ **4 entity** (AIm, Egoric, Vnecom, Egolive) + CEO Terminal, tách dữ liệu bằng Postgres schema và bật/tắt phân hệ theo từng công ty. Fretas nằm ngoài phạm vi RepositoryRealms.
 
 Repo này gồm **2 bề mặt** dùng chung một hệ nghiệp vụ (xem `docs/realms/ERP-REALM-SURFACE-SEPARATION.md`):
 

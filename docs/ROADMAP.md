@@ -1,6 +1,6 @@
 # Roadmap — RepositoryRealms ERP/CRM
 
-Cập nhật 2026-07-24 · Chốt bởi founder (Vũ Lương Sơn) · Nhánh làm việc `fix/crm-erp`
+Cập nhật 2026-07-28 · Chốt bởi founder (Vũ Lương Sơn) · Nhánh làm việc `codex/realms-demo`
 
 ## Ba quyết định định hình sản phẩm
 
@@ -61,5 +61,6 @@ Lộ trình theo nhịp nhân sự (chờ feedback rồi mới xây): **Dự án
 
 ## Mốc gần
 
+- **28/7–27/8/2026** — observation 30 ngày: monitor công khai read-only chạy hằng ngày trên 4 entity + CEO Terminal; evidence giữ 30 ngày. Monitor không mở khóa HOLD backup/restore.
 - **07/8/2026** — báo cáo evidence 2 tuần từ dữ liệu thật 4 công ty (receipts, events, lệnh liên công ty). Quyết định: đầu tư tiếp / tinh chỉnh / dừng.
 - **20/10/2026** — hạn service key CEO Terminal. Xoay bằng `node scripts/rotate-ceo-keys.mjs` (cron đã nhắc trước 14 ngày).

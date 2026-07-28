@@ -28,7 +28,7 @@ Các domain chuẩn đang trỏ đúng deployment READY tương ứng. Truy vấ
 
 - `npm ci`: đạt; dependency audit không có vulnerability.
 - `npm run qa`: đạt toàn bộ governance, ERP, Realm, CEO, collaboration, build và audit contract.
-- Node test suite: **683/683 pass**, không fail, skip hoặc cancel.
+- Node test suite: **689/689 pass**, không fail, skip hoặc cancel.
 - Production build: đạt.
 - UI inventory: 66 UI routes, 129 API routes, 961 elements; artifact hiện hành.
 - UI action audit: 175 data actions, 0 unresolved.
@@ -37,7 +37,7 @@ Các domain chuẩn đang trỏ đúng deployment READY tương ứng. Truy vấ
 - CEO security: 10/10 scoped routes, 7/7 chaos scenarios, 0 secret findings.
 - CEO rollout contract: 5/5 rings, 5/5 evidence kinds, 5/5 adapters, fail-closed.
 
-Artifact `qa/ceo-security/ceo-security-audit.json` được tái sinh sau khi đồng bộ canonical và thêm backup safety gate; **754 file** được quét, số secret finding vẫn bằng 0.
+Artifact `qa/ceo-security/ceo-security-audit.json` được tái sinh sau khi đồng bộ canonical, backup safety gate và production observation; **758 file** được quét, số secret finding vẫn bằng 0.
 
 ## 3. Smoke production không đăng nhập
 
@@ -62,6 +62,22 @@ Visual browser smoke xác nhận cả bốn trang đăng nhập:
 - nút đăng nhập được enable sau khi bootstrap hoàn tất;
 - không có horizontal overflow;
 - không có console error trong lượt kiểm tra.
+
+### Monitor observation 30 ngày
+
+Đã bổ sung monitor public read-only cho AIm, Egoric, Vnecom, Egolive và CEO Terminal. Mỗi surface có bảy probe phù hợp topology: login/CSP, auth provider, ERP/Realm hoặc CEO protected route, Realm entity health, CEO health và web manifest. Script chỉ gửi GET, không credential/cookie/body, không lưu response body và không có mutation hoặc database access.
+
+Baseline ngày 28/7 đạt **35/35 probe**, không probe nào vượt ngưỡng chậm 3 giây:
+
+| Surface | Kết quả | Latency lớn nhất |
+|---|---:|---:|
+| AIm Agency | 7/7 | 1,093 ms |
+| Egoric Agency | 7/7 | 1,049 ms |
+| Vnecom LLC | 7/7 | 1,207 ms |
+| Egolive | 7/7 | 1,059 ms |
+| CEO Terminal | 7/7 | 506 ms |
+
+Workflow hằng ngày chỉ bắt đầu sau khi được duyệt vào default branch, upload evidence với retention 30 ngày và fail để báo động khi contract lệch. Nó không tự rollback, redeploy hoặc thay đổi release gate. Runbook: `docs/30-DAY-PRODUCTION-OBSERVATION.md`.
 
 ## 4. Security cleanup
 

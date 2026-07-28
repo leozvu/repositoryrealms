@@ -122,6 +122,8 @@
     "backup:plan": "node scripts/backup-db.mjs plan",
     "backup": "node scripts/backup-db.mjs create",
     "backup:verify": "node scripts/backup-db.mjs verify",
+    "observe:production:plan": "node scripts/production-observation.mjs plan",
+    "observe:production": "node scripts/production-observation.mjs run",
     "restore": "node scripts/restore-db.js"
   },
   "dependencies": {
