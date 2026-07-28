@@ -30,7 +30,7 @@ All five URLs returned HTTP 200 on 2026-07-21. The four entity deployments redir
 - `/api/v1/summary` already exposes a Director-only aggregate for a Master Dashboard.
 - API keys are stored hashed, can carry Director role and can be revoked per entity.
 - `prisma/bootstrap.js` can initialize a new entity without deleting existing records.
-- `scripts/backup-db.js` knows `public`, `egoric`, `vnecom`, `fretas` and `egolive` schemas.
+- Backup v2 is fail-closed to `public`, `egoric`, `vnecom` and `egolive`; Fretas is outside RepositoryRealms ownership.
 - RepositoryRealms already supplies shared authorization, business rules, receipts, audit and ERP/Realm projections inside an entity.
 
 ### Egolive capabilities found

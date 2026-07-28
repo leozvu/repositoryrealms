@@ -119,7 +119,9 @@
     "staging:pilot:launch": "node scripts/launch-phase25-pilot.mjs launch",
     "staging:smoke:performance": "node scripts/staging-performance-smoke.mjs",
     "staging:hardening:record": "node scripts/record-phase25-hardening.mjs",
-    "backup": "node scripts/backup-db.js",
+    "backup:plan": "node scripts/backup-db.mjs plan",
+    "backup": "node scripts/backup-db.mjs create",
+    "backup:verify": "node scripts/backup-db.mjs verify",
     "restore": "node scripts/restore-db.js"
   },
   "dependencies": {

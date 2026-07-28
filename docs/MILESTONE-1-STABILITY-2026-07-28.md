@@ -28,7 +28,7 @@ Các domain chuẩn đang trỏ đúng deployment READY tương ứng. Truy vấ
 
 - `npm ci`: đạt; dependency audit không có vulnerability.
 - `npm run qa`: đạt toàn bộ governance, ERP, Realm, CEO, collaboration, build và audit contract.
-- Node test suite: **679/679 pass**, không fail, skip hoặc cancel.
+- Node test suite: **683/683 pass**, không fail, skip hoặc cancel.
 - Production build: đạt.
 - UI inventory: 66 UI routes, 129 API routes, 961 elements; artifact hiện hành.
 - UI action audit: 175 data actions, 0 unresolved.
@@ -37,7 +37,7 @@ Các domain chuẩn đang trỏ đúng deployment READY tương ứng. Truy vấ
 - CEO security: 10/10 scoped routes, 7/7 chaos scenarios, 0 secret findings.
 - CEO rollout contract: 5/5 rings, 5/5 evidence kinds, 5/5 adapters, fail-closed.
 
-Artifact `qa/ceo-security/ceo-security-audit.json` được tái sinh sau khi đồng bộ canonical; thay đổi duy nhất là số file được quét từ 703 lên 752, số secret finding vẫn bằng 0.
+Artifact `qa/ceo-security/ceo-security-audit.json` được tái sinh sau khi đồng bộ canonical và thêm backup safety gate; **754 file** được quét, số secret finding vẫn bằng 0.
 
 ## 3. Smoke production không đăng nhập
 
@@ -96,10 +96,25 @@ Mỗi lượt kiểm archive SHA-256, manifest counts, model shape, primary iden
 
 Trong quá trình chạy, gate cũng phát hiện source staging hiện tại bị schema drift (`User.avatar` và một số additive tables/columns chưa tồn tại). Script đã dừng fail-closed; không tự ý migrate hoặc reset source staging.
 
+### Backup v2 và rehearsal end-to-end
+
+Pipeline backup vận hành mới đã được thay bằng entrypoint fail-closed `scripts/backup-db.mjs`:
+
+- bắt buộc credential riêng `BACKUP_DATABASE_URL`, source và approval khớp fingerprint đã review;
+- production chỉ chấp nhận đúng `public`, `egoric`, `vnecom`, `egolive`; Fretas bị từ chối;
+- đọc cả bốn schema trong một transaction `REPEATABLE READ`, `READ ONLY`;
+- loại bảng hạ tầng `_prisma_migrations`, ghi SHA-256/table count/row count và chỉ tạo manifest khi toàn bộ lượt backup thành công;
+- không tự xóa backup cũ và không fallback sang credential runtime;
+- direct restore cũ dùng application credential đã bị khóa; rehearsal chỉ được ghi vào schema staging có prefix `restore_test_`.
+
+Một backup v2 mới đã được tạo từ database staging để kiểm chứng pipeline: `public` có **72 bảng / 475 dòng**; ba schema entity còn lại chưa được provision trên target staging này nên có **0 bảng / 0 dòng**. Verify đạt cho cả bốn file. Sau đó bốn lượt restore rehearsal đã dựng schema Prisma cô lập, đối chiếu checksum/count/primary identities và drop thành công. Truy vấn độc lập cuối cùng ghi nhận **0 schema `restore_test_%` còn sót**. Hai guard âm cũng đạt: Fretas bị chặn và approval sai không tạo output directory.
+
+Kết quả này chứng minh tooling backup/verify/restore rehearsal hoạt động cả khi source staging thiếu các additive model mới. Nó không thay thế fresh production backup vì không chứa dữ liệu production và ba schema staging phụ đang trống.
+
 ### Điều kiện gỡ HOLD
 
 - Cấp quyền snapshot/backup trên nhà cung cấp Postgres, hoặc cung cấp `DIRECT_URL` production qua secret channel dùng một lần.
-- Chạy `npm run backup` cho `public`, `egoric`, `vnecom`, `egolive`.
+- Chạy `npm run backup:plan`, review target đã redact, rồi `npm run backup` cho đúng `public`, `egoric`, `vnecom`, `egolive` bằng credential production read-only chuyên dụng.
 - Mã hóa/lưu artifact ngoài Git; ghi SHA-256 và retention policy.
 - Restore vào database/schema cô lập, tuyệt đối không restore đè production.
 - So sánh table count, row count và các business invariants; lưu biên bản pass/fail.

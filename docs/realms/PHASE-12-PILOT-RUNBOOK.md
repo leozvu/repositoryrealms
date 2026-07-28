@@ -10,7 +10,7 @@ Runbook này chỉ dành cho staging clone `crmegoric-realms-demo`. ERP/CRM hi�
 - Chạy `npm run staging:migrations:plan` và `npm run staging:migrations:verify` ở chế độ read-only với đúng approval token của staging. Phase 12 không có migration mới.
 - Trong Settings → Realm Pilot Control, chọn `Pilot theo vai trò`, để giao diện mặc định là ERP và bắt đầu với cohort 5–10 người.
 - Release readiness không được có blocking gate. Tavern có thể tắt để pilot Office trước.
-- Chụp snapshot/backup bằng cơ chế của nhà cung cấp staging trước buổi pilot. Không dùng `restore-db.js --commit` như một bước rollout thông thường.
+- Chụp snapshot/backup bằng cơ chế của nhà cung cấp staging trước buổi pilot. Direct restore bằng application credential đã bị khóa.
 
 ## 2. Smoke test cohort
 
@@ -39,7 +39,7 @@ Khi có lỗi blocker hoặc nghi ngờ sai dữ liệu:
 4. Ghi request ID, thời điểm, route, cohort bị ảnh hưởng và Ticket Guild Support; không thu nội dung riêng tư ngoài phạm vi đã khai báo.
 5. Chỉ mở lại cohort sau khi fix đã qua QA và release readiness không còn blocker.
 
-Không đảo migration trong rollback pilot. Không restore dữ liệu chỉ vì tắt Realm. Restore là quy trình disaster recovery riêng, có phê duyệt và rehearsal trên một clone cô lập trước khi dùng `restore-db.js --commit`.
+Không đảo migration trong rollback pilot. Không restore dữ liệu chỉ vì tắt Realm. Restore là quy trình disaster recovery riêng, có phê duyệt và rehearsal trên một clone cô lập; không ghi đè production từ script ứng dụng.
 
 ## 5. Phân loại sự cố
 

@@ -15,7 +15,7 @@ Cập nhật: 2026-07-26 · Baseline canonical: `main @ 64ef8c7` (PR #5 — v3.4
 | Sandbox test | `erp-crm-test` | erp-crm-test.vercel.app | `64ef8c7` | `crmtest` | ✅ diff-sạch | ALL | (dữ liệu demo — không cần) | redeploy bất kỳ |
 | CEO Terminal | `ceo-terminal-leoz` | ceo-terminal-leoz.vercel.app | `bf5270b` | `ceoportal` | ✅ diff-sạch | ALL (chỉ dùng trang CEO) | `backups/20260726-180503/` (registry/receipts nằm trong schema riêng) | như trên |
 
-Ngoài phạm vi: **Fretas** (`erp-fretas`) — thuộc đơn vị khác, KHÔNG nối terminal (key đã thu hồi, registry disabled) và **đã gỡ khỏi `db-push-all.ps1` / `deploy-all.ps1`** từ v3.42, nên không còn nhận schema mới hay code mới từ đây. Vẫn nằm trong `scripts/backup-db.js` — sao lưu là bảo vệ, không ghi đè; bỏ ra sẽ khiến dữ liệu của họ trong Supabase này mất lưới an toàn. **Master Dashboard cũ** (`erp-master-leoz`) — repo riêng, không thuộc manifest này.
+Ngoài phạm vi: **Fretas** (`erp-fretas`) — thuộc đơn vị khác, KHÔNG nối terminal (key đã thu hồi, registry disabled) và **đã gỡ khỏi deploy, schema push và backup RepositoryRealms**. Việc sao lưu Fretas phải do chủ sở hữu của hệ thống đó vận hành độc lập. **Master Dashboard cũ** (`erp-master-leoz`) — repo riêng, không thuộc manifest này.
 
 ## Đợt phát hành v3.42 — 26/7/2026
 
@@ -37,11 +37,11 @@ Các schema entity đồng bộ bằng `prisma db push` (không có bảng `_pri
 ## Quy trình rollback
 
 1. Vercel: `vercel rollback` về deployment Ready liền trước của project tương ứng (mỗi project giữ nguyên lịch sử deployment).
-2. Dữ liệu (chỉ khi sự cố dữ liệu, không tự động): `npm run restore` từ `backups/<timestamp>/<schema>.json` — quyết định bởi founder.
+2. Dữ liệu (chỉ khi sự cố dữ liệu, không tự động): xác minh backup v2 và rehearsal trên schema staging cô lập theo `HUONG-DAN-BACKUP.md`; direct restore từ app credential đã bị khóa.
 3. CEO Terminal: hạ ring qua trang CEO · Rollout (fail-closed, không mất dữ liệu số liệu cũ).
 
 ## Cách tái lập manifest
 
 - Deploy chuẩn: từ `main`, `vercel link --project <tên> && vercel deploy --prod` (hoặc chờ auto-deploy khi đã bật Git integration).
 - Kiểm schema: `npx prisma migrate diff --from-url "<DIRECT_URL>?schema=<s>" --to-schema-datamodel prisma/schema.prisma --exit-code`.
-- Backup: `npm run backup` (giữ 14 bản gần nhất trong `backups/`).
+- Backup: `npm run backup:plan` → kiểm target → `npm run backup` → `npm run backup:verify`. Script không tự xóa bản cũ; retention do storage policy quản lý.
