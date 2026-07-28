@@ -2,6 +2,8 @@
 
 Cập nhật: 2026-07-26 · Baseline canonical: `main @ 64ef8c7` (PR #5 — v3.42 cổng nhận lead, CI xanh: migration-chain + verify) · Người lập: Claude
 
+> **Đính chính kiểm chứng 2026-07-28:** bốn deployment production và các rollback target bên dưới vẫn `READY`, nhưng thư mục `backups/20260726-180503/` được ghi trong manifest không có trong workspace hiện tại. Vì chưa thể kiểm checksum hoặc restore cô lập, cột “Backup gần nhất” bên dưới chỉ là lịch sử được ghi nhận ngày 26/7, **không phải bằng chứng backup đã được xác minh**. Không thực hiện release có thay đổi schema cho tới khi tạo backup mới và restore-test thành công. Hồ sơ kiểm chứng: `docs/MILESTONE-1-STABILITY-2026-07-28.md`.
+
 ## Bảng entity
 
 | Entity | Vercel project | Domain | Commit | Postgres schema | Migration level | Modules bật | Backup gần nhất | Rollback target |
