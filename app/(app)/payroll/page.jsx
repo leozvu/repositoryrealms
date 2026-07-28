@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import { Icon, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
+import { Icon, ConfirmDialog, EmptyState, AsyncButton, useToast } from '@/components/ui';
 import { money, thisMonth, parseItems } from '@/lib/format';
 
 /* ---------- Phiếu lương cá nhân (nhân viên) ---------- */
@@ -83,10 +83,10 @@ export default function PayrollPage() {
           {!data.payrolls.length && <option value="">Chưa có bảng lương</option>}
         </select>
         <div className="spacer"></div>
-        {cur && cur.status === 'draft' && <button className="btn btn-outline" onClick={regenerate}
-          title="Nạp lại giờ OT / đi muộn từ Chấm công — dùng khi bảng lương tạo từ giữa tháng"><Icon name="repeat" size={16} /><span>Tính lại từ chấm công</span></button>}
+        {cur && cur.status === 'draft' && <AsyncButton className="btn btn-outline" pendingLabel="Đang tính…" onClick={regenerate}
+          title="Nạp lại giờ OT / đi muộn từ Chấm công — dùng khi bảng lương tạo từ giữa tháng"><Icon name="repeat" size={16} /><span>Tính lại từ chấm công</span></AsyncButton>}
         {cur && cur.status === 'draft' && <button className="btn btn-outline" onClick={() => setConfirm(true)}><Icon name="check" size={16} /><span>Chốt & ghi sổ quỹ</span></button>}
-        <button className="btn btn-primary" onClick={generate}><Icon name="plus" size={16} /><span>Tạo bảng lương tháng</span></button>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang tạo…" onClick={generate}><Icon name="plus" size={16} /><span>Tạo bảng lương tháng</span></AsyncButton>
       </div>
 
       {cur ? (

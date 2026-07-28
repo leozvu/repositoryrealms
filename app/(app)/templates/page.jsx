@@ -2,7 +2,7 @@
 // v3.10: Mẫu dự án — bộ giai đoạn + công việc + mốc chuẩn để nhân bản nhanh.
 // Khi tạo dự án, chọn mẫu là sinh hết. Chỉ PM/Lead.
 import { useState } from 'react';
-import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Forbidden, AsyncButton, useToast } from '@/components/ui';
 import { BADGE } from '@/lib/format';
 
 const parse = s => { try { return JSON.parse(s || '[]'); } catch { return []; } };
@@ -21,13 +21,13 @@ function TemplateModal({ tpl, onSave, onClose }) {
   return (
     <Modal title={tpl ? 'Sửa mẫu dự án' : 'Tạo mẫu dự án'} onClose={onClose} large
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={() => {
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={async () => {
           if (!name.trim()) return;
-          onSave({ name: name.trim(), service, budgetHours: +budgetHours || 0,
+          const result = await onSave({ name: name.trim(), service, budgetHours: +budgetHours || 0,
             phases: JSON.stringify(phases.filter(p => p.name?.trim()).map(p => ({ name: p.name.trim(), tasks: (p.tasks || []).filter(t => t.title?.trim()) }))),
             milestones: JSON.stringify(milestones.filter(m => m.name?.trim())) });
-          onClose();
-        }}>Lưu mẫu</button></>}>
+          if (result !== false && result !== null) onClose();
+        }}>Lưu mẫu</AsyncButton></>}>
       <div className="form-grid">
         <div className="field"><label>Tên mẫu *</label><input value={name} onChange={e => setName(e.target.value)} placeholder="VD: Dự án Branding chuẩn" /></div>
         <div className="field"><label>Dịch vụ</label><input value={service} onChange={e => setService(e.target.value)} placeholder="Branding" /></div>
@@ -107,7 +107,7 @@ export default function TemplatesPage() {
       )}
       {(modal?.mode === 'add' || modal?.mode === 'edit') && <TemplateModal tpl={modal.row}
         onClose={() => setModal(null)}
-        onSave={async d => { if (modal.row) await templates.update(modal.row.id, d); else await templates.create(d); toast('Đã lưu mẫu'); }} />}
+        onSave={async d => { const r = modal.row ? await templates.update(modal.row.id, d) : await templates.create(d); if (!r) return false; toast('Đã lưu mẫu'); return true; }} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa mẫu "${modal.row.name}"?`}
         onClose={() => setModal(null)} onYes={async () => { await templates.remove(modal.row.id); toast('Đã xóa'); }} />}
     </>

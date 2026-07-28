@@ -4,7 +4,7 @@
 // v3.8: gán việc chưa phân ngay tại chỗ (PM).
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Modal, EmptyState, Forbidden, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, EmptyState, Forbidden, AsyncButton, useToast } from '@/components/ui';
 import { localISO, todayISO, fmtDate, initials } from '@/lib/format';
 import { hasAny, rolesOf } from '@/lib/perm';
 
@@ -171,10 +171,10 @@ export default function ResourcesPage() {
                   <div className="act-title">{t.title}</div>
                   <div className="act-sub">{pName(t.projectId)}{t.dueDate ? ` · hạn ${fmtDate(t.dueDate)}` : ''}</div>
                 </div>
-                <button className="btn btn-outline btn-sm" onClick={async () => {
+                <AsyncButton className="btn btn-outline btn-sm" disabled={tasks.mutating} pendingLabel="Đang gán…" onClick={async () => {
                   const r = await tasks.update(t.id, { assigneeId: assignTo.id });
                   if (r) toast(`Đã gán "${t.title}" cho ${assignTo.name} — họ sẽ nhận chuông thông báo`);
-                }}>Gán</button>
+                }}>Gán</AsyncButton>
               </div>
             ))}
             {!unassigned.length && <p style={{ fontSize: '.83rem', color: 'var(--muted)' }}>Hết việc chưa phân 🎉</p>}

@@ -4,6 +4,7 @@ import { currentUser } from '@/lib/auth';
 import { hasAny } from '@/lib/perm';
 import { computeLine } from '@/lib/payroll';
 import { parseItems } from '@/lib/format';
+import { goldBonusFor, goldPayoutSettings } from '@/lib/gold-payout';
 
 const canManage = user => hasAny(user, ['HR', 'ACCOUNTANT']);
 
@@ -35,10 +36,32 @@ async function attendanceOf(month) {
   return by;
 }
 
+/* v3.41 (Chương 3): thưởng Gold tháng theo từng người.
+   Trả {} khi công tắc goldPayoutEnabled tắt → bảng lương y hệt như trước, không rủi ro. */
+async function goldBonusOf(month) {
+  const row = await prisma.setting.findUnique({ where: { id: 1 } });
+  let settings = {};
+  try { settings = row ? JSON.parse(row.json) : {}; } catch { settings = {}; }
+  if (!goldPayoutSettings(settings).enabled) return {};
+  // chỉ tính Gold KIẾM ĐƯỢC trong tháng; Gold tiêu ở Tavern không trừ vào thưởng
+  const entries = await prisma.realmGoldEntry.findMany({
+    where: {
+      amount: { gt: 0 },
+      createdAt: { gte: new Date(`${month}-01T00:00:00.000Z`), lt: new Date(`${month}-31T23:59:59.999Z`) },
+    },
+    select: { userId: true, amount: true },
+  });
+  const earned = {};
+  for (const entry of entries) earned[entry.userId] = (earned[entry.userId] || 0) + entry.amount;
+  const result = {};
+  for (const [userId, gold] of Object.entries(earned)) result[userId] = goldBonusFor(gold, settings);
+  return result;
+}
+
 // GET: HR/Kế toán/GĐ thấy toàn bộ; nhân viên chỉ nhận phiếu lương của mình
 export async function GET() {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const rows = await prisma.payroll.findMany({ orderBy: { month: 'desc' } });
   if (canManage(user)) return NextResponse.json({ manage: true, payrolls: rows });
   const mine = rows
@@ -50,7 +73,7 @@ export async function GET() {
 // POST {month}: tạo bảng lương nháp từ danh sách nhân sự đang hoạt động
 export async function POST(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!canManage(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { month } = await req.json();
   if (!/^\d{4}-\d{2}$/.test(month || '')) return NextResponse.json({ error: 'Tháng không hợp lệ' }, { status: 400 });
@@ -63,10 +86,15 @@ export async function POST(req) {
   });
   const { otMultiplier } = await shiftCfg();
   const att = await attendanceOf(month); // v3.13: giờ OT/đi muộn/nghỉ lấy thẳng từ chấm công
-  const lines = staff.map(s => computeLine({
-    userId: s.id, name: s.name, base: s.salary || 0, allowance: 0, bonus: 0,
-    ...(att[s.id] || { otHours: 0, lateCount: 0, offDays: 0 }),
-  }, otMultiplier));
+  const goldBonus = await goldBonusOf(month); // v3.41: thưởng Gold (rỗng khi công tắc tắt)
+  const lines = staff.map(s => {
+    const gold = goldBonus[s.id] || { gold: 0, amount: 0 };
+    return computeLine({
+      userId: s.id, name: s.name, base: s.salary || 0, allowance: 0, bonus: gold.amount,
+      goldEarned: gold.gold, goldBonus: gold.amount, // hiện trên phiếu để nhân sự đối chiếu
+      ...(att[s.id] || { otHours: 0, lateCount: 0, offDays: 0 }),
+    }, otMultiplier);
+  });
   const row = await prisma.payroll.create({ data: { month, lines: JSON.stringify(lines) } });
   await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'create', entity: 'payroll', refId: row.id, detail: 'Bảng lương ' + month } });
   return NextResponse.json(row);
@@ -75,7 +103,7 @@ export async function POST(req) {
 // PUT {id, lines}: sửa phụ cấp/thưởng khi còn nháp — server tính lại toàn bộ
 export async function PUT(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!canManage(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { id, lines, regenerate } = await req.json();
   const p = await prisma.payroll.findUnique({ where: { id } });
@@ -88,15 +116,20 @@ export async function PUT(req) {
   // Nút này nạp lại giờ OT/đi muộn từ chấm công nhưng GIỮ NGUYÊN phụ cấp/thưởng HR đã nhập.
   if (regenerate) {
     const att = await attendanceOf(p.month);
+    const gold = await goldBonusOf(p.month); // v3.41: nạp lại thưởng Gold cùng lúc với OT
     const old = parseItems(p.lines);
     const staff = await prisma.user.findMany({
       where: { status: 'active', userType: { not: 'freelancer' } }, orderBy: { name: 'asc' },
     });
     const fresh = staff.map(s => {
       const prev = old.find(l => l.userId === s.id) || {};
+      const g = gold[s.id] || { gold: 0, amount: 0 };
+      // thưởng tay HR nhập thêm = bonus cũ trừ phần Gold lần trước → cộng lại Gold mới
+      const manualBonus = Math.max(0, (prev.bonus || 0) - (prev.goldBonus || 0));
       return computeLine({
         userId: s.id, name: s.name, base: s.salary || 0,
-        allowance: prev.allowance || 0, bonus: prev.bonus || 0, // giữ tay HR đã nhập
+        allowance: prev.allowance || 0, bonus: manualBonus + g.amount,
+        goldEarned: g.gold, goldBonus: g.amount,
         ...(att[s.id] || { otHours: 0, lateCount: 0, offDays: 0 }),
       }, otMultiplier);
     });

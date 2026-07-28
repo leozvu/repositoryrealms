@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 12,
+    "verifiedContracts": 12,
+    "scenarios": 6,
+    "verifiedScenarios": 6
+  },
+  "contracts": [
+    {
+      "id": "snapshot-envelope",
+      "layer": "server",
+      "source": "lib/realm-erp-adapter.js",
+      "signals": [
+        "createRealmSyncEnvelope(snapshot",
+        "sync: createRealmSyncEnvelope"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "conditional-get",
+      "layer": "api",
+      "source": "app/api/realm-demo/operations/route.js",
+      "signals": [
+        "realmSnapshotMatchesEtag",
+        "status: 304"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-validator",
+      "layer": "api",
+      "source": "lib/realm-sync.js",
+      "signals": [
+        "'Cache-Control': 'private, no-cache, no-store, max-age=0'",
+        "Vary: 'Cookie'",
+        "'X-Realm-Revision'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "post-revision",
+      "layer": "api",
+      "source": "app/api/realm-demo/operations/route.js",
+      "signals": [
+        "return snapshotResponse(trace, snapshot, { ...snapshot, action })"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "profile-version-api",
+      "layer": "api",
+      "source": "app/api/realm-demo/operations/route.js",
+      "signals": [
+        "expectedProfileVersion: body.profileVersion"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "profile-version-transaction",
+      "layer": "server",
+      "source": "lib/realm-erp-adapter.js",
+      "signals": [
+        "'realm_profile_conflict'",
+        "isolationLevel: 'Serializable'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "claim-idempotency",
+      "layer": "server",
+      "source": "lib/realm-erp-adapter.js",
+      "signals": [
+        "normalizeRealmIdempotencyKey",
+        "if (existing) return { entry: existing, idempotent: true }"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "client-etag",
+      "layer": "client",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "'If-None-Match': operationsSyncEtagRef.current",
+        "response.status === 304"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "background-revalidation",
+      "layer": "client",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "REALM_REMOTE_REFRESH_MS",
+        "document.addEventListener('visibilitychange'",
+        "window.addEventListener('online'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "offline-preservation",
+      "layer": "client",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "setOperationsSyncState('offline')",
+        "Snapshot ERP gần nhất vẫn được giữ nguyên"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "stale-retry-ui",
+      "layer": "client",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "function SyncIntegrityCard",
+        "Snapshot có thể cũ · cần thử lại",
+        "Thử đồng bộ"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "no-false-write-success",
+      "layer": "client",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "Chưa có thay đổi nào được xác nhận.",
+        "if (!response.ok)",
+        "applyRemoteOperations(payload, response.headers.get('ETag'), responseTrace)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "stable-revision",
+      "expected": true,
+      "actual": true,
+      "status": "verified"
+    },
+    {
+      "id": "changed-data-new-revision",
+      "expected": true,
+      "actual": true,
+      "status": "verified"
+    },
+    {
+      "id": "exact-etag-match",
+      "expected": true,
+      "actual": true,
+      "status": "verified"
+    },
+    {
+      "id": "weak-etag-match",
+      "expected": true,
+      "actual": true,
+      "status": "verified"
+    },
+    {
+      "id": "stale-etag-miss",
+      "expected": false,
+      "actual": false,
+      "status": "verified"
+    },
+    {
+      "id": "profile-version-roundtrip",
+      "expected": "2026-07-18T09:00:00.000Z",
+      "actual": "2026-07-18T09:00:00.000Z",
+      "status": "verified"
+    }
+  ]
+}

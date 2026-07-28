@@ -1,7 +1,7 @@
 'use client';
 // Trình soạn báo giá / hóa đơn dùng chung: items động, VAT, chọn nhanh từ bảng giá
 import { useState } from 'react';
-import { Modal, Icon, useToast } from './ui';
+import { Modal, Icon, AsyncButton, useToast } from './ui';
 import { money, moneyC, todayISO, daysFromNow, parseItems, nextCode } from '@/lib/format';
 
 // v3.13: nextCode dọn về lib/format để server (API xuất hóa đơn từ giờ công) dùng chung
@@ -30,7 +30,7 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
   const setItem = (i, k, v) => setD(x => ({ ...x, items: x.items.map((it, j) => j === i ? { ...it, [k]: v } : it) }));
   const sub = d.items.reduce((s, it) => s + (+it.qty || 0) * (+it.price || 0), 0);
 
-  const save = () => {
+  const save = async () => {
     const items = d.items.filter(it => it.desc.trim());
     if (!items.length) return toast('Cần ít nhất một hạng mục', 'error');
     const out = {
@@ -50,14 +50,14 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
       else out.recGroup = null; // bỏ tick = tách khỏi nhóm định kỳ
     }
     else out.note = d.note || null;
-    onSave(out);
-    onClose();
+    const result = await onSave(out);
+    if (result !== false && result !== null) onClose();
   };
 
   return (
     <Modal title={(doc ? 'Sửa' : 'Tạo') + (isInv ? ' hóa đơn — ' : ' báo giá — ') + d.code} large onClose={onClose}
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={save}>Lưu {isInv ? 'hóa đơn' : 'báo giá'}</button></>}>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={save}>Lưu {isInv ? 'hóa đơn' : 'báo giá'}</AsyncButton></>}>
       <div className="form-grid" style={{ marginBottom: 16 }}>
         <div className="field"><label>Khách hàng <span className="req">*</span></label>
           <select value={d.clientId} onChange={e => setD({ ...d, clientId: e.target.value })}>

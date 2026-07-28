@@ -1,0 +1,18 @@
+id,layer,source,signals,missingSignals,status
+canonical-crm-records,data,prisma/schema.prisma,model Lead { | model Activity { | model User {,,verified
+workload-rule-version,domain,lib/crm-workload-intelligence.js,CRM_WORKLOAD_RULE_VERSION = 'crm-workload-intelligence-v1' | buildCrmWorkloadIntelligence | lifecycleFor | leadSignals,,verified
+lifecycle-bands,domain,lib/crm-workload-intelligence.js,band: 'active' | band: 'stale' | band: 'dormant' | band: 'decided',,verified
+recorded-activity-provenance,governance,lib/crm-workload-intelligence.js,source: completedDay ? 'recorded_completed_activity' | isObservedTruth: false | ceiling: 'medium',,verified
+explicit-owner-wip,resource,lib/crm-workload-intelligence.js,ownerWipLimit | openLeads | band === 'over' | ownerRows,,verified
+manager-review-queue,domain,lib/crm-workload-intelligence.js,managerQueue | assign_owner | review_dormant_lead | review_portfolio_distribution,,verified
+anti-ranking-advisory-policy,governance,lib/crm-workload-intelligence.js,advisoryOnly: true | automaticAssignment: false | automaticStageChange: false | employeeRanking: false | performanceInference: false,,verified
+crm-authorization-scope,authorization,lib/crm-workload-intelligence-admin.js,crmWorkloadScope | kind: 'company' | kind: 'portfolio' | crm_workload_scope_missing,,verified
+contact-data-does-not-leak,privacy,tests/crm-workload-intelligence-admin.test.mjs,"includes('hidden@example.com'), false | includes('0900'), false",,verified
+private-crm-api,api,app/api/leads/workload/route.js,"currentUser() | loadCrmWorkloadIntelligence | 'Cache-Control': 'private, no-store'",,verified
+erp-workload-before-pipeline,ui,app/(app)/leads/page.jsx,CRM Workload Intelligence | Manager Queue | Owner Workload | Pipeline &amp; forecast drill-down,,verified
+realm-shared-workload-contract,parity,lib/realm-embassy.js,import { buildCrmWorkloadIntelligence } | workloadIntelligence,,verified
+realm-workload-ui,ui,components/realm/RoyalEmbassy.jsx,CRM Workload Intelligence | Manager Queue | Owner WIP · alphabet | không phải employee ranking,,verified
+responsive-accessible-crm,ux,app/(app)/leads/crm-workload.module.css,min-height: 44px | @media (max-width: 700px) | @media (prefers-reduced-motion: reduce),,verified
+phase4-domain-tests,test,tests/crm-workload-intelligence.test.mjs,"active, stale, dormant và decided | không tạo employee ranking | chỉ advisory",,verified
+phase4-server-tests,test,tests/crm-workload-intelligence-admin.test.mjs,authorization của Lead ERP | response không leak contact | bị chặn trước database query,,verified
+phase4-runbook,operations,docs/realms/PHASE-4-CRM-WORKLOAD-INTELLIGENCE.md,CRM không chỉ là pipeline | canonical ERP records | crmegoric-realms-demo,,verified

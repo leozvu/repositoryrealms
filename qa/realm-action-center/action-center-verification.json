@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 17,
+    "verifiedContracts": 17,
+    "scenarios": 5,
+    "verifiedScenarios": 5
+  },
+  "contracts": [
+    {
+      "id": "receipt-extension",
+      "layer": "database",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model RealmActionReceipt",
+        "resultId",
+        "payloadHash"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "additive-migration",
+      "layer": "database",
+      "source": "prisma/migrations/20260718230000_extend_realm_action_receipts/migration.sql",
+      "signals": [
+        "ADD COLUMN \"resultId\"",
+        "ADD COLUMN \"payloadHash\""
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "create-action-allowlist",
+      "layer": "contract",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "'task.comment.create'",
+        "'lead.followup.create'",
+        "const ACTIONS = new Set"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "input-boundaries",
+      "layer": "contract",
+      "source": "lib/realm-action-contract.js",
+      "signals": [
+        "REALM_FOLLOWUP_KINDS",
+        "normalizeRealmTaskCommentDraft",
+        "normalizeRealmFollowupDraft"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "payload-free-receipt",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "createHash('sha256')",
+        "payloadHash: command.payloadHash",
+        "resultId: created.id"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "task-comment-scope",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "canWrite('taskcomments', user)",
+        "taskInScope(task, user)",
+        "resource: 'taskcomments'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "lead-followup-scope",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "canWrite('activities', user)",
+        "leadInScope(lead, user)",
+        "refType: 'lead'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "atomic-create-audit",
+      "layer": "server",
+      "source": "lib/realm-action-admin.js",
+      "signals": [
+        "tx.taskComment.create",
+        "tx.activity.create",
+        "createAuditData",
+        "tx.realmActionReceipt.create"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "safe-action-response",
+      "layer": "api",
+      "source": "app/api/realm-demo/actions/route.js",
+      "signals": [
+        "action: result.action",
+        "source: 'erp'",
+        "result.event ||"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "cross-surface-event",
+      "layer": "server",
+      "source": "lib/realm-change-feed.js",
+      "signals": [
+        "activities: ['embassy']",
+        "taskcomments: ['operations', 'campaigns']"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-notification",
+      "layer": "server",
+      "source": "lib/events.js",
+      "signals": [
+        "resource === 'taskcomments'",
+        "bình luận việc",
+        "await notify(task.assigneeId",
+        "resource === 'activities'",
+        "lên lịch follow-up"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "war-room-permission",
+      "layer": "server",
+      "source": "lib/realm-war-room-admin.js",
+      "signals": [
+        "canWrite('taskcomments', user)",
+        "canComment: commentWriteAllowed"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "embassy-permission",
+      "layer": "server",
+      "source": "lib/realm-embassy-admin.js",
+      "signals": [
+        "canWrite('activities', user)",
+        "canFollowUp: followupWriteAllowed"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "action-composer",
+      "layer": "client",
+      "source": "components/realm/RealmCreateActionDialog.jsx",
+      "signals": [
+        "War Council note",
+        "Diplomatic follow-up",
+        "Idempotency-Key",
+        "Gửi War Council note",
+        "Lập Diplomatic follow-up",
+        "RepositoryRealms"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "war-room-entrypoint",
+      "layer": "client",
+      "source": "components/realm/WarRoom.jsx",
+      "signals": [
+        "action: 'task.comment.create'",
+        "Ghi chú War Council",
+        "RealmCreateActionDialog"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "embassy-entrypoint",
+      "layer": "client",
+      "source": "components/realm/RoyalEmbassy.jsx",
+      "signals": [
+        "action: 'lead.followup.create'",
+        "Lên lịch follow-up",
+        "RealmCreateActionDialog"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "schema-readiness-v8",
+      "layer": "health",
+      "source": "lib/realm-health.js",
+      "signals": [
+        "REALM_SCHEMA_VERSION = 8",
+        "20260719133000_add_realm_pilot_feedback"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "comment-normalization",
+      "expected": "Quyết định\nmới",
+      "actual": "Quyết định\nmới",
+      "status": "verified"
+    },
+    {
+      "id": "followup-kind-allowlist",
+      "expected": "meeting",
+      "actual": "meeting",
+      "status": "verified"
+    },
+    {
+      "id": "followup-kind-deny",
+      "expected": "",
+      "actual": "",
+      "status": "verified"
+    },
+    {
+      "id": "comment-domain-fanout",
+      "expected": "operations,campaigns",
+      "actual": "operations,campaigns",
+      "status": "verified"
+    },
+    {
+      "id": "activity-domain-isolation",
+      "expected": "embassy",
+      "actual": "embassy",
+      "status": "verified"
+    }
+  ]
+}

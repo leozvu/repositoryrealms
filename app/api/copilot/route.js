@@ -2,10 +2,17 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { hasAny, rolesOf, ROLE_LABEL } from '@/lib/perm';
+import {
+  DEFAULT_OPENROUTER_MODEL,
+  OpenRouterError,
+  normalizeOpenRouterMessages,
+  openRouterUserMessage,
+  requestOpenRouterCompletion,
+} from '@/lib/openrouter';
 
 // ============================================================
 // AI Copilot: gom dữ liệu công ty (LỌC THEO VAI TRÒ người hỏi)
-// rồi gọi Claude API. Key lấy từ ANTHROPIC_API_KEY hoặc Cài đặt.
+// rồi gọi OpenRouter. Key chỉ được đọc phía server từ env hoặc Cài đặt.
 // ============================================================
 const parseItems = s => { try { return JSON.parse(s || '[]'); } catch { return []; } };
 const grand = v => Math.round(parseItems(v.items).reduce((s, it) => s + it.qty * it.price, 0) * (1 + (v.vat || 0) / 100));
@@ -55,15 +62,21 @@ async function buildContext(user) {
 
 export async function POST(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-  const { messages } = await req.json();
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
+  let requestBody;
+  try { requestBody = await req.json(); } catch { return NextResponse.json({ error: 'Payload không hợp lệ', code: 'invalid_payload' }, { status: 400 }); }
+  const messages = normalizeOpenRouterMessages(requestBody?.messages);
+  if (!messages.some((message) => message.role === 'user')) {
+    return NextResponse.json({ error: 'Cần ít nhất một câu hỏi.', code: 'invalid_prompt' }, { status: 400 });
+  }
 
-  let apiKey = process.env.ANTHROPIC_API_KEY;
+  let apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     const row = await prisma.setting.findUnique({ where: { id: 1 } });
-    apiKey = row ? JSON.parse(row.json).anthropicKey : null;
+    try { apiKey = row ? JSON.parse(row.json).openRouterKey : null; } catch { apiKey = null; }
   }
   if (!apiKey) return NextResponse.json({ error: 'NO_KEY' }, { status: 400 });
+  const model = process.env.OPENROUTER_MODEL || DEFAULT_OPENROUTER_MODEL;
 
   const ctx = await buildContext(user);
   const system = `Bạn là AI Copilot của hệ thống Agency ERP — trợ lý điều hành cho một marketing agency Việt Nam.
@@ -76,19 +89,21 @@ DỮ LIỆU CÔNG TY (JSON):
 ${JSON.stringify(ctx)}`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-5', max_tokens: 1500, system,
-        messages: (messages || []).slice(-10).map(m => ({ role: m.role, content: m.content })),
-      }),
+    const result = await requestOpenRouterCompletion({
+      apiKey,
+      system,
+      messages,
+      model,
+      siteUrl: process.env.NEXTAUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
     });
-    const json = await res.json();
-    if (!res.ok) return NextResponse.json({ error: json.error?.message || 'Lỗi gọi Claude API' }, { status: 500 });
-    await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'copilot', entity: 'ai', detail: (messages?.at(-1)?.content || '').slice(0, 80) } });
-    return NextResponse.json({ reply: json.content?.[0]?.text || '(không có phản hồi)' });
-  } catch (e) {
-    return NextResponse.json({ error: 'Không kết nối được Claude API: ' + e.message }, { status: 500 });
+    await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'copilot', entity: 'ai', detail: `${result.model} · ${(messages.at(-1)?.content || '').slice(0, 80)}` } });
+    return NextResponse.json({ reply: result.reply, model: result.model });
+  } catch (error) {
+    const normalized = error instanceof OpenRouterError
+      ? error
+      : new OpenRouterError('Unexpected OpenRouter failure.');
+    console.error('copilot_openrouter_failed', { status: normalized.status, type: normalized.type, model });
+    const status = [429, 503].includes(normalized.status) || normalized.status >= 500 ? 503 : 502;
+    return NextResponse.json({ error: openRouterUserMessage(normalized), code: `openrouter_${normalized.type}` }, { status });
   }
 }

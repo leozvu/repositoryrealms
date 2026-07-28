@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 17,
+    "verifiedContracts": 17,
+    "scenarios": 6,
+    "verifiedScenarios": 6,
+    "canonicalLeadStores": 1,
+    "canonicalActivityStores": 1,
+    "confidenceCeiling": "medium",
+    "employeeRankingEnabled": false,
+    "automaticLeadMutationEnabled": false,
+    "schemaMigrationRequired": false
+  },
+  "contracts": [
+    {
+      "id": "canonical-crm-records",
+      "layer": "data",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model Lead {",
+        "model Activity {",
+        "model User {"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "workload-rule-version",
+      "layer": "domain",
+      "source": "lib/crm-workload-intelligence.js",
+      "signals": [
+        "CRM_WORKLOAD_RULE_VERSION = 'crm-workload-intelligence-v1'",
+        "buildCrmWorkloadIntelligence",
+        "lifecycleFor",
+        "leadSignals"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "lifecycle-bands",
+      "layer": "domain",
+      "source": "lib/crm-workload-intelligence.js",
+      "signals": [
+        "band: 'active'",
+        "band: 'stale'",
+        "band: 'dormant'",
+        "band: 'decided'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "recorded-activity-provenance",
+      "layer": "governance",
+      "source": "lib/crm-workload-intelligence.js",
+      "signals": [
+        "source: completedDay ? 'recorded_completed_activity'",
+        "isObservedTruth: false",
+        "ceiling: 'medium'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "explicit-owner-wip",
+      "layer": "resource",
+      "source": "lib/crm-workload-intelligence.js",
+      "signals": [
+        "ownerWipLimit",
+        "openLeads",
+        "band === 'over'",
+        "ownerRows"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "manager-review-queue",
+      "layer": "domain",
+      "source": "lib/crm-workload-intelligence.js",
+      "signals": [
+        "managerQueue",
+        "assign_owner",
+        "review_dormant_lead",
+        "review_portfolio_distribution"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "anti-ranking-advisory-policy",
+      "layer": "governance",
+      "source": "lib/crm-workload-intelligence.js",
+      "signals": [
+        "advisoryOnly: true",
+        "automaticAssignment: false",
+        "automaticStageChange: false",
+        "employeeRanking: false",
+        "performanceInference: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "crm-authorization-scope",
+      "layer": "authorization",
+      "source": "lib/crm-workload-intelligence-admin.js",
+      "signals": [
+        "crmWorkloadScope",
+        "kind: 'company'",
+        "kind: 'portfolio'",
+        "crm_workload_scope_missing"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "contact-data-does-not-leak",
+      "layer": "privacy",
+      "source": "tests/crm-workload-intelligence-admin.test.mjs",
+      "signals": [
+        "includes('hidden@example.com'), false",
+        "includes('0900'), false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-crm-api",
+      "layer": "api",
+      "source": "app/api/leads/workload/route.js",
+      "signals": [
+        "currentUser()",
+        "loadCrmWorkloadIntelligence",
+        "'Cache-Control': 'private, no-store'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-workload-before-pipeline",
+      "layer": "ui",
+      "source": "app/(app)/leads/page.jsx",
+      "signals": [
+        "CRM Workload Intelligence",
+        "Manager Queue",
+        "Owner Workload",
+        "Pipeline &amp; forecast drill-down"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realm-shared-workload-contract",
+      "layer": "parity",
+      "source": "lib/realm-embassy.js",
+      "signals": [
+        "import { buildCrmWorkloadIntelligence }",
+        "workloadIntelligence"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realm-workload-ui",
+      "layer": "ui",
+      "source": "components/realm/RoyalEmbassy.jsx",
+      "signals": [
+        "CRM Workload Intelligence",
+        "Manager Queue",
+        "Owner WIP · alphabet",
+        "không phải employee ranking"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-accessible-crm",
+      "layer": "ux",
+      "source": "app/(app)/leads/crm-workload.module.css",
+      "signals": [
+        "min-height: 44px",
+        "@media (max-width: 700px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase4-domain-tests",
+      "layer": "test",
+      "source": "tests/crm-workload-intelligence.test.mjs",
+      "signals": [
+        "active, stale, dormant và decided",
+        "không tạo employee ranking",
+        "chỉ advisory"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase4-server-tests",
+      "layer": "test",
+      "source": "tests/crm-workload-intelligence-admin.test.mjs",
+      "signals": [
+        "authorization của Lead ERP",
+        "response không leak contact",
+        "bị chặn trước database query"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase4-runbook",
+      "layer": "operations",
+      "source": "docs/realms/PHASE-4-CRM-WORKLOAD-INTELLIGENCE.md",
+      "signals": [
+        "CRM không chỉ là pipeline",
+        "canonical ERP records",
+        "crmegoric-realms-demo"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "one-canonical-lead-and-activity-store",
+      "expected": "1:1",
+      "actual": "1:1",
+      "status": "verified"
+    },
+    {
+      "id": "workload-precedes-pipeline",
+      "expected": "true",
+      "actual": "true",
+      "status": "verified"
+    },
+    {
+      "id": "no-arbitrary-ui-lead-score",
+      "expected": "false",
+      "actual": "false",
+      "status": "verified"
+    },
+    {
+      "id": "activity-not-observed-confidence-medium",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "advisory-no-ranking-no-auto-mutation",
+      "expected": "true:true:true",
+      "actual": "true:true:true",
+      "status": "verified"
+    },
+    {
+      "id": "realm-and-erp-share-domain-engine",
+      "expected": "true:true",
+      "actual": "true:true",
+      "status": "verified"
+    }
+  ]
+}

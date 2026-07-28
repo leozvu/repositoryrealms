@@ -1,0 +1,24 @@
+id,layer,source,signals,missingSignals,status
+reuse-erp-setting,data,lib/realm-pilot-rehearsal.js,realmPilotRehearsal: | tx.setting.upsert | entity: 'realm_pilot_rehearsal',,verified
+no-parallel-business-store,data,lib/realm-pilot-rehearsal.js,no roster; no record content | REALM_REHEARSAL_LIMIT = 12,,verified
+director-only-rehearsal,rbac,lib/realm-pilot-rehearsal.js,requireDirector(sessionUser) | realm_rehearsal_forbidden,,verified
+serializable-cas,concurrency,lib/realm-pilot-rehearsal.js,"validateExpectedVersion(rehearsals, input.expectedVersion) | realm_rehearsal_version_conflict | isolationLevel: 'Serializable'",,verified
+fixed-operational-scenarios,domain,lib/realm-pilot-rehearsal.js,cross-surface-contact | record-deep-links | guild-support-bridge | kill-switch-rehearsal | mobile-accessibility,,verified
+bounded-evidence,privacy,lib/realm-pilot-rehearsal.js,"cleanText(input.evidence, 240) | realm_rehearsal_evidence_required | operational-attestation",,verified
+policy-version-binding,safety,lib/realm-pilot-rehearsal.js,run.policyVersion !== policy.version | realm_rehearsal_policy_stale,,verified
+submit-live-readiness,safety,lib/realm-pilot-rehearsal.js,"action === 'submit' | loadRealmLaunchReadiness(tx, policy, now) | realm_rehearsal_readiness_blocked",,verified
+independent-checker-required,rbac,lib/realm-pilot-rehearsal.js,directory.count < 2 | run.submittedById === sessionUser.id | self_approval_forbidden,,verified
+approval-rechecks-live-controls,safety,lib/realm-pilot-rehearsal.js,action === 'approve' | Live readiness vừa xuất hiện blocker mới | status: 'sealed',,verified
+twenty-four-hour-seal,safety,lib/realm-pilot-rehearsal.js,REALM_REHEARSAL_TTL_HOURS = 24 | expiresAt: | realm_rehearsal_stale,,verified
+wave-submit-needs-seal,integration,lib/realm-pilot-operations.js,"requireValidRealmPilotRehearsal(setting, policy, now) | rehearsalId: rehearsal.rehearsalId",,verified
+wave-activation-rechecks-seal,integration,lib/realm-pilot-operations.js,"requireValidRealmPilotRehearsal(setting, policy, now, wave.rehearsalId) | rehearsalExpiresAt: rehearsal.expiresAt",,verified
+erp-notification-handoff,integration,lib/realm-pilot-rehearsal.js,tx.notification.createMany | /settings#realm-pilot-rehearsal-title | Chờ bạn niêm phong launch rehearsal,,verified
+actionable-remediation,operations,lib/realm-pilot-rehearsal.js,buildRealmRehearsalRemediation | /settings#realm-pilot-title | /settings#realm-feedback-operations-title,,verified
+aggregate-privacy-contract,privacy,lib/realm-pilot-rehearsal.js,aggregateOnly: true | rosterIncluded: false | performanceTracking: false | durationTracking: false,,verified
+authenticated-traced-api,api,app/api/realm-demo/pilot/rehearsal/route.js,authenticatedUser() | startRealmApiRequest | realmJsonResponse | realmErrorResponse,,verified
+cross-surface-change-signal,api,app/api/realm-demo/pilot/rehearsal/route.js,safelyPublishRealmChange | resource: 'settings',,verified
+stale-settings-write-protection,data,app/api/settings/route.js,delete data.realmPilotRehearsal | current.realmPilotRehearsal,,verified
+accessible-rehearsal-ui,client,components/realm/RealmPilotRehearsal.jsx,"Launch Rehearsal · Sealed Evidence | <fieldset | <legend> | aria-live=""polite"" | Niêm phong 24 giờ",,verified
+responsive-reduced-motion-ui,style,components/realm/realm-pilot-rehearsal.module.css,min-height: 44px | @media (max-width: 680px) | @media (prefers-reduced-motion: reduce) | .autoChecks { grid-template-columns: 1fr; },,verified
+phase17-test-suite,test,tests/realm-pilot-rehearsal.test.mjs,requires operational evidence | independent checker | actionable remediation | expires after 24 hours,,verified
+phase17-runbook,operations,docs/realms/PHASE-17-LAUNCH-REHEARSAL.md,crmegoric-realms-demo | codex/realms-demo | 24 giờ | không tự đổi policy | không có migration,,verified

@@ -1,0 +1,15 @@
+id,layer,source,signals,missingSignals,status
+receipt-schema,database,prisma/schema.prisma,"model RealmActionReceipt | idempotencyKey String   @unique | @@index([resource, entityId, createdAt])",,verified
+additive-receipt-migration,database,prisma/migrations/20260718210000_add_realm_action_receipts/migration.sql,"CREATE TABLE ""RealmActionReceipt"" | RealmActionReceipt_idempotencyKey_key",,verified
+explicit-transition-allowlist,contract,lib/realm-action-contract.js,REALM_TASK_TRANSITIONS | REALM_LEAD_TRANSITIONS | done: Object.freeze([]) | won: Object.freeze([]),,verified
+erp-rbac-row-scope,server,lib/realm-action-admin.js,"canWrite('tasks', user) | RESOURCES.tasks.canWriteRow | realmGuildScope(user) | realmEmbassyScope(user)",,verified
+optimistic-concurrency,server,lib/realm-action-admin.js,updateMany({ | status: command.expectedState | stage: command.expectedState | 'realm_action_stale',,verified
+idempotent-command-receipt,server,lib/realm-action-admin.js,normalizeRealmIdempotencyKey | existingReceipt | error?.code !== 'P2002' | realm_action_idempotency_conflict,,verified
+atomic-audit-receipt,server,lib/realm-action-admin.js,db.$transaction | realmActionReceipt.create | auditLog.create | action: 'realm_action',,verified
+event-bus-feedback-loop,api,app/api/realm-demo/actions/route.js,"await emitEvent(result.resource, result.event || 'update' | !result.idempotent | route: 'realm.actions'",,verified
+surface-and-session-gate,api,app/api/realm-demo/actions/route.js,authorizedUser() | realmSurfaceDecision | isFreelancer(user) | loadRealmCompanyModules,,verified
+safe-response-shape,api,app/api/realm-demo/actions/route.js,source: 'erp' | idempotent: result.idempotent | action: result.action | generatedAt: new Date().toISOString(),,verified
+explicit-user-confirmation,client,components/realm/RealmActionDialog.jsx,ConfirmDialog | Idempotency-Key | Suggested Action: | RepositoryRealms | receipt | audit,,verified
+war-room-command-ui,client,components/realm/WarRoom.jsx,realmTaskTransitions | action: 'task.transition' | RealmActionDialog | command bridge,,verified
+embassy-command-ui,client,components/realm/RoyalEmbassy.jsx,realmLeadTransitions | action: 'lead.transition' | RealmActionDialog | command bridge,,verified
+schema-readiness-current,health,lib/realm-health.js,REALM_SCHEMA_VERSION = 8 | 20260719133000_add_realm_pilot_feedback | missing.push('action_receipts'),,verified

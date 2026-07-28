@@ -21,7 +21,7 @@ const cleanRoles = roles => {
 // này im lặng: HR không thấy nút, không biết là mình đáng lẽ phải làm được.
 export async function POST(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const body = await req.json();
   const { email, name, password, roles, title, phone, birthday, salary, teamId } = body;
   const isFL = body.userType === 'freelancer';
@@ -67,7 +67,7 @@ export async function POST(req) {
 // mỗi người tự sửa tên/sđt/mật khẩu của mình.
 export async function PUT(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const { id, password, ...fields } = await req.json();
   const isSelf = id === user.id;
   const isHR = hasAny(user, ['HR']);

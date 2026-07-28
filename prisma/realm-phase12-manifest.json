@@ -1,0 +1,53 @@
+{
+  "phase": 12,
+  "baselineName": "20260717000000_full_erp_realms_baseline",
+  "baselineSha256": "8bdbc9f15c6cf831ed2bc3e6724e632c88b4554f71dd4bd29f592245fa26da4a",
+  "migrationName": "20260717190000_add_realm_reward_governance",
+  "migrationSha256": "30fa22273163e6edf31fc64aa4db20cd38c9e9d6ced549bdf6f6052cee0c4089",
+  "rollbackSha256": "759a66176b01a8e1faf4460193f03463b418000c62836a5241b04b28cd7bad29",
+  "additiveTables": [
+    "RealmProfile",
+    "RealmQuestConfig",
+    "RealmRewardBudget",
+    "RealmGoldEntry"
+  ],
+  "requiredExistingTables": ["User", "Task"],
+  "requiredIndexes": [
+    "RealmProfile_userId_key",
+    "RealmQuestConfig_taskId_key",
+    "RealmQuestConfig_status_idx",
+    "RealmQuestConfig_configuredById_idx",
+    "RealmQuestConfig_approvedById_idx",
+    "RealmRewardBudget_period_key",
+    "RealmRewardBudget_status_idx",
+    "RealmRewardBudget_configuredById_idx",
+    "RealmRewardBudget_approvedById_idx",
+    "RealmGoldEntry_idempotencyKey_key",
+    "RealmGoldEntry_userId_createdAt_idx",
+    "RealmGoldEntry_sourceType_sourceId_idx",
+    "RealmGoldEntry_userId_type_sourceType_sourceId_key"
+  ],
+  "requiredForeignKeys": [
+    "RealmProfile_userId_fkey",
+    "RealmQuestConfig_taskId_fkey",
+    "RealmQuestConfig_configuredById_fkey",
+    "RealmQuestConfig_approvedById_fkey",
+    "RealmRewardBudget_configuredById_fkey",
+    "RealmRewardBudget_approvedById_fkey",
+    "RealmGoldEntry_userId_fkey"
+  ],
+  "requiredChecks": [
+    "RealmProfile_streakDays_check",
+    "RealmQuestConfig_gold_check",
+    "RealmQuestConfig_renown_check",
+    "RealmQuestConfig_version_check",
+    "RealmQuestConfig_status_check",
+    "RealmRewardBudget_period_check",
+    "RealmRewardBudget_caps_check",
+    "RealmRewardBudget_version_check",
+    "RealmRewardBudget_status_check",
+    "RealmGoldEntry_amount_check",
+    "RealmGoldEntry_renown_check"
+  ],
+  "rollbackDeletesRealmData": true
+}

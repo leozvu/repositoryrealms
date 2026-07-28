@@ -10,6 +10,12 @@ const DEFAULTS = {
   // v3.4: xác suất chốt theo giai đoạn pipeline (%) — cho forecast doanh thu
   probNew: 10, probContacted: 20, probProposal: 40, probNegotiation: 60,
   autoAssignLeads: false, // v3.4: tự chia lead chưa gán cho AM ít lead mở nhất
+  // v3.42 (cụm Lead): cổng nhận lead tự động từ Facebook/TikTok/landing + chia sale thông minh.
+  // leadIntakeToken rỗng = cổng ĐÓNG (endpoint trả 404). Sinh bằng nút trong Cài đặt.
+  leadIntakeToken: '',
+  leadAssignStrategy: 'least_load', // least_load | round_robin | region | service_line | campaign
+  leadRouting: {}, // { [userId]: { regions: [], serviceLines: [], campaigns: [] } }
+  leadRegions: ['Miền Bắc', 'Miền Trung', 'Miền Nam'],
   roleLabels: {}, // v3.6: đổi tên chức danh theo công ty (quyền giữ nguyên theo nhóm)
   leaveQuota: 12, // v3.7: số ngày phép năm mỗi nhân sự
   workStart: '09:00', workEnd: '18:00', otMultiplier: 1.5, // v3.11: ca làm chuẩn + hệ số OT
@@ -18,27 +24,73 @@ const DEFAULTS = {
   // v3.17: phân hệ bật/tắt theo công ty. null = chưa cấu hình → client hiểu là BẬT HẾT
   // (giữ nguyên hành vi 3 công ty cũ). Mảng = danh sách phân hệ đang bật.
   modules: null,
+  // v3.37 (feedback Egoric): "mảng dịch vụ" chỉnh được theo công ty thay vì hard-code —
+  // dùng cho dropdown Dịch vụ ở Dự án, cột/lọc ở Khách hàng và Bảng giá dịch vụ.
+  serviceLines: ['Digital Ads', 'Social Media', 'Branding', 'Web & SEO', 'Production', 'PR / Event', 'Seeding', 'Livestream', 'Khác'],
+  // v3.41 (Chương 1): siết chấm công theo ngữ cảnh. off = giữ nguyên như cũ (mặc định),
+  // warn = vẫn cho bấm nhưng ghi chú ngoài mạng công ty, strict = chặn khai "đi làm" khi
+  // bấm ngoài mạng công ty. officeNetworks: mỗi dòng một IP hoặc tiền tố ("113.161.10.").
+  attendanceStrictness: 'off',
+  officeNetworks: [],
+  // v3.41 (Chương 2+3): Gold. goldEnabled bật lớp trải nghiệm (điểm/huy hiệu, KHÔNG ra tiền).
+  // goldPayoutEnabled mới là công tắc quy Gold thành thưởng trong bảng lương — mặc định TẮT
+  // theo cảnh báo của nhân sự "quản lý theo hiệu suất phải có quá trình".
+  goldEnabled: false,
+  goldPayoutEnabled: false,
+  goldPerOnTimeTask: 10, // việc hoàn thành đúng hạn
+  goldPerFullAttendanceDay: 5, // ngày công đủ giờ
+  goldDailyEarnCap: 60, // trần Gold tự động mỗi người mỗi ngày — chặn cày điểm bằng việc vụn
+  goldToVndRate: 1000, // 1 Gold = ? đồng khi bật quy đổi
+  goldMonthlyCapVnd: 2000000, // trần thưởng Gold mỗi người mỗi tháng
 };
 
 // Các trường bí mật — chỉ Giám đốc đọc được (trang Cài đặt); route server đọc thẳng DB
-const SECRET_KEYS = ['anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPort', 'smtpFrom'];
+// leadIntakeToken nằm ở đây vì ai cầm được nó là bơm được lead vào pipeline công ty.
+const SECRET_KEYS = ['openRouterKey', 'anthropicKey', 'smtpPass', 'smtpUser', 'smtpHost', 'smtpPort', 'smtpFrom', 'leadIntakeToken'];
 
 export async function GET() {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const row = await prisma.setting.findUnique({ where: { id: 1 } });
   const data = { ...DEFAULTS, ...(row ? JSON.parse(row.json) : {}) };
-  if (!isDirector(user)) SECRET_KEYS.forEach(k => delete data[k]);
+  if (!isDirector(user)) {
+    SECRET_KEYS.forEach(k => delete data[k]);
+    // Shell chỉ cần company/modules/role labels. Roster của named cohort và metadata
+    // vận hành wave chỉ được đọc qua các API Director chuyên biệt.
+    delete data.realmPilot;
+    delete data.realmPilotOperations;
+    delete data.realmPilotRehearsal;
+    delete data.realmExperienceTelemetry;
+  }
   return NextResponse.json(data);
 }
 
 export async function PUT(req) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!isDirector(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const data = await req.json();
-  const json = JSON.stringify({ ...DEFAULTS, ...data });
-  await prisma.setting.upsert({ where: { id: 1 }, create: { id: 1, json }, update: { json } });
-  await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'settings', detail: 'Cập nhật cài đặt công ty' } });
+  await prisma.$transaction(async (tx) => {
+    const row = await tx.setting.findUnique({ where: { id: 1 }, select: { json: true } });
+    let current = {};
+    try { current = JSON.parse(row?.json || '{}'); } catch { current = {}; }
+    // Realm pilot, Pilot Operations, Launch Rehearsal và Experience Pilot có endpoint
+    // riêng để validate control plane / privacy contract. Form công ty dùng snapshot
+    // cũ nên không được ghi đè các trường được bảo vệ này.
+    const next = { ...DEFAULTS, ...data };
+    if (current.realmPilot) next.realmPilot = current.realmPilot;
+    else delete next.realmPilot;
+    if (current.realmPilotOperations) next.realmPilotOperations = current.realmPilotOperations;
+    else delete next.realmPilotOperations;
+    if (current.realmPilotRehearsal) next.realmPilotRehearsal = current.realmPilotRehearsal;
+    else delete next.realmPilotRehearsal;
+    if (current.realmExperienceTelemetry) next.realmExperienceTelemetry = current.realmExperienceTelemetry;
+    else delete next.realmExperienceTelemetry;
+    if (current.ceoFederation) next.ceoFederation = current.ceoFederation;
+    else delete next.ceoFederation;
+    const json = JSON.stringify(next);
+    await tx.setting.upsert({ where: { id: 1 }, create: { id: 1, json }, update: { json } });
+    await tx.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'update', entity: 'settings', detail: 'Cập nhật cài đặt công ty' } });
+  }, { isolationLevel: 'Serializable' });
   return NextResponse.json({ ok: true });
 }

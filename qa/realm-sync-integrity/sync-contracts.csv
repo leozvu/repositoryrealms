@@ -1,0 +1,13 @@
+id,layer,source,signals,missingSignals,status
+snapshot-envelope,server,lib/realm-erp-adapter.js,createRealmSyncEnvelope(snapshot | sync: createRealmSyncEnvelope,,verified
+conditional-get,api,app/api/realm-demo/operations/route.js,realmSnapshotMatchesEtag | status: 304,,verified
+private-validator,api,lib/realm-sync.js,"'Cache-Control': 'private, no-cache, no-store, max-age=0' | Vary: 'Cookie' | 'X-Realm-Revision'",,verified
+post-revision,api,app/api/realm-demo/operations/route.js,"return snapshotResponse(trace, snapshot, { ...snapshot, action })",,verified
+profile-version-api,api,app/api/realm-demo/operations/route.js,expectedProfileVersion: body.profileVersion,,verified
+profile-version-transaction,server,lib/realm-erp-adapter.js,'realm_profile_conflict' | isolationLevel: 'Serializable',,verified
+claim-idempotency,server,lib/realm-erp-adapter.js,"normalizeRealmIdempotencyKey | if (existing) return { entry: existing, idempotent: true }",,verified
+client-etag,client,components/realm/RealmOffice.jsx,'If-None-Match': operationsSyncEtagRef.current | response.status === 304,,verified
+background-revalidation,client,components/realm/RealmOffice.jsx,REALM_REMOTE_REFRESH_MS | document.addEventListener('visibilitychange' | window.addEventListener('online',,verified
+offline-preservation,client,components/realm/RealmOffice.jsx,setOperationsSyncState('offline') | Snapshot ERP gần nhất vẫn được giữ nguyên,,verified
+stale-retry-ui,client,components/realm/RealmOffice.jsx,function SyncIntegrityCard | Snapshot có thể cũ · cần thử lại | Thử đồng bộ,,verified
+no-false-write-success,client,components/realm/RealmOffice.jsx,"Chưa có thay đổi nào được xác nhận. | if (!response.ok) | applyRemoteOperations(payload, response.headers.get('ETag'), responseTrace)",,verified

@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "routes": 2,
+    "verifiedRoutes": 2,
+    "contracts": 15,
+    "verifiedContracts": 15,
+    "scenarios": 10,
+    "verifiedScenarios": 10,
+    "additiveModels": 2,
+    "databaseMutationsExecuted": 0
+  },
+  "routeCoverage": [
+    {
+      "id": "presence",
+      "source": "app/api/collaboration/presence/route.js",
+      "signals": [
+        "currentUser()",
+        "loadCollaborationDirectory",
+        "heartbeatCollaborationPresence",
+        "leaveCollaborationPresence",
+        "collaborationJson"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "contact",
+      "source": "app/api/collaboration/contact/route.js",
+      "signals": [
+        "currentUser()",
+        "loadCollaborationContacts",
+        "requestCollaborationContact",
+        "respondCollaborationContact",
+        "headers.get('Idempotency-Key')"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "contracts": [
+    {
+      "id": "additive-collaboration-schema",
+      "source": "prisma/schema.prisma",
+      "signals": [
+        "model CollaborationPresenceSession",
+        "model CollaborationContactRequest",
+        "idempotencyKey String    @unique"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "canonical-erp-chat-notification",
+      "source": "lib/collaboration-admin.js",
+      "signals": [
+        "tx.message.create",
+        "tx.notification.create",
+        "directConversation(tx"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-actor-boundary",
+      "source": "lib/collaboration-admin.js",
+      "signals": [
+        "if (!user?.id)",
+        "userId: user.id",
+        "requesterId: user.id"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "presence-session-ownership",
+      "source": "lib/collaboration-admin.js",
+      "signals": [
+        "collaborationPresenceSession.findUnique",
+        "owner.userId !== user.id",
+        "presence_session_conflict"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "multi-session-user-merge",
+      "source": "lib/collaboration.js",
+      "signals": [
+        "const byUser = new Map()",
+        "byUser.get(session.userId)",
+        "online: active.length > 0"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "contact-idempotency",
+      "source": "lib/collaboration-admin.js",
+      "signals": [
+        "idempotencyKey",
+        "error?.code !== 'P2002'",
+        "duplicate: true"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "dnd-and-rate-guard",
+      "source": "lib/collaboration-admin.js",
+      "signals": [
+        "session.availability === 'dnd'",
+        "CONTACT_RATE_LIMIT",
+        "contact_rate_limited"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "contact-lifecycle-expiry",
+      "source": "lib/collaboration-admin.js",
+      "signals": [
+        "status: 'expired'",
+        "['seen', 'accept', 'decline']",
+        "status === 'accepted'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "erp-global-bridge",
+      "source": "components/Shell.jsx",
+      "signals": [
+        "<CollaborationBridge />",
+        "<WorkspaceSurfaceSwitch pilot={realmPilot} />"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realm-to-erp-contact",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "useCollaborationDirectory",
+        "sendContactToSelected",
+        "targetUserId",
+        "Gõ cửa ERP"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "server-signed-realm-identity",
+      "source": "scripts/realm-signal-server.mjs",
+      "signals": [
+        "socket.realmClaims.userId",
+        "identityId: socket.realmClaims.userId"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "message-deep-link",
+      "source": "app/(app)/messages/page.jsx",
+      "signals": [
+        "useSearchParams",
+        "searchParams.get('conversation')",
+        "setSel(requested)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "policy-aware-surface-login",
+      "source": "app/login/page.jsx",
+      "signals": [
+        "fetch('/api/realm-demo/pilot'",
+        "pilot.user?.allowed",
+        "destination = '/realm'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "fail-soft-directory",
+      "source": "components/collaboration/useCollaborationDirectory.js",
+      "signals": [
+        "current === 'ready' ? 'stale' : 'unavailable'",
+        "fetch('/api/collaboration/presence'",
+        "cache: 'no-store'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "private-no-store-response",
+      "source": "lib/collaboration-response.js",
+      "signals": [
+        "'Cache-Control': 'private, no-cache, no-store, max-age=0'",
+        "Vary: 'Cookie'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "multi-tab-is-one-online-user",
+      "expected": 1,
+      "actual": 1,
+      "status": "verified"
+    },
+    {
+      "id": "surface-capability-merge",
+      "expected": "erp,realm|chat,voice|focus",
+      "actual": "erp,realm|chat,voice|focus",
+      "status": "verified"
+    },
+    {
+      "id": "expired-presence-is-offline",
+      "expected": false,
+      "actual": false,
+      "status": "verified"
+    },
+    {
+      "id": "safe-contact-deep-link",
+      "expected": "/messages?conversation=conv_01&contact=contact_01",
+      "actual": "/messages?conversation=conv_01&contact=contact_01",
+      "status": "verified"
+    },
+    {
+      "id": "contact-control-char-sanitized",
+      "expected": "Hop ngay",
+      "actual": "Hop ngay",
+      "status": "verified"
+    },
+    {
+      "id": "contact-viewer-direction",
+      "expected": "incoming",
+      "actual": "incoming",
+      "status": "verified"
+    },
+    {
+      "id": "surface-fallback",
+      "expected": "erp",
+      "actual": "erp",
+      "status": "verified"
+    },
+    {
+      "id": "availability-fallback",
+      "expected": "available",
+      "actual": "available",
+      "status": "verified"
+    },
+    {
+      "id": "capability-allowlist",
+      "expected": "chat,voice",
+      "actual": "chat,voice",
+      "status": "verified"
+    },
+    {
+      "id": "route-encoding",
+      "expected": "/messages?conversation=conv%2F01&contact=contact%3F01",
+      "actual": "/messages?conversation=conv%2F01&contact=contact%3F01",
+      "status": "verified"
+    }
+  ]
+}

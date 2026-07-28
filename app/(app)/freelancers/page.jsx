@@ -3,7 +3,7 @@
 // theo deadline dự án, đơn giá giờ. Freelancer là người ngoài: chỉ vai trò FREELANCER.
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Forbidden, AsyncButton, useToast } from '@/components/ui';
 import { money, fmtDate, todayISO, initials } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
 
@@ -38,8 +38,10 @@ export default function FreelancersPage() {
   const settle = async (f) => {
     const amount = f.kind === 'hourly' ? Math.round((+f.hours || 0) * (+f.rate || 0)) : (+f.amount || 0);
     if (amount <= 0) return toast('Số tiền không hợp lệ', 'error');
-    await payouts.create({ userId: f.userId, projectId: f.projectId || null, kind: f.kind, hours: f.kind === 'hourly' ? +f.hours || 0 : 0, amount, note: f.note || (f.projectId ? projName(f.projectId) : '') });
+    const result = await payouts.create({ userId: f.userId, projectId: f.projectId || null, kind: f.kind, hours: f.kind === 'hourly' ? +f.hours || 0 : 0, amount, note: f.note || (f.projectId ? projName(f.projectId) : '') });
+    if (!result) return false;
     toast('Đã tạo khoản phải trả freelancer');
+    return true;
   };
   const payNow = async (p) => {
     const r = await fetch(`/api/payouts/${p.id}/pay`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
@@ -64,7 +66,8 @@ export default function FreelancersPage() {
 
   const createFL = async f => {
     const r = await callUsers('POST', { userType: 'freelancer', email: f.email, name: f.name, password: f.password, hourlyRate: +f.hourlyRate || 0, skills: f.skills, portfolio: f.portfolio });
-    if (r) { toast('Đã tạo tài khoản freelancer'); users.refresh(); setModal(null); }
+    if (!r) return false;
+    toast('Đã tạo tài khoản freelancer'); users.refresh(); setModal(null); return true;
   };
   const assign = async (uid, projectId) => {
     if (!projectId) return;
@@ -76,11 +79,13 @@ export default function FreelancersPage() {
     toast('Đã gắn vào dự án — hạn truy cập tự cập nhật');
   };
   const unassign = async (m) => {
-    await members.remove(m.id);
+    const result = await members.remove(m.id);
+    if (!result) return false;
     await new Promise(r => setTimeout(r, 300));
     await members.refresh();
     await syncAccess(m.userId);
     toast('Đã gỡ khỏi dự án');
+    return true;
   };
 
   return (
@@ -117,7 +122,7 @@ export default function FreelancersPage() {
                     {mine.map(m => (
                       <div key={m.id} className="act-item" style={{ padding: '3px 0', alignItems: 'center' }}>
                         <span style={{ flex: 1 }}>{projName(m.projectId)}</span>
-                        {canManage && <button className="icon-btn" onClick={() => unassign(m)}><Icon name="x" size={12} /></button>}
+                        {canManage && <button className="icon-btn" onClick={() => setModal({ mode: 'unassign', row: m, projectName: projName(m.projectId), freelancerName: u.name })} aria-label={`Gỡ ${u.name} khỏi ${projName(m.projectId)}`}><Icon name="x" size={12} /></button>}
                       </div>
                     ))}
                     {canManage && (
@@ -142,7 +147,7 @@ export default function FreelancersPage() {
                         </div>
                         {p.status === 'paid'
                           ? <span className="badge b-green"><span className="dot"></span>Đã trả</span>
-                          : (canManage && <button className="btn btn-primary btn-sm" onClick={() => payNow(p)}>Trả</button>)}
+                          : (canManage && <AsyncButton className="btn btn-primary btn-sm" onClick={() => payNow(p)}>Trả</AsyncButton>)}
                       </div>
                     ))}
                   </div>
@@ -159,6 +164,8 @@ export default function FreelancersPage() {
         onClose={() => setModal(null)} onSave={settle} />}
       {modal?.mode === 'deactivate' && <ConfirmDialog yesLabel="Khóa" msg={`Khóa đăng nhập freelancer "${modal.row.name}"? (có thể mở lại sau)`}
         onClose={() => setModal(null)} onYes={async () => { await callUsers('PUT', { id: modal.row.id, status: 'inactive' }); users.refresh(); toast('Đã khóa'); }} />}
+      {modal?.mode === 'unassign' && <ConfirmDialog yesLabel="Gỡ khỏi dự án" msg={`Gỡ "${modal.freelancerName}" khỏi dự án "${modal.projectName}"? Quyền truy cập dự án sẽ được cập nhật.`}
+        onClose={() => setModal(null)} onYes={() => unassign(modal.row)} />}
     </>
   );
 }
@@ -180,7 +187,7 @@ function SettleModal({ fl, projects, loggedHours, settledHours, unpaidHours, onC
   return (
     <Modal title={`Chốt thanh toán — ${fl.name}`} onClose={onClose}
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={() => { if (preview <= 0) return; onSave({ userId: fl.id, projectId, kind, hours, amount, rate, note }); onClose(); }}>Tạo khoản phải trả</button></>}>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang tạo…" onClick={async () => { if (preview <= 0) return; const r = await onSave({ userId: fl.id, projectId, kind, hours, amount, rate, note }); if (r !== false && r !== null) onClose(); }}>Tạo khoản phải trả</AsyncButton></>}>
       <div className="form-grid">
         <div className="field"><label>Dự án</label>
           <select value={projectId} onChange={e => pickProject(e.target.value)}>
@@ -219,7 +226,7 @@ function FreelancerModal({ onClose, onSave }) {
   return (
     <Modal title="Thêm freelancer" onClose={onClose}
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={() => { if (!f.name || !f.email || f.password.length < 6) return; onSave(f); }}>Tạo tài khoản</button></>}>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang tạo…" onClick={() => { if (!f.name || !f.email || f.password.length < 6) return; return onSave(f); }}>Tạo tài khoản</AsyncButton></>}>
       <div className="form-grid">
         <div className="field"><label>Họ tên *</label><input value={f.name} onChange={e => set('name', e.target.value)} /></div>
         <div className="field"><label>Email đăng nhập *</label><input type="email" value={f.email} onChange={e => set('email', e.target.value)} /></div>

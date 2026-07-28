@@ -1,0 +1,3 @@
+/qa/** text eol=lf
+/prisma/migrations/**/*.sql text eol=lf
+/prisma/realm-rollbacks/*.sql text eol=lf

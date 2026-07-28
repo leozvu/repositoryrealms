@@ -9,7 +9,7 @@ import { reconcile } from '@/lib/livestream';
 // giờ chảy vào tài chính công ty. Đây là chỗ nối chuỗi tiền còn thiếu (giống lô hàng XNK).
 export async function POST(req, { params }) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user) || !hasAny(user, ['ACCOUNTANT', 'LEAD', 'PM'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const { date } = await req.json().catch(() => ({}));

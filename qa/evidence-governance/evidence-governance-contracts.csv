@@ -1,0 +1,16 @@
+id,layer,source,signals,missingSignals,status
+governance-runbook,policy,docs/realms/PHASE-0-EVIDENCE-GOVERNANCE.md,Runtime mode: `shadow` | Collection: `disabled` | Presence không phải productivity | Activation gates,,verified
+machine-readable-policy,policy,docs/realms/evidence-policy-v1.json,"""mode"": ""shadow"" | ""collectionActive"": false | ""individual_performance_ranking""",,verified
+append-only-ledger-schema,data,prisma/schema.prisma,model WorkEvidenceEvent | idempotencyKey String | sourceClass | retentionUntil,,verified
+employee-review-schema,data,prisma/schema.prisma,model EvidenceReviewRequest | requestedById | reasonCode | decisionCode,,verified
+policy-snapshot-schema,data,prisma/schema.prisma,model EvidencePolicySnapshot | shadowMode | contractHash,,verified
+additive-migration,migration,prisma/migrations/20260720150000_add_work_evidence_governance/migration.sql,"CREATE TABLE ""WorkEvidenceEvent"" | CREATE TABLE ""EvidenceReviewRequest"" | CREATE TABLE ""EvidencePolicySnapshot""",,verified
+fail-closed-contract,domain,lib/work-evidence-contract.js,work_evidence_metadata_not_allowed | work_evidence_purpose_not_allowed | work_evidence_source_mismatch,,verified
+surveillance-denylist,privacy,lib/work-evidence-contract.js,EVIDENCE_PROHIBITED_SIGNALS | work_evidence_surveillance_signal_prohibited | raw_device_id,,verified
+shadow-decision-guard,safety,lib/work-evidence-contract.js,EVIDENCE_PROHIBITED_DECISION_USES | work_evidence_shadow_decision_prohibited | gold_award,,verified
+trusted-producer-authorization,authorization,lib/work-evidence-admin.js,trustedProducer | work_evidence_trusted_producer_required | work_evidence_validation_forbidden,,verified
+atomic-event-audit,audit,lib/work-evidence-admin.js,db.$transaction | workEvidenceEvent.create | auditLog.create,,verified
+receipt-provenance-verification,receipt,lib/work-evidence-admin.js,verifyBusinessReceipt | work_evidence_business_receipt_not_found | work_evidence_business_receipt_mismatch,,verified
+idempotent-receipt,receipt,lib/work-evidence-admin.js,work_evidence_idempotency_conflict | type: 'work_evidence.recorded' | error?.code !== 'P2002',,verified
+self-read-server-scope,authorization,lib/work-evidence-admin.js,listOwnWorkEvidenceEvents | actorId: user.id | work_evidence_page_size_invalid,,verified
+contract-security-tests,test,tests/work-evidence-contract.test.mjs,"rejects surveillance signal | blocks Gold, payroll | untrusted producer | payload-free audit",,verified

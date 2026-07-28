@@ -7,7 +7,7 @@ import { dueTemplates, genDate, recurTag } from '@/lib/recurring';
 // v3.32: Sinh phiếu chi định kỳ cho tháng hiện tại từ các mẫu đang bật (chưa sinh trong tháng).
 export async function POST(req, ctx) {
   const user = await currentUser();
-  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user) || !hasAny(user, ['ACCOUNTANT'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const { month } = await req.json().catch(() => ({}));

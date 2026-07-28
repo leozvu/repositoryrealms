@@ -1,0 +1,395 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "contracts": 27,
+    "verifiedContracts": 27,
+    "phase22Contracts": 12,
+    "verifiedPhase22Contracts": 12,
+    "phase23Contracts": 15,
+    "verifiedPhase23Contracts": 15,
+    "journeys": 4,
+    "verifiedJourneys": 4,
+    "aggregateOnly": true,
+    "authoritativeLaunchGate": false,
+    "recordIdsStored": false,
+    "performanceTracking": false,
+    "additiveMigrations": 0
+  },
+  "contracts": [
+    {
+      "id": "presentation-only-context",
+      "phase": 22,
+      "layer": "privacy",
+      "source": "lib/realm-experience.js",
+      "signals": [
+        "REALM_EXPERIENCE_STORAGE_KEY",
+        "mode,",
+        "panel,",
+        "ledgerView,",
+        "position,"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "no-record-context",
+      "phase": 22,
+      "layer": "privacy",
+      "source": "tests/realm-experience.test.mjs",
+      "signals": [
+        "'recordId' in context, false",
+        "'campaignId' in context, false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "permission-safe-restore",
+      "phase": 22,
+      "layer": "client",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "experienceHydratedRef",
+        "realmAccessForPanel",
+        "realmAccessForSurface",
+        "? 'ledger'",
+        "'briefing'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "realm-erp-handoff",
+      "phase": 22,
+      "layer": "navigation",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "persistWorkspaceSurface",
+        "'erp_handoff'",
+        "ERP · CRM"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "mobile-destination-navigation",
+      "phase": 22,
+      "layer": "responsive",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "realm-mobile-destination",
+        "mobileNavigator",
+        "ledger:personal"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "responsive-safe-area",
+      "phase": 22,
+      "layer": "style",
+      "source": "components/realm/realm-office.module.css",
+      "signals": [
+        "@media (max-width: 620px)",
+        "env(safe-area-inset-bottom)",
+        ".mobileNavigator",
+        "min-height: 44px"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-navigation",
+      "phase": 22,
+      "layer": "accessibility",
+      "source": "components/realm/RealmOffice.jsx",
+      "signals": [
+        "skipLink",
+        "aria-live=\"polite\"",
+        "tabIndex={-1}"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "accessible-onboarding",
+      "phase": 22,
+      "layer": "accessibility",
+      "source": "components/realm/RealmPilotOnboarding.jsx",
+      "signals": [
+        "role=\"progressbar\"",
+        "aria-valuemin=\"1\"",
+        "không lưu record"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "reduced-motion",
+      "phase": 22,
+      "layer": "accessibility",
+      "source": "components/realm/realm-office.module.css",
+      "signals": [
+        "@media (prefers-reduced-motion: reduce)",
+        "animation-duration: .01ms"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "below-fold-render-budget",
+      "phase": 22,
+      "layer": "performance",
+      "source": "components/realm/realm-office.module.css",
+      "signals": [
+        "content-visibility: auto",
+        "contain-intrinsic-size: auto 420px"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "art-payload-budget",
+      "phase": 22,
+      "layer": "performance",
+      "source": "tests/realm-art-assets.test.mjs",
+      "signals": [
+        "totalBytes < 125_000",
+        "totalBytes < 100_000",
+        "totalBytes < 750_000"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase22-runbook",
+      "phase": 22,
+      "layer": "operations",
+      "source": "docs/realms/PHASE-22-UX-JOURNEY.md",
+      "signals": [
+        "Parity là parity của business invariant",
+        "390×844",
+        "Không tự retry mutation"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "fixed-aggregate-signals",
+      "phase": 23,
+      "layer": "privacy",
+      "source": "lib/realm-experience.js",
+      "signals": [
+        "REALM_EXPERIENCE_EVENTS",
+        "fixedCounter",
+        "totalEvents",
+        "performanceTracking: false"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "server-normalization",
+      "phase": 23,
+      "layer": "api",
+      "source": "lib/realm-experience-admin.js",
+      "signals": [
+        "normalizeRealmExperienceEvent",
+        "applyRealmExperienceTelemetryEvent",
+        "isolationLevel: 'Serializable'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "authenticated-pilot-ingest",
+      "phase": 23,
+      "layer": "api",
+      "source": "app/api/realm-demo/experience/route.js",
+      "signals": [
+        "currentUser",
+        "isFreelancer",
+        "loadRealmPilotDecision",
+        "if (!decision.allowed)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "experience-observability",
+      "phase": 23,
+      "layer": "observability",
+      "source": "app/api/realm-demo/experience/route.js",
+      "signals": [
+        "startRealmApiRequest",
+        "realmJsonResponse",
+        "realmErrorResponse"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "director-scorecard",
+      "phase": 23,
+      "layer": "authorization",
+      "source": "app/api/realm-demo/experience/route.js",
+      "signals": [
+        "isDirector",
+        "loadRealmLaunchReadiness",
+        "evaluateRealmExperiencePilot"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "settings-clobber-protection",
+      "phase": 23,
+      "layer": "persistence",
+      "source": "app/api/settings/route.js",
+      "signals": [
+        "delete data.realmExperienceTelemetry",
+        "current.realmExperienceTelemetry",
+        "next.realmExperienceTelemetry"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "advisory-not-authoritative",
+      "phase": 23,
+      "layer": "governance",
+      "source": "lib/realm-experience.js",
+      "signals": [
+        "authoritativeLaunchGate: false",
+        "hold-or-limited-pilot",
+        "ready-for-approved-expansion"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "experience-scorecard-ui",
+      "phase": 23,
+      "layer": "ui",
+      "source": "components/realm/RealmExperienceScorecard.jsx",
+      "signals": [
+        "Experience Pilot · Phase 23",
+        "RepositoryRealms launch readiness",
+        "Không tự động mở pilot"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "scorecard-responsive-accessible",
+      "phase": 23,
+      "layer": "style",
+      "source": "components/realm/realm-experience-scorecard.module.css",
+      "signals": [
+        "min-height: 44px",
+        "@media (max-width: 680px)",
+        "@media (prefers-reduced-motion: reduce)"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "feedback-loop-signal",
+      "phase": 23,
+      "layer": "feedback",
+      "source": "components/realm/RealmFeedbackLauncher.jsx",
+      "signals": [
+        "event: 'feedback_opened'",
+        "surface === 'realm'",
+        "Guild Support"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "four-journey-evidence",
+      "phase": 23,
+      "layer": "measurement",
+      "source": "lib/realm-experience.js",
+      "signals": [
+        "['guild', 'war', 'treasury', 'tavern']",
+        "id: 'four-journey-coverage'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "deterministic-experience-tests",
+      "phase": 23,
+      "layer": "test",
+      "source": "tests/realm-experience.test.mjs",
+      "signals": [
+        "Phase 22 continuity context",
+        "Phase 23 scorecard is advisory",
+        "preserves unrelated configuration"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "experience-auth-boundary-e2e",
+      "phase": 23,
+      "layer": "e2e",
+      "source": "tests/e2e/realm-smoke.spec.mjs",
+      "signals": [
+        "'/api/realm-demo/experience'",
+        "preserve the ERP authentication boundary"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "continuity-responsive-e2e",
+      "phase": 23,
+      "layer": "e2e",
+      "source": "tests/e2e/realm-smoke.spec.mjs",
+      "signals": [
+        "Realm presentation context restores without persisting business identifiers",
+        "name: 'Khu vực'",
+        "'ledger:treasury'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "phase23-runbook",
+      "phase": 23,
+      "layer": "operations",
+      "source": "docs/realms/PHASE-23-EXPERIENCE-PILOT.md",
+      "signals": [
+        "advisory",
+        "không tạo event log tăng vô hạn",
+        "Go / no-go"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    }
+  ],
+  "journeys": [
+    {
+      "journey": "guild",
+      "evidence": "lib/realm-experience.js · guild",
+      "status": "verified"
+    },
+    {
+      "journey": "war",
+      "evidence": "lib/realm-experience.js · war",
+      "status": "verified"
+    },
+    {
+      "journey": "treasury",
+      "evidence": "lib/realm-experience.js · treasury",
+      "status": "verified"
+    },
+    {
+      "journey": "tavern",
+      "evidence": "lib/realm-experience.js · tavern",
+      "status": "verified"
+    }
+  ]
+}

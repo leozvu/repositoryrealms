@@ -1,12 +1,12 @@
 'use client';
-// v3.10: Sở chỉ huy dự án — mọi dự án + sức khỏe + đốt ngân sách + rủi ro deadline
-// + tải nhân sự, một màn hình cho PM/CEO. Chỉ PM/LEAD/CEO/Kế toán.
+// Project Execution Health portfolio — delivery, dependency, capacity and planning proxies.
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useResource, Icon, Badge, Forbidden, EmptyState } from '@/components/ui';
-import { moneyShort, fmtDate, todayISO, initials, parseItems } from '@/lib/format';
+import { useResource, Icon, Forbidden, EmptyState } from '@/components/ui';
+import { moneyShort, fmtDate, todayISO, initials } from '@/lib/format';
+import styles from './portfolio-execution-health.module.css';
 
-const HEALTH = { green: ['#059669', 'Ổn'], amber: ['#D97706', 'Cần chú ý'], red: ['#DC2626', 'Rủi ro'] };
+const HEALTH = { green: ['Ổn định', 'green'], amber: ['Cần chú ý', 'amber'], red: ['Rủi ro', 'red'] };
 const ORDER = { red: 0, amber: 1, green: 2 };
 
 export default function PortfolioPage() {
@@ -26,22 +26,25 @@ export default function PortfolioPage() {
   const sorted = [...active].sort((a, b) => (ORDER[stats[a.id]?.health] ?? 3) - (ORDER[stats[b.id]?.health] ?? 3));
 
   const count = lv => active.filter(p => stats[p.id]?.health === lv).length;
-  const totalMargin = canMoney ? active.reduce((s, p) => s + (stats[p.id]?.margin || 0), 0) : null;
+  const totalMarginProxy = canMoney ? active.reduce((s, p) => s + (stats[p.id]?.margin || 0), 0) : null;
   const totalOverdue = active.reduce((s, p) => s + (stats[p.id]?.taskOverdue || 0), 0);
+  const totalBlocked = active.reduce((s, p) => s + (stats[p.id]?.blockedTasks || 0), 0);
+  const totalDependencies = active.reduce((s, p) => s + (stats[p.id]?.dependencyBlocked || 0), 0);
+  const constrainedProjectAssignments = active.reduce((s, p) => s + (stats[p.id]?.constrainedMembers || 0), 0);
 
-  // Tải nhân sự tuần này: giờ cam kết = Σ giờ ước lượng việc đang mở được gán (proxy nhìn trước)
-  const load = users.rows.filter(u => u.status === 'active').map(u => {
+  // Context only. Alphabetical, never a productivity score or employee ranking.
+  const resourceContext = users.rows.filter(u => u.status === 'active').map(u => {
     const open = tasks.rows.filter(t => t.assigneeId === u.id && t.status !== 'done');
-    const committed = open.reduce((s, t) => s + (t.estHours || 0), 0);
+    const openEstimate = open.reduce((s, t) => s + (t.estHours || 0), 0);
     const overdue = open.filter(t => t.dueDate && t.dueDate < todayISO()).length;
-    return { u, open: open.length, committed, overdue };
-  }).filter(x => x.open > 0).sort((a, b) => b.committed - a.committed);
+    return { u, open: open.length, openEstimate, overdue };
+  }).filter(x => x.open > 0).sort((a, b) => a.u.name.localeCompare(b.u.name, 'vi'));
 
   return (
     <>
       <div className="toolbar">
         <span style={{ fontSize: '1.05rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 7 }}>
-          <Icon name="reports" size={18} />Sở chỉ huy dự án</span>
+          <Icon name="reports" size={18} />Project Execution Health</span>
         <span style={{ fontSize: '.8rem', color: 'var(--muted)' }}>{active.length} dự án đang chạy</span>
         <div className="spacer"></div>
         <Link href="/projects" className="btn btn-outline btn-sm">Danh sách dự án</Link>
@@ -56,39 +59,47 @@ export default function PortfolioPage() {
             <span className="badge b-amber"><span className="dot"></span>{count('amber')} chú ý</span>
             <span className="badge b-green"><span className="dot"></span>{count('green')} ổn</span>
           </div></div>
-        <div className="card kpi"><span className="kpi-label">Việc trễ hạn (toàn bộ)</span>
-          <div className="kpi-value" style={{ color: totalOverdue ? 'var(--danger)' : 'inherit' }}>{totalOverdue}</div></div>
-        {canMoney && <div className="card kpi"><span className="kpi-label">Biên lợi nhuận gộp (đang chạy)</span>
-          <div className="kpi-value" style={{ color: totalMargin >= 0 ? 'var(--accent)' : 'var(--danger)' }}>{moneyShort(totalMargin)}</div></div>}
-        <div className="card kpi"><span className="kpi-label">Nhân sự quá tải tuần này</span>
-          <div className="kpi-value" style={{ color: load.filter(l => l.committed > 40).length ? 'var(--warn, #D97706)' : 'inherit' }}>{load.filter(l => l.committed > 40).length}</div>
-          <div className="kpi-sub">ngưỡng 40h việc đang mở</div></div>
+        <div className="card kpi"><span className="kpi-label">Delivery constraints</span>
+          <div className="kpi-value" style={{ color: totalBlocked ? 'var(--danger)' : 'inherit' }}>{totalBlocked} blocked</div>
+          <div className="kpi-sub">{totalDependencies} dependency chưa xong · {totalOverdue} task trễ</div></div>
+        {canMoney && <div className="card kpi"><span className="kpi-label">Planning margin proxy</span>
+          <div className="kpi-value" style={{ color: totalMarginProxy >= 0 ? 'var(--accent)' : 'var(--danger)' }}>{moneyShort(totalMarginProxy)}</div>
+          <div className="kpi-sub">Budget − labor proxy − vendor commitment; không phải accounting profit</div></div>}
+        <div className="card kpi"><span className="kpi-label">Capacity constraints</span>
+          <div className="kpi-value" style={{ color: constrainedProjectAssignments ? 'var(--warn, #D97706)' : 'inherit' }}>{constrainedProjectAssignments}</div>
+          <div className="kpi-sub">lượt phân bổ dự án vượt WIP; một người có thể xuất hiện ở nhiều dự án</div></div>
       </div>
 
       <div className="card" style={{ marginTop: 16 }}>
         <div className="card-head"><span className="card-title">Dự án theo mức rủi ro</span></div>
         <div className="card-body" style={{ paddingTop: 0, overflowX: 'auto' }}>
           <table>
-            <thead><tr><th></th><th>Dự án</th><th>Khách</th><th style={{ minWidth: 120 }}>Tiến độ</th><th>Giờ đốt</th>{canMoney && <th className="num">Biên LN</th>}<th>Deadline</th><th>Việc trễ</th></tr></thead>
+            <thead><tr><th>Sức khỏe</th><th>Dự án</th><th>Khách</th><th style={{ minWidth: 120 }}>Tiến độ</th><th>Giờ khai báo / NS</th><th>Constraints</th>{canMoney && <th className="num">Margin proxy</th>}<th>Deadline</th></tr></thead>
             <tbody>
               {sorted.map(p => {
                 const s = stats[p.id] || {};
-                const [hc, hl] = HEALTH[s.health] || ['var(--muted)', ''];
+                const [healthLabel, healthTone] = HEALTH[s.health] || ['Chưa đủ dữ liệu', 'neutral'];
                 const late = p.deadline && p.deadline < todayISO();
                 return (
                   <tr key={p.id}>
-                    <td title={s.healthReasons?.join(', ') || hl} style={{ width: 8 }}><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: hc }}></span></td>
+                    <td><span className={`${styles.healthBadge} ${styles[healthTone]}`} title={s.healthReasons?.join(', ') || healthLabel}>
+                      <span className={styles.healthDot} aria-hidden="true"></span>{healthLabel}
+                    </span></td>
                     <td><Link href={`/projects/${p.id}`} style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>{p.name}</Link>
-                      {s.healthReasons?.length > 0 && <div className="cell-sub" style={{ color: hc }}>{s.healthReasons[0]}</div>}</td>
+                      {s.healthReasons?.length > 0 && <div className={styles.primarySignal}>{s.healthReasons[0]}</div>}</td>
                     <td>{cName(p.clientId)}</td>
                     <td><div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <div className="progress" style={{ minWidth: 60 }}><i style={{ width: `${s.progress ?? p.progress}%` }}></i></div>
                       <small>{s.progress ?? p.progress}%</small></div></td>
                     <td style={{ fontSize: '.78rem', ...(s.burnHours > 100 ? { color: 'var(--danger)', fontWeight: 700 } : s.burnHours > 80 ? { color: 'var(--warn, #D97706)' } : {}) }}>
                       {s.loggedHours ?? 0}h{p.budgetHours ? `/${p.budgetHours}h` : ''}{s.burnHours != null ? ` (${s.burnHours}%)` : ''}</td>
+                    <td className={styles.constraintCell}>
+                      <span>{s.blockedTasks || 0} blocked</span>
+                      <span>{s.dependencyBlocked || 0} dependency</span>
+                      <span>{s.constrainedMembers || 0} vượt WIP</span>
+                    </td>
                     {canMoney && <td className="num" style={{ color: (s.margin ?? 0) >= 0 ? 'var(--accent)' : 'var(--danger)', fontWeight: 700 }}>{moneyShort(s.margin ?? 0)}</td>}
-                    <td style={late ? { color: 'var(--danger)', fontWeight: 600 } : {}}>{fmtDate(p.deadline)}</td>
-                    <td style={{ textAlign: 'center', color: s.taskOverdue ? 'var(--danger)' : 'var(--muted)', fontWeight: s.taskOverdue ? 700 : 400 }}>{s.taskOverdue || '—'}</td>
+                    <td style={late ? { color: 'var(--danger)', fontWeight: 600 } : {}}>{fmtDate(p.deadline)}{late && <span className={styles.overdueLabel}>Trễ</span>}</td>
                   </tr>
                 );
               })}
@@ -99,20 +110,20 @@ export default function PortfolioPage() {
       </div>
 
       <div className="card" style={{ marginTop: 16 }}>
-        <div className="card-head"><span className="card-title">Tải nhân sự — giờ cam kết (việc đang mở)</span>
-          <span style={{ fontSize: '.74rem', color: 'var(--muted)' }}>Nhìn trước theo giờ ước lượng · đỏ = &gt;40h</span></div>
+        <div className="card-head"><span className="card-title">Resource context — theo thứ tự tên</span>
+          <span style={{ fontSize: '.74rem', color: 'var(--muted)' }}>Context điều phối; không phải điểm hiệu suất hay bảng xếp hạng</span></div>
         <div className="card-body" style={{ paddingTop: 8 }}>
-          {load.map(l => (
+          {resourceContext.map(l => (
             <div key={l.u.id} className="act-item" style={{ alignItems: 'center' }}>
               <span className="avatar">{initials(l.u.name)}</span>
               <div style={{ flex: 1 }}>
                 <div className="act-title">{l.u.name} <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '.75rem' }}>· {l.open} việc mở{l.overdue ? ` · ${l.overdue} trễ` : ''}</span></div>
-                <div className="progress" style={{ marginTop: 3 }}><i style={{ width: Math.min(100, l.committed / 40 * 100) + '%', background: l.committed > 40 ? 'var(--danger)' : l.committed > 30 ? 'var(--warn, #D97706)' : 'var(--accent)' }}></i></div>
+                <div className={styles.resourceProvenance}>Ước lượng còn mở chỉ để lập kế hoạch; capacity chính thức dùng WIP trong từng project.</div>
               </div>
-              <b style={{ fontSize: '.85rem', color: l.committed > 40 ? 'var(--danger)' : 'inherit', minWidth: 44, textAlign: 'right' }}>{l.committed}h</b>
+              <b style={{ fontSize: '.85rem', minWidth: 82, textAlign: 'right' }}>{l.openEstimate}h estimate</b>
             </div>
           ))}
-          {!load.length && <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Chưa ai có việc mở với giờ ước lượng — nhập "giờ ước lượng" cho việc để dòng này có số.</p>}
+          {!resourceContext.length && <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Chưa có nguồn lực nào được gán vào task đang mở.</p>}
         </div>
       </div>
     </>

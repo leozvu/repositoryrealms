@@ -2,12 +2,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
+import { useResource, useServiceLines, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
 import { DocLinksModal } from '@/components/DocLinks';
-import { money, moneyShort, fmtDate, todayISO, BADGE } from '@/lib/format';
+import { moneyShort, fmtDate, todayISO, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
+import styles from './projects-execution-list.module.css';
 
-const HEALTH = { green: ['#059669', 'Ổn'], amber: ['#D97706', 'Cần chú ý'], red: ['#DC2626', 'Rủi ro'] };
+const HEALTH = { green: ['Ổn định', 'green'], amber: ['Cần chú ý', 'amber'], red: ['Rủi ro', 'red'] };
 
 export default function ProjectsPage() {
   const { data: session } = useSession();
@@ -27,10 +28,11 @@ export default function ProjectsPage() {
   useEffect(() => { loadStats(); }, [rows.length]);
 
   const clientName = id => clients.rows.find(c => c.id === id)?.name || '—';
+  const serviceLines = useServiceLines(); // v3.37: mảng dịch vụ theo công ty (chỉnh trong Cài đặt)
   const FIELDS = [
     { key: 'name', label: 'Tên dự án', required: true, full: true },
     { key: 'clientId', label: 'Khách hàng', type: 'select', options: clients.rows.map(c => ({ value: c.id, label: c.name })), required: true },
-    { key: 'service', label: 'Dịch vụ', type: 'select', options: ['Digital Ads', 'Social Media', 'Branding', 'Web & SEO', 'Production', 'PR / Event', 'Khác'].map(s => ({ value: s, label: s })) },
+    { key: 'service', label: 'Dịch vụ', type: 'select', options: serviceLines.map(s => ({ value: s, label: s })) },
     { key: 'budget', label: 'Ngân sách / giá trị HĐ (đ)', type: 'number' },
     { key: 'budgetHours', label: 'Ngân sách giờ công (giờ)', type: 'number', hint: 'Để 0 nếu chưa ước lượng' },
     { key: 'status', label: 'Trạng thái', type: 'select', options: Object.entries(BADGE.project).map(([v, [l]]) => ({ value: v, label: l })) },
@@ -42,19 +44,17 @@ export default function ProjectsPage() {
   const norm = d => ({ ...d, budget: +d.budget || 0, budgetHours: +d.budgetHours || 0, progress: +d.progress || 0, autoProgress: d.autoProgress === '1' || d.autoProgress === true });
   const filtered = rows.filter(p => (f === 'all' || p.status === f) && (!q || (p.name + clientName(p.clientId)).toLowerCase().includes(q.toLowerCase())));
 
-  const applyTemplate = async (tpl, projectId, startDate) => {
-    const base = new Date((startDate || todayISO()) + 'T00:00:00');
-    const off = n => { const d = new Date(base); d.setDate(d.getDate() + (+n || 0)); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
-    let phases = []; try { phases = JSON.parse(tpl.phases || '[]'); } catch {}
-    let ms = []; try { ms = JSON.parse(tpl.milestones || '[]'); } catch {}
-    let order = 0;
-    for (const ph of phases) {
-      const phase = await fetch('/api/data/phases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId, name: ph.name, order: order++ }) }).then(r => r.json());
-      for (const t of (ph.tasks || [])) {
-        await fetch('/api/data/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId, phaseId: phase.id, title: t.title, status: 'todo', priority: t.priority || 'medium', estHours: +t.estHours || 0, dueDate: t.offsetDays != null ? off(t.offsetDays) : null }) });
-      }
-    }
-    for (const m of ms) await fetch('/api/data/milestones', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId, name: m.name, date: off(m.offsetDays), done: false }) });
+  // v3.41: áp mẫu chạy TRỌN GÓI ở server (một giao dịch). Trước đây chạy ở trình duyệt bằng
+  // vài chục request nối nhau — mất mạng giữa chừng để lại dự án dở dang phải dọn tay.
+  const applyTemplate = async (tpl, projectId) => {
+    const response = await fetch('/api/projects/apply-template', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectId, templateId: tpl.id }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || 'Không áp được mẫu dự án', 'error'); return false; }
+    toast(`Đã áp mẫu "${tpl.name}": ${body.phaseCount} giai đoạn · ${body.taskCount} việc · ${body.milestoneCount} mốc`);
+    return true;
   };
 
   return (
@@ -74,22 +74,29 @@ export default function ProjectsPage() {
       </div>
       <div className="table-wrap">
         <table>
-          <thead><tr><th></th><th>Dự án</th><th>Khách hàng</th>{isMgmt && <th className="num">Ngân sách</th>}<th>Deadline</th><th style={{ minWidth: 140 }}>Tiến độ</th><th>Giờ (log/NS)</th><th>Trạng thái</th>{isMgmt && <th></th>}</tr></thead>
+          <thead><tr><th>Sức khỏe</th><th>Dự án</th><th>Khách hàng</th>{isMgmt && <th className="num">Ngân sách</th>}<th>Deadline</th><th style={{ minWidth: 140 }}>Tiến độ</th><th>Giờ khai báo / NS</th><th>Trạng thái</th>{isMgmt && <th><span className="sr-only">Thao tác</span></th>}</tr></thead>
           <tbody>
             {filtered.map(p => {
               const late = p.status !== 'done' && p.deadline && p.deadline < todayISO();
               const st = stats[p.id] || {};
-              const [hc, hl] = HEALTH[st.health] || ['var(--muted)', ''];
+              const [healthLabel, healthTone] = HEALTH[st.health] || ['Chưa đủ dữ liệu', 'neutral'];
+              const riskDetails = [
+                st.blockedTasks ? `${st.blockedTasks} blocked` : null,
+                st.dependencyBlocked ? `${st.dependencyBlocked} dependency` : null,
+                st.constrainedMembers ? `${st.constrainedMembers} vượt WIP` : null,
+              ].filter(Boolean);
               return (
                 <tr key={p.id}>
-                  <td title={st.healthReasons?.length ? hl + ': ' + st.healthReasons.join(', ') : hl}
-                    style={{ width: 8, padding: 0 }}><span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', background: hc }}></span></td>
+                  <td><span className={`${styles.healthBadge} ${styles[healthTone]}`} title={st.healthReasons?.join(', ') || healthLabel}>
+                    <span className={styles.healthDot} aria-hidden="true"></span>{healthLabel}
+                  </span></td>
                   <td><Link href={`/projects/${p.id}`} style={{ textDecoration: 'none' }}>
                     <span className="cell-main" style={{ color: 'var(--primary)' }}>{p.name}</span></Link>
-                    <span className="cell-sub">{p.service || '—'} · {st.taskTotal ? `${st.taskDone}/${st.taskTotal} việc` : 'chưa có việc'}{st.taskOverdue ? ` · ${st.taskOverdue} trễ` : ''}</span></td>
+                    <span className="cell-sub">{p.service || '—'} · {st.taskTotal ? `${st.taskDone}/${st.taskTotal} việc` : 'chưa có execution plan'}{st.taskOverdue ? ` · ${st.taskOverdue} trễ` : ''}</span>
+                    {riskDetails.length > 0 && <span className={styles.riskDetails}>{riskDetails.join(' · ')}</span>}</td>
                   <td>{clientName(p.clientId)}</td>
                   {isMgmt && <td className="num" style={{ fontWeight: 700 }}>{moneyShort(p.budget)}</td>}
-                  <td style={late ? { color: 'var(--danger)', fontWeight: 600 } : {}}>{fmtDate(p.deadline)}{late ? ' ⚠' : ''}</td>
+                  <td style={late ? { color: 'var(--danger)', fontWeight: 600 } : {}}>{fmtDate(p.deadline)}{late && <span className={styles.overdueLabel}>Trễ</span>}</td>
                   <td><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div className={`progress ${(st.progress ?? p.progress) >= 100 ? 'p-done' : ''}`}><i style={{ width: `${Math.min(100, st.progress ?? p.progress)}%` }}></i></div>
                     <span style={{ fontSize: '.75rem', color: 'var(--muted)' }}>{st.progress ?? p.progress}%</span></div></td>
@@ -99,9 +106,9 @@ export default function ProjectsPage() {
                   <td><Badge map="project" k={p.status} /></td>
                   {isMgmt && (
                     <td><div className="row-actions">
-                      <button className="icon-btn" title="Tài liệu (Drive/Notion…)" onClick={() => setModal({ mode: 'docs', row: p })}>📎</button>
-                      <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: p })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
-                      <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: p })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
+                      <button className={`icon-btn ${styles.projectAction}`} title="Tài liệu (Drive/Notion…)" onClick={() => setModal({ mode: 'docs', row: p })} aria-label={`Mở tài liệu của ${p.name}`}><Icon name="link" size={16} /></button>
+                      <button className={`icon-btn ${styles.projectAction}`} onClick={() => setModal({ mode: 'edit', row: p })} aria-label={`Sửa ${p.name}`}><Icon name="edit" size={16} /></button>
+                      <button className={`icon-btn danger ${styles.projectAction}`} onClick={() => setModal({ mode: 'del', row: p })} aria-label={`Xóa ${p.name}`}><Icon name="trash" size={16} /></button>
                     </div></td>
                   )}
                 </tr>
@@ -114,7 +121,7 @@ export default function ProjectsPage() {
       {modal?.mode === 'add' && <FormModal title="Thêm dự án" fields={FIELDS} data={{ status: 'planning', progress: 0, autoProgress: '1', startDate: todayISO() }}
         onClose={() => setModal(null)} onSave={async d => {
           const p = await create(norm(d));
-          if (p && modal.template) { await applyTemplate(modal.template, p.id, d.startDate); toast(`Đã tạo dự án + áp mẫu "${modal.template.name}"`); loadStats(); }
+          if (p && modal.template) { await applyTemplate(modal.template, p.id); loadStats(); }
           else toast('Đã thêm dự án');
         }}
         extraFooter={templates.rows.length > 0 && <select value={modal.template?.id || ''} onChange={e => setModal(m => ({ ...m, template: templates.rows.find(t => t.id === e.target.value) }))}

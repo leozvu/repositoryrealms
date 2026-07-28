@@ -1,6 +1,10 @@
 node_modules/
 .next/
+playwright-report/
+test-results/
 .env
+.env.*
+!.env.example
 *.db
 *.db-journal
 .DS_Store
@@ -12,3 +16,11 @@ CREDENTIALS-NOI-BO.txt
 
 # Phase 0: sao lưu DB (dữ liệu thật — KHÔNG commit)
 backups/
+
+# 30-day production observation evidence (public metadata, generated per run)
+qa/production-observation/runs/
+qa/production-observation/reports/
+
+# file tạm phiên làm việc — chứa secret, KHÔNG commit
+*.tmp
+.tmp-*.mjs

@@ -6,7 +6,7 @@ import { emitEvent } from '@/lib/events';
 
 export async function PUT(req, { params }) {
   let ctx;
-  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message }, { status: e.status || 403 }); }
+  try { ctx = await freelancerGuard(); } catch (e) { return NextResponse.json({ error: e.message, code: e.status === 401 ? 'unauthorized' : undefined }, { status: e.status || 403 }); }
   const { user, projectIds } = ctx;
   const task = await prisma.task.findUnique({ where: { id: params.id } });
   if (!task || task.assigneeId !== user.id || !projectIds.includes(task.projectId)) {
@@ -29,6 +29,6 @@ export async function PUT(req, { params }) {
   }
   const updated = await prisma.task.update({ where: { id: params.id }, data });
   await prisma.auditLog.create({ data: { userId: user.id, userName: user.name + ' (FL)', action: 'update', entity: 'tasks', refId: params.id, detail: updated.title } }).catch(() => {});
-  emitEvent('tasks', 'update', updated, task, { id: user.id, name: user.name });
+  await emitEvent('tasks', 'update', updated, task, { id: user.id, name: user.name });
   return NextResponse.json({ ok: true });
 }

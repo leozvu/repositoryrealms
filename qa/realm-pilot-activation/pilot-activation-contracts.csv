@@ -1,0 +1,20 @@
+id,layer,source,signals,missingSignals,status
+reuse-pilot-wave-setting,data,lib/realm-pilot-operations.js,realmPilotOperations: | activation: | tx.setting.upsert,,verified
+ninety-minute-canary-window,domain,lib/realm-pilot-operations.js,REALM_PILOT_CANARY_WINDOW_MINUTES = 90 | activationWindow,,verified
+activation-starts-after-checker,rbac,lib/realm-pilot-operations.js,action === 'approve' | state: 'watching' | approvedById: sessionUser.id,,verified
+aggregate-baseline-only,privacy,lib/realm-pilot-operations.js,activationBaseline | eligibleUsers: | fallbackUsers: | blockedFeedback: | aggregateOnly: true,,verified
+canary-policy-binding,safety,lib/realm-pilot-operations.js,wave?.policyVersion === policy?.version | realm_pilot_wave_policy_stale,,verified
+canary-live-readiness,safety,lib/realm-pilot-operations.js,buildRealmPilotActivationGuard | id: 'live-readiness' | id: 'blocked-feedback' | id: 'erp-fallback',,verified
+checkpoint-fails-closed,safety,lib/realm-pilot-operations.js,realm_pilot_canary_window_open | realm_pilot_canary_blocked | guard.state !== 'ready',,verified
+clear-rechecks-live-state,concurrency,lib/realm-pilot-operations.js,"action === 'clear_activation' | loadRealmLaunchReadiness(tx, policy, now) | validateExpectedVersion(operations, input.expectedVersion)",,verified
+clear-does-not-expand-cohort,safety,lib/realm-pilot-operations.js,"state: 'cleared' | cohort hiện tại tiếp tục, chưa mở rộng tự động",,verified
+rollback-reuses-kill-switch,rollback,lib/realm-pilot-operations.js,action === 'pause' | mode: 'off' | state: 'rolled_back' | status: 'paused',,verified
+canary-operational-alerts,operations,lib/realm-pilot-operations.js,id: 'canary-blocked' | id: 'canary-checkpoint-ready',,verified
+director-notifications,integration,lib/realm-pilot-operations.js,"await directorIds(tx, sessionUser.id) | '/settings#realm-pilot-operations-title'",,verified
+serializable-cas,concurrency,lib/realm-pilot-operations.js,isolationLevel: 'Serializable' | realm_pilot_operations_version_conflict,,verified
+existing-traced-api,api,app/api/realm-demo/pilot/operations/route.js,authenticatedUser() | startRealmApiRequest | safelyPublishRealmChange,,verified
+activation-guard-ui,client,components/realm/RealmPilotOperations.jsx,Canary Activation Guard | Xác nhận qua canary gate | Rollback về ERP | Canary guardrails,,verified
+semantic-state-with-icon-text,accessibility,components/realm/RealmPilotOperations.jsx,ACTIVATION | <Icon name={icon} | {label}</span>,,verified
+responsive-touch-safe-ui,style,components/realm/realm-pilot-operations.module.css,.activationActions button { min-height: 44px; | @media (max-width: 680px) | .activationCriteria { display: grid; | @media (prefers-reduced-motion: reduce),,verified
+phase18-unit-tests,test,tests/realm-pilot-operations.test.mjs,Phase 18 canary guard waits 90 minutes | Phase 18 activation guard fails closed,,verified
+phase18-runbook,operations,docs/realms/PHASE-18-CANARY-ACTIVATION.md,crmegoric-realms-demo | 90 phút | mode = off | Không tự mở rộng cohort,,verified

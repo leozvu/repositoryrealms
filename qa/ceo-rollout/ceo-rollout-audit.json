@@ -1,0 +1,59 @@
+{
+  "phase": "CEO-9",
+  "generatedBy": "scripts/audit-ceo-rollout.mjs",
+  "summary": {
+    "ringsPresent": 5,
+    "evidenceKindsPresent": 5,
+    "outboundAdaptersGuarded": 5,
+    "outboundAdapters": 5,
+    "routesPresent": 3,
+    "routes": 3,
+    "migrationAdditive": true,
+    "seededFailClosed": true,
+    "portalOnlyTransition": true,
+    "productionHold": true,
+    "makerChecker": true,
+    "egoliveFinanceLocal": true,
+    "responsiveAccessibleUi": true,
+    "roadmapUpdated": true
+  },
+  "adapterChecks": [
+    {
+      "file": "lib/ceo-unified-dashboard-admin.js",
+      "guarded": true
+    },
+    {
+      "file": "lib/ceo-identity-admin.js",
+      "guarded": true
+    },
+    {
+      "file": "lib/ceo-messaging-admin.js",
+      "guarded": true
+    },
+    {
+      "file": "lib/ceo-federation-admin.js",
+      "guarded": true
+    },
+    {
+      "file": "lib/ceo-command-gateway-admin.js",
+      "guarded": true
+    }
+  ],
+  "routeChecks": [
+    {
+      "file": "app/api/ceo/v1/rollout/route.js",
+      "exists": true,
+      "privateNoStore": true
+    },
+    {
+      "file": "app/api/ceo/v1/rollout/evidence/route.js",
+      "exists": true,
+      "privateNoStore": true
+    },
+    {
+      "file": "app/api/ceo/v1/rollout/[entityId]/transition/route.js",
+      "exists": true,
+      "privateNoStore": true
+    }
+  ]
+}

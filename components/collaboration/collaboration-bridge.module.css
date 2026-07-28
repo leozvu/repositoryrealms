@@ -1,0 +1,91 @@
+.contactBanner {
+  width: min(680px, calc(100% - 28px));
+  min-height: 88px;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 140;
+  padding: 12px;
+  border: 1px solid #b88936;
+  border-radius: 10px;
+  background: #fffaf0;
+  box-shadow: 0 18px 48px rgba(42, 31, 12, .24);
+  color: #2b2418;
+}
+
+.contactBanner[data-surface="realm"] {
+  top: 82px;
+  border-color: #8f7743;
+  color: #f1ead6;
+  background: #14231b;
+}
+
+.contactIcon {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  color: #fff8e8;
+  background: #315b43;
+}
+
+.contactCopy { min-width: 0; }
+.contactCopy strong { display: block; font-size: .88rem; line-height: 1.4; }
+.contactCopy p { margin: 3px 0; font-size: .8rem; line-height: 1.45; overflow-wrap: anywhere; }
+.contactCopy small { color: #71664f; font-size: .7rem; line-height: 1.4; }
+.contactBanner[data-surface="realm"] .contactCopy small { color: #aeb9ae; }
+
+.contactActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contactActions button {
+  min-height: 44px;
+  padding: 0 15px;
+  border-radius: 7px;
+  font-size: .78rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.contactActions button:disabled { cursor: wait; opacity: .55; }
+.declineButton { border: 1px solid #b9aa90; color: inherit; background: transparent; }
+.acceptButton { border: 1px solid #315b43; color: #fff; background: #315b43; }
+.acceptButton:hover:not(:disabled) { background: #274b37; }
+.declineButton:hover:not(:disabled) { background: rgba(128, 99, 48, .1); }
+
+.realmToErp {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.unavailableSwitch {
+  cursor: not-allowed;
+  opacity: .62;
+}
+
+@media (max-width: 680px) {
+  .contactBanner {
+    grid-template-columns: 44px minmax(0, 1fr);
+    top: 68px;
+  }
+  .contactActions { grid-column: 1 / -1; }
+  .contactActions button { flex: 1; }
+  .contactCopy small { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contactBanner { scroll-behavior: auto; }
+}

@@ -1,9 +1,16 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { Icon, Forbidden, useToast, useResource, Modal, useRoleLabels } from '@/components/ui';
+import { Icon, Forbidden, useToast, useResource, Modal, ConfirmDialog, AsyncButton, useRoleLabels } from '@/components/ui';
 import { ROLES, ROLE_LABEL } from '@/lib/perm';
 import { MODULE_GROUPS, MODULE_PRESETS } from '@/lib/modules';
+import RealmPilotControl from '@/components/realm/RealmPilotControl';
+import RealmPilotRehearsal from '@/components/realm/RealmPilotRehearsal';
+import RealmPilotOperations from '@/components/realm/RealmPilotOperations';
+import RealmFeedbackOperations from '@/components/realm/RealmFeedbackOperations';
+import RealmExperienceScorecard from '@/components/realm/RealmExperienceScorecard';
+import RealmReleaseCandidateDossier from '@/components/realm/RealmReleaseCandidateDossier';
+import CeoFederationPolicy from '@/components/ceo/CeoFederationPolicy';
 
 /* ---------- v3.3: API key + Webhook (chỉ Giám đốc) ---------- */
 function ApiSection() {
@@ -16,6 +23,7 @@ function ApiSection() {
   const [wUrl, setWUrl] = useState('');
   const [wEvents, setWEvents] = useState('*');
   const [wSecret, setWSecret] = useState('');
+  const [deleteWebhook, setDeleteWebhook] = useState(null);
   const toast = useToast();
 
   const loadKeys = () => fetch('/api/apikeys').then(r => r.ok ? r.json() : []).then(setKeys);
@@ -28,14 +36,25 @@ function ApiSection() {
     if (!r.ok) return toast(j.error || 'Lỗi', 'error');
     setNewKey({ name: kName.trim(), key: j.key }); setKName(''); loadKeys();
   };
-  const toggleKey = async k => { await fetch('/api/apikeys', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id, active: !k.active }) }); loadKeys(); };
-  const delKey = async k => { if (!confirm(`Xóa key "${k.name}"? Ứng dụng đang dùng key này sẽ mất truy cập.`)) return; await fetch('/api/apikeys', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id }) }); loadKeys(); toast('Đã xóa key'); };
+  const toggleKey = async k => {
+    const r = await fetch('/api/apikeys', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id, active: !k.active }) });
+    if (!r.ok) return toast('Không thể cập nhật API key', 'error');
+    await loadKeys(); toast(k.active ? 'Đã khóa API key' : 'Đã mở API key');
+  };
+  const delKey = async k => {
+    if (!confirm(`Xóa key "${k.name}"? Ứng dụng đang dùng key này sẽ mất truy cập.`)) return;
+    const r = await fetch('/api/apikeys', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: k.id }) });
+    if (!r.ok) return toast('Không thể xóa API key', 'error');
+    await loadKeys(); toast('Đã xóa key');
+  };
 
   const addWebhook = async () => {
     if (!wUrl.trim().startsWith('http')) return toast('URL webhook không hợp lệ', 'error');
     const events = wEvents.split(',').map(x => x.trim()).filter(Boolean);
-    await webhooks.create({ url: wUrl.trim(), events: JSON.stringify(events.length ? events : ['*']), secret: wSecret.trim() || null });
+    const result = await webhooks.create({ url: wUrl.trim(), events: JSON.stringify(events.length ? events : ['*']), secret: wSecret.trim() || null });
+    if (!result) return false;
     setWUrl(''); setWEvents('*'); setWSecret(''); toast('Đã thêm webhook');
+    return true;
   };
 
   return (
@@ -50,8 +69,8 @@ function ApiSection() {
                 <div className="act-title">{k.name} <code style={{ fontSize: '.72rem' }}>{k.prefix}…</code>{!k.active && <span className="badge b-gray" style={{ marginLeft: 6 }}><span className="dot"></span>Đã khóa</span>}</div>
                 <div className="act-sub">{JSON.parse(k.roles || '[]').map(r => RL[r] || r).join(', ')} · dùng lần cuối: {k.lastUsed ? new Date(k.lastUsed).toLocaleString('vi-VN') : 'chưa'}</div>
               </div>
-              <button className="btn btn-outline btn-sm" onClick={() => toggleKey(k)}>{k.active ? 'Khóa' : 'Mở'}</button>
-              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={() => delKey(k)}><Icon name="trash" size={14} /></button>
+              <AsyncButton className="btn btn-outline btn-sm" onClick={() => toggleKey(k)}>{k.active ? 'Khóa' : 'Mở'}</AsyncButton>
+              <AsyncButton className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={() => delKey(k)} aria-label={`Xóa API key ${k.name}`}><Icon name="trash" size={14} /></AsyncButton>
             </div>
           ))}
           <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
@@ -59,7 +78,7 @@ function ApiSection() {
             <select multiple size={3} value={kRoles} onChange={e => setKRoles([...e.target.selectedOptions].map(o => o.value))} title="Ctrl+click chọn nhiều vai trò">
               {ROLES.map(r => <option key={r} value={r}>{RL[r] || ROLE_LABEL[r]}</option>)}
             </select>
-            <button className="btn btn-primary btn-sm" onClick={createKey}><Icon name="plus" size={14} /> Tạo key</button>
+            <AsyncButton className="btn btn-primary btn-sm" pendingLabel="Đang tạo…" onClick={createKey}><Icon name="plus" size={14} /> Tạo key</AsyncButton>
           </div>
         </div>
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
@@ -70,8 +89,8 @@ function ApiSection() {
                 <div className="act-title" style={{ wordBreak: 'break-all' }}>{h.url}{!h.active && <span className="badge b-gray" style={{ marginLeft: 6 }}><span className="dot"></span>Tắt</span>}</div>
                 <div className="act-sub">{JSON.parse(h.events || '[]').join(', ')} · lần gọi cuối: {h.lastStatus || 'chưa'}</div>
               </div>
-              <button className="btn btn-outline btn-sm" onClick={() => webhooks.update(h.id, { active: !h.active })}>{h.active ? 'Tắt' : 'Bật'}</button>
-              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={async () => { await webhooks.remove(h.id); toast('Đã xóa webhook'); }}><Icon name="trash" size={14} /></button>
+              <AsyncButton className="btn btn-outline btn-sm" disabled={webhooks.mutating} onClick={async () => { const r = await webhooks.update(h.id, { active: !h.active }); if (r) toast(h.active ? 'Đã tắt webhook' : 'Đã bật webhook'); }}>{h.active ? 'Tắt' : 'Bật'}</AsyncButton>
+              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={() => setDeleteWebhook(h)} aria-label={`Xóa webhook ${h.url}`}><Icon name="trash" size={14} /></button>
             </div>
           ))}
           <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
@@ -79,7 +98,7 @@ function ApiSection() {
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <input style={{ flex: 1, minWidth: 120 }} placeholder="Sự kiện (mặc định *)" value={wEvents} onChange={e => setWEvents(e.target.value)} />
               <input style={{ flex: 1, minWidth: 120 }} placeholder="Secret (tùy chọn)" value={wSecret} onChange={e => setWSecret(e.target.value)} />
-              <button className="btn btn-primary btn-sm" onClick={addWebhook}><Icon name="plus" size={14} /> Thêm</button>
+              <AsyncButton className="btn btn-primary btn-sm" disabled={webhooks.mutating} pendingLabel="Đang thêm…" onClick={addWebhook}><Icon name="plus" size={14} /> Thêm</AsyncButton>
             </div>
           </div>
         </div>
@@ -91,6 +110,108 @@ function ApiSection() {
           <code style={{ display: 'block', padding: '10px 12px', background: 'var(--bg, #f1f5f9)', borderRadius: 8, wordBreak: 'break-all', fontWeight: 700 }}>{newKey.key}</code>
         </Modal>
       )}
+      {deleteWebhook && <ConfirmDialog msg={`Xóa webhook "${deleteWebhook.url}"? Hệ thống tích hợp sẽ ngừng nhận sự kiện.`}
+        onClose={() => setDeleteWebhook(null)} onYes={async () => { const r = await webhooks.remove(deleteWebhook.id); if (!r) return false; toast('Đã xóa webhook'); }} />}
+    </div>
+  );
+}
+
+/* ---------- v3.42 (cụm Lead): cổng nhận lead tự động + chia sale thông minh ----------
+   Trước đây lead phải nhập tay: mở Facebook, landing, website rồi chép về. Khối này bật
+   một địa chỉ nhận lead riêng của công ty để các nền tảng đẩy thẳng vào pipeline, và cho
+   Giám đốc chọn cách chia (ít tải nhất / luân phiên / khu vực / mảng dịch vụ / chiến dịch). */
+const ASSIGN_LABELS = [
+  ['least_load', 'Ai đang ít lead mở nhất (mặc định)'],
+  ['round_robin', 'Luân phiên đều tay'],
+  ['region', 'Theo khu vực khách'],
+  ['service_line', 'Theo mảng dịch vụ khách quan tâm'],
+  ['campaign', 'Theo chiến dịch marketing'],
+];
+
+function LeadIntakeSection({ s, setS }) {
+  const users = useResource('users');
+  const toast = useToast();
+  const [origin, setOrigin] = useState('');
+  useEffect(() => { setOrigin(window.location.origin); }, []);
+
+  const ams = (users.rows || []).filter(u => {
+    let roles = [];
+    try { roles = JSON.parse(u.roles || '[]'); } catch { roles = []; }
+    return u.status === 'active' && (roles.includes('AM') || u.role === 'AM');
+  });
+  const routing = s.leadRouting || {};
+  const setRouting = (id, key, value) => setS({
+    ...s,
+    leadRouting: { ...routing, [id]: { ...(routing[id] || {}), [key]: value.split(',').map(x => x.trim()).filter(Boolean) } },
+  });
+  const url = `${origin}/api/lead-intake`;
+  const byAttribute = ['region', 'service_line', 'campaign'].includes(s.leadAssignStrategy);
+
+  return (
+    <div className="card">
+      <div className="card-head"><span className="card-title">Cổng nhận lead tự động</span></div>
+      <div className="card-body" style={{ display: 'grid', gap: 12, fontSize: '.83rem' }}>
+        <div className="hint">
+          Bật cổng để Facebook Lead Ads, TikTok Lead, form landing page hoặc website đẩy thẳng khách vào mục
+          Khách hàng tiềm năng — không phải chép tay về Excel. Mỗi lead vào sẽ tự chia cho sale và bắn thông báo ngay.
+        </div>
+
+        <div className="field full">
+          <label>Địa chỉ nhận lead (dán vào nền tảng quảng cáo / form)</label>
+          <input readOnly value={s.leadIntakeToken ? url : '— chưa bật —'} onFocus={e => e.target.select()} />
+          <div className="hint">Gửi <code>POST</code> kèm header <code>x-intake-token</code> (hoặc <code>?token=</code>). Nội dung tối thiểu: <code>{'{ "name": "...", "phone": "0912...", "source": "Facebook", "campaign": "4_MKT_Landing_ThaoVietAn" }'}</code></div>
+        </div>
+
+        <div className="field full">
+          <label>Mã bí mật của cổng</label>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <input style={{ flex: 1, minWidth: 200, fontFamily: 'monospace' }} value={s.leadIntakeToken || ''}
+              onChange={e => setS({ ...s, leadIntakeToken: e.target.value.trim() })} placeholder="Trống = cổng đóng" />
+            <button type="button" className="btn btn-outline btn-sm"
+              onClick={() => { setS({ ...s, leadIntakeToken: crypto.randomUUID().replace(/-/g, '') }); toast('Đã sinh mã mới — nhớ Lưu rồi cập nhật lại bên nền tảng'); }}>Sinh mã mới</button>
+            {s.leadIntakeToken && <button type="button" className="btn btn-ghost btn-sm"
+              onClick={() => setS({ ...s, leadIntakeToken: '' })} style={{ color: 'var(--danger)' }}>Đóng cổng</button>}
+          </div>
+          <div className="hint">⚠ Ai cầm mã này là bơm được lead vào công ty. Chỉ đưa cho bên chạy quảng cáo. Đổi mã sẽ làm luồng cũ ngừng chảy tới khi cập nhật lại.</div>
+        </div>
+
+        <div className="field full">
+          <label>Cách chia lead cho sale</label>
+          <select value={s.leadAssignStrategy || 'least_load'} onChange={e => setS({ ...s, leadAssignStrategy: e.target.value })}>
+            {ASSIGN_LABELS.map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+          </select>
+          <div className="hint">Áp dụng cho cả lead nhập tay lẫn lead chảy về tự động (cần bật &quot;Tự chia lead chưa gán&quot; ở khối bên trái). Không ai khớp tiêu chí thì hệ thống vẫn chia cho người ít tải nhất — không bao giờ bỏ rơi lead.</div>
+        </div>
+
+        {byAttribute && (
+          <div className="field full">
+            <label>Phân vùng phụ trách của từng sale</label>
+            {!ams.length && <div className="hint">Chưa có ai mang vai trò Account/Sales đang hoạt động.</div>}
+            {ams.map(am => (
+              <div key={am.id} style={{ display: 'grid', gap: 4, padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                <b>{am.name}</b>
+                <input placeholder="Khu vực (cách nhau dấu phẩy) — VD: Miền Bắc, Hà Nội"
+                  value={(routing[am.id]?.regions || []).join(', ')} onChange={e => setRouting(am.id, 'regions', e.target.value)} />
+                <input placeholder="Mảng dịch vụ — VD: Seeding, Livestream"
+                  value={(routing[am.id]?.serviceLines || []).join(', ')} onChange={e => setRouting(am.id, 'serviceLines', e.target.value)} />
+                <input placeholder="Từ khóa chiến dịch — VD: Landing, Fanpage"
+                  value={(routing[am.id]?.campaigns || []).join(', ')} onChange={e => setRouting(am.id, 'campaigns', e.target.value)} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="field full">
+          <label>Khu vực dùng chung (mỗi dòng một khu vực)</label>
+          <textarea rows={3} value={Array.isArray(s.leadRegions) ? s.leadRegions.join('\n') : (s.leadRegions ?? '')}
+            onChange={e => setS({ ...s, leadRegions: e.target.value })} placeholder={'Miền Bắc\nMiền Trung\nMiền Nam'} />
+        </div>
+
+        <div className="hint" style={{ borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+          <b>Quy ước đặt tên chiến dịch</b> — đặt theo dạng <code>&lt;số&gt;_&lt;kênh&gt;_&lt;nội dung&gt;</code>, VD <code>4_MKT_Landing_ThaoVietAn</code>.
+          Nhờ vậy báo cáo tách được doanh thu về từ đúng chiến dịch, và luật chia theo chiến dịch chỉ cần khớp một từ khóa (&quot;Landing&quot;).
+        </div>
+      </div>
     </div>
   );
 }
@@ -107,7 +228,13 @@ export default function SettingsPage() {
   if (!s) return null;
 
   const save = async () => {
-    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(s) });
+    // v3.37: serviceLines soạn dạng text mỗi dòng một mảng → chuẩn hóa thành mảng khi lưu
+    const toList = (value) => (Array.isArray(value) ? value : String(value || '').split(/[\n,]/))
+      .map(x => String(x).trim()).filter(Boolean);
+    const serviceLines = toList(s.serviceLines);
+    const officeNetworks = toList(s.officeNetworks); // v3.41: mạng công ty cũng soạn theo dòng
+    const leadRegions = toList(s.leadRegions); // v3.42: khu vực chia lead cũng soạn theo dòng
+    const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...s, serviceLines, officeNetworks, leadRegions }) });
     toast(res.ok ? 'Đã lưu cài đặt' : 'Có lỗi khi lưu', res.ok ? 'success' : 'error');
   };
 
@@ -145,11 +272,60 @@ export default function SettingsPage() {
             <F k="monthlyTarget" label="Mục tiêu doanh thu tháng (đ)" type="number" />
             <F k="address" label="Địa chỉ" full />
             <F k="bank" label="Thông tin ngân hàng (in trên hóa đơn)" full />
+            <div className="field full">
+              <label>Mảng dịch vụ (mỗi dòng một mảng — dùng cho Dự án, Khách hàng, Bảng giá)</label>
+              <textarea rows={5} value={Array.isArray(s.serviceLines) ? s.serviceLines.join('\n') : (s.serviceLines ?? '')}
+                onChange={e => setS({ ...s, serviceLines: e.target.value })}
+                placeholder={'Digital Ads\nSocial Media\nSeeding\nLivestream…'} />
+              <div className="hint">Nhân viên chỉ chọn từ danh sách này; muốn thêm mảng mới thì Giám đốc bổ sung tại đây.</div>
+            </div>
             <F k="approveQuoteOver" label="Ngưỡng duyệt báo giá (đ)" type="number" />
-            <F k="approveExpenseOver" label="Ngưỡng duyệt khoản chi (đ)" type="number" />
+            <F k="approveExpenseOver" label="Ngưỡng duyệt khoản chi (đ) — nhập 0 nếu muốn MỌI khoản chi đều phải duyệt" type="number" />
             <F k="approveExpenseDirectorOver" label="Chi cần thêm Giám đốc duyệt từ (đ)" type="number" />
             <F k="commissionRate" label="Tỷ lệ hoa hồng mặc định (%)" type="number" />
             <F k="leaveQuota" label="Ngày phép năm / nhân sự" type="number" />
+            {/* v3.41: siết chấm công theo ngữ cảnh — công ty tự chọn mức */}
+            <div className="field">
+              <label>Siết chấm công theo nơi bấm</label>
+              <select value={s.attendanceStrictness || 'off'} onChange={e => setS({ ...s, attendanceStrictness: e.target.value })}>
+                <option value="off">Không siết — chỉ ghi nhận nơi bấm</option>
+                <option value="warn">Cảnh báo — vẫn cho bấm, ghi chú nếu ngoài mạng công ty</option>
+                <option value="strict">Chặn — khai "đi làm" phải bấm trong mạng công ty</option>
+              </select>
+            </div>
+            <div className="field full">
+              <label>Mạng công ty (mỗi dòng một IP hoặc tiền tố, VD 113.161.10.)</label>
+              <textarea rows={3} value={Array.isArray(s.officeNetworks) ? s.officeNetworks.join('\n') : (s.officeNetworks ?? '')}
+                onChange={e => setS({ ...s, officeNetworks: e.target.value })}
+                placeholder={'113.161.10.\n27.72.88.145'} />
+              <div className="hint">Bỏ trống = không kiểm tra nơi bấm (mọi thứ như cũ). Xem IP văn phòng bằng cách tra "what is my ip" tại công ty.</div>
+            </div>
+            {/* v3.41 (Chương 2+3): Gold — hai công tắc tách bạch */}
+            <div className="field full" style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <input type="checkbox" style={{ width: 'auto' }} checked={s.goldEnabled === true}
+                  onChange={e => setS({ ...s, goldEnabled: e.target.checked })} />
+                <b>Bật Gold (điểm ghi nhận) — việc xong đúng hạn &amp; ngày công đủ giờ tự cộng điểm</b>
+              </label>
+              <div className="hint">Gold hiện trong Realm như điểm/huy hiệu. Chưa liên quan tiền bạc.</div>
+            </div>
+            {s.goldEnabled && <>
+              <F k="goldPerOnTimeTask" label="Gold mỗi việc hoàn thành đúng hạn" type="number" />
+              <F k="goldPerFullAttendanceDay" label="Gold mỗi ngày công đủ giờ" type="number" />
+              <F k="goldDailyEarnCap" label="Trần Gold tự động / người / ngày" type="number" />
+              <div className="field full">
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <input type="checkbox" style={{ width: 'auto' }} checked={s.goldPayoutEnabled === true}
+                    onChange={e => setS({ ...s, goldPayoutEnabled: e.target.checked })} />
+                  <b style={{ color: 'var(--danger)' }}>Quy Gold thành THƯỞNG TIỀN trong bảng lương</b>
+                </label>
+                <div className="hint">⚠ Chỉ bật khi đã chạy Gold đủ lâu để số liệu công bằng. Bật xong, Gold tháng sẽ thành một dòng thưởng thật trong phiếu lương.</div>
+              </div>
+              {s.goldPayoutEnabled && <>
+                <F k="goldToVndRate" label="1 Gold = ? đồng" type="number" />
+                <F k="goldMonthlyCapVnd" label="Trần thưởng Gold / người / tháng (đ)" type="number" />
+              </>}
+            </>}
             <F k="workStart" label="Giờ vào ca chuẩn (HH:MM)" />
             <F k="workEnd" label="Giờ tan ca chuẩn (HH:MM)" />
             <F k="otMultiplier" label="Hệ số lương làm thêm (OT)" type="number" />
@@ -225,24 +401,31 @@ export default function SettingsPage() {
             </div>
             <F k="smtpFrom" label="Địa chỉ gửi (để trống = tài khoản)" full />
             <div className="field full">
-              <button className="btn btn-outline btn-sm" onClick={async () => {
+              <AsyncButton className="btn btn-outline btn-sm" pendingLabel="Đang gửi thử…" onClick={async () => {
                 const save = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(s) });
                 if (!save.ok) return toast('Lưu cài đặt thất bại', 'error');
                 const r = await fetch('/api/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'test', to: s.smtpUser }) });
                 const j = await r.json().catch(() => ({}));
                 toast(r.ok ? `Đã gửi email thử tới ${s.smtpUser} — kiểm tra hộp thư` : j.error || 'Gửi thất bại', r.ok ? 'success' : 'error');
-              }}>Lưu &amp; gửi email thử tới chính hộp thư này</button>
+              }}>Lưu &amp; gửi email thử tới chính hộp thư này</AsyncButton>
             </div>
             <div className="field full">
-              <label>Claude API key (bật AI Copilot)</label>
-              <input type="password" value={s.anthropicKey ?? ''} onChange={e => setS({ ...s, anthropicKey: e.target.value })} placeholder="sk-ant-…  (tạo tại console.anthropic.com)" />
+              <label>OpenRouter API key (bật AI Copilot)</label>
+              <input type="password" value={s.openRouterKey ?? ''} onChange={e => setS({ ...s, openRouterKey: e.target.value })} placeholder="sk-or-v1-…  (tạo tại openrouter.ai/keys)" autoComplete="off" />
               <div className="hint">Dùng cho menu AI Copilot — chat với dữ liệu công ty, viết email/proposal. Không có key thì các tính năng AI rule-based (AI Summary, Lead Score) vẫn chạy bình thường.</div>
             </div>
           </div>
-          <div style={{ marginTop: 16 }}><button className="btn btn-primary" onClick={save}>Lưu cài đặt</button></div>
+          <div style={{ marginTop: 16 }}><AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={save}>Lưu cài đặt</AsyncButton></div>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <CeoFederationPolicy />
+        <RealmPilotControl />
+        <RealmPilotRehearsal />
+        <RealmPilotOperations />
+        <RealmFeedbackOperations />
+        <RealmExperienceScorecard />
+        <RealmReleaseCandidateDossier />
         <div className="card">
           <div className="card-head"><span className="card-title">Import dữ liệu từ bản offline (v1)</span></div>
           <div className="card-body">
@@ -257,6 +440,7 @@ export default function SettingsPage() {
               onChange={e => e.target.files[0] && importV1(e.target.files[0])} />
           </div>
         </div>
+        <LeadIntakeSection s={s} setS={setS} />
         <ApiSection />
         <div className="card">
           <div className="card-body" style={{ fontSize: '.8rem', color: 'var(--muted)' }}>

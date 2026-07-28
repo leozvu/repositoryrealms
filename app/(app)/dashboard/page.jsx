@@ -30,12 +30,16 @@ export default function Dashboard() {
   const tickets = useResource('tickets');
   const modules = useModules();                    // v3.22: biết công ty bật phân hệ nào
   const on = m => modOn(m, modules);               // mod lõi/null xử lý sẵn trong modOn
-  // XNK: công ty không bật 'export' sẽ nhận 403 im lặng (module-guard) → rows rỗng, không lỗi.
-  const shipments = useResource('shipments');
-  const areaCodes = useResource('areacodes');
-  const liveSessions = useResource('livesessions'); // livestream — 403 im lặng nếu không bật
-  const violations = useResource('violations');
+  // Giữ hook ổn định nhưng không phát request tới API của phân hệ đang tắt.
+  const shipments = useResource('shipments', null, { enabled: on('export') });
+  const areaCodes = useResource('areacodes', null, { enabled: on('export') });
+  const liveSessions = useResource('livesessions', null, { enabled: on('livestream') });
+  const violations = useResource('violations', null, { enabled: on('livestream') });
   const [insights, setInsights] = useState(null);
+  // Hooks must run in the same order while NextAuth hydrates from `null` to a
+  // signed-in user. Keeping onboarding state above the early return prevents
+  // React #310 ("Rendered more hooks than during the previous render").
+  const [onbHidden, setOnbHidden] = useState(() => { try { return localStorage.getItem('onbDismissed') === '1'; } catch { return false; } });
   useEffect(() => { fetch('/api/insights').then(r => r.json()).then(setInsights).catch(() => setInsights([])); }, []);
   if (!user) return null;
 
@@ -45,7 +49,6 @@ export default function Dashboard() {
   const tm = thisMonth();
 
   // v3.31: Onboarding — vài bước đầu để bắt đầu. Tự ẩn khi xong hết hoặc người dùng tắt.
-  const [onbHidden, setOnbHidden] = useState(() => { try { return localStorage.getItem('onbDismissed') === '1'; } catch { return false; } });
   const dismissOnb = () => { try { localStorage.setItem('onbDismissed', '1'); } catch {} setOnbHidden(true); };
 
   /* ---- Chỉ số ---- */

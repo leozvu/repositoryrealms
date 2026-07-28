@@ -2,7 +2,7 @@
 // v3.3: Rule tự động IF/THEN — chỉ Giám đốc.
 // KHI <resource> <create/update> VÀ thỏa mọi điều kiện → chạy các hành động.
 import { useState } from 'react';
-import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Forbidden, AsyncButton, useToast } from '@/components/ui';
 import { parseItems } from '@/lib/format';
 
 const RESOURCES_UI = [
@@ -31,7 +31,7 @@ function RuleModal({ row, users, onSave, onClose }) {
   return (
     <Modal title={row ? 'Sửa rule' : 'Tạo rule tự động'} onClose={onClose} large
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <button className="btn btn-primary" onClick={() => { if (!f.name.trim()) return; onSave(f); onClose(); }}>Lưu</button></>}>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={async () => { if (!f.name.trim()) return; const r = await onSave(f); if (r !== false && r !== null) onClose(); }}>Lưu</AsyncButton></>}>
       <div style={{ display: 'grid', gap: 14, fontSize: '.85rem' }}>
         <div className="field"><label>Tên rule *</label>
           <input value={f.name} onChange={e => set('name', e.target.value)} placeholder="VD: Báo tin khi thắng deal" /></div>
@@ -99,8 +99,10 @@ export default function AutomationPage() {
 
   const save = async f => {
     const data = { name: f.name.trim(), resource: f.resource, event: f.event, conditions: JSON.stringify(f.conditions.filter(c => c.field)), actions: JSON.stringify(f.actions) };
-    if (modal.row) await rules.update(modal.row.id, data); else await rules.create(data);
+    const result = modal.row ? await rules.update(modal.row.id, data) : await rules.create(data);
+    if (!result) return false;
     toast(modal.row ? 'Đã cập nhật rule' : 'Đã tạo rule');
+    return true;
   };
   const resLabel = k => RESOURCES_UI.find(r => r.key === k)?.label || k;
   const evLabel = v => EVENTS.find(e => e.v === v)?.l || v;
@@ -121,7 +123,7 @@ export default function AutomationPage() {
                 <div className="act-title">{r.name}</div>
                 <div className="act-sub">Khi <b>{resLabel(r.resource)}</b> {evLabel(r.event)} · {parseItems(r.conditions).length} điều kiện · {parseItems(r.actions).length} hành động</div>
               </div>
-              <button className="btn btn-outline btn-sm" onClick={e => { e.stopPropagation(); rules.update(r.id, { active: !r.active }); }}>{r.active ? 'Tắt' : 'Bật'}</button>
+              <AsyncButton className="btn btn-outline btn-sm" disabled={rules.mutating} onClick={async e => { e.stopPropagation(); await rules.update(r.id, { active: !r.active }); }}>{r.active ? 'Tắt' : 'Bật'}</AsyncButton>
               <button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }} onClick={e => { e.stopPropagation(); setModal({ mode: 'del', row: r }); }}><Icon name="trash" size={14} /></button>
             </div>
           ))}

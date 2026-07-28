@@ -1,7 +1,7 @@
 'use client';
 import { useState, useMemo, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
+import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Forbidden, AsyncButton, useToast } from '@/components/ui';
 import { money, docGrand, todayISO } from '@/lib/format';
 import { hasAny, rolesOf } from '@/lib/perm';
 
@@ -79,8 +79,10 @@ export default function CommissionsPage() {
   };
 
   const markPaid = async row => {
-    await commissions.update(row.id, { status: 'paid' });
+    const result = await commissions.update(row.id, { status: 'paid' });
+    if (!result) return false;
     toast('Đã đánh dấu thanh toán');
+    return true;
   };
 
   return (
@@ -151,9 +153,9 @@ export default function CommissionsPage() {
                       <td>
                         <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
                           {c.status === 'pending' && canManage && (
-                            <button className="btn btn-outline btn-sm" onClick={() => markPaid(c)}>
+                            <AsyncButton className="btn btn-outline btn-sm" disabled={commissions.mutating} onClick={() => markPaid(c)}>
                               <Icon name="check" size={13} /> Đã trả
-                            </button>
+                            </AsyncButton>
                           )}
                           {canManage && (
                             <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: c })}>
@@ -175,7 +177,7 @@ export default function CommissionsPage() {
         <Modal title="Ghi hoa hồng Sales" onClose={() => setModal(null)}
           footer={<>
             <button className="btn btn-outline" onClick={() => setModal(null)}>Hủy</button>
-            <button className="btn btn-primary" onClick={saveCommission}>Lưu</button>
+            <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={saveCommission}>Lưu</AsyncButton>
           </>}>
           <div className="form-grid">
             <div className="field">

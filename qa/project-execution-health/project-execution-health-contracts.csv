@@ -1,0 +1,16 @@
+id,layer,source,signals,missingSignals,status
+canonical-erp-records,data,prisma/schema.prisma,model Project { | model Task { | model TimeLog { | model Milestone { | model VendorBill { | model Invoice {,,verified
+execution-health-rule-version,domain,lib/project-execution-health.js,PROJECT_EXECUTION_HEALTH_RULE_VERSION = 'project-execution-health-v1' | buildProjectExecutionHealth | dependencyCycles | capacitySnapshot,,verified
+delivery-risk-signals,domain,lib/project-execution-health.js,deadline_overdue | blocked_work | dependency_cycle | dependencies_unresolved | capacity_constrained,,verified
+declared-timelog-provenance,governance,lib/project-execution-health.js,actualSource: 'declared_timelog' | actualIsObservedTruth: false | ceiling: 'medium',,verified
+anti-ranking-policy,governance,lib/project-execution-health.js,employeeRanking: false | presenceAsProductivity: false | payrollUse: false | goldUse: false,,verified
+finance-planning-proxy,finance,lib/project-execution-health.js,planningCostProxy | planningMarginProxy | cashContributionProxy | isAccountingProfit: false,,verified
+canonical-read-model,server,lib/project-execution-health-admin.js,db.project.findUnique | db.task.findMany | db.timeLog.findMany | source: 'canonical-erp-project',,verified
+financial-authorization,authorization,lib/project-execution-health-admin.js,"hasAny(user, ['ACCOUNTANT', 'PM', 'LEAD']) | canSeeMoney ? db.vendorBill.findMany | canSeeMoney ? db.invoice.findMany",,verified
+private-api,api,app/api/projects/[id]/execution-health/route.js,"currentUser() | loadProjectExecutionHealth | 'Cache-Control': 'private, no-store'",,verified
+dashboard-before-drilldown,ui,app/(app)/projects/[id]/page.jsx,Project Execution Health | Delivery risk | Capacity | Estimate ≠ TimeLog | Execution drill-down,,verified
+portfolio-constraints,ui,app/(app)/portfolio/page.jsx,Delivery constraints | Planning margin proxy | Capacity constraints | không phải accounting profit | không phải điểm hiệu suất hay bảng xếp hạng,,verified
+accessible-responsive-dashboard,ux,app/(app)/projects/[id]/project-execution-health.module.css,min-height:44px | @media(max-width:700px) | @media(prefers-reduced-motion:reduce),,verified
+phase3-domain-tests,test,tests/project-execution-health.test.mjs,dependency cycle | không tạo employee ranking | không nhận là accounting profit,,verified
+phase3-server-tests,test,tests/project-execution-health-admin.test.mjs,không leak salary | finance bị chặn từ query tới response | fail-closed,,verified
+phase3-runbook,operations,docs/realms/PHASE-3-PROJECT-EXECUTION-HEALTH.md,Project không phải Task list | canonical ERP records | crmegoric-realms-demo,,verified

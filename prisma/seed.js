@@ -1,4 +1,4 @@
-/* Seed v3.2: 8 tài khoản (7 vai trò) + bộ dữ liệu demo phủ toàn bộ module.
+/* Seed v3.2: 9 tài khoản (7 vai trò nội bộ, Director checker + freelancer) + bộ dữ liệu demo phủ toàn bộ module.
    Chạy: npm run db:seed
    ⚠ CHỈ DÙNG CHO DEV/DEMO — xóa toàn bộ dữ liệu hiện có rồi seed lại từ đầu.
    Ngày tháng sinh tương đối so với hôm nay để dashboard/AI Summary/aging luôn "sống". */
@@ -41,8 +41,8 @@ async function main() {
     data: {
       id: 1,
       json: J({
-        company: 'Aim Agency', address: '68 Nguyễn Huệ, Q.1, TP.HCM', taxCode: '0312345678',
-        email: 'hello@aimagency.vn', phone: '028 3823 6868', bank: 'VCB 0071000123456 — CN Sài Gòn',
+        company: 'Egoric', address: '68 Nguyễn Huệ, Q.1, TP.HCM', taxCode: '0312345678',
+        email: 'hello@egoric.vn', phone: '028 3823 6868', bank: 'VCB 0071000123456 — CN Sài Gòn',
         invoicePrefix: 'INV', quotePrefix: 'BG', vat: 8, monthlyTarget: 350000000,
         approveQuoteOver: 50000000, approveExpenseOver: 10000000, approveExpenseDirectorOver: 50000000,
         commissionRate: 5,
@@ -50,7 +50,7 @@ async function main() {
     },
   });
 
-  /* ---------- Nhóm + tài khoản (8 tài khoản README + 2 nhân viên phụ) ---------- */
+  /* ---------- Nhóm + tài khoản (mỗi vai trò đúng một persona demo) ---------- */
   const teamCreative = await prisma.team.create({ data: { name: 'Nhóm Sáng tạo' } });
   const teamMedia = await prisma.team.create({ data: { name: 'Nhóm Media' } });
 
@@ -61,17 +61,15 @@ async function main() {
   const DEMO_PW = process.env.SEED_PASSWORD || crypto.randomBytes(9).toString('base64').replace(/[+/=]/g, '').slice(0, 10);
   const mk = pw => bcrypt.hashSync(pw, 10);
   const mkUser = d => prisma.user.create({ data: d });
-  const giamdoc = await mkUser({ email: 'giamdoc@agency.vn', name: 'Vũ Minh Long', passwordHash: mk(DEMO_PW), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Founder / CEO', salary: 40000000, phone: '0901111222' });
-  const ketoan = await mkUser({ email: 'ketoan@agency.vn', name: 'Nguyễn Thu Trang', passwordHash: mk(DEMO_PW), role: 'ACCOUNTANT', roles: J(['ACCOUNTANT']), title: 'Kế toán trưởng', salary: 18000000 });
-  const am = await mkUser({ email: 'am@agency.vn', name: 'Phạm Hoàng Anh', passwordHash: mk(DEMO_PW), role: 'AM', roles: J(['AM']), title: 'Account Manager', salary: 20000000, phone: '0903334455' });
-  const pm = await mkUser({ email: 'pm@agency.vn', name: 'Trần Quốc Việt', passwordHash: mk(DEMO_PW), role: 'PM', roles: J(['PM']), title: 'Project Manager', salary: 22000000 });
-  const hr = await mkUser({ email: 'hr@agency.vn', name: 'Lê Thị Hồng Nhung', passwordHash: mk(DEMO_PW), role: 'HR', roles: J(['HR']), title: 'HR Executive', salary: 15000000 });
-  const lead = await mkUser({ email: 'truongnhom@agency.vn', name: 'Đỗ Văn Khánh', passwordHash: mk(DEMO_PW), role: 'LEAD', roles: J(['LEAD']), title: 'Trưởng nhóm Sáng tạo', salary: 19000000, teamId: teamCreative.id });
+  const giamdoc = await mkUser({ email: 'giamdoc@agency.vn', name: 'Phạm Minh Quân', passwordHash: mk(DEMO_PW), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Founder / CEO', salary: 40000000, phone: '0901111222' });
+  await mkUser({ email: 'director.checker@agency.vn', name: 'Nguyễn Minh Quân', passwordHash: mk(DEMO_PW), role: 'DIRECTOR', roles: J(['DIRECTOR']), title: 'Director / Independent Checker', salary: 0 });
+  const ketoan = await mkUser({ email: 'ketoan@agency.vn', name: 'Phạm Thu Hà', passwordHash: mk(DEMO_PW), role: 'ACCOUNTANT', roles: J(['ACCOUNTANT']), title: 'Kế toán trưởng', salary: 18000000 });
+  const am = await mkUser({ email: 'am@agency.vn', name: 'Trần Khánh Linh', passwordHash: mk(DEMO_PW), role: 'AM', roles: J(['AM']), title: 'Account Manager', salary: 20000000, phone: '0903334455' });
+  const pm = await mkUser({ email: 'pm@agency.vn', name: 'Nguyễn Minh An', passwordHash: mk(DEMO_PW), role: 'PM', roles: J(['PM']), title: 'Project Manager', salary: 22000000 });
+  const hr = await mkUser({ email: 'hr@agency.vn', name: 'Lê Ngọc Mai', passwordHash: mk(DEMO_PW), role: 'HR', roles: J(['HR']), title: 'HR Executive', salary: 15000000 });
+  const lead = await mkUser({ email: 'truongnhom@agency.vn', name: 'Đỗ Quốc Anh', passwordHash: mk(DEMO_PW), role: 'LEAD', roles: J(['LEAD']), title: 'Trưởng nhóm Sáng tạo', salary: 19000000, teamId: teamCreative.id });
   const bdayThisWeek = (() => { const d = new Date(); d.setDate(d.getDate() + 3); return `1998-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
-  const nhanvien = await mkUser({ email: 'nhanvien@agency.vn', name: 'Lê Thu Hà', passwordHash: mk(DEMO_PW), role: 'STAFF', roles: J(['STAFF']), title: 'Designer', salary: 14000000, teamId: teamCreative.id, birthday: bdayThisWeek });
-  const quanly = await mkUser({ email: 'quanly@agency.vn', name: 'Trần Quốc Bảo', passwordHash: mk(DEMO_PW), role: 'MANAGER', roles: J(['PM', 'AM', 'ACCOUNTANT']), title: 'Quản lý (đa vai trò)', salary: 25000000 });
-  const content = await mkUser({ email: 'content@agency.vn', name: 'Ngô Mai Phương', passwordHash: mk(DEMO_PW), role: 'STAFF', roles: J(['STAFF']), title: 'Content Writer', salary: 12000000, teamId: teamCreative.id });
-  const media = await mkUser({ email: 'media@agency.vn', name: 'Bùi Đức Mạnh', passwordHash: mk(DEMO_PW), role: 'STAFF', roles: J(['STAFF']), title: 'Media Buyer', salary: 13000000, teamId: teamMedia.id });
+  const nhanvien = await mkUser({ email: 'nhanvien@agency.vn', name: 'Hoàng Gia Hân', passwordHash: mk(DEMO_PW), role: 'STAFF', roles: J(['STAFF']), title: 'Designer', salary: 14000000, teamId: teamCreative.id, birthday: bdayThisWeek });
   await prisma.team.update({ where: { id: teamCreative.id }, data: { leadId: lead.id } });
 
   /* ---------- Khách hàng (1 khách "nguội" >45 ngày → cảnh báo churn) ---------- */
@@ -133,7 +131,7 @@ async function main() {
 
   /* ---------- Công việc: đủ 4 cột kanban, 3 việc trễ hạn ---------- */
   // Chuỗi phụ thuộc P1 (v3.2): kịch bản → quay dựng → setup ads (tạo riêng để lấy id)
-  const tScript = await prisma.task.create({ data: { title: 'Kịch bản video hero 45s', projectId: p1.id, phaseId: phEva1.id, assigneeId: content.id, priority: 'high', status: 'done', dueDate: D(-18), estHours: 16, labels: J(['Nội dung']) } });
+  const tScript = await prisma.task.create({ data: { title: 'Kịch bản video hero 45s', projectId: p1.id, phaseId: phEva1.id, assigneeId: nhanvien.id, priority: 'high', status: 'done', dueDate: D(-18), estHours: 16, labels: J(['Nội dung']) } });
   const tShoot = await prisma.task.create({
     data: {
       title: 'Quay + dựng video hero', projectId: p1.id, phaseId: phEva2.id, assigneeId: lead.id, priority: 'high', status: 'review', dueDate: D(+2), dependsOn: J([tScript.id]), estHours: 40, labels: J(['Sản xuất', 'Video']),
@@ -146,8 +144,8 @@ async function main() {
       { taskId: tShoot.id, userId: lead.id, content: 'Ok anh, chiều nay em gửi bản chỉnh màu v2.' },
     ],
   });
-  await prisma.task.create({ data: { title: 'Báo cáo ads tuần gửi khách retainer', projectId: p2.id, assigneeId: media.id, priority: 'medium', status: 'todo', dueDate: D(+2), recur: 'weekly', note: 'Việc định kỳ — xong tự tạo kỳ sau', checklist: J([{ text: 'Tổng hợp số liệu ads', done: false }, { text: 'Viết nhận xét + đề xuất', done: false }]) } });
-  await prisma.task.create({ data: { title: 'Setup chiến dịch ads giai đoạn 1', projectId: p1.id, phaseId: phEva3.id, assigneeId: media.id, priority: 'medium', status: 'doing', dueDate: D(+5), dependsOn: J([tShoot.id]), estHours: 20, labels: J(['Ads']), note: 'Chỉ chạy ads sau khi video hero hoàn thành' } });
+  await prisma.task.create({ data: { title: 'Báo cáo ads tuần gửi khách retainer', projectId: p2.id, assigneeId: lead.id, priority: 'medium', status: 'todo', dueDate: D(+2), recur: 'weekly', note: 'Việc định kỳ — xong tự tạo kỳ sau', checklist: J([{ text: 'Tổng hợp số liệu ads', done: false }, { text: 'Viết nhận xét + đề xuất', done: false }]) } });
+  await prisma.task.create({ data: { title: 'Setup chiến dịch ads giai đoạn 1', projectId: p1.id, phaseId: phEva3.id, assigneeId: lead.id, priority: 'medium', status: 'doing', dueDate: D(+5), dependsOn: J([tShoot.id]), estHours: 20, labels: J(['Ads']), note: 'Chỉ chạy ads sau khi video hero hoàn thành' } });
   await prisma.task.createMany({
     data: [
       // P1 — EVA Thu Đông
@@ -155,21 +153,21 @@ async function main() {
       { title: 'Thiết kế 12 key visual', projectId: p1.id, phaseId: phEva2.id, assigneeId: nhanvien.id, priority: 'high', status: 'doing', dueDate: D(-2), estHours: 48, labels: J(['Thiết kế']), statusSince: D(-8), note: 'Trễ vì chờ ảnh sản phẩm từ khách' },
       { title: 'Chốt danh sách 8 KOL', projectId: p1.id, phaseId: phEva3.id, assigneeId: am.id, priority: 'medium', status: 'todo', dueDate: D(+8), estHours: 12, labels: J(['KOL']) },
       // P2 — retainer Cà phê
-      { title: 'Content lịch tháng này (20 bài)', projectId: p2.id, assigneeId: content.id, priority: 'medium', status: 'doing', dueDate: D(+10) },
+      { title: 'Content lịch tháng này (20 bài)', projectId: p2.id, assigneeId: nhanvien.id, priority: 'medium', status: 'doing', dueDate: D(+10) },
       { title: 'Thiết kế bộ ảnh menu mới', projectId: p2.id, assigneeId: nhanvien.id, priority: 'medium', status: 'todo', dueDate: D(+12) },
-      { title: 'Báo cáo ads tháng trước', projectId: p2.id, assigneeId: media.id, priority: 'low', status: 'done', dueDate: D(-7) },
-      { title: 'Tối ưu ngân sách ads tuần này', projectId: p2.id, assigneeId: media.id, priority: 'high', status: 'doing', dueDate: D(-1) },
+      { title: 'Báo cáo ads tháng trước', projectId: p2.id, assigneeId: lead.id, priority: 'low', status: 'done', dueDate: D(-7) },
+      { title: 'Tối ưu ngân sách ads tuần này', projectId: p2.id, assigneeId: lead.id, priority: 'high', status: 'doing', dueDate: D(-1) },
       // P3 — Smile Plus (dự án trễ)
       { title: 'Code landing page đặt lịch', projectId: p3.id, assigneeId: lead.id, priority: 'high', status: 'review', dueDate: D(-4), note: 'Chờ khách duyệt bản final' },
-      { title: 'Viết content 5 trang dịch vụ', projectId: p3.id, assigneeId: content.id, priority: 'medium', status: 'done', dueDate: D(-15) },
+      { title: 'Viết content 5 trang dịch vụ', projectId: p3.id, assigneeId: nhanvien.id, priority: 'medium', status: 'done', dueDate: D(-15) },
       { title: 'Tối ưu tốc độ + SEO onpage', projectId: p3.id, assigneeId: lead.id, priority: 'medium', status: 'todo', dueDate: D(+4) },
       // P4 — Minh Phát
-      { title: 'Nghiên cứu thị trường BĐS khu Đông', projectId: p4.id, assigneeId: content.id, priority: 'medium', status: 'todo', dueDate: D(+14) },
+      { title: 'Nghiên cứu thị trường BĐS khu Đông', projectId: p4.id, assigneeId: nhanvien.id, priority: 'medium', status: 'todo', dueDate: D(+14) },
       { title: 'Phác thảo 3 hướng logo', projectId: p4.id, assigneeId: nhanvien.id, priority: 'medium', status: 'todo', dueDate: D(+20) },
       // Việc chung
       { title: 'Cập nhật portfolio agency Q3', projectId: null, assigneeId: nhanvien.id, priority: 'low', status: 'todo', dueDate: D(+25) },
       { title: 'Chuẩn bị pitching Mây Bakery', projectId: null, assigneeId: am.id, priority: 'high', status: 'doing', dueDate: D(+3) },
-      { title: 'Sắp xếp lại ổ tài liệu chung', projectId: null, assigneeId: content.id, priority: 'low', status: 'todo', dueDate: null },
+      { title: 'Sắp xếp lại ổ tài liệu chung', projectId: null, assigneeId: nhanvien.id, priority: 'low', status: 'todo', dueDate: null },
     ],
   });
 
@@ -187,8 +185,8 @@ async function main() {
 
   /* ---------- Giờ công: ~12 ngày làm việc gần nhất × 5 người (utilization hợp lý) ---------- */
   const wds = workdays(14);
-  const loggers = [nhanvien, content, media, lead, pm];
-  const projByUser = { [nhanvien.id]: p1.id, [content.id]: p2.id, [media.id]: p2.id, [lead.id]: p3.id, [pm.id]: p1.id };
+  const loggers = [nhanvien, lead, pm, am, hr];
+  const projByUser = { [nhanvien.id]: p1.id, [lead.id]: p3.id, [pm.id]: p1.id, [am.id]: p2.id, [hr.id]: p4.id };
   const timeLogs = [];
   wds.forEach((date, di) => loggers.forEach((u, ui) => {
     timeLogs.push({ userId: u.id, projectId: (di + ui) % 3 === 0 ? p1.id : projByUser[u.id], date, hours: 6 + ((di + ui) % 3), billable: (di + ui) % 5 !== 0, note: null });
@@ -278,8 +276,8 @@ async function main() {
   await prisma.asset.createMany({
     data: [
       { name: 'MacBook Pro 14" M3', category: 'Laptop / máy tính', serial: 'MBP14-2025-041', holderId: nhanvien.id, price: 45000000, buyDate: D(-300), status: 'in_use' },
-      { name: 'Sony A7 IV + lens 24-70', category: 'Thiết bị quay chụp', serial: 'SONY-A74-112', holderId: media.id, price: 75000000, buyDate: D(-400), status: 'in_use' },
-      { name: 'Màn hình LG 27" 4K', category: 'Laptop / máy tính', serial: 'LG27-2024-007', holderId: content.id, price: 9000000, buyDate: D(-500), status: 'in_use' },
+      { name: 'Sony A7 IV + lens 24-70', category: 'Thiết bị quay chụp', serial: 'SONY-A74-112', holderId: lead.id, price: 75000000, buyDate: D(-400), status: 'in_use' },
+      { name: 'Màn hình LG 27" 4K', category: 'Laptop / máy tính', serial: 'LG27-2024-007', holderId: nhanvien.id, price: 9000000, buyDate: D(-500), status: 'in_use' },
       { name: 'Adobe Creative Cloud (5 seat)', category: 'License phần mềm', holderId: lead.id, price: 30000000, buyDate: D(-340), renewAt: D(+25), status: 'in_use', note: 'Gia hạn hàng năm — nhớ thương lượng giá team' },
       { name: 'Gimbal DJI RS3', category: 'Thiết bị quay chụp', serial: 'DJI-RS3-889', price: 12000000, buyDate: D(-200), status: 'storage' },
     ],
@@ -289,7 +287,7 @@ async function main() {
   const attDays = workdays(10);
   const attData = [];
   const clockIns = ['08:52', '09:05', '08:58', '09:14', '08:45']; // vài buổi muộn để demo
-  [nhanvien, content, media, lead, pm].forEach((u, ui) => attDays.forEach((date, di) => {
+  [nhanvien, lead, pm, am, hr].forEach((u, ui) => attDays.forEach((date, di) => {
     const s = (di + ui) % 7 === 3 ? 'remote' : (di + ui) % 11 === 5 ? 'off' : 'present';
     const ci = s === 'off' ? null : clockIns[(di + ui) % clockIns.length];
     const co = s === 'off' ? null : (di === 0 ? null : '18:0' + ((di + ui) % 6)); // hôm nay chưa tan ca
@@ -300,7 +298,7 @@ async function main() {
   /* ---------- Ngày lễ + Freelancer (v3.11) ---------- */
   await prisma.holiday.createMany({ data: [{ date: MD(0, 2), name: 'Nghỉ mát công ty' }] });
   const flVideo = await prisma.user.create({ data: {
-    email: 'freelancer.video@demo.vn', name: 'Trần Video Editor', passwordHash: mk(DEMO_PW),
+    email: 'freelancer@agency.vn', name: 'Đặng Hải Nam', passwordHash: mk(DEMO_PW),
     role: 'FREELANCER', roles: J(['FREELANCER']), userType: 'freelancer', title: 'Freelancer',
     hourlyRate: 250000, skills: 'Video editor, Motion graphics', portfolio: 'https://behance.net/demo',
     accessUntil: D(+35), // theo deadline dự án EVA
@@ -319,8 +317,8 @@ async function main() {
   await prisma.leave.createMany({
     data: [
       { userId: nhanvien.id, from: D(-20), to: D(-19), type: 'annual', status: 'approved', note: 'Về quê đám cưới' },
-      { userId: content.id, from: D(+7), to: D(+9), type: 'annual', status: 'pending', note: 'Du lịch gia đình' },
-      { userId: media.id, from: D(-10), to: D(-6), type: 'unpaid', status: 'rejected', note: 'Trùng đợt chạy chiến dịch lớn' },
+      { userId: hr.id, from: D(+7), to: D(+9), type: 'annual', status: 'pending', note: 'Du lịch gia đình' },
+      { userId: lead.id, from: D(-10), to: D(-6), type: 'unpaid', status: 'rejected', note: 'Trùng đợt chạy chiến dịch lớn' },
     ],
   });
 
@@ -349,10 +347,10 @@ async function main() {
   /* ---------- Ticket hỗ trợ (1 vỡ SLA → insight đỏ) ---------- */
   await prisma.ticket.createMany({
     data: [
-      { code: 'TK-2026-001', clientId: eva.id, title: 'Ads bị Facebook từ chối duyệt', desc: 'Chiến dịch BST bị flag chính sách — cần kháng gấp', priority: 'urgent', status: 'in_progress', assigneeId: media.id, channel: 'zalo', createdAt: DT(-30), dueAt: DT(-5) },
-      { code: 'TK-2026-002', clientId: cafe.id, title: 'Muốn đổi lịch đăng bài tuần này', priority: 'high', status: 'open', assigneeId: content.id, channel: 'messenger', createdAt: DT(-10), dueAt: DT(+30) },
+      { code: 'TK-2026-001', clientId: eva.id, title: 'Ads bị Facebook từ chối duyệt', desc: 'Chiến dịch BST bị flag chính sách — cần kháng gấp', priority: 'urgent', status: 'in_progress', assigneeId: lead.id, channel: 'zalo', createdAt: DT(-30), dueAt: DT(-5) },
+      { code: 'TK-2026-002', clientId: cafe.id, title: 'Muốn đổi lịch đăng bài tuần này', priority: 'high', status: 'open', assigneeId: nhanvien.id, channel: 'messenger', createdAt: DT(-10), dueAt: DT(+30) },
       { code: 'TK-2026-003', clientId: smile.id, title: 'Form đặt lịch không nhận số điện thoại bàn', priority: 'normal', status: 'waiting', assigneeId: lead.id, channel: 'email', createdAt: DT(-50), dueAt: DT(+40), desc: 'Chờ khách xác nhận format số cần hỗ trợ' },
-      { code: 'TK-2026-004', clientId: eva.id, title: 'Xuất lại báo cáo ads tháng trước bản PDF', priority: 'low', status: 'resolved', assigneeId: media.id, channel: 'email', createdAt: DT(-100), dueAt: DT(-20), resolvedAt: DT(-40) },
+      { code: 'TK-2026-004', clientId: eva.id, title: 'Xuất lại báo cáo ads tháng trước bản PDF', priority: 'low', status: 'resolved', assigneeId: lead.id, channel: 'email', createdAt: DT(-100), dueAt: DT(-20), resolvedAt: DT(-40) },
       { code: 'TK-2026-005', clientId: minhphat.id, title: 'Hỏi quy trình bàn giao file thiết kế', priority: 'normal', status: 'closed', assigneeId: am.id, channel: 'phone', createdAt: DT(-200), dueAt: DT(-150), resolvedAt: DT(-180) },
     ],
   });
@@ -412,7 +410,7 @@ async function main() {
   });
 
   /* ---------- Nhắn tin nội bộ: kênh #Chung + 1 nhóm dự án ---------- */
-  const allUsers = [giamdoc, ketoan, am, pm, hr, lead, nhanvien, quanly, content, media];
+  const allUsers = [giamdoc, ketoan, am, pm, hr, lead, nhanvien, flVideo];
   const general = await prisma.conversation.create({ data: { type: 'general', name: 'Kênh chung' } });
   await prisma.convMember.createMany({ data: allUsers.map(u => ({ convId: general.id, userId: u.id, lastReadAt: DT(-100) })) });
   await prisma.message.createMany({
@@ -424,10 +422,10 @@ async function main() {
     ],
   });
   const grp = await prisma.conversation.create({ data: { type: 'group', name: 'Dự án EVA Thu Đông' } });
-  await prisma.convMember.createMany({ data: [pm, lead, nhanvien, media].map(u => ({ convId: grp.id, userId: u.id, lastReadAt: DT(-100) })) });
+  await prisma.convMember.createMany({ data: [pm, lead, nhanvien].map(u => ({ convId: grp.id, userId: u.id, lastReadAt: DT(-100) })) });
   await prisma.message.createMany({
     data: [
-      { convId: grp.id, senderId: pm.id, content: 'Khách phản hồi key visual: đổi tone ấm hơn, Hà xem giúp nhé.', createdAt: DT(-20) },
+      { convId: grp.id, senderId: pm.id, content: 'Khách phản hồi key visual: đổi tone ấm hơn, Hân xem giúp nhé.', createdAt: DT(-20) },
       { convId: grp.id, senderId: nhanvien.id, content: 'Ok anh, em gửi bản chỉnh trước 5h chiều nay.', createdAt: DT(-19) },
     ],
   });
@@ -482,8 +480,8 @@ async function main() {
   await prisma.review.createMany({
     data: [
       { userId: nhanvien.id, quarter: Q(), status: 'final', selfNote: 'Em muốn học thêm motion graphics', mgrNote: 'Thiết kế ổn định, cần chủ động deadline hơn', scores: J(CRIT.map((name, i) => ({ name, self: [4, 3, 4, 5, 4][i], mgr: [4, 3, 4, 5, 5][i] }))) },
-      { userId: content.id, quarter: Q(), status: 'self_done', selfNote: 'Quý này em viết đều 20 bài/tháng', scores: J(CRIT.map((name, i) => ({ name, self: [4, 4, 3, 4, 5][i], mgr: 0 }))) },
-      { userId: media.id, quarter: Q(), status: 'pending', scores: '[]' },
+      { userId: hr.id, quarter: Q(), status: 'self_done', selfNote: 'Quý này em hoàn thành kế hoạch nhân sự', scores: J(CRIT.map((name, i) => ({ name, self: [4, 4, 3, 4, 5][i], mgr: 0 }))) },
+      { userId: lead.id, quarter: Q(), status: 'pending', scores: '[]' },
     ],
   });
 
@@ -552,18 +550,22 @@ async function main() {
   /* ---------- Tổng kết ---------- */
   console.log('✔ Seed hoàn tất. Đăng nhập (http://localhost:3300):');
   console.log('');
-  console.log('  MẬT KHẨU CHUNG CHO MỌI TÀI KHOẢN DEMO: ' + DEMO_PW);
-  console.log('  (sinh ngẫu nhiên mỗi lần seed — đặt SEED_PASSWORD nếu muốn cố định)');
+  if (process.env.SEED_SHOW_PASSWORD === '0') {
+    console.log('  MẬT KHẨU DEMO: đã được cấp qua secret staging (không hiển thị trong log)');
+  } else {
+    console.log('  MẬT KHẨU CHUNG CHO MỌI TÀI KHOẢN DEMO: ' + DEMO_PW);
+    console.log('  (sinh ngẫu nhiên mỗi lần seed — đặt SEED_PASSWORD nếu muốn cố định)');
+  }
   console.log('');
   console.log('  Giám đốc   : giamdoc@agency.vn');
+  console.log('  Duyệt độc lập: director.checker@agency.vn');
   console.log('  Kế toán    : ketoan@agency.vn');
   console.log('  Account/AM : am@agency.vn');
   console.log('  Quản lý DA : pm@agency.vn');
   console.log('  HR         : hr@agency.vn');
   console.log('  Trưởng nhóm: truongnhom@agency.vn');
   console.log('  Nhân viên  : nhanvien@agency.vn');
-  console.log('  Đa vai trò : quanly@agency.vn (PM+AM+Kế toán)');
-  console.log('  Phụ        : content@agency.vn, media@agency.vn');
+  console.log('  Freelancer : freelancer@agency.vn');
 }
 
 main()

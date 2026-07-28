@@ -1,0 +1,16 @@
+id,layer,source,signals,missingSignals,status
+erp-records-remain-source-of-truth,database,prisma/schema.prisma,model User { | model Task { | model TimeLog { | model Leave { | model Attendance { | model Approval { | model RealmGoldEntry {,,verified
+personal-surface-for-internal-users,access,lib/realm-access.js,key: 'personal' | roles: ERP_ALL_ROLES | module: null,,verified
+authenticated-feature-gated-read-api,api,app/api/realm-demo/chronicle/route.js,"process.env.REALM_ERP_SYNC_ENABLED !== '1' | realmSurfaceDecision(user, 'personal' | isFreelancer(user) | export async function GET",,verified
+self-scoped-business-queries,server,lib/realm-chronicle-admin.js,where: { assigneeId: user.id } | where: { userId: user.id | where: { requesterId: user.id } | where: { userId: user.id },,verified
+sensitive-fields-never-selected,server,lib/realm-chronicle-admin.js,"id: true, name: true, title: true, teamId: true, status: true, userType: true, realmProfile: true | select: { id: true, from: true, to: true, type: true, status: true } | select: { id: true, type: true, title: true, status: true, createdAt: true }",,verified
+privacy-and-no-ranking-contract,contract,lib/realm-chronicle.js,"scope: 'self' | performanceRanking: false | sensitiveFieldsExcluded: ['salary', 'hourlyRate', 'reviewScores', 'managerNotes', 'privateNotes'] | sourceOfTruth: 'erp-records'",,verified
+allowlisted-personal-timeline,contract,lib/realm-chronicle.js,"kind: 'gold' | kind: 'time' | kind: 'leave' | kind: 'approval' | .slice(0, 16)",,verified
+exact-erp-deep-links,contract,lib/realm-chronicle.js,?focus=${encodeURIComponent(id)}&from=realm | ?focus=${encodeURIComponent(safeId(taskId))}&from=realm | links.projects}/${encodeURIComponent,,verified
+realtime-personal-domains,sync,lib/realm-change-feed.js,"timelogs: ['operations', 'command', 'chronicle'] | leaves: ['chronicle'] | attendance: ['chronicle'] | realm_gold: ['operations', 'treasury', 'rewards', 'chronicle']",,verified
+accessible-chronicle-ui,client,components/realm/AdventurerChronicle.jsx,"role=""progressbar"" | aria-live=""polite"" | aria-label=""Adventurer Chronicle từ dữ liệu ERP cá nhân"" | Hồ sơ tự phục vụ, không phải công cụ giám sát",,verified
+resilient-chronicle-ui,client,components/realm/AdventurerChronicle.jsx,"AbortController | window.setTimeout(() => controller.abort(), 7000) | Snapshot gần nhất vẫn được giữ | Thử lại",,verified
+responsive-accessible-style,style,components/realm/adventurer-chronicle.module.css,min-height: 44px | :focus-visible | @media (max-width: 480px) | @media (prefers-reduced-motion: reduce),,verified
+chronicle-integrated-without-replacement,client,components/realm/RealmOffice.jsx,<AdventurerChronicle | Cổng nghiệp vụ ERP/CRM | Quest ↔ công việc ERP/CRM | Gold journal,,verified
+classic-personal-erp-routes-preserved,client,lib/realm-business-bridge.js,timesheet: ['Chronicle' | attendance: ['Royal Muster' | approvals: ['Council Chamber' | staff: ['Guild Roster',,verified
+no-chronicle-write-endpoint,api,app/api/realm-demo/chronicle/route.js,export async function GET | operation: 'self.read' | code: 'realm_chronicle_ready',,verified

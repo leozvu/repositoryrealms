@@ -1,0 +1,65 @@
+.page { display: grid; gap: 20px; }
+.hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.hero > div { max-width: 850px; }
+.hero h1, .sectionHead h2, .danger h2 { color: var(--fg); font-family: var(--font-display); }
+.hero h1 { font-size: clamp(1.7rem, 3vw, 2.35rem); }
+.hero p:not(.eyebrow), .sectionHead p:not(.eyebrow), .danger p:not(.eyebrow) { margin-top: 7px; color: var(--muted); font-size: .84rem; line-height: 1.65; }
+.eyebrow { margin-bottom: 5px; color: var(--warn); font-size: .7rem; font-weight: 800; letter-spacing: .11em; }
+.loading { display: grid; min-height: 180px; place-items: center; color: var(--muted); }
+.error, .restore { display: flex; align-items: flex-start; gap: 11px; padding: 14px; border-radius: var(--radius); }
+.error { border: 1px solid #efaaaa; color: #8f1d1d; background: var(--danger-soft); }
+.restore { border: 1px solid #d7b267; color: #65440f; background: var(--warn-soft); }
+.restore p { margin-top: 3px; font-size: .8rem; line-height: 1.55; }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.metrics article { display: grid; gap: 5px; min-width: 0; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow-sm); }
+.metrics span, .metrics small { color: var(--muted); font-size: .7rem; overflow-wrap: anywhere; }
+.metrics strong { font-family: var(--font-display); font-size: 1.05rem; }
+.good { color: #08704a !important; }
+.bad { color: #a32020 !important; }
+.sectionHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 18px; border-bottom: 1px solid var(--border); }
+.sectionHead > div { max-width: 760px; }
+.sectionHead h2, .danger h2 { font-size: 1.08rem; }
+.entityGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 18px; }
+.entity { display: grid; gap: 12px; min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
+.entity header { display: flex; align-items: center; gap: 10px; }
+.entity header > div:not(.monogram) { display: grid; min-width: 0; }
+.entity header strong { overflow-wrap: anywhere; font-size: .86rem; }
+.entity header span { color: var(--muted); font-size: .68rem; }
+.monogram { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 10px; color: #fff; background: var(--primary); font-weight: 800; }
+.entity dl { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--border); }
+.entity dl div { min-width: 0; padding: 9px; background: var(--card); }
+.entity dt { color: var(--muted); font-size: .65rem; }
+.entity dd { margin-top: 3px; overflow-wrap: anywhere; font-size: .73rem; font-weight: 750; }
+.separation { width: fit-content; padding: 5px 8px; border-radius: 99px; font-size: .67rem; font-weight: 750; }
+.goodBg { color: #08704a; background: var(--accent-soft); }
+.warnBg { color: #76500f; background: var(--warn-soft); }
+.actionPanel { display: grid; }
+.actionPanel > button { min-height: 44px; width: fit-content; margin: 0 18px 18px; }
+.scenarios { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin: 18px; overflow: hidden; border: 1px solid var(--border); border-radius: 9px; background: var(--border); }
+.scenarios > div { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 9px; min-height: 48px; padding: 10px; background: var(--card); }
+.scenarios span { font-size: .78rem; }
+.scenarios strong { color: var(--muted); font-size: .68rem; }
+.rotateRow { display: grid; grid-template-columns: auto 110px minmax(220px, auto); align-items: center; gap: 10px; padding: 18px; }
+.rotateRow label { font-size: .78rem; font-weight: 750; }
+.rotateRow input, .suspendForm input { min-height: 44px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; color: var(--fg); background: var(--card); }
+.rotateRow button { min-height: 44px; width: fit-content; }
+.danger { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px; border-color: #d99c9c; background: linear-gradient(120deg, var(--card), var(--danger-soft)); }
+.danger > div { max-width: 760px; }
+.danger button { min-height: 44px; flex: 0 0 auto; }
+.rawSecret, .suspendForm { display: grid; gap: 10px; }
+.rawSecret p { padding: 11px; border-radius: 8px; color: #6a470f; background: var(--warn-soft); font-size: .8rem; line-height: 1.55; }
+.rawSecret code { padding: 12px; overflow-wrap: anywhere; border: 1px solid var(--border); border-radius: 8px; background: var(--muted-bg); font-size: .8rem; }
+.rawSecret small { color: var(--muted); }
+.suspendForm p { color: var(--muted); font-size: .82rem; line-height: 1.55; }
+.suspendForm label { font-size: .76rem; font-weight: 750; }
+
+@media (max-width: 1050px) { .metrics { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 720px) {
+  .hero, .danger, .sectionHead { flex-direction: column; }
+  .hero button, .danger button { width: 100%; justify-content: center; }
+  .entityGrid, .scenarios { grid-template-columns: 1fr; }
+  .rotateRow { grid-template-columns: 1fr; }
+  .rotateRow button { width: 100%; justify-content: center; }
+}
+@media (max-width: 480px) { .metrics, .entityGrid { grid-template-columns: 1fr; } .entity dl { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .page * { transition: none !important; animation: none !important; } }

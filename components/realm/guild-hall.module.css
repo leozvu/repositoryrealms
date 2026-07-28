@@ -1,0 +1,284 @@
+.guildHall {
+  --guild-ink: #f4ead2;
+  --guild-muted: #b9b3a4;
+  --guild-border: rgba(215, 190, 126, .2);
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  color: var(--guild-ink);
+}
+
+.hero,
+.panel,
+.metric,
+.embassyLink,
+.governance,
+.stateCard {
+  border: 1px solid var(--guild-border);
+  background: linear-gradient(145deg, rgba(38, 55, 46, .96), rgba(24, 34, 30, .98));
+  box-shadow: 0 18px 48px rgba(8, 14, 11, .22);
+}
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 116px;
+  padding: 22px 24px;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+:global([data-realm-ui-art='ready']) .hero::before {
+  position: absolute;
+  inset: 4px;
+  z-index: 0;
+  pointer-events: none;
+  content: '';
+  background-image:
+    var(--realm-ui-notice-corner-tl),
+    var(--realm-ui-notice-corner-tr),
+    var(--realm-ui-notice-corner-bl),
+    var(--realm-ui-notice-corner-br);
+  background-position: left top, right top, left bottom, right bottom;
+  background-repeat: no-repeat;
+  background-size: 42px 42px;
+  opacity: .68;
+}
+
+:global([data-realm-ui-art='ready']) .hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.crest {
+  display: grid;
+  width: 54px;
+  height: 62px;
+  place-items: center;
+  color: #f1d489;
+  border: 1px solid rgba(241, 212, 137, .36);
+  border-radius: 46% 46% 52% 52%;
+  background: linear-gradient(160deg, #4e765e, #294738);
+}
+
+.eyebrow,
+.panelHead span,
+.campaignCard header span:first-child {
+  display: block;
+  color: #d8ba75;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.hero h2,
+.panelHead h3,
+.campaignCard h3 {
+  margin: 4px 0 0;
+  color: #fff8e8;
+}
+
+.hero h2 { font-size: clamp(22px, 3vw, 31px); }
+.hero p { max-width: 72ch; margin: 8px 0 0; color: var(--guild-muted); line-height: 1.55; }
+
+.sourceBadge,
+.health,
+.presence,
+.leadBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.sourceBadge { min-height: 34px; padding: 0 12px; color: #ddc583; border: 1px solid rgba(216, 186, 117, .24); background: rgba(216, 186, 117, .08); }
+.sourceLive { color: #9ce0b6; border-color: rgba(100, 196, 141, .3); background: rgba(100, 196, 141, .1); }
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  min-height: 112px;
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.metric > span { grid-row: 1 / 4; display: grid; width: 38px; height: 38px; place-items: center; color: #d8ba75; border-radius: 10px; background: rgba(216, 186, 117, .1); }
+.metric small { color: var(--guild-muted); }
+.metric strong { font-size: 24px; font-variant-numeric: tabular-nums; }
+.metric p { margin: 0; color: #999f96; font-size: 12px; line-height: 1.4; }
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(320px, .82fr) minmax(420px, 1.18fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.panel { overflow: hidden; border-radius: 16px; }
+.panelHead { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 18px 18px 14px; border-bottom: 1px solid var(--guild-border); }
+.panelHead::after {
+  position: absolute;
+  right: 18px;
+  bottom: -5px;
+  left: 18px;
+  height: 10px;
+  pointer-events: none;
+  content: '';
+  background: var(--realm-ui-panel-divider) center/100% 100% no-repeat;
+  opacity: 0;
+}
+:global([data-realm-ui-art='ready']) .panelHead::after { opacity: .58; }
+.panelHead h3 { font-size: 18px; }
+.panelHead > small { max-width: 190px; color: #9da29b; text-align: right; line-height: 1.4; }
+.roster,
+.campaigns { display: grid; gap: 8px; padding: 12px; }
+
+.memberRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 66px;
+  padding: 10px 12px;
+  color: inherit;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .025);
+}
+
+button.memberRow { cursor: pointer; transition: border-color 180ms ease, background 180ms ease; }
+button.memberRow:hover { border-color: rgba(216, 186, 117, .3); background: rgba(216, 186, 117, .06); }
+button.memberRow:focus-visible,
+.campaignCard button:focus-visible,
+.embassyLink:focus-visible,
+.stateCard button:focus-visible { outline: 3px solid rgba(241, 212, 137, .72); outline-offset: 2px; }
+
+.embassyLink {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 70px;
+  padding: 12px 16px;
+  color: inherit;
+  text-align: left;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+.embassyLink:hover { border-color: rgba(139, 177, 198, .4); background: linear-gradient(145deg, rgba(42, 57, 57, .98), rgba(28, 37, 37, .99)); }
+.embassyLink > span { display: grid; width: 42px; height: 42px; place-items: center; color: #bed1dc; border-radius: 50%; background: rgba(122, 157, 179, .12); }
+.embassyLink small { display: block; color: #b6c9d4; font-size: 10px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+.embassyLink strong { display: block; margin-top: 3px; color: #fff8e8; }
+.embassyLink p { margin: 3px 0 0; color: var(--guild-muted); line-height: 1.4; }
+.embassyLink > svg { color: #d8ba75; }
+
+.avatar { display: grid; width: 42px; height: 42px; place-items: center; color: white; font-weight: 800; border: 2px solid color-mix(in srgb, var(--guild-color) 76%, white); border-radius: 50%; background: var(--guild-color); }
+.memberIdentity { min-width: 0; }
+.memberIdentity > strong { display: flex; align-items: center; gap: 8px; }
+.memberIdentity > small { display: block; overflow: hidden; margin-top: 4px; color: var(--guild-muted); text-overflow: ellipsis; white-space: nowrap; }
+.leadBadge { padding: 3px 7px; color: #f1d489; background: rgba(216, 186, 117, .1); font-size: 10px; }
+.presence { min-height: 28px; padding: 0 9px; color: #c3c8c2; background: rgba(255, 255, 255, .05); }
+.presence i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.presence_ready { color: #92d9ae; }
+.presence_busy { color: #efc270; }
+.presence_focus { color: #b9a6f5; }
+.presence_dnd { color: #ee9297; }
+.presence_quiet { color: #a5aaa6; }
+.questCount { display: grid; min-width: 48px; text-align: right; }
+.questCount b { font-variant-numeric: tabular-nums; }
+.questCount small { color: #999f96; font-size: 10px; }
+
+.campaignCard { padding: 15px; border: 1px solid rgba(255, 255, 255, .07); border-radius: 13px; background: rgba(255, 255, 255, .025); }
+.campaignCard header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.campaignCard h3 { font-size: 16px; }
+.campaignCard > p { margin: 8px 0 14px; color: var(--guild-muted); font-size: 13px; line-height: 1.45; }
+.health { min-height: 28px; flex: 0 0 auto; padding: 0 9px; }
+.health_stable,
+.health_completed { color: #9ce0b6; background: rgba(100, 196, 141, .1); }
+.health_attention { color: #f1c97b; background: rgba(231, 173, 88, .11); }
+.health_critical { color: #f29a9f; background: rgba(220, 107, 114, .12); }
+.progressLabel { display: flex; justify-content: space-between; gap: 10px; color: #aeb4ad; font-size: 12px; }
+.progressLabel strong { color: #f1d489; font-variant-numeric: tabular-nums; }
+.progress { overflow: hidden; height: 7px; margin-top: 7px; border-radius: 99px; background: rgba(255, 255, 255, .07); }
+.progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #648e70, #d0ac61); }
+.campaignCard footer { display: flex; align-items: center; gap: 14px; margin-top: 12px; color: #9fa59f; font-size: 12px; }
+.campaignCard footer b { color: #eee7d7; font-variant-numeric: tabular-nums; }
+.campaignCard button,
+.stateCard button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 6px; margin-left: auto; padding: 0 12px; color: #f4dfac; border: 1px solid rgba(216, 186, 117, .25); border-radius: 10px; background: rgba(216, 186, 117, .08); cursor: pointer; }
+
+.governance,
+.stateCard { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 14px; }
+.governance > svg,
+.stateCard > svg { flex: 0 0 auto; color: #d8ba75; }
+.governance strong,
+.stateCard strong { color: #fff8e8; }
+.governance p,
+.stateCard p { margin: 4px 0 0; color: var(--guild-muted); line-height: 1.5; }
+.empty { margin: 0; padding: 24px 16px; color: var(--guild-muted); text-align: center; }
+
+.compact { gap: 14px; }
+.compact .hero { min-height: auto; grid-template-columns: minmax(0, 1fr); align-items: start; padding: 16px; }
+.compact .crest { width: 46px; height: 52px; }
+.compact .hero > div { min-width: 0; }
+.compact .hero h2 { font-size: 1.26rem; overflow-wrap: anywhere; }
+.compact .sourceBadge { max-width: 100%; justify-self: start; white-space: normal; overflow-wrap: anywhere; }
+.compact .hero p { display: none; }
+.compact .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.compact .metric { min-height: 88px; padding: 12px; }
+.compact .metric strong { font-size: 20px; }
+.compact .columns { grid-template-columns: 1fr; }
+
+@container realm-inspector (max-width: 310px) {
+  .compact .metrics { grid-template-columns: 1fr; }
+  .compact .panelHead { align-items: flex-start; flex-direction: column; }
+  .compact .panelHead > small { max-width: none; text-align: left; }
+}
+
+@media (max-width: 980px) {
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .columns { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .guildHall { gap: 12px; }
+  .hero { grid-template-columns: auto minmax(0, 1fr); padding: 16px; }
+  .hero .sourceBadge { grid-column: 1 / -1; }
+  .crest { width: 46px; height: 52px; }
+  .metrics,
+  .compact .metrics { grid-template-columns: 1fr; }
+  .metric { min-height: 86px; }
+  .panelHead { align-items: flex-start; flex-direction: column; }
+  .panelHead > small { max-width: none; text-align: left; }
+  .memberRow { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .presence { grid-column: 2 / -1; grid-row: 2; justify-self: start; }
+  .questCount { grid-column: 3; grid-row: 1; }
+  .campaignCard header { align-items: flex-start; flex-direction: column; }
+  .campaignCard footer { align-items: flex-start; flex-wrap: wrap; }
+  .campaignCard button { width: 100%; margin-left: 0; }
+  .embassyLink { min-height: 76px; padding: 12px; }
+  .embassyLink p { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.memberRow,
+  .embassyLink { transition: none; }
+}

@@ -1,0 +1,13 @@
+id,layer,source,signals,missingSignals,status
+audience-schema,database,prisma/schema.prisma,"audienceUserId String? | @@index([audienceUserId, createdAt, id])",,verified
+additive-audience-migration,database,prisma/migrations/20260718193000_add_realm_change_audience/migration.sql,"ADD COLUMN ""audienceUserId"" TEXT | RealmChangeEvent_audienceUserId_createdAt_id_idx",,verified
+session-audience-filter,server,lib/realm-change-feed.js,"{ audienceUserId: user.id } | where: { AND: [audience, afterCursor] }",,verified
+payload-free-audience-feed,server,lib/realm-change-feed.js,"select: { id: true, createdAt: true, domains: true } | domains: [...domainSet].sort()",,verified
+notification-create-wakeup,server,lib/events.js,"resource: 'notifications', action: 'create', audienceUserId",,verified
+notification-read-wakeup,api,app/api/notifications/route.js,"resource: 'notifications' | audienceUserId: user.id | 'Cache-Control': 'private, no-cache, no-store, max-age=0'",,verified
+collaboration-target-wakeup,server,lib/collaboration-admin.js,"resource: 'collaboration', action: 'request' | audienceUserId: targetId",,verified
+message-recipient-wakeup,api,app/api/chat/[id]/route.js,"resource: 'messages', action: 'create' | audienceUserId",,verified
+erp-live-counters,client,components/Shell.jsx,handleShellChanges | loadShellCounters | domains.has(domain),,verified
+realm-raven-inbox,client,components/realm/RealmNotificationBell.jsx,Raven Inbox | fetch('/api/notifications' | dataRevision,,verified
+single-browser-event,client,components/realm/useRealmChangeFeed.js,REALM_CHANGE_BROWSER_EVENT | window.dispatchEvent(new CustomEvent,,verified
+instant-contact-refresh,client,components/collaboration/CollaborationBridge.jsx,REALM_CHANGE_BROWSER_EVENT | includes('collaboration') | loadContacts(),,verified
