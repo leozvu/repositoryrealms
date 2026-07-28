@@ -90,3 +90,27 @@ test('audit log line carries required fields and ZERO PII', async () => {
   // fingerprint must not be the raw key
   assert.ok(!lines[0].includes(KEY));
 });
+
+test('data-source failure fails closed with one payload-free 500 audit event', async () => {
+  _resetRateLimit();
+  const secretDetail = 'postgresql://admin:secret@private-db/egoric';
+  const lines = [];
+  const r = await handleSnapshot(req(), base({
+    loadLeads: async () => { throw new Error(secretDetail); },
+    log: message => lines.push(message),
+  }));
+
+  assert.equal(r.status, 500);
+  assert.deepEqual(r.body, { error: 'snapshot unavailable' });
+  assert.equal(r.headers['Cache-Control'], 'private, no-store');
+  assert.equal(r.headers['X-Correlation-ID'], 'gen-uuid-1');
+  assert.equal(lines.length, 1);
+
+  const entry = JSON.parse(lines[0]);
+  assert.equal(entry.status, 500);
+  assert.equal(entry.key_fingerprint, HASH.slice(0, 8));
+  assert.equal(entry.record_count, null);
+  assert.equal(entry.snapshot_id, null);
+  assert.ok(!lines[0].includes(secretDetail));
+  assert.ok(!JSON.stringify(r).includes(secretDetail));
+});

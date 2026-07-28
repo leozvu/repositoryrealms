@@ -46,7 +46,9 @@ curl -s http://localhost:3300/api/integrations/leozops/v1/lead-snapshot \
 - **60 req/hour per key** rate limit (429 + `Retry-After`). In-memory, so the
   limit is **per serverless instance**, not globally shared — best-effort.
 - One structured JSON audit line per request (correlation id, key fingerprint,
-  path, status, latency, record count, snapshot id) — zero PII.
+  path, status, latency, record count, snapshot id) — zero PII. Data-source
+  failures fail closed with a generic `500` response and the same audit shape;
+  the underlying database error is never returned or logged.
 
 ## Scope of the bearer key
 
