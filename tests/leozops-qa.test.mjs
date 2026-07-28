@@ -72,7 +72,7 @@ test('deterministic ETag + 304 flow', async () => {
 
 test('method denial -> 405', async () => {
   _resetRateLimit();
-  for (const m of ['POST', 'PUT', 'PATCH', 'DELETE']) {
+  for (const m of ['POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']) {
     assert.equal((await handleSnapshot(req(m, 'Bearer ' + KEY), base())).status, 405);
   }
 });

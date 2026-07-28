@@ -5,7 +5,9 @@
 //   app/api/v1/summary/route.js            (GET)
 //   app/api/v1/[resource]/route.js         (GET, POST)
 //   app/api/v1/[resource]/[id]/route.js    (GET, PUT, DELETE)
-// plus their sole real auth entry point, apiUser() in lib/apiauth.js.
+//   app/api/data/[resource]/route.js        (GET, POST)
+//   app/api/data/[resource]/[id]/route.js   (PUT, DELETE)
+// plus their real auth entry points: apiUser() and currentUser().
 //
 // How it runs prisma-free: a test-scoped ESM loader (helpers/leozops-esm-loader.mjs)
 // resolves the '@/' alias to the repo root and stubs ONLY the two npm packages
@@ -33,6 +35,9 @@ const { apiUser } = await import('../lib/apiauth.js');
 const summaryRoute = await import('../app/api/v1/summary/route.js');
 const collectionRoute = await import('../app/api/v1/[resource]/route.js');
 const itemRoute = await import('../app/api/v1/[resource]/[id]/route.js');
+const dataCollectionRoute = await import('../app/api/data/[resource]/route.js');
+const dataItemRoute = await import('../app/api/data/[resource]/[id]/route.js');
+const snapshotRoute = await import('../app/api/integrations/leozops/v1/lead-snapshot/route.js');
 
 const LEOZOPS_KEY = 'lozk_live_g1_denial_matrix_key';
 const KEY_HASH = crypto.createHash('sha256').update(LEOZOPS_KEY).digest('hex');
@@ -44,8 +49,9 @@ process.env.LEOZOPS_READ_KEY_HASH = KEY_HASH;
 
 // A request carrying the LEOZOPS key. req.json THROWS: if any handler ever
 // reads the body, the test fails loudly — business logic must never run.
-const leozReq = () => ({
-  method: 'GET',
+const leozReq = (method = 'GET') => ({
+  method,
+  url: 'https://erp-egoric.vercel.app/api/data/leads',
   headers: { get: n => (n.toLowerCase() === 'authorization' ? 'Bearer ' + LEOZOPS_KEY : null) },
   json: async () => { throw new Error('business handler executed: request body was read'); },
 });
@@ -112,6 +118,51 @@ test('PATCH: no generic route exports a PATCH handler — nothing exists to exec
   assert.equal(summaryRoute.PATCH, undefined);
   assert.equal(collectionRoute.PATCH, undefined);
   assert.equal(itemRoute.PATCH, undefined);
+});
+
+function assertSessionDenial(res, label) {
+  assert.equal(res.status, 401, `${label}: a service bearer key is not a NextAuth employee session`);
+  assert.equal(prismaOps.length, 0, `${label}: denial must happen before operational DB access`);
+}
+
+test('GET /api/data/<resource> with LEOZOPS key -> 401 at real currentUser boundary', async () => {
+  _resetPrismaOps();
+  const res = await dataCollectionRoute.GET(leozReq('GET'), { params: { resource: 'leads' } });
+  assertSessionDenial(res, 'data collection GET');
+});
+
+test('POST /api/data/<resource> with LEOZOPS key -> 401, body never read', async () => {
+  _resetPrismaOps();
+  const res = await dataCollectionRoute.POST(leozReq('POST'), { params: { resource: 'leads' } });
+  assertSessionDenial(res, 'data collection POST');
+});
+
+test('PUT /api/data/<resource>/<id> with LEOZOPS key -> 401, body never read', async () => {
+  _resetPrismaOps();
+  const res = await dataItemRoute.PUT(leozReq('PUT'), { params: { resource: 'leads', id: 'lead-1' } });
+  assertSessionDenial(res, 'data item PUT');
+});
+
+test('DELETE /api/data/<resource>/<id> with LEOZOPS key -> 401', async () => {
+  _resetPrismaOps();
+  const res = await dataItemRoute.DELETE(leozReq('DELETE'), { params: { resource: 'leads', id: 'lead-1' } });
+  assertSessionDenial(res, 'data item DELETE');
+});
+
+test('PATCH /api/data has no handler and cannot execute', () => {
+  assert.equal(dataCollectionRoute.PATCH, undefined);
+  assert.equal(dataItemRoute.PATCH, undefined);
+});
+
+test('actual snapshot route adapter exports every non-GET method and returns 405', async () => {
+  for (const method of ['POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']) {
+    const handler = snapshotRoute[method];
+    assert.equal(typeof handler, 'function', `${method}: explicit export required`);
+    const request = leozReq(method);
+    request.url = 'https://erp-egoric.vercel.app/api/integrations/leozops/v1/lead-snapshot';
+    const res = await handler(request);
+    assert.equal(res.status, 405, `${method}: snapshot route must be GET-only`);
+  }
 });
 
 test('reverse direction: an app-style ApiKey (ak_...) never validates on the snapshot route', () => {

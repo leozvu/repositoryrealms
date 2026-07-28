@@ -23,6 +23,30 @@ test('projectLead yields ONLY the 7 allowlisted keys even with PII present', () 
   // owner_assigned is a boolean derived from presence, never the id
   assert.equal(out.owner_assigned, true);
   assert.equal(projectLead(rawLeads[1]).owner_assigned, false);
+  assert.equal(out.created_at, '2026-01-02');
+  assert.equal(out.expected_close_at, '2026-03-01');
+});
+
+test('Date timestamp inputs are normalized and included in snapshot_id', () => {
+  const base = [{
+    id: 'date-lead', source: 'direct', value: 1, stage: 'new', ownerId: null,
+    createdAt: new Date('2026-01-01T00:00:00.000Z'), expectedClose: null,
+  }];
+  const changed = [{ ...base[0], createdAt: new Date('2026-01-02T00:00:00.000Z') }];
+  const a = buildSnapshot(base, { generatedAt: '2026-07-18T00:00:00Z' });
+  const b = buildSnapshot(changed, { generatedAt: '2026-07-18T00:00:00Z' });
+
+  assert.equal(a.leads[0].created_at, '2026-01-01T00:00:00.000Z');
+  assert.equal(b.leads[0].created_at, '2026-01-02T00:00:00.000Z');
+  assert.notEqual(a.snapshot_id, b.snapshot_id, 'timestamp fact changes must change the content hash');
+});
+
+test('current string timestamp facts are preserved and included in snapshot_id', () => {
+  const a = buildSnapshot([rawLeads[0]], { generatedAt: '2026-07-18T00:00:00Z' });
+  const b = buildSnapshot([{ ...rawLeads[0], createdAt: '2026-01-03' }], { generatedAt: '2026-07-18T00:00:00Z' });
+  assert.equal(a.leads[0].created_at, '2026-01-02');
+  assert.equal(b.leads[0].created_at, '2026-01-03');
+  assert.notEqual(a.snapshot_id, b.snapshot_id);
 });
 
 test('full snapshot contains no PII keys anywhere in the tree', () => {

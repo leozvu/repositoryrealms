@@ -54,8 +54,8 @@ test('flag on + valid key -> 200 with T1 payload', async () => {
   assert.ok(r.body.snapshot_id.startsWith('sha256:'));
 });
 
-test('non-GET methods -> 405 when flag on', async () => {
-  for (const m of ['POST', 'PUT', 'PATCH', 'DELETE']) {
+test('all non-GET methods -> 405 when flag on', async () => {
+  for (const m of ['POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']) {
     const r = await handleSnapshot(req(m, 'Bearer ' + KEY), opts());
     assert.equal(r.status, 405, `${m} should be 405`);
     assert.equal(r.headers.Allow, 'GET');

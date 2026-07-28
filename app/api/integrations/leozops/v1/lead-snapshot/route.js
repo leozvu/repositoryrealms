@@ -46,3 +46,7 @@ export const POST = run;
 export const PUT = run;
 export const PATCH = run;
 export const DELETE = run;
+// Export these explicitly so framework-generated HEAD/OPTIONS behavior cannot
+// bypass the handler's GET-only contract.
+export const HEAD = run;
+export const OPTIONS = run;

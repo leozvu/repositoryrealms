@@ -16,7 +16,7 @@ const req = (extra = {}) => {
   const h = { authorization: 'Bearer ' + KEY, ...extra };
   return { method: 'GET', url: 'https://erp-egoric.vercel.app/api/integrations/leozops/v1/lead-snapshot', headers: { get: n => h[n.toLowerCase()] ?? null } };
 };
-const base = over => ({ env: ON, loadLeads, now: () => 0, uuid: () => 'gen-uuid-1', ...over });
+const base = over => ({ env: ON, loadLeads, now: () => 0, uuid: () => 'gen-uuid-1', log: () => {}, ...over });
 
 test('200 sets ETag to QUOTED snapshot_id and Cache-Control: private, no-cache', async () => {
   _resetRateLimit();
@@ -93,7 +93,7 @@ test('audit log line carries required fields and ZERO PII', async () => {
 
 test('data-source failure fails closed with one payload-free 500 audit event', async () => {
   _resetRateLimit();
-  const secretDetail = 'postgresql://admin:secret@private-db/egoric';
+  const secretDetail = 'sensitive-db-error-marker';
   const lines = [];
   const r = await handleSnapshot(req(), base({
     loadLeads: async () => { throw new Error(secretDetail); },
@@ -113,4 +113,24 @@ test('data-source failure fails closed with one payload-free 500 audit event', a
   assert.equal(entry.snapshot_id, null);
   assert.ok(!lines[0].includes(secretDetail));
   assert.ok(!JSON.stringify(r).includes(secretDetail));
+});
+
+test('invalid projected source facts fail closed without leaking details', async () => {
+  _resetRateLimit();
+  const lines = [];
+  const r = await handleSnapshot(req(), base({
+    loadLeads: async () => [{
+      id: 'bad-date', source: 'direct', value: 1, stage: 'new', ownerId: null,
+      createdAt: new Date(Number.NaN), expectedClose: null,
+    }],
+    log: message => lines.push(message),
+  }));
+
+  assert.equal(r.status, 500);
+  assert.deepEqual(r.body, { error: 'snapshot unavailable' });
+  assert.equal(r.headers['Cache-Control'], 'private, no-store');
+  assert.equal(lines.length, 1);
+  assert.equal(JSON.parse(lines[0]).status, 500);
+  assert.ok(!JSON.stringify(r).includes('invalid source timestamp'));
+  assert.ok(!lines[0].includes('invalid source timestamp'));
 });
