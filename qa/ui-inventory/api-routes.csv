@@ -77,6 +77,7 @@
 "/api/import","app/api/import/route.js","false","POST","unreviewed"
 "/api/import/bulk","app/api/import/bulk/route.js","false","POST","unreviewed"
 "/api/insights","app/api/insights/route.js","false","GET","unreviewed"
+"/api/integrations/leozops/v1/lead-snapshot","app/api/integrations/leozops/v1/lead-snapshot/route.js","false","GET | POST | PUT | PATCH | DELETE | HEAD | OPTIONS","unreviewed"
 "/api/invoices/[id]/pay","app/api/invoices/[id]/pay/route.js","true","POST","unreviewed"
 "/api/invoices/from-hours","app/api/invoices/from-hours/route.js","false","GET | POST","unreviewed"
 "/api/lead-intake","app/api/lead-intake/route.js","false","GET | POST","unreviewed"

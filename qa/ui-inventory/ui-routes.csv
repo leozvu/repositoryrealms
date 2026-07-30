@@ -49,6 +49,8 @@
 "/quotes","app/(app)/quotes/page.jsx","false","authenticated","true","Báo giá","CRM — Bán hàng","DIRECTOR | AM | PM | ACCOUNTANT","sales","clients | invoices | projects | quotes | services","POST `/api/quotes/${q.id}/convert`","","unreviewed"
 "/realm","app/(app)/realm/page.jsx","false","authenticated","true","Văn phòng Realm","Realm — Trải nghiệm","DIRECTOR | PM | AM | ACCOUNTANT | HR | LEAD | STAFF","","","","","unreviewed"
 "/realm-demo","app/realm-demo/page.jsx","false","public","false","","","","","","","","unreviewed"
+"/realm-v2/[[...area]]","app/realm-v2/[[...area]]/page.jsx","true","unverified","false","","","","","","","","unreviewed"
+"/realm-v2/design-system","app/realm-v2/design-system/page.jsx","false","unverified","false","","","","","","","","unreviewed"
 "/recruitment","app/(app)/recruitment/page.jsx","false","authenticated","true","Tuyển dụng","Nhân sự","DIRECTOR | HR","recruitment","candidates | onboardings","","","unreviewed"
 "/reports","app/(app)/reports/page.jsx","false","authenticated","true","Báo cáo","Công ty","DIRECTOR | ACCOUNTANT | PM","","clients | invoices | leads | projects | timelogs | transactions | users","GET '/api/settings' | GET '/api/insights'","","unreviewed"
 "/resources","app/(app)/resources/page.jsx","false","authenticated","true","Nguồn lực","Vận hành","DIRECTOR | PM | HR | LEAD","delivery","leaves | projects | tasks | timelogs | users","","","unreviewed"
