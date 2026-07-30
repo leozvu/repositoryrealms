@@ -1,6 +1,6 @@
 # LeozOps → Egoric integration
 
-Status: Sprint 1A merged; Sprints 1B–1D implemented on isolated feature branches.
+Status: Sprints 1A–1J implemented; Sprints 1E–1J remain isolated on `codex/leozops-s1e-s1j` until review and merge.
 
 LeozOps has two read-only CRM surfaces and one proposal-recording surface. All are disabled by default and each uses a separate credential.
 
@@ -11,6 +11,10 @@ LeozOps has two read-only CRM surfaces and one proposal-recording surface. All a
 | Action Proposals | `GET, POST /api/integrations/leozops/v1/action-proposals` | Persist evidence-bound review metadata; never execute work |
 | Human Review Inbox | `GET /api/leozops/action-proposals` | Director-session inbox for explicit solo review |
 | Human Review Decision | `POST /api/leozops/action-proposals/:id/review` | Append accept/reject attention metadata; never approve or execute |
+| Command Inbox / Dry-run | `GET, POST /api/leozops/command-intents` | List capability state or prepare an evidence-bound intent |
+| Explicit Confirmation | `POST /api/leozops/command-intents/:id/confirm` | Confirm one prepared intent and enqueue durable work |
+| Runtime Control | `GET, POST /api/leozops/runtime` | Director kill switch, activation, limit and circuit reset |
+| Job Runner | `POST /api/leozops/jobs/run` or cron-authenticated `GET` | Execute/reconcile due jobs through RepositoryRealms |
 
 ## Default-off configuration
 
@@ -25,6 +29,14 @@ This code ships with every business deployment. A route exists only where its op
 | `LEOZOPS_PROPOSAL_ENABLED` | `true` enables action proposals; anything else returns 404 |
 | `LEOZOPS_PROPOSAL_WRITE_KEY_HASH` | Proposal-only write/list bearer-key hash |
 | `LEOZOPS_REVIEW_ENABLED` | `true` enables the internal Director review inbox; anything else returns 404 |
+| `LEOZOPS_COMMAND_ENABLED` | `true` exposes the Director-session command surfaces; anything else returns 404 |
+| `LEOZOPS_EXECUTION_ENABLED` | Separate deployment gate required before runtime activation or execution |
+| `LEOZOPS_CONFIRMATION_SECRET` | Server-only HMAC secret (at least 32 characters) for one-intent confirmation tokens |
+| `LEOZOPS_CAP_FOLLOWUP_ENABLED` | Enables only `lead.followup.create` preparation/execution |
+| `LEOZOPS_CAP_EXPECTED_CLOSE_ENABLED` | Enables only `lead.expected_close.update` preparation/execution |
+| `LEOZOPS_CAP_SOURCE_ENABLED` | Enables only `lead.source.update` preparation/execution |
+| `LEOZOPS_CAP_LEAD_TRANSITION_ENABLED` | Reserved default-off transition capability; not bound to current proposals |
+| `LEOZOPS_CRON_SECRET` | Separate server-only credential for the GET job runner |
 
 All three raw keys must be different. None creates a session, maps to an `ApiKey` database row or grants access to normal application APIs.
 
@@ -189,6 +201,42 @@ Even after an accepted review, the proposal response remains explicit:
 
 Deploy migration `20260729210000_add_leozops_proposal_reviews` before enabling `LEOZOPS_REVIEW_ENABLED`.
 
+## Sprints 1E–1J — Safe command plane
+
+These sprints add bounded action capability without turning a reviewed proposal into an automatic approval. The authority sequence is deliberately split:
+
+```text
+accepted current review
+  → capability-bound dry-run (prepared)
+  → explicit per-intent confirmation (confirmed)
+  → durable leased job
+  → RepositoryRealms authorization + CAS/idempotency
+  → canonical RealmActionReceipt
+  → success reconciliation
+```
+
+- **1E — Capability registry:** a proposal can only offer an allowlisted action explicitly bound to its action type. Assignment and funnel-repair proposals remain unsupported.
+- **1F — Intent and dry-run:** the server revalidates the current Brief, review hash, evidence membership and current non-PII Lead projection. Preparation stores before/after facts but performs no business mutation.
+- **1G — First executor:** aging-lead proposals may create one allowlisted follow-up activity through `lead.followup.create`.
+- **1H — Guarded mutations:** expected-close and source updates use expected-value compare-and-swap actions registered in RepositoryRealms. No direct LeoZOps Lead update exists.
+- **1I — Receipt/reconciliation:** a job is successful only when a matching `RealmActionReceipt` exists for actor, action, target and repository idempotency key. Retry discovery reconciles an existing receipt before dispatch.
+- **1J — Runtime controls:** persistent shared quotas, per-day action budget, durable job lease, bounded exponential retry/dead-letter, circuit breaker, deployment gate and DB kill switch.
+
+All command HTTP surfaces require a normal active `DIRECTOR` session. Proposal bearer credentials never cross this boundary. Confirmation tokens are stored only as hashes; raw tokens exist only in the prepare response. Stored intents contain action facts and pseudonymous Lead refs, not Lead name, company, email, phone or notes.
+
+Execution is fail-closed unless every relevant gate is open:
+
+1. `LEOZOPS_COMMAND_ENABLED=true` exposes the command plane;
+2. the specific capability flag is `true`;
+3. `LEOZOPS_EXECUTION_ENABLED=true` permits activation;
+4. the singleton runtime record exists, execution is enabled and its kill switch is off;
+5. the circuit is closed (or one cooldown probe enters half-open);
+6. the persistent daily budget permits the command.
+
+Deploy migration `20260729230000_add_leozops_command_control` before enabling the command flag. The migration intentionally does not seed an active runtime row: a missing row means stopped. Activate from the Director UI only after staging verification. `kill` always wins and can be issued regardless of the deployment execution flag.
+
+The cron route accepts `Authorization: Bearer $LEOZOPS_CRON_SECRET`; this secret must be at least 32 characters and distinct from snapshot, brief, proposal and confirmation credentials. The session-authenticated POST runner is for manual recovery/verification only.
+
 ### Honest limitations
 
 The current Lead schema has no transition or last-activity history. The brief therefore returns `null` for conversion rate and stage velocity, and states that last-activity data and client attribution are unavailable. The aging signal is based on creation age and always requires human review.
@@ -225,6 +273,13 @@ LEOZOPS_BRIEF_READ_KEY_HASH=<different-brief-key-sha256>
 LEOZOPS_PROPOSAL_ENABLED=true
 LEOZOPS_PROPOSAL_WRITE_KEY_HASH=<third-proposal-key-sha256>
 LEOZOPS_REVIEW_ENABLED=true
+LEOZOPS_COMMAND_ENABLED=true
+LEOZOPS_EXECUTION_ENABLED=true
+LEOZOPS_CONFIRMATION_SECRET=<server-secret-at-least-32-characters>
+LEOZOPS_CAP_FOLLOWUP_ENABLED=true
+LEOZOPS_CAP_EXPECTED_CLOSE_ENABLED=true
+LEOZOPS_CAP_SOURCE_ENABLED=true
+LEOZOPS_CRON_SECRET=<different-server-secret-at-least-32-characters>
 
 npm run dev
 
@@ -253,4 +308,4 @@ npm run test:leozops
 
 ## Next authority boundary
 
-Sprint 1D ends at an explicit solo review record. A future command-design sprint must remain a separate capability with a new authority boundary, action-specific confirmation, idempotency, live preconditions and a canonical receipt. Review acceptance must never silently become approval or execution, and the proposal bearer credential must never gain business-record mutation authority.
+Sprints 1E–1J stop at narrow Director-confirmed CRM commands. Future capabilities must register a RepositoryRealms action first, define action-specific live preconditions, idempotency and receipt reconciliation, then receive a separate proposal binding and deployment flag. Review acceptance must never silently become confirmation or execution, and proposal bearer credentials must never gain business-record mutation authority.

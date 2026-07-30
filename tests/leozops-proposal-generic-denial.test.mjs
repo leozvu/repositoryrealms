@@ -15,6 +15,10 @@ const dataCollectionRoute = await import('../app/api/data/[resource]/route.js');
 const proposalRoute = await import('../app/api/integrations/leozops/v1/action-proposals/route.js');
 const humanReviewInboxRoute = await import('../app/api/leozops/action-proposals/route.js');
 const humanReviewDecisionRoute = await import('../app/api/leozops/action-proposals/[id]/review/route.js');
+const commandInboxRoute = await import('../app/api/leozops/command-intents/route.js');
+const commandConfirmRoute = await import('../app/api/leozops/command-intents/[id]/confirm/route.js');
+const commandRuntimeRoute = await import('../app/api/leozops/runtime/route.js');
+const commandJobsRoute = await import('../app/api/leozops/jobs/run/route.js');
 
 const KEY = 'lozk_live_proposal_denial_matrix_key';
 const HASH = crypto.createHash('sha256').update(KEY).digest('hex');
@@ -22,6 +26,8 @@ const HASH = crypto.createHash('sha256').update(KEY).digest('hex');
 process.env.LEOZOPS_PROPOSAL_ENABLED = 'true';
 process.env.LEOZOPS_PROPOSAL_WRITE_KEY_HASH = HASH;
 process.env.LEOZOPS_REVIEW_ENABLED = 'true';
+process.env.LEOZOPS_COMMAND_ENABLED = 'true';
+process.env.LEOZOPS_CRON_SECRET = 'cron-secret-that-is-distinct-and-long-enough';
 
 const request = (method = 'GET', url = 'https://erp-egoric.vercel.app/api/v1/summary', key = KEY) => ({
   method,
@@ -109,4 +115,26 @@ test('proposal bearer credential cannot become a Director review session', async
   ), { params: { id: 'proposal_1' } });
   assert.equal(decision.status, 401);
   assert.equal(prismaOps.length, 0, 'session denial must happen before body or storage access');
+});
+
+test('proposal bearer credential cannot become a Director command session or cron credential', async () => {
+  const sessionCalls = [
+    ['inbox', () => commandInboxRoute.GET(request('GET', 'https://erp-egoric.vercel.app/api/leozops/command-intents'))],
+    ['confirmation', () => commandConfirmRoute.POST(
+      request('POST', 'https://erp-egoric.vercel.app/api/leozops/command-intents/intent_1/confirm'),
+      { params: Promise.resolve({ id: 'intent_1' }) },
+    )],
+    ['runtime', () => commandRuntimeRoute.GET(request('GET', 'https://erp-egoric.vercel.app/api/leozops/runtime'))],
+    ['manual jobs', () => commandJobsRoute.POST(request('POST', 'https://erp-egoric.vercel.app/api/leozops/jobs/run'))],
+  ];
+  for (const [label, call] of sessionCalls) {
+    _resetPrismaOps();
+    const response = await call();
+    assert.equal(response.status, 401, label);
+    assert.equal(prismaOps.length, 0, `${label}: session denial must precede command storage access`);
+  }
+  _resetPrismaOps();
+  const cron = await commandJobsRoute.GET(request('GET', 'https://erp-egoric.vercel.app/api/leozops/jobs/run'));
+  assert.equal(cron.status, 401);
+  assert.equal(prismaOps.length, 0, 'cron denial must precede job storage access');
 });
