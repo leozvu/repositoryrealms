@@ -1,5 +1,5 @@
 export function createProposalDb() {
-  const state = { proposals: [], audits: [], sequence: 0 };
+  const state = { proposals: [], reviews: [], audits: [], sequence: 0, reviewSequence: 0 };
 
   const model = {
     async findUnique({ where }) {
@@ -18,7 +18,7 @@ export function createProposalDb() {
       state.proposals.push(row);
       return row;
     },
-    async findMany({ where, orderBy, take }) {
+    async findMany({ where = {}, orderBy, take }) {
       let rows = state.proposals.filter(row =>
         Object.entries(where).every(([field, value]) => row[field] === value));
       if (orderBy?.createdAt === 'desc') {
@@ -36,19 +36,47 @@ export function createProposalDb() {
     },
   };
 
+  const reviewModel = {
+    async findUnique({ where }) {
+      const [field, value] = Object.entries(where)[0] || [];
+      return state.reviews.find(row => row[field] === value) || null;
+    },
+    async create({ data }) {
+      const duplicate = state.reviews.some(row =>
+        row.proposalId === data.proposalId || row.correlationId === data.correlationId);
+      if (duplicate) {
+        const error = new Error('unique constraint');
+        error.code = 'P2002';
+        throw error;
+      }
+      const row = { id: `review_${++state.reviewSequence}`, ...data };
+      state.reviews.push(row);
+      return row;
+    },
+    async findMany({ where } = {}) {
+      const ids = where?.proposalId?.in;
+      return ids ? state.reviews.filter(row => ids.includes(row.proposalId)) : [...state.reviews];
+    },
+  };
+
   const db = {
     leozOpsActionProposal: model,
+    leozOpsProposalReview: reviewModel,
     auditLog,
     async $transaction(work) {
       const proposals = state.proposals.map(row => ({ ...row }));
+      const reviews = state.reviews.map(row => ({ ...row }));
       const audits = state.audits.map(row => ({ ...row }));
       const sequence = state.sequence;
+      const reviewSequence = state.reviewSequence;
       try {
-        return await work({ leozOpsActionProposal: model, auditLog });
+        return await work({ leozOpsActionProposal: model, leozOpsProposalReview: reviewModel, auditLog });
       } catch (error) {
         state.proposals.splice(0, state.proposals.length, ...proposals);
+        state.reviews.splice(0, state.reviews.length, ...reviews);
         state.audits.splice(0, state.audits.length, ...audits);
         state.sequence = sequence;
+        state.reviewSequence = reviewSequence;
         throw error;
       }
     },

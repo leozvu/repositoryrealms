@@ -13,12 +13,15 @@ const summaryRoute = await import('../app/api/v1/summary/route.js');
 const collectionRoute = await import('../app/api/v1/[resource]/route.js');
 const dataCollectionRoute = await import('../app/api/data/[resource]/route.js');
 const proposalRoute = await import('../app/api/integrations/leozops/v1/action-proposals/route.js');
+const humanReviewInboxRoute = await import('../app/api/leozops/action-proposals/route.js');
+const humanReviewDecisionRoute = await import('../app/api/leozops/action-proposals/[id]/review/route.js');
 
 const KEY = 'lozk_live_proposal_denial_matrix_key';
 const HASH = crypto.createHash('sha256').update(KEY).digest('hex');
 
 process.env.LEOZOPS_PROPOSAL_ENABLED = 'true';
 process.env.LEOZOPS_PROPOSAL_WRITE_KEY_HASH = HASH;
+process.env.LEOZOPS_REVIEW_ENABLED = 'true';
 
 const request = (method = 'GET', url = 'https://erp-egoric.vercel.app/api/v1/summary', key = KEY) => ({
   method,
@@ -88,4 +91,22 @@ test('actual proposal route denies read credentials and explicitly exports forbi
     ));
     assert.equal(response.status, 405, method);
   }
+});
+
+test('proposal bearer credential cannot become a Director review session', async () => {
+  _resetPrismaOps();
+  const inbox = await humanReviewInboxRoute.GET(request(
+    'GET',
+    'https://erp-egoric.vercel.app/api/leozops/action-proposals',
+  ));
+  assert.equal(inbox.status, 401);
+  assert.equal(prismaOps.length, 0, 'session denial must happen before proposal storage access');
+
+  _resetPrismaOps();
+  const decision = await humanReviewDecisionRoute.POST(request(
+    'POST',
+    'https://erp-egoric.vercel.app/api/leozops/action-proposals/proposal_1/review',
+  ), { params: { id: 'proposal_1' } });
+  assert.equal(decision.status, 401);
+  assert.equal(prismaOps.length, 0, 'session denial must happen before body or storage access');
 });

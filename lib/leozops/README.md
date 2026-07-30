@@ -1,6 +1,6 @@
 # LeozOps → Egoric integration
 
-Status: Sprint 1A merged; Sprint 1B and Sprint 1C implemented on isolated feature branches.
+Status: Sprint 1A merged; Sprints 1B–1D implemented on isolated feature branches.
 
 LeozOps has two read-only CRM surfaces and one proposal-recording surface. All are disabled by default and each uses a separate credential.
 
@@ -9,6 +9,8 @@ LeozOps has two read-only CRM surfaces and one proposal-recording surface. All a
 | Lead Snapshot | `GET /api/integrations/leozops/v1/lead-snapshot` | Stable allowlisted funnel facts |
 | Lead Operations Brief | `GET /api/integrations/leozops/v1/lead-brief` | Aggregate attention signals and proposal-only next steps |
 | Action Proposals | `GET, POST /api/integrations/leozops/v1/action-proposals` | Persist evidence-bound review metadata; never execute work |
+| Human Review Inbox | `GET /api/leozops/action-proposals` | Director-session inbox for explicit solo review |
+| Human Review Decision | `POST /api/leozops/action-proposals/:id/review` | Append accept/reject attention metadata; never approve or execute |
 
 ## Default-off configuration
 
@@ -22,6 +24,7 @@ This code ships with every business deployment. A route exists only where its op
 | `LEOZOPS_BRIEF_READ_KEY_HASH` | Brief-only bearer-key hash |
 | `LEOZOPS_PROPOSAL_ENABLED` | `true` enables action proposals; anything else returns 404 |
 | `LEOZOPS_PROPOSAL_WRITE_KEY_HASH` | Proposal-only write/list bearer-key hash |
+| `LEOZOPS_REVIEW_ENABLED` | `true` enables the internal Director review inbox; anything else returns 404 |
 
 All three raw keys must be different. None creates a session, maps to an `ApiKey` database row or grants access to normal application APIs.
 
@@ -145,6 +148,47 @@ The stored state is only `proposed`. Its effective response state becomes `expir
 
 Deploy migration `20260729190000_add_leozops_action_proposals` before enabling the flag. Leave the flag off if the migration or write key is not deployed.
 
+## Sprint 1D — Human Review Inbox
+
+Sprint 1D adds the missing human gate without pretending a solo company has a second checker. Its governance mode is explicitly:
+
+```text
+single_operator_explicit_review
+solo_operator=true
+four_eyes_verified=false
+grants_approval=false
+grants_execution=false
+```
+
+The integration bearer key cannot call this surface. The inbox requires a normal signed-in ERP session with the `DIRECTOR` role. The UI is embedded in the existing Phê duyệt page and clearly labels every decision as review metadata—not approval or execution.
+
+Each proposal can receive exactly one append-only review record. No proposal row is updated. The review body has an exact contract and does not accept free-text notes:
+
+```json
+{
+  "contract": "leozops.proposal-review",
+  "version": 1,
+  "decision": "accept",
+  "reason_code": "reviewed_current_evidence"
+}
+```
+
+An accept decision rebuilds the current Brief and verifies the proposal payload, snapshot, signal, evidence, action and reason again inside the review workflow. Changed or expired evidence returns 409 and creates no review. Reject decisions use one allowlisted reason: `not_actionable`, `outside_current_priority`, `duplicate_or_superseded` or `stale_or_incorrect`.
+
+The review and payload-free `AuditLog` row are created in one serializable transaction. Repeated identical decisions replay safely; conflicting decisions return 409. External proposal listing receives only sanitized review status/reason/time and never the Director identity.
+
+Even after an accepted review, the proposal response remains explicit:
+
+```json
+{
+  "next_state": "review_recorded_no_execution",
+  "approval": { "required": true, "status": "not_started" },
+  "execution": { "allowed": false, "status": "not_started", "receipt_id": null }
+}
+```
+
+Deploy migration `20260729210000_add_leozops_proposal_reviews` before enabling `LEOZOPS_REVIEW_ENABLED`.
+
 ### Honest limitations
 
 The current Lead schema has no transition or last-activity history. The brief therefore returns `null` for conversion rate and stage velocity, and states that last-activity data and client attribution are unavailable. The aging signal is based on creation age and always requires human review.
@@ -166,6 +210,8 @@ The two read routes provide:
 
 The proposal route provides 404/401 failure behavior on the same principles, allows only GET/POST, requires no-store responses, limits requests to 30/hour/key/serverless instance by default, enforces a 16 KB POST body, and emits a PII-free audit event. Validation conflicts return stable 4xx codes; unexpected source/storage errors return a generic 500 without internal error details.
 
+The review routes use private no-store responses, strict UUID correlation, 4 KB decision bodies, Director-session authorization and per-user best-effort rate limits. Console audit events contain only a hashed reviewer fingerprint; the canonical database audit retains the authenticated internal actor ID.
+
 The in-memory limiter is not a global quota. A shared store is required before treating it as an enforceable cross-instance limit.
 
 ## Local testing
@@ -178,6 +224,7 @@ LEOZOPS_BRIEF_ENABLED=true
 LEOZOPS_BRIEF_READ_KEY_HASH=<different-brief-key-sha256>
 LEOZOPS_PROPOSAL_ENABLED=true
 LEOZOPS_PROPOSAL_WRITE_KEY_HASH=<third-proposal-key-sha256>
+LEOZOPS_REVIEW_ENABLED=true
 
 npm run dev
 
@@ -206,4 +253,4 @@ npm run test:leozops
 
 ## Next authority boundary
 
-Sprint 1C ends at durable, evidence-bound proposal metadata. A later sprint may introduce an approval inbox, but approval and execution must remain separate capabilities with new credentials, maker-checker policy, explicit confirmation and a canonical receipt. The current proposal credential must never gain approval, command or business-record mutation authority.
+Sprint 1D ends at an explicit solo review record. A future command-design sprint must remain a separate capability with a new authority boundary, action-specific confirmation, idempotency, live preconditions and a canonical receipt. Review acceptance must never silently become approval or execution, and the proposal bearer credential must never gain business-record mutation authority.

@@ -274,6 +274,23 @@ model LeozOpsActionProposal {
   @@index([briefId, signalId])
 }
 
+// LeozOps Sprint 1D — one immutable human-review fact per proposal.
+// "accept" records attention only; it grants no approval or execution authority.
+model LeozOpsProposalReview {
+  id                  String   @id @default(cuid())
+  proposalId          String   @unique
+  correlationId       String   @unique
+  decision            String
+  reasonCode          String
+  governanceMode      String   @default("single_operator_explicit_review")
+  reviewerId          String
+  proposalPayloadHash String
+  reviewedAt          DateTime @default(now())
+
+  @@index([reviewerId, reviewedAt])
+  @@index([decision, reviewedAt])
+}
+
 model Service {
   id        String  @id @default(cuid())
   name      String

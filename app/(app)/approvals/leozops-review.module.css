@@ -1,0 +1,49 @@
+.reviewSection{margin-bottom:16px;overflow:hidden}
+.sectionHead{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--info-soft),var(--card) 62%)}
+.sectionHead h2{font-family:var(--font-display);font-size:1rem;margin-top:3px}
+.sectionHead p{max-width:680px;margin-top:5px;color:var(--muted);font-size:.79rem;line-height:1.55}
+.eyebrow{display:block;color:var(--primary);font-size:.67rem;font-weight:800;letter-spacing:.12em}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(76px,1fr));gap:8px;flex:none}
+.summary span{display:flex;flex-direction:column;min-width:76px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--muted);font-size:.68rem;text-align:center}
+.summary b{color:var(--fg);font-size:1rem;font-variant-numeric:tabular-nums}
+.reviewCard{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border)}
+.reviewIcon{display:flex;align-items:center;justify-content:center;width:38px;height:38px;flex:none;border:1px solid var(--border);border-radius:9px;background:var(--warn-soft);color:var(--warn)}
+.reviewBody{flex:1;min-width:0}
+.reviewHeading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.reviewHeading h3{font-size:.9rem;line-height:1.4}
+.reviewHeading p{margin-top:2px;color:var(--muted);font-size:.75rem}
+.status{display:inline-flex;align-items:center;gap:5px;flex:none;padding:4px 9px;border-radius:99px;font-size:.7rem;font-weight:700}
+.pending{background:var(--warn-soft);color:var(--warn)}
+.accepted{background:var(--accent-soft);color:var(--accent)}
+.rejected{background:var(--danger-soft);color:var(--danger)}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:8px;margin-top:12px}
+.facts div{padding:8px 10px;border-radius:var(--radius-sm);background:var(--muted-bg)}
+.facts dt{color:var(--muted);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.facts dd{margin-top:2px;font-size:.76rem;font-weight:650;font-variant-numeric:tabular-nums}
+.governanceNote{margin-top:10px;color:var(--muted);font-size:.73rem;line-height:1.5}
+.reviewActions{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--border)}
+.reasonField{display:grid;gap:5px;min-width:min(100%,290px)}
+.reasonField label{font-size:.7rem;font-weight:700;color:var(--muted)}
+.reasonField select{min-height:40px;padding:8px 32px 8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--fg);font-size:.78rem}
+.buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.buttons button{min-height:40px}
+.recent{border-top:1px solid var(--border)}
+.recent summary{padding:13px 18px;color:var(--muted);font-size:.77rem;font-weight:700;cursor:pointer}
+.recent summary:hover{color:var(--fg)}
+.dialogCopy{font-size:.88rem;line-height:1.6}
+.dialogBoundary{display:flex;align-items:flex-start;gap:9px;margin-top:14px;padding:11px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--warn-soft);color:var(--warn);font-size:.76rem;font-weight:700;line-height:1.45}
+.dialogBoundary svg{flex:none;margin-top:1px}
+.dialogActions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.dialogActions button{min-height:40px}
+
+@media (hover:none),(pointer:coarse){.reasonField select,.buttons button,.dialogActions button{min-height:44px}}
+@media (max-width:760px){
+  .sectionHead{display:grid;gap:14px}.summary{width:100%}
+  .reviewHeading{display:grid;gap:8px}.status{justify-self:start}
+  .facts{grid-template-columns:1fr}.reviewActions{display:grid}.reasonField{min-width:0;width:100%}
+  .buttons{display:grid;grid-template-columns:1fr 1fr}.buttons button{justify-content:center}
+}
+@media (max-width:460px){
+  .reviewCard{padding:14px 12px;gap:10px}.reviewIcon{width:34px;height:34px}
+  .summary{grid-template-columns:1fr}.buttons{grid-template-columns:1fr}
+}
