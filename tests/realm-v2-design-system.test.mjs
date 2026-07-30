@@ -4,6 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 import {
   advanceCommand,
+  canonicalAreaHref,
   canTransitionCommand,
   mobileDestinations,
   REALM_V2_AREAS,
@@ -16,9 +17,22 @@ test('Realm v2 coverage contract contains all 18 unique product areas', () => {
   assert.equal(new Set(REALM_V2_AREAS.map(area => area.slug)).size, 18);
   for (const area of REALM_V2_AREAS) {
     assert.ok(area.label);
+    assert.ok(area.labelVi);
     assert.ok(area.template);
     assert.ok(area.group);
+    assert.match(area.canonicalPath, /^\//);
   }
+});
+
+test('Realm v2 product entries resolve to canonical ERP and Realm workflows', () => {
+  assert.equal(canonicalAreaHref('home'), '/dashboard');
+  assert.equal(canonicalAreaHref('my-work'), '/myday');
+  assert.equal(canonicalAreaHref('work-management'), '/tasks');
+  assert.equal(canonicalAreaHref('projects'), '/projects');
+  assert.equal(canonicalAreaHref('approvals'), '/approvals');
+  assert.equal(canonicalAreaHref('settings'), '/settings');
+  assert.equal(canonicalAreaHref('chronicle'), '/realm');
+  assert.equal(canonicalAreaHref('missing'), '/dashboard');
 });
 
 test('mobile contract exposes exactly five labeled destinations in required order', () => {
@@ -59,4 +73,20 @@ test('token stylesheet defines semantic contract and accessibility hooks', () =>
   assert.match(css, /min-height:\s*44px/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
+});
+
+test('canonical theme bridges Realm v2 tokens onto the existing ERP shell', () => {
+  const css = fs.readFileSync(path.resolve('app/realm-canonical-v2.css'), 'utf8');
+  const layout = fs.readFileSync(path.resolve('app/(app)/layout.jsx'), 'utf8');
+  const shell = fs.readFileSync(path.resolve('components/Shell.jsx'), 'utf8');
+  const route = fs.readFileSync(path.resolve('app/realm-v2/[[...area]]/page.jsx'), 'utf8');
+
+  assert.match(css, /repository-realms-v2-workspace/);
+  assert.match(css, /--r2-canvas/);
+  assert.match(css, /prefers-reduced-motion/);
+  assert.match(layout, /realmV2PreviewEnabled\(\)/);
+  assert.match(shell, /repository-realms-workspace.*repository-realms-v2-workspace/s);
+  assert.match(shell, /data-visual-upgrade/);
+  assert.match(route, /redirect\(canonicalAreaHref\(slug\)\)/);
+  assert.doesNotMatch(route, /RealmV2Shell/);
 });

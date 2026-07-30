@@ -3,6 +3,7 @@ import { currentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Shell from '@/components/Shell';
 import { parseRealmPilotConfig, realmPilotDecision } from '@/lib/realm-pilot';
+import { realmV2PreviewEnabled } from '@/lib/realm-v2-contracts';
 
 export default async function AppLayout({ children }) {
   const user = await currentUser();
@@ -23,5 +24,14 @@ export default async function AppLayout({ children }) {
       ? realmPilotDecision(profile, policy, profile.workspacePreference)
       : { ...realmPilotDecision(null, policy), code: 'inactive_user', reason: 'Tài khoản không còn hoạt động.' };
   } catch {}
-  return <Shell user={user} company={company} realmPilot={realmPilot}>{children}</Shell>;
+  return (
+    <Shell
+      user={user}
+      company={company}
+      realmPilot={realmPilot}
+      realmV2Theme={realmV2PreviewEnabled()}
+    >
+      {children}
+    </Shell>
+  );
 }

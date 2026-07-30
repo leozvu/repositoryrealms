@@ -256,7 +256,7 @@ function TwoFAModal({ onClose }) {
 
 const NAV = ERP_NAV;
 
-export default function Shell({ user, company, realmPilot, children }) {
+export default function Shell({ user, company, realmPilot, realmV2Theme = false, children }) {
   const { locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
@@ -290,6 +290,15 @@ export default function Shell({ user, company, realmPilot, children }) {
   const pathname = usePathname();
   const router = useRouter();
   const isRealmRoute = pathname === '/realm' || pathname.startsWith('/realm/');
+  useEffect(() => {
+    if (!realmV2Theme || isRealmRoute) return undefined;
+    document.documentElement.dataset.realmVisualSystem = 'v2';
+    return () => {
+      if (document.documentElement.dataset.realmVisualSystem === 'v2') {
+        delete document.documentElement.dataset.realmVisualSystem;
+      }
+    };
+  }, [isRealmRoute, realmV2Theme]);
   useTableLabels(pathname); // v3.14: bảng đọc được trên điện thoại
   const isFL = user?.userType === 'freelancer';
   // v3.11: freelancer chỉ được ở /freelancer — chuyển hướng nếu lạc sang trang nhân viên
@@ -369,8 +378,11 @@ export default function Shell({ user, company, realmPilot, children }) {
       {!isFL && <RealmPilotOnboarding user={user} pilot={realmPilot} />}
       <div
         id="app"
-        className={isRealmRoute ? 'realm-immersive' : 'repository-realms-workspace'}
+        className={isRealmRoute
+          ? 'realm-immersive'
+          : `repository-realms-workspace${realmV2Theme ? ' repository-realms-v2-workspace' : ''}`}
         data-visual-system="phase-22"
+        data-visual-upgrade={realmV2Theme ? 'realm-v2-canonical' : undefined}
       >
         <aside id="sidebar" className={open ? 'open' : ''}>
           <div className="brand">

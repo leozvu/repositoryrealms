@@ -1,4 +1,5 @@
 import './globals.css';
+import './realm-canonical-v2.css';
 import { Be_Vietnam_Pro, Noto_Serif, Roboto_Mono } from 'next/font/google';
 import { LanguageProvider } from '@/components/LanguageProvider';
 

@@ -1,0 +1,355 @@
+/* Realm Design System v2 — canonical ERP/CRM presentation layer.
+   This file changes presentation only. The existing DOM, routes, forms, RBAC,
+   server actions, APIs and RepositoryRealms receipts remain untouched. */
+
+:root[data-realm-visual-system='v2'] {
+  color-scheme: dark;
+  --r2-canvas: #0b1015;
+  --r2-surface-1: #111923;
+  --r2-surface-2: #17212b;
+  --r2-surface-3: #1d2934;
+  --r2-emerald: #4fa47a;
+  --r2-emerald-strong: #67bd91;
+  --r2-emerald-dark: #2f7255;
+  --r2-gold: #c8a96b;
+  --r2-blue: #6398c8;
+  --r2-amber: #d69a4c;
+  --r2-red: #cf5a5a;
+  --r2-text: #f3f5f7;
+  --r2-text-2: #b5bec7;
+  --r2-muted: #8f9ba7;
+  --r2-border: rgba(255, 255, 255, .09);
+  --r2-border-strong: rgba(200, 169, 107, .35);
+  --r2-focus: #8fc4f2;
+  --r2-shadow-1: 0 1px 2px rgba(0, 0, 0, .32);
+  --r2-shadow-2: 0 16px 48px rgba(0, 0, 0, .34);
+
+  /* Bridge the existing ERP semantic tokens to Realm v2 tokens. */
+  --primary: var(--r2-emerald-dark);
+  --primary-dark: #255e46;
+  --on-primary: #fff;
+  --secondary: #668477;
+  --accent: var(--r2-emerald);
+  --accent-soft: rgba(79, 164, 122, .14);
+  --bg: var(--r2-canvas);
+  --fg: var(--r2-text);
+  --muted: var(--r2-text-2);
+  --muted-bg: var(--r2-surface-2);
+  --border: var(--r2-border);
+  --card: var(--r2-surface-1);
+  --danger: var(--r2-red);
+  --danger-soft: rgba(207, 90, 90, .14);
+  --warn: var(--r2-amber);
+  --warn-soft: rgba(214, 154, 76, .14);
+  --info-soft: rgba(99, 152, 200, .14);
+  --violet: #a78bc2;
+  --violet-soft: rgba(167, 139, 194, .14);
+  --sidebar-bg: #0d141b;
+  --sidebar-fg: var(--r2-text-2);
+  --sidebar-active: rgba(79, 164, 122, .14);
+  --realm-gold: var(--r2-gold);
+  --radius: 12px;
+  --radius-sm: 9px;
+  --shadow: var(--r2-shadow-1);
+  --shadow-lg: var(--r2-shadow-2);
+}
+
+:root[data-realm-visual-system='v2'] body {
+  background: var(--r2-canvas);
+  color: var(--r2-text);
+}
+
+:root[data-realm-visual-system='v2'] ::selection {
+  color: var(--r2-text);
+  background: rgba(79, 164, 122, .36);
+}
+
+:root[data-realm-visual-system='v2'] button:focus-visible,
+:root[data-realm-visual-system='v2'] a:focus-visible,
+:root[data-realm-visual-system='v2'] input:focus-visible,
+:root[data-realm-visual-system='v2'] select:focus-visible,
+:root[data-realm-visual-system='v2'] textarea:focus-visible {
+  outline: 3px solid var(--r2-focus);
+  outline-offset: 2px;
+}
+
+#app.repository-realms-v2-workspace {
+  min-height: 100dvh;
+  color: var(--r2-text);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(79, 164, 122, .08), transparent 30rem),
+    linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px),
+    var(--r2-canvas);
+  background-size: auto, 32px 32px, 32px 32px, auto;
+}
+
+#app.repository-realms-v2-workspace #sidebar {
+  width: 240px;
+  color: var(--r2-text-2);
+  background: rgba(13, 20, 27, .98);
+  background-image: none;
+  border-right: 1px solid var(--r2-border);
+  box-shadow: none;
+}
+
+#app.repository-realms-v2-workspace #main {
+  margin-left: 240px;
+  background:
+    radial-gradient(circle at 78% 4%, rgba(99, 152, 200, .045), transparent 26rem),
+    transparent;
+}
+
+#app.repository-realms-v2-workspace #topbar {
+  min-height: 56px;
+  padding-block: 6px;
+  color: var(--r2-text);
+  background: rgba(11, 16, 21, .9);
+  background-image: none;
+  border-bottom: 1px solid var(--r2-border);
+  box-shadow: none;
+  backdrop-filter: blur(16px);
+}
+
+#app.repository-realms-v2-workspace #topbar::after,
+#app.repository-realms-v2-workspace #view::before,
+#app.repository-realms-v2-workspace .card::after,
+#app.repository-realms-v2-workspace .table-wrap::after,
+#app.repository-realms-v2-workspace .kpi::after,
+#app.repository-realms-v2-workspace .user-chip .avatar::after {
+  content: none;
+  display: none;
+}
+
+#app.repository-realms-v2-workspace #view {
+  max-width: 1520px;
+  padding-top: 24px;
+}
+
+#app.repository-realms-v2-workspace #view > *:not(.modal-overlay) {
+  position: relative;
+  z-index: 1;
+}
+
+#app.repository-realms-v2-workspace #page-title {
+  color: var(--r2-text);
+  font-family: var(--font);
+  font-size: 1.05rem;
+  font-weight: 750;
+  text-shadow: none;
+}
+
+#app.repository-realms-v2-workspace .brand {
+  min-height: 56px;
+  padding: 8px 15px;
+  border-bottom: 1px solid var(--r2-border);
+}
+
+#app.repository-realms-v2-workspace .brand-logo {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--r2-border-strong);
+  border-radius: 10px;
+  color: var(--r2-gold);
+  background: linear-gradient(145deg, #1b2b29, #121d21);
+  box-shadow: none;
+  text-shadow: none;
+}
+
+#app.repository-realms-v2-workspace .brand-name { color: var(--r2-text); }
+#app.repository-realms-v2-workspace .brand-sub,
+#app.repository-realms-v2-workspace .nav-section { color: var(--r2-muted); }
+#app.repository-realms-v2-workspace #nav { padding: 12px 10px; }
+
+#app.repository-realms-v2-workspace .nav-item {
+  min-height: 42px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  color: var(--r2-text-2);
+  font-size: .79rem;
+  font-weight: 650;
+}
+
+#app.repository-realms-v2-workspace .nav-item:hover {
+  color: var(--r2-text);
+  background: rgba(255,255,255,.045);
+}
+
+#app.repository-realms-v2-workspace .nav-item.active {
+  color: var(--r2-text);
+  background: rgba(79, 164, 122, .14);
+  box-shadow: inset 3px 0 var(--r2-emerald);
+}
+
+#app.repository-realms-v2-workspace .user-chip {
+  color: var(--r2-text-2);
+  background: rgba(255,255,255,.02);
+  border-top-color: var(--r2-border);
+}
+
+#app.repository-realms-v2-workspace .user-chip .avatar {
+  overflow: hidden;
+  color: #0b1812;
+  background: var(--r2-emerald-strong);
+}
+
+#app.repository-realms-v2-workspace .uc-name { color: var(--r2-text); }
+#app.repository-realms-v2-workspace .uc-role { color: var(--r2-muted); }
+
+/* Existing business components retain their markup and behavior; only their
+   surfaces, density and interaction states are remapped. */
+#app.repository-realms-v2-workspace .card,
+#app.repository-realms-v2-workspace .table-wrap,
+#app.repository-realms-v2-workspace .chat-wrap,
+#app.repository-realms-v2-workspace .kan-col,
+#app.repository-realms-v2-workspace .kan-card {
+  color: var(--r2-text);
+  background: linear-gradient(180deg, rgba(255,255,255,.014), transparent 80%), var(--r2-surface-1);
+  background-image: linear-gradient(180deg, rgba(255,255,255,.014), transparent 80%);
+  border-color: var(--r2-border);
+  box-shadow: var(--r2-shadow-1);
+}
+
+#app.repository-realms-v2-workspace .card-head,
+#app.repository-realms-v2-workspace th {
+  color: var(--r2-muted);
+  background: rgba(255,255,255,.018);
+  border-color: var(--r2-border);
+}
+
+#app.repository-realms-v2-workspace .card-title,
+#app.repository-realms-v2-workspace .kpi-value,
+#app.repository-realms-v2-workspace .cell-main,
+#app.repository-realms-v2-workspace .kan-title,
+#app.repository-realms-v2-workspace .empty-title {
+  color: var(--r2-text);
+}
+
+#app.repository-realms-v2-workspace .kpi {
+  min-height: 118px;
+  overflow: hidden;
+  border-color: var(--r2-border);
+}
+
+#app.repository-realms-v2-workspace .kpi-icon {
+  color: var(--r2-emerald-strong);
+  background: rgba(79, 164, 122, .08) !important;
+  border: 1px solid var(--r2-border);
+}
+
+#app.repository-realms-v2-workspace .kpi-label,
+#app.repository-realms-v2-workspace .kpi-sub,
+#app.repository-realms-v2-workspace .cell-sub,
+#app.repository-realms-v2-workspace .kan-sub,
+#app.repository-realms-v2-workspace .empty,
+#app.repository-realms-v2-workspace .empty p {
+  color: var(--r2-muted);
+}
+
+#app.repository-realms-v2-workspace td {
+  color: var(--r2-text-2);
+  border-color: var(--r2-border);
+}
+
+#app.repository-realms-v2-workspace tbody tr:hover { background: rgba(255,255,255,.022); }
+#app.repository-realms-v2-workspace .kan-col { background: rgba(255,255,255,.018); }
+#app.repository-realms-v2-workspace .kan-card:hover { box-shadow: 0 10px 28px rgba(0,0,0,.28); }
+#app.repository-realms-v2-workspace .progress { background: rgba(255,255,255,.08); }
+#app.repository-realms-v2-workspace .progress i { background: var(--r2-emerald); }
+
+#app.repository-realms-v2-workspace .btn,
+#app.repository-realms-v2-workspace .icon-btn,
+#app.repository-realms-v2-workspace .language-switch button,
+#app.repository-realms-v2-workspace .workspace-surface-switch button {
+  transition: color .16s ease, background .16s ease, border-color .16s ease, transform .16s ease;
+}
+
+#app.repository-realms-v2-workspace .btn-primary {
+  color: var(--r2-text);
+  background: var(--r2-emerald-dark);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+#app.repository-realms-v2-workspace .btn-primary:hover { background: #398362; }
+#app.repository-realms-v2-workspace .btn-outline,
+#app.repository-realms-v2-workspace .search-box input,
+#app.repository-realms-v2-workspace select.filter {
+  color: var(--r2-text-2);
+  background: var(--r2-surface-1);
+  border-color: var(--r2-border);
+}
+
+#app.repository-realms-v2-workspace .btn-outline:hover,
+#app.repository-realms-v2-workspace .icon-btn:hover {
+  color: var(--r2-text);
+  background: var(--r2-surface-2);
+  border-color: rgba(255,255,255,.18);
+}
+
+#app.repository-realms-v2-workspace .b-gray { color: var(--r2-text-2); background: rgba(255,255,255,.06); }
+#app.repository-realms-v2-workspace .b-blue { color: #9bc5eb; background: rgba(99,152,200,.13); }
+#app.repository-realms-v2-workspace .b-green { color: #9bdab9; background: rgba(79,164,122,.13); }
+#app.repository-realms-v2-workspace .b-red { color: #ef9292; background: rgba(207,90,90,.13); }
+#app.repository-realms-v2-workspace .b-amber { color: #efc37b; background: rgba(214,154,76,.13); }
+#app.repository-realms-v2-workspace .b-violet { color: #c9afd9; background: rgba(167,139,194,.13); }
+
+:root[data-realm-visual-system='v2'] input,
+:root[data-realm-visual-system='v2'] select,
+:root[data-realm-visual-system='v2'] textarea,
+:root[data-realm-visual-system='v2'] .field input,
+:root[data-realm-visual-system='v2'] .field select,
+:root[data-realm-visual-system='v2'] .field textarea,
+:root[data-realm-visual-system='v2'] .items-table input {
+  color: var(--r2-text);
+  background: #0d151d;
+  border-color: var(--r2-border);
+}
+
+:root[data-realm-visual-system='v2'] input::placeholder,
+:root[data-realm-visual-system='v2'] textarea::placeholder { color: var(--r2-muted); }
+:root[data-realm-visual-system='v2'] select option { color: var(--r2-text); background: var(--r2-surface-1); }
+:root[data-realm-visual-system='v2'] .field label { color: var(--r2-text-2); }
+:root[data-realm-visual-system='v2'] .field .hint { color: var(--r2-muted); }
+
+/* Portalled overlays inherit the same semantic tokens from <html>. */
+:root[data-realm-visual-system='v2'] .modal-overlay {
+  background: rgba(2, 6, 9, .72);
+  backdrop-filter: blur(5px);
+}
+
+:root[data-realm-visual-system='v2'] .modal {
+  color: var(--r2-text);
+  background: var(--r2-surface-1);
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 28px 100px rgba(0,0,0,.65);
+}
+
+:root[data-realm-visual-system='v2'] .modal-head,
+:root[data-realm-visual-system='v2'] .modal-foot { border-color: var(--r2-border); }
+:root[data-realm-visual-system='v2'] .toast { background: #16241f; border: 1px solid rgba(79,164,122,.38); }
+:root[data-realm-visual-system='v2'] .act-item { border-color: var(--r2-border); }
+:root[data-realm-visual-system='v2'] .act-item:hover { background: var(--r2-surface-2); }
+
+/* Keep dense ERP readable on mobile without changing its route or record model. */
+@media (max-width: 900px) {
+  #app.repository-realms-v2-workspace #sidebar { width: min(288px, 86vw); }
+  #app.repository-realms-v2-workspace #main { margin-left: 0; }
+  #app.repository-realms-v2-workspace #topbar { padding-inline: 12px; }
+  #app.repository-realms-v2-workspace #topbar::after { display: none; }
+  #app.repository-realms-v2-workspace #view { padding: 16px 12px calc(84px + env(safe-area-inset-bottom)); }
+  #app.repository-realms-v2-workspace .nav-item { min-height: 44px; }
+  #app.repository-realms-v2-workspace .card,
+  #app.repository-realms-v2-workspace .table-wrap { border-radius: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-realm-visual-system='v2'] *,
+  :root[data-realm-visual-system='v2'] *::before,
+  :root[data-realm-visual-system='v2'] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

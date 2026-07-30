@@ -4,10 +4,10 @@
 
 - Implementation branch: `codex/realm-design-system-v2-implementation`
 - Design base: `codex/realm-design-system-v2-spec` at `e161d7519a254aa7ebcffad671711e4b7c3c097c`
-- Preview namespace: `/realm-v2/*`
+- Preview namespace: `/realm-v2/*` redirects into canonical authenticated product routes
 - Runtime gate: available outside production; production requires `REALM_V2_PREVIEW=true`
-- Data: deterministic preview fixtures marked `Non-canonical`
-- Existing ERP, `/realm`, authentication, services and APIs are unchanged
+- Data: canonical ERP/Realm data on product routes; deterministic fixtures exist only in Design QA
+- Existing ERP, `/realm`, authentication, services and APIs are unchanged and remain authoritative
 - No production command, approval, receipt, database or integration is invoked
 
 ## Component inventory
@@ -23,6 +23,7 @@
 | Templates and areas | `components/realm-v2/Templates.jsx` | Nine operational templates and all 18 product area compositions |
 | Shell | `components/realm-v2/RealmV2Shell.jsx` | Rail, top bar, workspace switcher, search, context drawer, mobile navigation and route focus |
 | Visual QA | `components/realm-v2/DesignSystemGallery.jsx` | Inspectable primitives, state matrix, work objects, overlays and command safety |
+| Canonical theme bridge | `app/realm-canonical-v2.css`, `components/Shell.jsx` | Applies v2 tokens to the existing ERP shell without replacing routes, workflows or records |
 
 ## Operational templates
 
@@ -60,9 +61,10 @@ $env:REALM_V2_PREVIEW='true'; npx playwright test tests/e2e/realm-v2.spec.mjs
 
 The full repository test suite should also be executed before review. The focused e2e test uses only local deterministic preview data.
 
-## Deliberate limitations before canonical integration
+## Canonical integration rule
 
-- The preview shows typed fixtures instead of wiring to production RepositoryRealms adapters.
-- Buttons that demonstrate navigation or presentation state do not mutate business records.
-- Command lifecycle simulation proves UI/state invariants; canonical command gateway integration requires a separately reviewed adapter and authorization test plan.
-- Translation coverage for the new v2 preview is English-first; existing Vietnamese ERP and Realm localization remain unchanged.
+- `/realm-v2/<area>` is an entry alias, not a parallel product. It redirects to the corresponding canonical authenticated ERP/Realm route.
+- The existing Vietnamese-first `LanguageProvider`, VI/EN switch, role-filtered navigation, forms, tables, APIs, authorization and receipt flows remain in use.
+- `REALM_V2_PREVIEW=true` changes presentation by enabling `repository-realms-v2-workspace`; it does not select fixture data or a replacement workflow.
+- Deterministic fixtures are limited to `/realm-v2/design-system`, which is explicitly labeled `Non-canonical` and exists only for visual QA.
+- The immersive `/realm` map keeps its existing runtime and presentation; it continues to share canonical business data through the existing adapters.
