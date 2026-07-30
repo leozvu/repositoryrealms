@@ -248,6 +248,32 @@ model Lead {
   @@index([ownerId, stage])
 }
 
+// LeozOps Sprint 1C — append-only proposal metadata. A proposal is not an
+// approval, command, execution or receipt and has no relation that can mutate a Lead.
+// Only pseudonymous lead refs plus integrity hashes are persisted; no Lead PII.
+model LeozOpsActionProposal {
+  id                       String   @id @default(cuid())
+  idempotencyKeyHash       String   @unique
+  correlationId            String   @unique
+  requesterFingerprint     String
+  briefId                  String
+  sourceSnapshotId         String
+  signalId                 String
+  signalType               String
+  actionType               String
+  reasonCode               String
+  leadRefs                 String   @default("[]")
+  evidenceHash             String
+  payloadHash              String
+  status                   String   @default("proposed")
+  expiresAt                DateTime
+  createdAt                DateTime @default(now())
+
+  @@index([requesterFingerprint, createdAt])
+  @@index([status, expiresAt, createdAt])
+  @@index([briefId, signalId])
+}
+
 model Service {
   id        String  @id @default(cuid())
   name      String
