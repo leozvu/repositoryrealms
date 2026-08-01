@@ -8,14 +8,11 @@ route.attendance.action.luu-ot,app/(app)/attendance/page.jsx,186,Lưu OT,data-ac
 route.automation.action.luu,app/(app)/automation/page.jsx,34,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.automation.action.tat-bat,app/(app)/automation/page.jsx,126,Tắt / Bật,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.ceo-commands.form-submit.command,app/(app)/ceo-commands/page.jsx,208,COMMAND / * / — / *,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.ceo-commands.action.button,app/(app)/ceo-commands/page.jsx,246,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.ceo-commands.action.reconcile-delivery,app/(app)/ceo-commands/page.jsx,262,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-inbox.action.sync,app/(app)/ceo-inbox/page.jsx,163,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-inbox.form-submit.form,app/(app)/ceo-inbox/page.jsx,171,—,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.ceo-inbox.action.button,app/(app)/ceo-inbox/page.jsx,176,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.ceo-inbox.action.refresh,app/(app)/ceo-inbox/page.jsx,188,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-inbox.action.reconcile-message,app/(app)/ceo-inbox/page.jsx,191,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-route.ceo-inbox.action.button.2,app/(app)/ceo-inbox/page.jsx,193,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.ceo-inbox.form-submit.send,app/(app)/ceo-inbox/page.jsx,193,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.ceo-overview.action.refresh-filter,app/(app)/ceo-overview/page.jsx,186,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-registry.action.activateidentity,app/(app)/ceo-registry/page.jsx,301,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
@@ -31,12 +28,10 @@ route.ceo-security.action.rotate,app/(app)/ceo-security/page.jsx,167,,data-actio
 route.ceo-security.action.suspend,app/(app)/ceo-security/page.jsx,178,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-workforce.action.sync,app/(app)/ceo-workforce/page.jsx,205,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.ceo-workforce.form-submit.form,app/(app)/ceo-workforce/page.jsx,220,* / — / — / * / — / — / * / — / — / * / * / * / * / *,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.ceo-workforce.action.button,app/(app)/ceo-workforce/page.jsx,246,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.commissions.action.a-tra,app/(app)/commissions/page.jsx,156,Đã trả,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.commissions.action.luu,app/(app)/commissions/page.jsx,180,Lưu,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 route.copilot.action.s,app/(app)/copilot/page.jsx,58,💬 / {s},data-action,local-state,toast-or-state,handled-candidate,not-required,verified
 route.copilot.form-submit.gui,app/(app)/copilot/page.jsx,75,Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.copilot.action.gui,app/(app)/copilot/page.jsx,79,Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.finplan.action.sinh-cho-thang,app/(app)/finplan/page.jsx,167,Sinh cho tháng / /,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
 route.freelancer.action.luu-gio-hom-nay,app/(app)/freelancer/page.jsx,103,Lưu giờ hôm nay,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.freelancers.action.tra,app/(app)/freelancers/page.jsx,150,Trả,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
@@ -51,12 +46,10 @@ route.leads.action.chuyen-thanh-khach-hang,app/(app)/leads/page.jsx,304,Chuyển
 route.messages.action.bat-au,app/(app)/messages/page.jsx,32,Bắt đầu,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.messages.action.ngung-chia-se-voi-ceo-portal-chia-se-voi-ceo-portal,app/(app)/messages/page.jsx,165,Ngừng chia sẻ với CEO Portal / Chia sẻ với CEO Portal,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.messages.form-submit.ang-gui-gui,app/(app)/messages/page.jsx,229,Đang gửi… / Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-route.messages.action.ang-gui-gui,app/(app)/messages/page.jsx,231,Đang gửi… / Gửi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.myday.action.ua-viec-len-mot-bac,app/(app)/myday/page.jsx,95,Đưa việc lên một bậc,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.myday.action.ua-viec-xuong-mot-bac,app/(app)/myday/page.jsx,96,Đưa việc xuống một bậc,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.myday.action.button,app/(app)/myday/page.jsx,108,…,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.myday.form-submit.so-gio-uoc-luong-nhom-cong-viec-o-phuc-tap-ghi-chu-pham-vi-khong,app/(app)/myday/page.jsx,130,Số giờ ước lượng / Nhóm công việc / Độ phức tạp / Ghi chú phạm vi (không bắt buộc) / Hủy / Đang lưu… / Lưu estimate có receipt,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
-route.myday.action.ang-luu-luu-estimate-co-receipt,app/(app)/myday/page.jsx,138,Đang lưu… / Lưu estimate có receipt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.myday.action.ang-xep-xep-ca-bang-theo-deadline,app/(app)/myday/page.jsx,313,Đang xếp… / Xếp cả bảng theo deadline,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 route.payroll.action.tinh-lai-tu-cham-cong,app/(app)/payroll/page.jsx,86,Tính lại từ chấm công,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 route.payroll.action.tao-bang-luong-thang,app/(app)/payroll/page.jsx,89,Tạo bảng lương tháng,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
@@ -95,16 +88,23 @@ component.components-activities.action.update-a-id-done-a-done,components/Activi
 component.components-ceo-ceofederationpolicy.action.toggle,components/ceo/CeoFederationPolicy.jsx,69,,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-doceditor.action.luu-hoa-on-bao-gia,components/DocEditor.jsx,60,Lưu / hóa đơn / báo giá,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
 component.components-doclinks.action.gan,components/DocLinks.jsx,36,Gắn,data-action,async-button-guard,hook-refresh,hook-error-toast,not-required,verified
+component.components-realm-v2-canonicalrealmcommunicationscreens.action.onselect-item,components/realm-v2/CanonicalRealmCommunicationScreens.jsx,117,,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-v2-canonicalrealmcommunicationscreens.form-submit.ang-gui-gui-vao-erp,components/realm-v2/CanonicalRealmCommunicationScreens.jsx,182,Đang gửi… / Gửi vào ERP,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-v2-canonicalrealmcommunicationscreens.form-submit.moi-chat-go-cua-moi-thoai-khong-kha-dung-ang-khong-lam-phien,components/realm-v2/CanonicalRealmCommunicationScreens.jsx,419,Mời chat / Gõ cửa / Mời thoại / · không khả dụng / Đang Không làm phiền,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-v2-canonicalrealmexperiencescreens.action.anh-dau-a-oc,components/realm-v2/CanonicalRealmExperienceScreens.jsx,90,Đánh dấu đã đọc,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-v2-canonicalrealmexperiencescreens.action.oc-tat-ca,components/realm-v2/CanonicalRealmExperienceScreens.jsx,146,Đọc tất cả,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-v2-canonicalrealmexperiencescreens.action.title-description,components/realm-v2/CanonicalRealmExperienceScreens.jsx,326,{title} / {description},data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-v2-canonicalrealmgovernancescreens.action.oi-soat,components/realm-v2/CanonicalRealmGovernanceScreens.jsx,159,Đối soát,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-v2-canonicalrealmgovernancescreens.form-submit.chon-entity-cau-truc-proposal-normalized-command-action-canonica,components/realm-v2/CanonicalRealmGovernanceScreens.jsx,263,Chọn entity… / Cấu trúc proposal / Normalized command / {action} / Canonical resource / Authorization / Target entity revalidates / Business rules / RepositoryRealms allowlist / Id,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-v2-canonicalrealmscreens.action.hoan-tat-bat-au,components/realm-v2/CanonicalRealmScreens.jsx,98,Hoàn tất / Bắt đầu,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
+component.components-realm-v2-primitives.action.children,components/realm-v2/Primitives.jsx,9,{children},data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmcreateactiondialog.action.gui-war-council-note,components/realm/RealmCreateActionDialog.jsx,49,Gửi War Council note,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmcreateactiondialog.action.lap-diplomatic-follow-up,components/realm/RealmCreateActionDialog.jsx,91,Lập Diplomatic follow-up,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmfeedbacklauncher.form-submit.cho-oi-pilot-biet-ieu-gi-ang-can-tro-cong-viec-khong-can-roi-rea,components/realm/RealmFeedbackLauncher.jsx,152,Cho đội pilot biết điều gì đang cản trở công việc. Không cần rời Realm và không tạo một hệ thống dữ liệu thứ hai. / Loại phản hồi / Mức ảnh hưởng / Mô tả ngắn / * / /120 ký tự / Đi,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-realmfeedbacklauncher.action.ang-gui-gui-vao-guild-support,components/realm/RealmFeedbackLauncher.jsx,198,Đang gửi… / Gửi vào Guild Support,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmfeedbackoperations.action.luu-thong-bao,components/realm/RealmFeedbackOperations.jsx,138,Lưu & thông báo,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmnotificationbell.action.ang-xu-ly-oc-tat-ca,components/realm/RealmNotificationBell.jsx,130,Đang xử lý… / Đọc tất cả,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmoffice.form-submit.go-cua-erp-nguoi-nhan-ang-offline-loi-nhan-van-uoc-luu-trong-not,components/realm/RealmOffice.jsx,2306,Gõ cửa ERP / Người nhận đang offline; lời nhắn vẫn được lưu trong Notification và Lantern Mail.,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-realmoffice.action.button.2,components/realm/RealmOffice.jsx,2319,,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so,components/realm/RealmOffice.jsx,2350,Tên hiển thị / Class trong Realm / Màu huy hiệu / Đang đồng bộ… / Lưu hồ sơ,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so,components/realm/RealmOffice.jsx,2371,Đang đồng bộ… / Lưu hồ sơ,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmoffice.action.nhan-gold,components/realm/RealmOffice.jsx,2407,Nhận / Gold,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmoffice.action.ang-ghi-ghi-nhan-gold,components/realm/RealmOffice.jsx,3021,Đang ghi… / Ghi nhận Gold,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-realmpilotcontrol.action.a-khoa-do-timeout-duyet-ap-dung,components/realm/RealmPilotControl.jsx,74,Đã khóa do timeout / Duyệt & áp dụng,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
@@ -120,9 +120,6 @@ component.components-realm-realmpilotrehearsal.action.tao-ban-nhap,components/re
 component.components-realm-rewardcontrolcenter.action.ang-gui-gui-duyet,components/realm/RewardControlCenter.jsx,253,Đang gửi… / Gửi duyệt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-rewardcontrolcenter.action.ang-duyet-phe-duyet-budget,components/realm/RewardControlCenter.jsx,254,Đang duyệt… / Phê duyệt budget,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-rewardcontrolcenter.form-submit.checker-review-cau-hinh-han-muc-truoc-khi-reward-uoc-phe-duyet-t,components/realm/RewardControlCenter.jsx,271,Checker review / Cấu hình hạn mức trước khi reward được phê duyệt / Trần Gold toàn công ty / Trần Gold mỗi nhân sự / Lý do và phạm vi budget / Trần mỗi nhân sự không được lớn hơn t,data-action,local-state,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-rewardcontrolcenter.action.ang-luu-luu-budget-draft,components/realm/RewardControlCenter.jsx,288,Đang lưu… / Lưu budget draft,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-rewardcontrolcenter.action.ang-luu-luu-ban-nhap,components/realm/RewardControlCenter.jsx,298,Đang lưu… / Lưu bản nháp,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-component.components-realm-rewardcontrolcenter.action.ang-gui,components/realm/RewardControlCenter.jsx,303,Đang gửi…,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-rewardcontrolcenter.action.ang-gui-gui-duyet.2,components/realm/RewardControlCenter.jsx,337,Đang gửi… / Gửi duyệt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-rewardcontrolcenter.action.ang-duyet-phe-duyet,components/realm/RewardControlCenter.jsx,338,Đang duyệt… / Phê duyệt,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-royalcommandcenter.action.ang-ghi-erp-xac-nhan-phan-cong,components/realm/RoyalCommandCenter.jsx,74,Đang ghi ERP… / Xác nhận phân công,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
@@ -132,10 +129,10 @@ component.components-realm-royaltreasuryexchange.action.ang-ong-bo,components/re
 component.components-realm-royaltreasuryexchange.action.xac-nhan-a-trao,components/realm/RoyalTreasuryExchange.jsx,335,Xác nhận đã trao,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-realm-royaltreasuryexchange.action.a-trao-thuong,components/realm/RoyalTreasuryExchange.jsx,349,Đã trao thưởng,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
 component.components-sendemail.action.ang-gui-gui-email,components/SendEmail.jsx,30,Đang gửi… / Gửi email,data-action,disabled-binding,toast-or-state,handled-candidate,not-required,verified
-component.components-shell.action.bat-thong-bao-thiet-bi,components/Shell.jsx,177,Bật thông báo thiết bị,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-component.components-shell.action.oc-tat-ca,components/Shell.jsx,188,Đọc tất cả,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-component.components-shell.action.tat-2fa,components/Shell.jsx,232,Tắt 2FA,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
-component.components-shell.action.bat-2fa,components/Shell.jsx,233,Bật 2FA,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-shell.action.bat-thong-bao-thiet-bi,components/Shell.jsx,165,Bật thông báo thiết bị,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-shell.action.oc-tat-ca,components/Shell.jsx,176,Đọc tất cả,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-shell.action.tat-2fa,components/Shell.jsx,220,Tắt 2FA,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
+component.components-shell.action.bat-2fa,components/Shell.jsx,221,Bật 2FA,data-action,async-button-guard,toast-or-state,handled-candidate,not-required,verified
 component.components-ui.action.ang-xu-ly,components/ui.jsx,242,Đang xử lý…,data-action,disabled-binding,hook-refresh,hook-error-toast,confirmed,verified
 component.components-ui.action.ang-luu-luu,components/ui.jsx,289,Đang lưu… / Lưu,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified
 component.components-ui.form-submit.e-e-preventdefault-submit,components/ui.jsx,293,,data-action,disabled-binding,hook-refresh,hook-error-toast,not-required,verified

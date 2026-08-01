@@ -132,7 +132,7 @@
       "source": "components/Shell.jsx",
       "signals": [
         "<CollaborationBridge />",
-        "<WorkspaceSurfaceSwitch pilot={realmPilot} />"
+        "<WorkspaceSurfaceSwitch pilot={realmPilot}"
       ],
       "missingSignals": [],
       "status": "verified"

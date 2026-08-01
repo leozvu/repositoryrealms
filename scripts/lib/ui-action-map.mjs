@@ -239,6 +239,10 @@ function traceNode(node, analysis, trace = createTrace(), options = {}) {
     else if (!resolved && analysis.hookAliases.has(node.name)) trace.helperCalls.add(`hook:${node.name}`);
     else if (!resolved && analysis.importedIdentifiers.has(node.name)) trace.helperCalls.add(`import:${node.name}`);
   }
+  if (node.type === 'MemberExpression' || node.type === 'OptionalMemberExpression') {
+    const chain = calleeChain(node);
+    if (chain.length) trace.helperCalls.add(`member:${chain.join('.')}`);
+  }
 
   walk(node, (current) => {
     if (current.type === 'CatchClause') trace.hasCatch = true;
@@ -606,6 +610,7 @@ function arrayOf(setOrMap) {
 function classifyAction(element, trace) {
   if (element.kind === 'navigation' || trace.routeTargets.size || element.target) return 'navigation';
   if (element.kind === 'form-control') return 'form-control';
+  if (element.disabledBinding && !element.handler) return 'disabled-control';
   if (trace.resourceOps.size || trace.apiCalls.size) return 'data-action';
   if (trace.callbacks.size) return 'delegated-action';
   if (trace.browserActions.size) return 'browser-action';
@@ -626,7 +631,7 @@ function actionStates(element, trace, actionType, resourcePolicies, apiPolicies)
   const disabled = Boolean(element.disabledBinding);
   const loadingSignal = [...trace.stateSetters].some((name) => /(loading|saving|sending|busy|pending|submitting)/i.test(name));
   const errorSignal = trace.hasCatch || trace.hasResponseCheck || [...trace.toastCalls].some((call) => /error|lỗi|thất bại/i.test(call));
-  const responseStateSignal = [...trace.stateSetters].some((name) => /messages/i.test(name));
+  const responseStateSignal = [...trace.stateSetters].some((name) => /(messages|feedback|notice|receipt|result)/i.test(name));
   const successSignal = trace.toastCalls.size > 0 || hookManaged || responseStateSignal;
   const loadingState = !dataAction || !mutating ? 'not-required'
     : asyncButtonManaged ? 'async-button-guard'

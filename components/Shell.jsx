@@ -9,13 +9,13 @@ import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
 import { modOn } from '@/lib/modules';
 import { ERP_NAV } from '@/lib/erp-navigation';
-import { realmRecordHref } from '@/lib/realm-business-bridge';
 import CollaborationBridge, { WorkspaceSurfaceSwitch } from './collaboration/CollaborationBridge';
 import { useRealmChangeFeed } from './realm/useRealmChangeFeed';
 import { NOTIFICATION_SYNC_EVENT } from '@/lib/notification-inbox';
 import RealmFeedbackLauncher from './realm/RealmFeedbackLauncher';
 import RealmPilotOnboarding from './realm/RealmPilotOnboarding';
 import { LanguageSwitch, useLanguage } from './LanguageProvider';
+import { GLOBAL_SEARCH_GROUPS, searchGroupRows } from '@/lib/global-search-contract';
 
 /* v3.14: TỰ GẮN NHÃN CỘT CHO BẢNG.
    Toàn app có 19 trang bảng, mỗi bảng viết tay riêng. Trên điện thoại, bảng 8 cột buộc phải
@@ -58,25 +58,13 @@ function useTableLabels(pathname) {
 }
 
 // v3.4: tìm kiếm toàn cục Ctrl+K — gom mọi resource user được đọc
-const SEARCH_GROUPS = [
-  { res: 'clients', label: 'Khách hàng', icon: 'clients', text: r => [r.name, r.contact, r.industry, r.phone], title: r => r.name, sub: r => r.industry || '', href: r => `/clients/${r.id}` },
-  { res: 'leads', label: 'Khách tiềm năng', icon: 'leads', text: r => [r.name, r.company, r.phone, r.email], title: r => r.company || r.name, sub: r => r.name, href: r => realmRecordHref('lead', r.id) },
-  { res: 'projects', label: 'Dự án', icon: 'projects', text: r => [r.name, r.service], title: r => r.name, sub: r => r.service || '', href: r => realmRecordHref('project', r.id) },
-  { res: 'tasks', label: 'Công việc', icon: 'tasks', text: r => [r.title, r.note], title: r => r.title, sub: r => r.status, href: r => realmRecordHref('task', r.id) },
-  { res: 'invoices', label: 'Hóa đơn', icon: 'invoices', text: r => [r.code], title: r => r.code, sub: r => r.date, href: () => '/invoices' },
-  { res: 'tickets', label: 'Ticket', icon: 'check', text: r => [r.code, r.title], title: r => `${r.code}: ${r.title}`, sub: r => r.status, href: () => '/tickets' },
-  { res: 'vendors', label: 'Nhà cung cấp', icon: 'wallet', text: r => [r.name, r.type], title: r => r.name, sub: r => r.type || '', href: () => '/vendors' },
-  { res: 'contracts', label: 'Hợp đồng', icon: 'shield', text: r => [r.code, r.partner], title: r => `${r.code} — ${r.partner}`, sub: r => r.endDate || '', href: () => '/contracts' },
-  { res: 'users', label: 'Nhân sự', icon: 'staff', text: r => [r.name, r.email, r.title], title: r => r.name, sub: r => r.title || '', href: r => realmRecordHref('staff', r.id) },
-];
-
-function GlobalSearch({ onClose }) {
+export function GlobalSearch({ onClose }) {
   const [q, setQ] = useState('');
   const [data, setData] = useState({});
   const router = useRouter();
   useEffect(() => {
     let alive = true;
-    Promise.all(SEARCH_GROUPS.map(async g => {
+    Promise.all(GLOBAL_SEARCH_GROUPS.map(async g => {
       const res = await fetch('/api/data/' + g.res).catch(() => null);
       return [g.res, res?.ok ? await res.json() : []];
     })).then(pairs => alive && setData(Object.fromEntries(pairs)));
@@ -86,9 +74,9 @@ function GlobalSearch({ onClose }) {
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (needle.length < 2) return [];
-    return SEARCH_GROUPS.map(g => ({
+    return GLOBAL_SEARCH_GROUPS.map(g => ({
       ...g,
-      items: (data[g.res] || []).filter(r => g.text(r).filter(Boolean).join(' ').toLowerCase().includes(needle)).slice(0, 5),
+      items: searchGroupRows(g, data[g.res], needle, 5),
     })).filter(g => g.items.length);
   }, [q, data]);
 
@@ -142,7 +130,7 @@ async function subscribePush(vapidPublicKey) {
   return response.ok ? 'granted' : 'error';
 }
 
-function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
+export function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
   const [data, setData] = useState(null);
   const router = useRouter();
   const toast = useToast();
@@ -256,7 +244,7 @@ function TwoFAModal({ onClose }) {
 
 const NAV = ERP_NAV;
 
-export default function Shell({ user, company, realmPilot, realmV2Theme = false, children }) {
+export default function Shell({ user, company, realmPilot, realmV2Theme = false, realmV2Available = false, children }) {
   const { locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
@@ -448,7 +436,7 @@ export default function Shell({ user, company, realmPilot, realmV2Theme = false,
             <button id="menu-btn" onClick={() => setOpen(true)} aria-label="Mở menu"><Icon name="menu" /></button>
             <h1 id="page-title">{current?.label || 'Agency ERP'}</h1>
             <div className="topbar-right">
-              <WorkspaceSurfaceSwitch pilot={realmPilot} />
+              <WorkspaceSurfaceSwitch pilot={realmPilot} realmV2Available={realmV2Available} />
               <LanguageSwitch compact />
               <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
                 <Icon name="search" size={14} /><span> Ctrl+K</span>

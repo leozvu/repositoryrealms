@@ -31,7 +31,7 @@ const CONTRACTS = [
   { id: 'contact-idempotency', source: 'lib/collaboration-admin.js', signals: ['idempotencyKey', "error?.code !== 'P2002'", 'duplicate: true'] },
   { id: 'dnd-and-rate-guard', source: 'lib/collaboration-admin.js', signals: ["session.availability === 'dnd'", 'CONTACT_RATE_LIMIT', 'contact_rate_limited'] },
   { id: 'contact-lifecycle-expiry', source: 'lib/collaboration-admin.js', signals: ["status: 'expired'", "['seen', 'accept', 'decline']", "status === 'accepted'"] },
-  { id: 'erp-global-bridge', source: 'components/Shell.jsx', signals: ['<CollaborationBridge />', '<WorkspaceSurfaceSwitch pilot={realmPilot} />'] },
+  { id: 'erp-global-bridge', source: 'components/Shell.jsx', signals: ['<CollaborationBridge />', '<WorkspaceSurfaceSwitch pilot={realmPilot}'] },
   { id: 'realm-to-erp-contact', source: 'components/realm/RealmOffice.jsx', signals: ['useCollaborationDirectory', 'sendContactToSelected', 'targetUserId', 'Gõ cửa ERP'] },
   { id: 'server-signed-realm-identity', source: 'scripts/realm-signal-server.mjs', signals: ['socket.realmClaims.userId', 'identityId: socket.realmClaims.userId'] },
   { id: 'message-deep-link', source: 'app/(app)/messages/page.jsx', signals: ['useSearchParams', "searchParams.get('conversation')", 'setSel(requested)'] },

@@ -32,7 +32,7 @@ Phase 4 giữ ERP/CRM làm nguồn sự thật duy nhất và biến lớp medie
 | embassy-lead | Embassy opportunity | Lead detail | /leads?focus=:id | verified | onOpenLead + Mở Lead ERP |
 | lead-focus | Realm deep-link | Lead modal | Lead FormModal | verified | get('focus') + setModal({ mode: 'edit', row: lead }) |
 | embassy-client | Embassy alliance | Client detail | /clients/:id | verified | onOpenClient + Mở Client ERP |
-| global-search | Shared navigation | Exact record | record-aware routes | verified | realmRecordHref('lead' + realmRecordHref('task' + realmRecordHref('project' + realmRecordHref('staff' |
+| global-search | Shared ERP and Realm search | Exact record | record-aware routes | verified | realmRecordHref('lead' + realmRecordHref('task' + realmRecordHref('project' + realmRecordHref('staff' |
 
 ## Browser scenarios
 

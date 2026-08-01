@@ -1,19 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-test('Realm v2 entries redirect into canonical ERP and Realm workflows', async ({ request }) => {
-  const mappings = {
-    home: '/dashboard',
-    'my-work': '/myday',
-    'work-management': '/tasks',
-    projects: '/projects',
-    approvals: '/approvals',
-    settings: '/settings',
-    chronicle: '/realm',
-  };
-  for (const [slug, canonicalPath] of Object.entries(mappings)) {
+test('all 18 Realm v2 compositions require an authenticated product session', async ({ request }) => {
+  for (const slug of ['home', 'my-work', 'work-management', 'action-center', 'command-center', 'approvals', 'inbox', 'collaboration', 'projects', 'chronicle', 'world-map', 'ceo-terminal', 'employee-profile', 'recognition', 'notifications', 'search', 'settings', 'mobile']) {
     const response = await request.get(`/realm-v2/${slug}`, { maxRedirects: 0 });
     expect([307, 308]).toContain(response.status());
-    expect(response.headers().location).toBe(canonicalPath);
+    expect(response.headers().location).toBe(`/login?callbackUrl=%2Frealm-v2%2F${slug}`);
   }
 });
 

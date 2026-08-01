@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2026-07-30T15:25:00.063Z",
+  "results": [
+    {
+      "slug": "world-map",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "Bản đồ bốn công ty",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "ceo-terminal",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "CEO Terminal",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "world-map",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "Bản đồ bốn công ty",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "ceo-terminal",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "CEO Terminal",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "world-map",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "Bản đồ bốn công ty",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "ceo-terminal",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "CEO Terminal",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "world-map",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "Bản đồ bốn công ty",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "ceo-terminal",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "CEO Terminal",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "world-map",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "Bản đồ bốn công ty",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "ceo-terminal",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-6-qa",
+      "heading": "CEO Terminal",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    }
+  ],
+  "mutationRequests": []
+}

@@ -39,8 +39,8 @@ async function contactAction(id, action) {
   return payload.contact;
 }
 
-export function WorkspaceSurfaceSwitch({ realm = false, pilot = null }) {
-  const href = realm ? '/dashboard' : '/realm';
+export function WorkspaceSurfaceSwitch({ realm = false, pilot = null, realmV2Available = false }) {
+  const href = realm ? '/dashboard' : realmV2Available ? '/realm-v2/home' : '/realm';
   const surface = realm ? 'erp' : 'realm';
   const unavailable = !realm && pilot && !pilot.allowed;
   const label = realm ? 'ERP · CRM' : 'Mở Realm';
@@ -83,7 +83,7 @@ export default function CollaborationBridge() {
   const [workingId, setWorkingId] = useState(null);
   const dismissedRef = useRef(new Set());
   const announcedRef = useRef(new Set());
-  const surface = pathname === '/realm' || pathname.startsWith('/realm/') ? 'realm' : 'erp';
+  const surface = pathname === '/realm' || pathname.startsWith('/realm/') || pathname.startsWith('/realm-v2') ? 'realm' : 'erp';
 
   const heartbeat = useCallback(async () => {
     const saved = preferredCollaborationAvailability();

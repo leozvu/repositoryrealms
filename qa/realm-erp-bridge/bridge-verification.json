@@ -1015,9 +1015,9 @@
     },
     {
       "id": "global-search",
-      "realm": "Shared navigation",
+      "realm": "Shared ERP and Realm search",
       "erp": "Exact record",
-      "source": "components/Shell.jsx",
+      "source": "lib/global-search-contract.js",
       "signals": [
         "realmRecordHref('lead'",
         "realmRecordHref('task'",

@@ -116,6 +116,7 @@
 "/api/realm-demo/token","app/api/realm-demo/token/route.js","false","POST","unreviewed"
 "/api/realm-demo/treasury","app/api/realm-demo/treasury/route.js","false","GET | POST","unreviewed"
 "/api/realm-demo/war-room","app/api/realm-demo/war-room/route.js","false","GET","unreviewed"
+"/api/realm-v2/profile-recognition","app/api/realm-v2/profile-recognition/route.js","false","GET","unreviewed"
 "/api/recurring/generate","app/api/recurring/generate/route.js","false","POST","unreviewed"
 "/api/settings","app/api/settings/route.js","false","GET | PUT","unreviewed"
 "/api/shipments/[id]/pay","app/api/shipments/[id]/pay/route.js","true","POST","unreviewed"

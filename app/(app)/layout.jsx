@@ -30,6 +30,7 @@ export default async function AppLayout({ children }) {
       company={company}
       realmPilot={realmPilot}
       realmV2Theme={realmV2PreviewEnabled()}
+      realmV2Available={realmV2PreviewEnabled()}
     >
       {children}
     </Shell>

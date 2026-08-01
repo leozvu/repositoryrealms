@@ -75,18 +75,28 @@ test('token stylesheet defines semantic contract and accessibility hooks', () =>
   assert.match(css, /env\(safe-area-inset-bottom\)/);
 });
 
-test('canonical theme bridges Realm v2 tokens onto the existing ERP shell', () => {
+test('Realm v2 presentation adapts the original ERP shell without replacing its workflows', () => {
   const css = fs.readFileSync(path.resolve('app/realm-canonical-v2.css'), 'utf8');
   const layout = fs.readFileSync(path.resolve('app/(app)/layout.jsx'), 'utf8');
   const shell = fs.readFileSync(path.resolve('components/Shell.jsx'), 'utf8');
   const route = fs.readFileSync(path.resolve('app/realm-v2/[[...area]]/page.jsx'), 'utf8');
+  const productShell = fs.readFileSync(path.resolve('components/realm-v2/RealmV2ApplicationShell.jsx'), 'utf8');
+  const productScreens = fs.readFileSync(path.resolve('components/realm-v2/CanonicalRealmScreens.jsx'), 'utf8');
 
   assert.match(css, /repository-realms-v2-workspace/);
   assert.match(css, /--r2-canvas/);
   assert.match(css, /prefers-reduced-motion/);
-  assert.match(layout, /realmV2PreviewEnabled\(\)/);
+  assert.match(layout, /realmV2Theme=\{realmV2PreviewEnabled\(\)\}/);
+  assert.match(layout, /realmV2Available=\{realmV2PreviewEnabled\(\)\}/);
   assert.match(shell, /repository-realms-workspace.*repository-realms-v2-workspace/s);
   assert.match(shell, /data-visual-upgrade/);
-  assert.match(route, /redirect\(canonicalAreaHref\(slug\)\)/);
+  assert.match(route, /REALM_V2_AREAS\.some\(area => area\.slug === slug\)/);
+  assert.match(route, /\['notifications', 'search', 'settings', 'mobile'\]\.includes\(slug\)/);
+  assert.match(route, /RealmV2ApplicationShell/);
+  assert.match(productShell, /WorkspaceSurfaceSwitch realm/);
+  assert.match(productScreens, /\/api\/execution\/my-work/);
+  assert.match(productScreens, /\/api\/execution\/actions/);
+  assert.match(productScreens, /Idempotency-Key/);
+  assert.doesNotMatch(productScreens, /from '.\/fixtures'/);
   assert.doesNotMatch(route, /RealmV2Shell/);
 });

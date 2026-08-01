@@ -1,0 +1,473 @@
+{
+  "version": 1,
+  "status": "Design complete / implementation partial",
+  "scoredAt": "2026-07-30T02:04:42.557Z",
+  "sourceCommit": "3be4588b7f6c684122abf73b5945706da550a4b5",
+  "rubric": {
+    "layoutHierarchy": 25,
+    "componentFidelity": 20,
+    "tokenFidelity": 15,
+    "responsiveComposition": 15,
+    "interactionResilience": 10,
+    "accessibility": 10,
+    "localizationPerformance": 5
+  },
+  "aggregateScore": 47.5,
+  "releaseGate": {
+    "aggregateMinimum": 95,
+    "areaMinimum": 90,
+    "stableRegionDiffMaximumPercent": 5
+  },
+  "areas": [
+    {
+      "slug": "home",
+      "productArea": "Realm Home",
+      "referenceBoard": "06-realm-home-my-work-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical ERP route",
+      "visualScore": 50,
+      "responsiveScore": 40,
+      "weightedScore": 51,
+      "dimensions": {
+        "layoutHierarchy": 52,
+        "componentFidelity": 45,
+        "tokenFidelity": 62,
+        "responsiveComposition": 40,
+        "interactionResilience": 48,
+        "accessibility": 58,
+        "localizationPerformance": 62
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 5,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "my-work",
+      "productArea": "My Work",
+      "referenceBoard": "06-realm-home-my-work-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical ERP route",
+      "visualScore": 45,
+      "responsiveScore": 38,
+      "weightedScore": 47.4,
+      "dimensions": {
+        "layoutHierarchy": 48,
+        "componentFidelity": 40,
+        "tokenFidelity": 58,
+        "responsiveComposition": 38,
+        "interactionResilience": 45,
+        "accessibility": 55,
+        "localizationPerformance": 60
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 5,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "work-management",
+      "productArea": "Work Management",
+      "referenceBoard": "07-work-management-action-center-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical ERP route",
+      "visualScore": 40,
+      "responsiveScore": 32,
+      "weightedScore": 42.9,
+      "dimensions": {
+        "layoutHierarchy": 42,
+        "componentFidelity": 35,
+        "tokenFidelity": 55,
+        "responsiveComposition": 32,
+        "interactionResilience": 42,
+        "accessibility": 52,
+        "localizationPerformance": 58
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 0,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "action-center",
+      "productArea": "Action Center",
+      "referenceBoard": "07-work-management-action-center-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical authorization and receipts",
+      "visualScore": 55,
+      "responsiveScore": 45,
+      "weightedScore": 55.8,
+      "dimensions": {
+        "layoutHierarchy": 58,
+        "componentFidelity": 50,
+        "tokenFidelity": 64,
+        "responsiveComposition": 45,
+        "interactionResilience": 56,
+        "accessibility": 62,
+        "localizationPerformance": 62
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 0,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "command-center",
+      "productArea": "Command Center",
+      "referenceBoard": "08-command-center-approvals-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical command gateway",
+      "visualScore": 45,
+      "responsiveScore": 35,
+      "weightedScore": 47.9,
+      "dimensions": {
+        "layoutHierarchy": 47,
+        "componentFidelity": 40,
+        "tokenFidelity": 60,
+        "responsiveComposition": 35,
+        "interactionResilience": 52,
+        "accessibility": 58,
+        "localizationPerformance": 58
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 1,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "inbox",
+      "productArea": "Unified Inbox",
+      "referenceBoard": "09-unified-inbox-collaboration-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical messaging route",
+      "visualScore": 45,
+      "responsiveScore": 38,
+      "weightedScore": 46.3,
+      "dimensions": {
+        "layoutHierarchy": 46,
+        "componentFidelity": 38,
+        "tokenFidelity": 58,
+        "responsiveComposition": 38,
+        "interactionResilience": 45,
+        "accessibility": 54,
+        "localizationPerformance": 58
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 5,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "projects",
+      "productArea": "Project Realm",
+      "referenceBoard": "10-project-realm-chronicle-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical project route",
+      "visualScore": 40,
+      "responsiveScore": 32,
+      "weightedScore": 42.4,
+      "dimensions": {
+        "layoutHierarchy": 43,
+        "componentFidelity": 34,
+        "tokenFidelity": 55,
+        "responsiveComposition": 32,
+        "interactionResilience": 40,
+        "accessibility": 50,
+        "localizationPerformance": 55
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 4,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "chronicle",
+      "productArea": "Chronicle",
+      "referenceBoard": "10-project-realm-chronicle-v1.png",
+      "implementation": "Partial — existing Realm ledger, reference composition absent",
+      "canonicalData": "Yes — canonical Realm journal",
+      "visualScore": 25,
+      "responsiveScore": 20,
+      "weightedScore": 31.8,
+      "dimensions": {
+        "layoutHierarchy": 28,
+        "componentFidelity": 20,
+        "tokenFidelity": 50,
+        "responsiveComposition": 20,
+        "interactionResilience": 32,
+        "accessibility": 45,
+        "localizationPerformance": 52
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 1,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "collaboration",
+      "productArea": "Collaboration / Presence",
+      "referenceBoard": "09-unified-inbox-collaboration-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical collaboration route",
+      "visualScore": 30,
+      "responsiveScore": 25,
+      "weightedScore": 35.9,
+      "dimensions": {
+        "layoutHierarchy": 34,
+        "componentFidelity": 25,
+        "tokenFidelity": 52,
+        "responsiveComposition": 25,
+        "interactionResilience": 34,
+        "accessibility": 47,
+        "localizationPerformance": 55
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 0,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "world-map",
+      "productArea": "World Map",
+      "referenceBoard": "11-world-map-ceo-terminal-v1.png",
+      "implementation": "Partial — canonical federation map with legacy composition",
+      "canonicalData": "Yes — canonical entity federation",
+      "visualScore": 65,
+      "responsiveScore": 55,
+      "weightedScore": 62.9,
+      "dimensions": {
+        "layoutHierarchy": 68,
+        "componentFidelity": 60,
+        "tokenFidelity": 70,
+        "responsiveComposition": 55,
+        "interactionResilience": 58,
+        "accessibility": 62,
+        "localizationPerformance": 62
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 0,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "ceo-terminal",
+      "productArea": "CEO Terminal",
+      "referenceBoard": "11-world-map-ceo-terminal-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical CEO aggregation",
+      "visualScore": 55,
+      "responsiveScore": 40,
+      "weightedScore": 53.3,
+      "dimensions": {
+        "layoutHierarchy": 56,
+        "componentFidelity": 48,
+        "tokenFidelity": 65,
+        "responsiveComposition": 40,
+        "interactionResilience": 52,
+        "accessibility": 58,
+        "localizationPerformance": 58
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 2,
+        "runtimeIssueSamples": 4,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "employee-profile",
+      "productArea": "Employee Profile",
+      "referenceBoard": "12-employee-profile-recognition-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical staff route",
+      "visualScore": 35,
+      "responsiveScore": 28,
+      "weightedScore": 39.3,
+      "dimensions": {
+        "layoutHierarchy": 38,
+        "componentFidelity": 30,
+        "tokenFidelity": 55,
+        "responsiveComposition": 28,
+        "interactionResilience": 36,
+        "accessibility": 50,
+        "localizationPerformance": 55
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 5,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "recognition",
+      "productArea": "Recognition / Gold Ledger",
+      "referenceBoard": "12-employee-profile-recognition-v1.png",
+      "implementation": "Partial — canonical Realm ledger, reference composition absent",
+      "canonicalData": "Yes — canonical Gold journal",
+      "visualScore": 55,
+      "responsiveScore": 45,
+      "weightedScore": 55.5,
+      "dimensions": {
+        "layoutHierarchy": 58,
+        "componentFidelity": 50,
+        "tokenFidelity": 65,
+        "responsiveComposition": 45,
+        "interactionResilience": 55,
+        "accessibility": 60,
+        "localizationPerformance": 60
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 0,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "approvals",
+      "productArea": "Approvals",
+      "referenceBoard": "08-command-center-approvals-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical authorization and receipts",
+      "visualScore": 60,
+      "responsiveScore": 50,
+      "weightedScore": 60.2,
+      "dimensions": {
+        "layoutHierarchy": 62,
+        "componentFidelity": 55,
+        "tokenFidelity": 68,
+        "responsiveComposition": 50,
+        "interactionResilience": 62,
+        "accessibility": 65,
+        "localizationPerformance": 65
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 0,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "notifications",
+      "productArea": "Notifications",
+      "referenceBoard": "13-settings-search-notifications-v1.png",
+      "implementation": "Partial — canonical dashboard opens, notification overlay is not deep-linked",
+      "canonicalData": "Yes — scenario entry incomplete",
+      "visualScore": 45,
+      "responsiveScore": 35,
+      "weightedScore": 45.6,
+      "dimensions": {
+        "layoutHierarchy": 46,
+        "componentFidelity": 38,
+        "tokenFidelity": 58,
+        "responsiveComposition": 35,
+        "interactionResilience": 42,
+        "accessibility": 55,
+        "localizationPerformance": 58
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 5,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "search",
+      "productArea": "Search / Command Palette",
+      "referenceBoard": "13-settings-search-notifications-v1.png",
+      "implementation": "Partial — canonical dashboard opens, command palette is not deep-linked",
+      "canonicalData": "Yes — scenario entry incomplete",
+      "visualScore": 45,
+      "responsiveScore": 35,
+      "weightedScore": 47.1,
+      "dimensions": {
+        "layoutHierarchy": 48,
+        "componentFidelity": 40,
+        "tokenFidelity": 58,
+        "responsiveComposition": 35,
+        "interactionResilience": 45,
+        "accessibility": 58,
+        "localizationPerformance": 58
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 5,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "settings",
+      "productArea": "Settings",
+      "referenceBoard": "13-settings-search-notifications-v1.png",
+      "implementation": "Partial — canonical workflow with Realm v2 token skin",
+      "canonicalData": "Yes — canonical settings route",
+      "visualScore": 50,
+      "responsiveScore": 45,
+      "weightedScore": 51.8,
+      "dimensions": {
+        "layoutHierarchy": 52,
+        "componentFidelity": 45,
+        "tokenFidelity": 62,
+        "responsiveComposition": 45,
+        "interactionResilience": 48,
+        "accessibility": 60,
+        "localizationPerformance": 60
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 5,
+        "previewToolingNoiseSamples": 5
+      }
+    },
+    {
+      "slug": "mobile",
+      "productArea": "Mobile Realm",
+      "referenceBoard": "14-mobile-realm-v1.png",
+      "implementation": "Partial — responsive ERP dashboard, priority-first Realm shell absent",
+      "canonicalData": "Yes — canonical dashboard route",
+      "visualScore": 35,
+      "responsiveScore": 25,
+      "weightedScore": 38.1,
+      "dimensions": {
+        "layoutHierarchy": 38,
+        "componentFidelity": 30,
+        "tokenFidelity": 52,
+        "responsiveComposition": 25,
+        "interactionResilience": 35,
+        "accessibility": 48,
+        "localizationPerformance": 55
+      },
+      "baselineEvidence": {
+        "screenshotCount": 5,
+        "horizontalOverflowSamples": 0,
+        "runtimeIssueSamples": 5,
+        "previewToolingNoiseSamples": 5
+      }
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "generatedAt": "2026-07-30T03:32:40.580Z",
+  "results": [
+    {
+      "slug": "command-center",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Command Center",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "approvals",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Phê duyệt",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "command-center",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Command Center",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "approvals",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Phê duyệt",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "command-center",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Command Center",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "approvals",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Phê duyệt",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "command-center",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Command Center",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "approvals",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Phê duyệt",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "command-center",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Command Center",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "approvals",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-3-qa",
+      "heading": "Phê duyệt",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    }
+  ],
+  "commandChecks": [
+    {
+      "targetEntityId": "egoric-agency",
+      "action": "task.create",
+      "title": "Hoàn thiện báo cáo chiến dịch mùa thu trước thứ Sáu.",
+      "notePresent": true,
+      "idempotencyKeyPresent": true,
+      "correlationIdPresent": true,
+      "receiptVisible": true
+    }
+  ],
+  "safetyChecks": [
+    {
+      "erpDecisionDeepLinkPresent": true,
+      "directApproveButtonCount": 0,
+      "directRejectButtonCount": 0,
+      "failClosedCopyPresent": true
+    }
+  ]
+}
