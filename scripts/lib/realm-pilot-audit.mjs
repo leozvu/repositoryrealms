@@ -17,7 +17,7 @@ const CONTRACTS = [
   { id: 'authenticated-policy-api', layer: 'api', source: 'app/api/realm-demo/pilot/route.js', signals: ['authenticatedUser()', 'export async function GET', 'export async function PUT', 'export async function PATCH'] },
   { id: 'director-policy-write', layer: 'server', source: 'lib/realm-pilot.js', signals: ['if (!isDirector(sessionUser))', 'realm_pilot_admin_forbidden', 'realm_pilot_roles_required'] },
   { id: 'aggregate-private-metrics', layer: 'server', source: 'lib/realm-pilot.js', signals: ['eligibleUsers', 'aggregateOnly: true', 'performanceTracking: false', 'durationTracking: false', 'lastSeen: { gte: activeAfter }'] },
-  { id: 'policy-aware-login', layer: 'client', source: 'app/login/page.jsx', signals: ["fetch('/api/realm-demo/pilot'", 'pilot.user?.allowed', "destination = '/realm'"] },
+  { id: 'policy-aware-login', layer: 'client', source: 'app/login/LoginForm.jsx', signals: ["fetch('/api/realm-demo/pilot'", 'pilot.user?.allowed', "destination = '/realm'"] },
   { id: 'cross-surface-preference', layer: 'client', source: 'lib/collaboration.js', signals: ['persistWorkspaceSurface', "window.fetch('/api/realm-demo/pilot'", 'preference: normalized', 'keepalive: true'] },
   { id: 'both-surfaces-persist-choice', layer: 'client', source: 'components/realm/RealmOffice.jsx', signals: ["persistWorkspaceSurface('erp')", 'Mở workspace ERP CRM gốc', 'Mở ERP · CRM gốc'] },
   { id: 'pilot-admin-control', layer: 'client', source: 'components/realm/RealmPilotControl.jsx', signals: ['Realm Pilot Control', 'Pilot theo cohort', 'Lưu chính sách pilot', 'không thay thế ERP'] },

@@ -86,8 +86,9 @@ test('Realm v2 presentation adapts the original ERP shell without replacing its 
   assert.match(css, /repository-realms-v2-workspace/);
   assert.match(css, /--r2-canvas/);
   assert.match(css, /prefers-reduced-motion/);
-  assert.match(layout, /realmV2Theme=\{realmV2PreviewEnabled\(\)\}/);
-  assert.match(layout, /realmV2Available=\{realmV2PreviewEnabled\(\)\}/);
+  assert.match(layout, /const v2Enabled = ceoPortal \|\| realmV2PreviewEnabled\(\)/);
+  assert.match(layout, /realmV2Theme=\{v2Enabled\}/);
+  assert.match(layout, /realmV2Available=\{!ceoPortal && realmV2PreviewEnabled\(\)\}/);
   assert.match(shell, /repository-realms-workspace.*repository-realms-v2-workspace/s);
   assert.match(shell, /data-visual-upgrade/);
   assert.match(route, /REALM_V2_AREAS\.some\(area => area\.slug === slug\)/);

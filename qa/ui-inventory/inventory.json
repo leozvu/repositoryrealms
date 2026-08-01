@@ -6171,7 +6171,7 @@
       "elementId": "route.ceo-overview.navigation.ceo-workforce",
       "source": "app/(app)/ceo-overview/page.jsx",
       "line": 184,
-      "column": 67,
+      "column": 11,
       "surface": "route.ceo-overview",
       "tag": "Link",
       "kind": "navigation",
@@ -7858,7 +7858,7 @@
     {
       "elementId": "route.ceo-workforce.navigation.ceo-overview",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 204,
+      "line": 203,
       "column": 9,
       "surface": "route.ceo-workforce",
       "tag": "Link",
@@ -7890,7 +7890,7 @@
     {
       "elementId": "route.ceo-workforce.action.sync",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 205,
+      "line": 204,
       "column": 9,
       "surface": "route.ceo-workforce",
       "tag": "AsyncButton",
@@ -7922,7 +7922,7 @@
     {
       "elementId": "route.ceo-workforce.navigation.ceo-registry",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 213,
+      "line": 212,
       "column": 119,
       "surface": "route.ceo-workforce",
       "tag": "Link",
@@ -7954,7 +7954,7 @@
     {
       "elementId": "route.ceo-workforce.action.load",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 214,
+      "line": 213,
       "column": 82,
       "surface": "route.ceo-workforce",
       "tag": "button",
@@ -7988,7 +7988,7 @@
     {
       "elementId": "route.ceo-workforce.form-submit.form",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 220,
+      "line": 219,
       "column": 5,
       "surface": "route.ceo-workforce",
       "tag": "form",
@@ -8020,7 +8020,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.select",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 223,
+      "line": 222,
       "column": 115,
       "surface": "route.ceo-workforce",
       "tag": "select",
@@ -8054,7 +8054,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.select.2",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 228,
+      "line": 227,
       "column": 117,
       "surface": "route.ceo-workforce",
       "tag": "select",
@@ -8088,7 +8088,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.select.3",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 229,
+      "line": 228,
       "column": 117,
       "surface": "route.ceo-workforce",
       "tag": "select",
@@ -8122,7 +8122,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.title",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 237,
+      "line": 236,
       "column": 135,
       "surface": "route.ceo-workforce",
       "tag": "input",
@@ -8154,7 +8154,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.note",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 238,
+      "line": 237,
       "column": 126,
       "surface": "route.ceo-workforce",
       "tag": "textarea",
@@ -8186,7 +8186,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.startdate",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 239,
+      "line": 238,
       "column": 111,
       "surface": "route.ceo-workforce",
       "tag": "input",
@@ -8218,7 +8218,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.enddate",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 240,
+      "line": 239,
       "column": 107,
       "surface": "route.ceo-workforce",
       "tag": "input",
@@ -8250,7 +8250,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.hoursperweek",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 241,
+      "line": 240,
       "column": 111,
       "surface": "route.ceo-workforce",
       "tag": "input",
@@ -8282,7 +8282,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.approverrole",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 242,
+      "line": 241,
       "column": 86,
       "surface": "route.ceo-workforce",
       "tag": "select",
@@ -8314,7 +8314,7 @@
     {
       "elementId": "route.ceo-workforce.form-control.input",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 245,
+      "line": 244,
       "column": 65,
       "surface": "route.ceo-workforce",
       "tag": "input",
@@ -8348,7 +8348,7 @@
     {
       "elementId": "route.ceo-workforce.action.button",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 246,
+      "line": 245,
       "column": 7,
       "surface": "route.ceo-workforce",
       "tag": "button",
@@ -8382,7 +8382,7 @@
     {
       "elementId": "route.ceo-workforce.action.load.2",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 250,
+      "line": 249,
       "column": 125,
       "surface": "route.ceo-workforce",
       "tag": "button",
@@ -8416,7 +8416,7 @@
     {
       "elementId": "route.ceo-workforce.action.openapproval-delivery",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 251,
+      "line": 250,
       "column": 781,
       "surface": "route.ceo-workforce",
       "tag": "AsyncButton",
@@ -21876,14 +21876,14 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.login.form-submit.email-mat-khau-ma-2fa-bo-trong-neu-chua-bat-ang-khoi-tao-quay-la",
-      "source": "app/login/page.jsx",
-      "line": 85,
+      "elementId": "component.app-login-loginform.form-submit.email-mat-khau-ma-2fa-bo-trong-neu-chua-bat-ang-khoi-tao",
+      "source": "app/login/LoginForm.jsx",
+      "line": 75,
       "column": 9,
-      "surface": "route.login",
+      "surface": "component.app-login-loginform",
       "tag": "form",
       "kind": "form-submit",
-      "label": "Email / Mật khẩu / Mã 2FA (bỏ trống nếu chưa bật) / Đang khởi tạo… / Quay lại đăng nhập TOTP / CEO mất thiết bị TOTP? Dùng recovery code",
+      "label": "Email / Mật khẩu / Mã 2FA (bỏ trống nếu chưa bật) / Đang khởi tạo…",
       "handlerEvent": "onSubmit",
       "handler": "submit",
       "target": "/login",
@@ -21904,11 +21904,11 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.login.form-control.ban-congty-vn",
-      "source": "app/login/page.jsx",
-      "line": 88,
+      "elementId": "component.app-login-loginform.form-control.ban-congty-vn",
+      "source": "app/login/LoginForm.jsx",
+      "line": 78,
       "column": 13,
-      "surface": "route.login",
+      "surface": "component.app-login-loginform",
       "tag": "input",
       "kind": "form-control",
       "label": "ban@congty.vn",
@@ -21932,11 +21932,11 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.login.form-control.input",
-      "source": "app/login/page.jsx",
-      "line": 92,
+      "elementId": "component.app-login-loginform.form-control.input",
+      "source": "app/login/LoginForm.jsx",
+      "line": 82,
       "column": 13,
-      "surface": "route.login",
+      "surface": "component.app-login-loginform",
       "tag": "input",
       "kind": "form-control",
       "label": "••••••••",
@@ -21960,11 +21960,11 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.login.form-control.000000",
-      "source": "app/login/page.jsx",
-      "line": 96,
+      "elementId": "component.app-login-loginform.form-control.000000",
+      "source": "app/login/LoginForm.jsx",
+      "line": 86,
       "column": 13,
-      "surface": "route.login",
+      "surface": "component.app-login-loginform",
       "tag": "input",
       "kind": "form-control",
       "label": "000000",
@@ -21988,11 +21988,11 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.login.form-control.rr-xxxx-xxxx-xxxx",
-      "source": "app/login/page.jsx",
-      "line": 101,
+      "elementId": "component.app-login-loginform.form-control.rr-xxxx-xxxx-xxxx",
+      "source": "app/login/LoginForm.jsx",
+      "line": 91,
       "column": 15,
-      "surface": "route.login",
+      "surface": "component.app-login-loginform",
       "tag": "input",
       "kind": "form-control",
       "label": "RR-XXXX-XXXX-XXXX",
@@ -22016,11 +22016,11 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.login.form-control.devicelabel",
-      "source": "app/login/page.jsx",
-      "line": 105,
+      "elementId": "component.app-login-loginform.form-control.devicelabel",
+      "source": "app/login/LoginForm.jsx",
+      "line": 95,
       "column": 15,
-      "surface": "route.login",
+      "surface": "component.app-login-loginform",
       "tag": "input",
       "kind": "form-control",
       "label": "deviceLabel",
@@ -22044,11 +22044,11 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.login.action.ang-khoi-tao",
-      "source": "app/login/page.jsx",
-      "line": 108,
+      "elementId": "component.app-login-loginform.action.ang-khoi-tao",
+      "source": "app/login/LoginForm.jsx",
+      "line": 98,
       "column": 11,
-      "surface": "route.login",
+      "surface": "component.app-login-loginform",
       "tag": "button",
       "kind": "action",
       "label": "Đang khởi tạo…",
@@ -22072,11 +22072,11 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.login.action.quay-lai-ang-nhap-totp-ceo-mat-thiet-bi-totp-dung-recovery-code",
-      "source": "app/login/page.jsx",
-      "line": 111,
-      "column": 11,
-      "surface": "route.login",
+      "elementId": "component.app-login-loginform.action.quay-lai-ang-nhap-totp-ceo-mat-thiet-bi-totp-dung-recovery-code",
+      "source": "app/login/LoginForm.jsx",
+      "line": 101,
+      "column": 25,
+      "surface": "component.app-login-loginform",
       "tag": "button",
       "kind": "action",
       "label": "Quay lại đăng nhập TOTP / CEO mất thiết bị TOTP? Dùng recovery code",
@@ -38170,9 +38170,50 @@
       ]
     },
     {
+      "elementId": "component.components-shell.navigation.mo-ceo-terminal",
+      "source": "components/Shell.jsx",
+      "line": 392,
+      "column": 15,
+      "surface": "component.components-shell",
+      "tag": "a",
+      "kind": "navigation",
+      "label": "Mở CEO Terminal",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "`${ceoPortalOrigin}/ceo-overview`",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/data/' + g.res",
+        "POST '/api/push/subscribe'",
+        "GET '/api/notifications'",
+        "PUT '/api/notifications'",
+        "PUT '/api/notifications'",
+        "GET '/api/users/2fa'",
+        "method '/api/users/2fa'",
+        "GET '/api/settings'",
+        "GET '/api/approvals'",
+        "GET '/api/chat'",
+        "GET '/api/notifications'",
+        "POST '/api/avatar'"
+      ],
+      "routeCandidates": [
+        "'/dashboard'",
+        "'/freelancer'",
+        "'/login'",
+        "g.href(r)",
+        "n.route"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
       "elementId": "component.components-shell.navigation.item-href-item-key",
       "source": "components/Shell.jsx",
-      "line": 393,
+      "line": 405,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -38213,7 +38254,7 @@
     {
       "elementId": "component.components-shell.action.oi-anh-ai-dien",
       "source": "components/Shell.jsx",
-      "line": 403,
+      "line": 415,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38254,7 +38295,7 @@
     {
       "elementId": "component.components-shell.form-control.input",
       "source": "components/Shell.jsx",
-      "line": 407,
+      "line": 419,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "input",
@@ -38297,7 +38338,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 421,
+      "line": 433,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38338,7 +38379,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 424,
+      "line": 436,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38379,7 +38420,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 433,
+      "line": 445,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -38423,7 +38464,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 436,
+      "line": 448,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38464,7 +38505,7 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 441,
+      "line": 454,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38505,7 +38546,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 444,
+      "line": 457,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38903,7 +38944,7 @@
   "summary": {
     "uiRoutes": 76,
     "apiRoutes": 131,
-    "interactiveElements": 1218,
+    "interactiveElements": 1219,
     "sourceFilesWithInteractions": 110,
     "routesInPrimaryNavigation": 62,
     "routesWithResourceCandidates": 42,
@@ -38911,7 +38952,7 @@
       "action": 663,
       "form-control": 380,
       "form-submit": 20,
-      "navigation": 155
+      "navigation": 156
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 86,
@@ -38978,8 +39019,8 @@
         "count": 21
       },
       {
-        "source": "app/(app)/staff/page.jsx",
-        "count": 20
+        "source": "components/Shell.jsx",
+        "count": 21
       }
     ]
   }

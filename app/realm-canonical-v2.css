@@ -161,6 +161,45 @@
 #app.repository-realms-v2-workspace .nav-section { color: var(--r2-muted); }
 #app.repository-realms-v2-workspace #nav { padding: 12px 10px; }
 
+#app.repository-realms-v2-workspace[data-deployment-kind='ceo-portal'] .brand {
+  background: linear-gradient(135deg, rgba(79,164,122,.12), transparent 72%);
+}
+
+#app.repository-realms-v2-workspace[data-deployment-kind='ceo-portal'] .brand-logo {
+  color: #102219;
+  background: linear-gradient(145deg, #e7cc83, #b88b37);
+  border-color: rgba(244, 218, 145, .78);
+  box-shadow: 0 8px 24px rgba(0,0,0,.3), inset 0 0 0 1px rgba(255,255,255,.3);
+}
+
+#app.repository-realms-v2-workspace .ceo-portal-link {
+  min-height: 44px;
+  margin-bottom: 10px;
+  color: #e8cb81;
+  border: 1px solid rgba(214,154,76,.34);
+  background: rgba(214,154,76,.08);
+}
+
+#app.repository-realms-v2-workspace .ceo-portal-link:hover {
+  color: #f3dda4;
+  background: rgba(214,154,76,.14);
+}
+
+#app.repository-realms-v2-workspace .ceo-terminal-scope {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 6px 10px;
+  color: #9bdab9;
+  border: 1px solid rgba(79,164,122,.28);
+  border-radius: 8px;
+  background: rgba(79,164,122,.08);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
 #app.repository-realms-v2-workspace .nav-item {
   min-height: 42px;
   padding: 9px 10px;
@@ -339,6 +378,7 @@
   #app.repository-realms-v2-workspace #topbar::after { display: none; }
   #app.repository-realms-v2-workspace #view { padding: 16px 12px calc(84px + env(safe-area-inset-bottom)); }
   #app.repository-realms-v2-workspace .nav-item { min-height: 44px; }
+  #app.repository-realms-v2-workspace .ceo-terminal-scope { display: none; }
   #app.repository-realms-v2-workspace .card,
   #app.repository-realms-v2-workspace .table-wrap { border-radius: 11px; }
 }

@@ -28,8 +28,9 @@ test('Phase 1 preserves ERP routes and provides the required five-item mobile na
   const appLayout = read('app/(app)/layout.jsx');
   const switcher = read('components/collaboration/CollaborationBridge.jsx');
   const shell = read('components/realm-v2/RealmV2ApplicationShell.jsx');
-  assert.match(appLayout, /realmV2Theme=\{realmV2PreviewEnabled\(\)\}/);
-  assert.match(appLayout, /realmV2Available=\{realmV2PreviewEnabled\(\)\}/);
+  assert.match(appLayout, /const v2Enabled = ceoPortal \|\| realmV2PreviewEnabled\(\)/);
+  assert.match(appLayout, /realmV2Theme=\{v2Enabled\}/);
+  assert.match(appLayout, /realmV2Available=\{!ceoPortal && realmV2PreviewEnabled\(\)\}/);
   assert.match(switcher, /realmV2Available \? '\/realm-v2\/home' : '\/realm'/);
   assert.match(shell, /mobileDestinations\(\)\.map/);
   for (const label of ['Trang chủ', 'Việc tôi', 'Hành động', 'Hộp thư', 'Thêm']) assert.ok(shell.includes(label));

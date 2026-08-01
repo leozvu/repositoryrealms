@@ -243,8 +243,14 @@ function TwoFAModal({ onClose }) {
 }
 
 const NAV = ERP_NAV;
+const CEO_NAV = [
+  { section: 'Điều hành tập đoàn' },
+  ...NAV.filter((item) => ['ceo-overview', 'ceo-world', 'ceo-commands', 'ceo-inbox'].includes(item.key)),
+  { section: 'Năng lực & quản trị' },
+  ...NAV.filter((item) => ['ceo-workforce', 'ceo-registry', 'ceo-security', 'ceo-rollout'].includes(item.key)),
+];
 
-export default function Shell({ user, company, realmPilot, realmV2Theme = false, realmV2Available = false, children }) {
+export default function Shell({ user, company, realmPilot, realmV2Theme = false, realmV2Available = false, ceoPortal = false, ceoPortalOrigin = '', children }) {
   const { locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
@@ -299,14 +305,14 @@ export default function Shell({ user, company, realmPilot, realmV2Theme = false,
     if (cur && cur.mod && !modOn(cur.mod, modules)) router.replace('/dashboard');
   }, [pathname, modules, isFL, router]);
   const NAV_FL = [{ key: 'freelancer', label: 'Công việc của tôi', icon: 'tasks', roles: ['FREELANCER'] }];
-  const navList = isFL ? NAV_FL : NAV;
+  const navList = isFL ? NAV_FL : ceoPortal ? CEO_NAV : NAV;
   const current = navList.find(n => n.key && pathname.startsWith('/' + n.key));
   const myRoles = rolesOf(user);
   // v3.17: mục menu hiện khi (đúng vai trò) VÀ (phân hệ của nó đang bật). Mục lõi (không mod)
   // luôn qua modOn. Freelancer đi lối riêng.
   const visible = item => isFL
     ? true
-    : (!item.ceoPortalOnly || process.env.NEXT_PUBLIC_CEO_GROUP_WORKFORCE === '1')
+    : (!item.ceoPortalOnly || ceoPortal)
       && (!item.realmSurface || realmPilot?.allowed)
       && hasAny(user, item.roles)
       && modOn(item.mod, modules);
@@ -361,9 +367,9 @@ export default function Shell({ user, company, realmPilot, realmV2Theme = false,
     <ToastProvider>
     <RoleLabelsCtx.Provider value={roleLabels}>
     <ModulesCtx.Provider value={modules}>
-      <CollaborationBridge />
-      {!isFL && realmPilot?.allowed && realmPilot?.config?.features?.feedback !== false && <RealmFeedbackLauncher />}
-      {!isFL && <RealmPilotOnboarding user={user} pilot={realmPilot} />}
+      {!ceoPortal && <CollaborationBridge />}
+      {!ceoPortal && !isFL && realmPilot?.allowed && realmPilot?.config?.features?.feedback !== false && <RealmFeedbackLauncher />}
+      {!ceoPortal && !isFL && <RealmPilotOnboarding user={user} pilot={realmPilot} />}
       <div
         id="app"
         className={isRealmRoute
@@ -371,16 +377,22 @@ export default function Shell({ user, company, realmPilot, realmV2Theme = false,
           : `repository-realms-workspace${realmV2Theme ? ' repository-realms-v2-workspace' : ''}`}
         data-visual-system="phase-22"
         data-visual-upgrade={realmV2Theme ? 'realm-v2-canonical' : undefined}
+        data-deployment-kind={ceoPortal ? 'ceo-portal' : 'entity'}
       >
         <aside id="sidebar" className={open ? 'open' : ''}>
           <div className="brand">
-            <div className="brand-logo">{(company || 'A')[0].toUpperCase()}</div>
+            <div className="brand-logo">{ceoPortal ? 'L' : (company || 'A')[0].toUpperCase()}</div>
             <div className="brand-text">
               <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">ERP · CRM · 7 vai trò nghiệp vụ</span>
+              <span className="brand-sub">{ceoPortal ? 'CEO Terminal · 4 công ty' : 'ERP · CRM · 7 vai trò nghiệp vụ'}</span>
             </div>
           </div>
           <nav id="nav">
+            {!ceoPortal && myRoles.includes('DIRECTOR') && ceoPortalOrigin && (
+              <a className="nav-item ceo-portal-link" href={`${ceoPortalOrigin}/ceo-overview`} rel="noopener noreferrer">
+                <Icon name="link" size={18} /><span>Mở CEO Terminal</span>
+              </a>
+            )}
             {navList.map((item, i) => {
               if (item.section) {
                 const next = navList.findIndex((x, j) => j > i && x.section);
@@ -436,7 +448,8 @@ export default function Shell({ user, company, realmPilot, realmV2Theme = false,
             <button id="menu-btn" onClick={() => setOpen(true)} aria-label="Mở menu"><Icon name="menu" /></button>
             <h1 id="page-title">{current?.label || 'Agency ERP'}</h1>
             <div className="topbar-right">
-              <WorkspaceSurfaceSwitch pilot={realmPilot} realmV2Available={realmV2Available} />
+              {!ceoPortal && <WorkspaceSurfaceSwitch pilot={realmPilot} realmV2Available={realmV2Available} />}
+              {ceoPortal && <span className="ceo-terminal-scope"><Icon name="shield" size={14} /> 4 entity · control plane</span>}
               <LanguageSwitch compact />
               <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
                 <Icon name="search" size={14} /><span> Ctrl+K</span>

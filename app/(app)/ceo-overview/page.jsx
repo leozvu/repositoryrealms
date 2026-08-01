@@ -181,7 +181,7 @@ export default function CeoOverviewPage() {
         <div className={styles.heroActions}>
           <Link className="btn btn-outline" href="/ceo-world"><Icon name="link" size={16} />{c.worldMap}</Link>
           <Link className="btn btn-outline" href="/ceo-commands"><Icon name="link" size={16} />{c.commandCenter}</Link>
-          {process.env.NEXT_PUBLIC_CEO_GROUP_WORKFORCE === '1' && <Link className="btn btn-outline" href="/ceo-workforce"><Icon name="staff" size={16} />{c.groupWorkforce}</Link>}
+          <Link className="btn btn-outline" href="/ceo-workforce"><Icon name="staff" size={16} />{c.groupWorkforce}</Link>
           <Link className="btn btn-outline" href="/ceo-inbox"><Icon name="mail" size={16} />{locale === 'en' ? 'Unified inbox' : 'Hộp thư liên công ty'}</Link>
           <AsyncButton type="button" className="btn btn-primary" pendingLabel={c.refreshing} onClick={() => refresh(filter)}>
             <Icon name="repeat" size={16} />{c.refresh}
