@@ -261,7 +261,7 @@
       "dynamic": false,
       "auth": "authenticated",
       "inNavigation": true,
-      "navLabel": "CEO · Tổng quan 4 công ty",
+      "navLabel": "CEO · Trung tâm điều hành",
       "navSection": "Công ty",
       "roles": [
         "DIRECTOR"
@@ -6110,125 +6110,9 @@
       "uxRiskCandidates": []
     },
     {
-      "elementId": "route.ceo-overview.navigation.ceo-world",
-      "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 182,
-      "column": 11,
-      "surface": "route.ceo-overview",
-      "tag": "Link",
-      "kind": "navigation",
-      "label": "/ceo-world",
-      "handlerEvent": "",
-      "handler": "",
-      "target": "/ceo-world",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "navigation-candidate",
-      "mappingStatus": "unreviewed",
-      "businessFeature": "",
-      "resourceCandidates": [],
-      "apiCandidates": [
-        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
-        "GET '/api/ceo/v1/identity/session'",
-        "POST '/api/ceo/v1/dashboard/refresh'",
-        "POST '/api/ceo/v1/sso/authorize'"
-      ],
-      "routeCandidates": [
-        "body.destination"
-      ],
-      "uxRiskCandidates": []
-    },
-    {
-      "elementId": "route.ceo-overview.navigation.ceo-commands",
-      "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 183,
-      "column": 11,
-      "surface": "route.ceo-overview",
-      "tag": "Link",
-      "kind": "navigation",
-      "label": "/ceo-commands",
-      "handlerEvent": "",
-      "handler": "",
-      "target": "/ceo-commands",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "navigation-candidate",
-      "mappingStatus": "unreviewed",
-      "businessFeature": "",
-      "resourceCandidates": [],
-      "apiCandidates": [
-        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
-        "GET '/api/ceo/v1/identity/session'",
-        "POST '/api/ceo/v1/dashboard/refresh'",
-        "POST '/api/ceo/v1/sso/authorize'"
-      ],
-      "routeCandidates": [
-        "body.destination"
-      ],
-      "uxRiskCandidates": []
-    },
-    {
-      "elementId": "route.ceo-overview.navigation.ceo-workforce",
-      "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 184,
-      "column": 11,
-      "surface": "route.ceo-overview",
-      "tag": "Link",
-      "kind": "navigation",
-      "label": "/ceo-workforce",
-      "handlerEvent": "",
-      "handler": "",
-      "target": "/ceo-workforce",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "navigation-candidate",
-      "mappingStatus": "unreviewed",
-      "businessFeature": "",
-      "resourceCandidates": [],
-      "apiCandidates": [
-        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
-        "GET '/api/ceo/v1/identity/session'",
-        "POST '/api/ceo/v1/dashboard/refresh'",
-        "POST '/api/ceo/v1/sso/authorize'"
-      ],
-      "routeCandidates": [
-        "body.destination"
-      ],
-      "uxRiskCandidates": []
-    },
-    {
-      "elementId": "route.ceo-overview.navigation.unified-inbox-hop-thu-lien-cong-ty",
-      "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 185,
-      "column": 11,
-      "surface": "route.ceo-overview",
-      "tag": "Link",
-      "kind": "navigation",
-      "label": "Unified inbox / Hộp thư liên công ty",
-      "handlerEvent": "",
-      "handler": "",
-      "target": "/ceo-inbox",
-      "insideForm": false,
-      "disabledBinding": "",
-      "actionStatus": "navigation-candidate",
-      "mappingStatus": "unreviewed",
-      "businessFeature": "",
-      "resourceCandidates": [],
-      "apiCandidates": [
-        "GET `/api/ceo/v1/dashboard?entity=${encodeURIComponent(entityId)}`",
-        "GET '/api/ceo/v1/identity/session'",
-        "POST '/api/ceo/v1/dashboard/refresh'",
-        "POST '/api/ceo/v1/sso/authorize'"
-      ],
-      "routeCandidates": [
-        "body.destination"
-      ],
-      "uxRiskCandidates": []
-    },
-    {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 186,
+      "line": 183,
       "column": 11,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -6257,7 +6141,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-all",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 199,
+      "line": 196,
       "column": 9,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -6288,7 +6172,7 @@
     {
       "elementId": "route.ceo-overview.action.setfilter-entity-id",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 200,
+      "line": 197,
       "column": 40,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -6319,7 +6203,7 @@
     {
       "elementId": "route.ceo-overview.action.load-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 217,
+      "line": 214,
       "column": 111,
       "surface": "route.ceo-overview",
       "tag": "button",
@@ -6350,7 +6234,7 @@
     {
       "elementId": "route.ceo-overview.navigation.ceo-registry",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 229,
+      "line": 233,
       "column": 161,
       "surface": "route.ceo-overview",
       "tag": "Link",
@@ -6379,7 +6263,7 @@
     {
       "elementId": "route.ceo-overview.action.opendetail-entity-domain",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 281,
+      "line": 285,
       "column": 216,
       "surface": "route.ceo-overview",
       "tag": "AsyncButton",
@@ -22343,6 +22227,126 @@
       "apiCandidates": [
         "GET '/api/ceo/v1/federation/policy'",
         "PUT '/api/ceo/v1/federation/policy'"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-ceo-ceooperationscockpit.navigation.ceo-commands-compose-task-create",
+      "source": "components/ceo/CeoOperationsCockpit.jsx",
+      "line": 180,
+      "column": 9,
+      "surface": "component.components-ceo-ceooperationscockpit",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-commands?compose=task.create",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-commands?compose=task.create",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET endpoint"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-ceo-ceooperationscockpit.navigation.ceo-inbox",
+      "source": "components/ceo/CeoOperationsCockpit.jsx",
+      "line": 181,
+      "column": 9,
+      "surface": "component.components-ceo-ceooperationscockpit",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-inbox",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-inbox",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET endpoint"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-ceo-ceooperationscockpit.navigation.ceo-workforce",
+      "source": "components/ceo/CeoOperationsCockpit.jsx",
+      "line": 182,
+      "column": 9,
+      "surface": "component.components-ceo-ceooperationscockpit",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-workforce",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-workforce",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET endpoint"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-ceo-ceooperationscockpit.navigation.ceo-world",
+      "source": "components/ceo/CeoOperationsCockpit.jsx",
+      "line": 183,
+      "column": 9,
+      "surface": "component.components-ceo-ceooperationscockpit",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-world",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-world",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET endpoint"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "component.components-ceo-ceooperationscockpit.navigation.item-href",
+      "source": "components/ceo/CeoOperationsCockpit.jsx",
+      "line": 204,
+      "column": 15,
+      "surface": "component.components-ceo-ceooperationscockpit",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "item.href",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "item.href",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET endpoint"
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
@@ -38944,15 +38948,15 @@
   "summary": {
     "uiRoutes": 76,
     "apiRoutes": 131,
-    "interactiveElements": 1219,
-    "sourceFilesWithInteractions": 110,
+    "interactiveElements": 1220,
+    "sourceFilesWithInteractions": 111,
     "routesInPrimaryNavigation": 62,
     "routesWithResourceCandidates": 42,
     "byKind": {
       "action": 663,
       "form-control": 380,
       "form-submit": 20,
-      "navigation": 156
+      "navigation": 157
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 86,

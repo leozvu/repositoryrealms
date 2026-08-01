@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { AsyncButton, Forbidden, Icon, useToast } from '@/components/ui';
+import CeoOperationsCockpit from '@/components/ceo/CeoOperationsCockpit';
 import { useLanguage } from '@/components/LanguageProvider';
 import { rolesOf } from '@/lib/perm';
 import styles from './overview.module.css';
@@ -17,8 +18,8 @@ const DEFAULT_ENTITIES = [
 
 const COPY = {
   vi: {
-    eyebrow: 'CEO-4 · UNIFIED READ DASHBOARD', title: 'Toàn cảnh bốn công ty',
-    intro: 'Một bảng đọc chung cho AIm, Egoric, Vnecom và Egolive. Mỗi chỉ số luôn cho biết nguồn, thời điểm chốt dữ liệu và độ mới.',
+    eyebrow: 'CEO-12 · LEOZ GROUP CONTROL PLANE', title: 'CEO Terminal · Leoz Group',
+    intro: 'Điều hành AIm, Egoric, Vnecom và Egolive từ một điểm vào; mỗi hành động vẫn chạy trong workflow và quyền của công ty sở hữu.',
     all: 'Tất cả công ty', refresh: 'Làm mới dữ liệu', refreshing: 'Đang gọi các entity…',
     loading: 'Đang tải snapshot đã lưu…', retry: 'Thử lại', loadError: 'Không thể tải CEO Dashboard.',
     readOnly: 'Control plane chỉ đọc', policy: 'Portal chỉ nhận aggregate đã whitelist. Không truy vấn trực tiếp database công ty và không ghi business record.',
@@ -36,8 +37,8 @@ const COPY = {
     cashBasis: 'Cash-ledger, không phải lợi nhuận kế toán', gmvWarning: 'GMV không được cộng vào revenue',
   },
   en: {
-    eyebrow: 'CEO-4 · UNIFIED READ DASHBOARD', title: 'Four-company overview',
-    intro: 'One read surface for AIm, Egoric, Vnecom and Egolive. Every metric exposes its source, source timestamp and freshness.',
+    eyebrow: 'CEO-12 · LEOZ GROUP CONTROL PLANE', title: 'CEO Terminal · Leoz Group',
+    intro: 'Operate AIm, Egoric, Vnecom, and Egolive from one entry point while every action remains inside the owning company’s workflow and authorization.',
     all: 'All companies', refresh: 'Refresh data', refreshing: 'Contacting entities…',
     loading: 'Loading saved snapshots…', retry: 'Try again', loadError: 'CEO Dashboard could not be loaded.',
     readOnly: 'Read-only control plane', policy: 'The Portal accepts whitelisted aggregates only. It never queries company databases directly or writes business records.',
@@ -179,10 +180,6 @@ export default function CeoOverviewPage() {
       <header className={styles.hero}>
         <div><p className={styles.eyebrow}>{c.eyebrow}</p><h1>{c.title}</h1><p>{c.intro}</p></div>
         <div className={styles.heroActions}>
-          <Link className="btn btn-outline" href="/ceo-world"><Icon name="link" size={16} />{c.worldMap}</Link>
-          <Link className="btn btn-outline" href="/ceo-commands"><Icon name="link" size={16} />{c.commandCenter}</Link>
-          <Link className="btn btn-outline" href="/ceo-workforce"><Icon name="staff" size={16} />{c.groupWorkforce}</Link>
-          <Link className="btn btn-outline" href="/ceo-inbox"><Icon name="mail" size={16} />{locale === 'en' ? 'Unified inbox' : 'Hộp thư liên công ty'}</Link>
           <AsyncButton type="button" className="btn btn-primary" pendingLabel={c.refreshing} onClick={() => refresh(filter)}>
             <Icon name="repeat" size={16} />{c.refresh}
           </AsyncButton>
@@ -218,6 +215,13 @@ export default function CeoOverviewPage() {
       {!dashboard && !error && <div className={styles.loading} role="status">{c.loading}</div>}
 
       {dashboard && <>
+        <CeoOperationsCockpit
+          dashboard={dashboard}
+          identityReady={Boolean(identity?.active && identity?.stepUp)}
+          locale={locale}
+          entityId={filter}
+        />
+
         <section className={styles.summaryGrid} aria-label={c.title}>
           <article className={`card ${styles.summaryCard}`}><div className={styles.summaryHead}><span><Icon name="link" size={18} /></span><small>{c.sourceHealth}</small></div><strong>{dashboard.health.available}/{dashboard.health.registered}</strong><p>{dashboard.health.fresh} {c.fresh.toLowerCase()} · {dashboard.health.stale} {c.stale.toLowerCase()}</p><footer>{c.sourceSnapshot}</footer></article>
           <article className={`card ${styles.summaryCard}`}><div className={styles.summaryHead}><span><Icon name="finance" size={18} /></span><small>{c.cashRevenue}</small></div><strong>{moneyList(portfolio.finance.revenueCashByCurrency, locale, c.noData)}</strong><p>{portfolio.finance.entitiesContributing} {c.contributing} · {c.cashBasis}</p><footer>{sourceLabel}</footer></article>
