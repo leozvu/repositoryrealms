@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "erpNavigationRoutes": 61,
-    "mappedNavigationRoutes": 61,
-    "verifiedNavigationRoutes": 61,
+    "erpNavigationRoutes": 62,
+    "mappedNavigationRoutes": 62,
+    "verifiedNavigationRoutes": 62,
     "recordFlows": 10,
     "verifiedRecordFlows": 10,
     "linkContracts": 5,
@@ -775,6 +775,21 @@
       "module": null,
       "mapped": true,
       "routeFile": "app/(app)/ceo-overview/page.jsx",
+      "routeExists": true,
+      "status": "verified"
+    },
+    {
+      "key": "ceo-navigator",
+      "erpLabel": "CEO · Tìm & mở mọi công ty",
+      "realmLabel": "Royal Wayfinder",
+      "realmSurface": "Cổng điều hành CEO",
+      "group": "Công ty",
+      "href": "/ceo-navigator",
+      "icon": "search",
+      "roles": "DIRECTOR only",
+      "module": null,
+      "mapped": true,
+      "routeFile": "app/(app)/ceo-navigator/page.jsx",
       "routeExists": true,
       "status": "verified"
     },

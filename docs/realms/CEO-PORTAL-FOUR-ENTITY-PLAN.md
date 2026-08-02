@@ -327,6 +327,19 @@ Implementation status: code complete on `codex/realm-design-system-v2-implementa
 
 Exit gate: all four companies return a validated decision feed, a forced timeout proves graceful degradation, and every briefing link resolves to a canonical Portal or signed entity workflow.
 
+### CEO-15 — Universal company navigator
+
+Implementation status: code complete on `codex/realm-design-system-v2-implementation`. See `CEO-15-UNIVERSAL-COMPANY-NAVIGATOR.md`.
+
+- `Ctrl+K` in CEO Terminal opens one bilingual, keyboard-first workflow finder.
+- Portal workspaces remain locally available even when Entity Registry is degraded.
+- Entity workflows are generated from the entity capability profile, never by indexing business records.
+- Every entity launch uses the existing signed SSO authorization-code boundary and a relative allowlisted path.
+- The Portal never searches generic ERP `/api/data/*`, exposes registry secrets or executes a business action from the Navigator.
+- Mobile, tablet and desktop layouts preserve visible focus, 44px controls and reduced-motion behavior.
+
+Exit gate: the four entities expose the correct capability-aware workflow set, TOTP-locked sessions cannot launch entity SSO, Registry failure preserves Portal navigation, and entity deployments return 404 for `/ceo-navigator`.
+
 ## 6. Proposed deployment topology
 
 | Component | Suggested project | Database |

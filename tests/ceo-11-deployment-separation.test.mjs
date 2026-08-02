@@ -21,7 +21,7 @@ test('CEO-11 classifies deployments server-side and defaults unknown production 
 
 test('CEO-11 exposes control-plane paths only on the CEO deployment', () => {
   for (const path of [
-    '/ceo-overview', '/ceo-briefing', '/ceo-decisions', '/ceo-world', '/ceo-commands', '/ceo-workforce', '/ceo-inbox', '/ceo-registry', '/ceo-security', '/ceo-rollout',
+    '/ceo-overview', '/ceo-navigator', '/ceo-briefing', '/ceo-decisions', '/ceo-world', '/ceo-commands', '/ceo-workforce', '/ceo-inbox', '/ceo-registry', '/ceo-security', '/ceo-rollout',
     '/realm-v2/command-center', '/realm-v2/world-map', '/realm-v2/ceo-terminal',
     '/api/ceo/v1/dashboard', '/api/ceo/v1/decision-queue', '/api/ceo/v1/registry/aim', '/api/ceo/v1/identity/session', '/api/ceo/v1/staff/sso',
   ]) assert.equal(isCeoPortalOnlyPath(path), true, path);
@@ -61,7 +61,7 @@ test('all CEO navigation entries are portal-only while entity ERP keeps a safe p
   const navigation = text('lib/erp-navigation.js');
   const entries = [...navigation.matchAll(/\{ key: '(ceo-[^']+)'[^\n]+\}/g)];
   assert.deepEqual(entries.map((entry) => entry[1]), [
-    'ceo-overview', 'ceo-briefing', 'ceo-decisions', 'ceo-world', 'ceo-commands',
+    'ceo-overview', 'ceo-navigator', 'ceo-briefing', 'ceo-decisions', 'ceo-world', 'ceo-commands',
     'ceo-workforce', 'ceo-inbox', 'ceo-registry', 'ceo-security', 'ceo-rollout',
   ]);
   for (const entry of entries) assert.match(entry[0], /ceoPortalOnly:\s*true/, entry[1]);

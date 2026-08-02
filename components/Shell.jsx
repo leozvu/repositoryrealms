@@ -245,7 +245,7 @@ function TwoFAModal({ onClose }) {
 const NAV = ERP_NAV;
 const CEO_NAV = [
   { section: 'Điều hành tập đoàn' },
-  ...NAV.filter((item) => ['ceo-overview', 'ceo-briefing', 'ceo-decisions', 'ceo-world', 'ceo-commands', 'ceo-inbox'].includes(item.key)),
+  ...NAV.filter((item) => ['ceo-overview', 'ceo-navigator', 'ceo-briefing', 'ceo-decisions', 'ceo-world', 'ceo-commands', 'ceo-inbox'].includes(item.key)),
   { section: 'Năng lực & quản trị' },
   ...NAV.filter((item) => ['ceo-workforce', 'ceo-registry', 'ceo-security', 'ceo-rollout'].includes(item.key)),
 ];
@@ -357,10 +357,16 @@ export default function Shell({ user, company, realmPilot, realmV2Theme = false,
   }, []);
 
   useEffect(() => { // v3.4: Ctrl+K mở tìm kiếm toàn cục
-    const h = e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setShowSearch(true); } };
+    const h = e => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (ceoPortal) router.push('/ceo-navigator');
+        else setShowSearch(true);
+      }
+    };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
-  }, []);
+  }, [ceoPortal, router]);
 
   return (
     <SessionProvider>
@@ -439,7 +445,7 @@ export default function Shell({ user, company, realmPilot, realmV2Theme = false,
           </div>
         </aside>
         {show2fa && <TwoFAModal onClose={() => setShow2fa(false)} />}
-        {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
+        {!ceoPortal && showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
         {showNotif && <NotificationsModal dataRevision={notificationRevision} onClose={() => setShowNotif(false)}
           onChanged={() => { setNotificationRevision((currentRevision) => currentRevision + 1); loadShellCounters(); }} />}
         <div id="backdrop" className={open ? 'show' : ''} onClick={() => setOpen(false)}></div>
@@ -451,7 +457,7 @@ export default function Shell({ user, company, realmPilot, realmV2Theme = false,
               {!ceoPortal && <WorkspaceSurfaceSwitch pilot={realmPilot} realmV2Available={realmV2Available} />}
               {ceoPortal && <span className="ceo-terminal-scope"><Icon name="shield" size={14} /> 4 entity · control plane</span>}
               <LanguageSwitch compact />
-              <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
+              <button className="btn btn-outline btn-sm" onClick={() => ceoPortal ? router.push('/ceo-navigator') : setShowSearch(true)} title={ceoPortal ? 'Mở Universal Company Navigator (Ctrl+K)' : 'Tìm kiếm toàn hệ thống (Ctrl+K)'}>
                 <Icon name="search" size={14} /><span> Ctrl+K</span>
               </button>
               <button className="btn btn-outline btn-sm" onClick={() => setShowNotif(true)} title="Thông báo" style={{ position: 'relative' }} aria-label="Thông báo">

@@ -14782,6 +14782,450 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "route.ceo-navigator.navigation.ceo-briefing",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 127,
+      "column": 7,
+      "surface": "route.ceo-navigator",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "CEO Briefing",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-briefing",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoNavigatorPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination",
+        "item.href"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.form-control.input",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 134,
+      "column": 9,
+      "surface": "route.ceo-navigator",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ],
+      "ownerComponent": "CeoNavigatorPage",
+      "effectiveHandlerEvent": "onChange",
+      "actionType": "form-control",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination",
+        "item.href"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.action.setscope-item-id",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 141,
+      "column": 31,
+      "surface": "route.ceo-navigator",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setScope(item.id)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoNavigatorPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination",
+        "item.href"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.navigation.ceo-registry",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 147,
+      "column": 26,
+      "surface": "route.ceo-navigator",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-registry",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoNavigatorPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination",
+        "item.href"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.action.load",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 157,
+      "column": 123,
+      "surface": "route.ceo-navigator",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoNavigatorPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination",
+        "item.href"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session",
+        "GET /api/ceo/v1/registry"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.navigation.item-href",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 177,
+      "column": 17,
+      "surface": "route.ceo-navigator",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "item.href",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "item.href",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoNavigatorPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination",
+        "item.href"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.action.openitem-item",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 178,
+      "column": 17,
+      "surface": "route.ceo-navigator",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openItem(item)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!item.available || Boolean(openingId)",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoNavigatorPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "openItem"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination",
+        "item.href"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/sso/authorize"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState",
+        "CeoSsoAuthorizationCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.location.assign"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
       "line": 183,
@@ -92585,6 +93029,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -92603,6 +93048,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -92660,6 +93106,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -92697,7 +93144,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 442,
+          "line": 448,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -92713,6 +93160,7 @@
         "component:realm-v2/RealmV2ApplicationShell"
       ],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -92770,6 +93218,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -92788,6 +93237,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -92853,6 +93303,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -92889,7 +93340,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 443,
+          "line": 449,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -92912,6 +93363,7 @@
         "component:realm-v2/RealmV2ApplicationShell"
       ],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -92992,6 +93444,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93024,7 +93477,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 443,
+          "line": 449,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -93040,6 +93493,7 @@
         "component:realm-v2/RealmV2ApplicationShell"
       ],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93097,6 +93551,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93146,7 +93601,7 @@
         {
           "callback": "onChanged",
           "source": "components/Shell.jsx",
-          "line": 443,
+          "line": 449,
           "surface": "component:Shell",
           "apiCalls": [
             "GET /api/approvals",
@@ -93166,7 +93621,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 443,
+          "line": 449,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -93182,6 +93637,7 @@
         "component:realm-v2/RealmV2ApplicationShell"
       ],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93262,6 +93718,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93281,7 +93738,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 441,
+          "line": 447,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -93296,6 +93753,7 @@
         "component:Shell"
       ],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93353,6 +93811,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93374,7 +93833,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 441,
+          "line": 447,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -93389,6 +93848,7 @@
         "component:Shell"
       ],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93453,6 +93913,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93474,7 +93935,7 @@
         {
           "callback": "onClose",
           "source": "components/Shell.jsx",
-          "line": 441,
+          "line": 447,
           "surface": "component:Shell",
           "apiCalls": [],
           "resourceOperations": [],
@@ -93489,6 +93950,7 @@
         "component:Shell"
       ],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93553,6 +94015,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93571,6 +94034,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93628,6 +94092,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93646,6 +94111,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93673,7 +94139,7 @@
     {
       "elementId": "component.components-shell.navigation.mo-ceo-terminal",
       "source": "components/Shell.jsx",
-      "line": 392,
+      "line": 398,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "a",
@@ -93703,6 +94169,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93719,6 +94186,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93746,7 +94214,7 @@
     {
       "elementId": "component.components-shell.navigation.item-href-item-key",
       "source": "components/Shell.jsx",
-      "line": 405,
+      "line": 411,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -93776,6 +94244,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93792,6 +94261,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93819,7 +94289,7 @@
     {
       "elementId": "component.components-shell.action.oi-anh-ai-dien",
       "source": "components/Shell.jsx",
-      "line": 415,
+      "line": 421,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -93849,6 +94319,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93865,6 +94336,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93894,7 +94366,7 @@
     {
       "elementId": "component.components-shell.form-control.input",
       "source": "components/Shell.jsx",
-      "line": 419,
+      "line": 425,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "input",
@@ -93924,6 +94396,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93942,6 +94415,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -93980,7 +94454,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 433,
+      "line": 439,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -94010,6 +94484,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94026,6 +94501,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94053,7 +94529,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 436,
+      "line": 442,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -94083,6 +94559,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94099,6 +94576,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94129,7 +94607,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 445,
+      "line": 451,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -94159,6 +94637,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94178,6 +94657,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94205,7 +94685,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 448,
+      "line": 454,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -94235,6 +94715,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94251,6 +94732,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94278,14 +94760,14 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 454,
+      "line": 460,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
       "kind": "action",
       "label": "Ctrl+K",
       "handlerEvent": "onClick",
-      "handler": "() => setShowSearch(true)",
+      "handler": "() => ceoPortal ? router.push('/ceo-navigator') : setShowSearch(true)",
       "target": "",
       "insideForm": false,
       "disabledBinding": "",
@@ -94308,6 +94790,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94317,16 +94800,18 @@
       "uxRiskCandidates": [],
       "ownerComponent": "Shell",
       "effectiveHandlerEvent": "onClick",
-      "actionType": "local-state",
+      "actionType": "navigation",
       "mappingConfidence": "high",
       "handlerChain": [],
       "delegatedCallbacks": [],
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
+        "/ceo-navigator",
         "g.href(r)",
         "n.route"
       ],
@@ -94351,7 +94836,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 457,
+      "line": 463,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -94381,6 +94866,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -94397,6 +94883,7 @@
       "delegatedBindings": [],
       "usedBySurfaces": [],
       "routeTargets": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -110558,31 +111045,31 @@
     }
   ],
   "summary": {
-    "elements": 1230,
+    "elements": 1237,
     "apiContracts": 133,
     "registryResources": 50,
     "byActionType": {
       "local-state": 280,
-      "data-action": 180,
-      "form-control": 380,
+      "data-action": 181,
+      "form-control": 381,
       "delegated-action": 117,
-      "navigation": 190,
+      "navigation": 195,
       "disabled-control": 18,
       "browser-action": 33,
       "helper-action": 32
     },
     "byMappingStatus": {
-      "classified-local": 857,
+      "classified-local": 862,
       "delegated-resolved": 58,
-      "handler-resolved": 198,
+      "handler-resolved": 200,
       "delegated": 117
     },
     "byConfidence": {
-      "high": 1172,
+      "high": 1179,
       "medium": 58
     },
     "uxStateCandidates": {},
-    "dataActions": 180,
+    "dataActions": 181,
     "delegatedBindings": 1426,
     "actionableUnresolved": 0
   }

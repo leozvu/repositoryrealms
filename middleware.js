@@ -28,6 +28,7 @@ export const config = {
     '/ceo-rollout/:path*',
     '/ceo-decisions/:path*',
     '/ceo-briefing/:path*',
+    '/ceo-navigator/:path*',
     '/realm-v2/:path*',
     '/api/ceo/v1/:path*',
   ],

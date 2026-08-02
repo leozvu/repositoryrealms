@@ -298,6 +298,30 @@
       "mappingStatus": "unreviewed"
     },
     {
+      "route": "/ceo-navigator",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "dynamic": false,
+      "auth": "authenticated",
+      "inNavigation": true,
+      "navLabel": "CEO · Tìm & mở mọi công ty",
+      "navSection": "Công ty",
+      "roles": [
+        "DIRECTOR"
+      ],
+      "module": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "mappingStatus": "unreviewed"
+    },
+    {
       "route": "/ceo-overview",
       "source": "app/(app)/ceo-overview/page.jsx",
       "dynamic": false,
@@ -6436,6 +6460,217 @@
       ],
       "routeCandidates": [],
       "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.navigation.ceo-briefing",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 127,
+      "column": 7,
+      "surface": "route.ceo-navigator",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "CEO Briefing",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-briefing",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.form-control.input",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 134,
+      "column": 9,
+      "surface": "route.ceo-navigator",
+      "tag": "input",
+      "kind": "form-control",
+      "label": "",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "control-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [
+        "control_binding_unverified"
+      ]
+    },
+    {
+      "elementId": "route.ceo-navigator.action.setscope-item-id",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 141,
+      "column": 31,
+      "surface": "route.ceo-navigator",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setScope(item.id)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-navigator.navigation.ceo-registry",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 147,
+      "column": 26,
+      "surface": "route.ceo-navigator",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-registry",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.action.load",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 157,
+      "column": 123,
+      "surface": "route.ceo-navigator",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
+    },
+    {
+      "elementId": "route.ceo-navigator.navigation.item-href",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 177,
+      "column": 17,
+      "surface": "route.ceo-navigator",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "item.href",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "item.href",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": []
+    },
+    {
+      "elementId": "route.ceo-navigator.action.openitem-item",
+      "source": "app/(app)/ceo-navigator/page.jsx",
+      "line": 178,
+      "column": 17,
+      "surface": "route.ceo-navigator",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openItem(item)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "!item.available || Boolean(openingId)",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "unreviewed",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/registry'",
+        "GET '/api/ceo/v1/identity/session'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination",
+        "item.href"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ]
     },
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
@@ -38074,6 +38309,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38117,6 +38353,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38161,6 +38398,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38202,6 +38440,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38243,6 +38482,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38284,6 +38524,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38325,6 +38566,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38366,6 +38608,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38407,6 +38650,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38448,6 +38692,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38491,6 +38736,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38504,7 +38750,7 @@
     {
       "elementId": "component.components-shell.navigation.mo-ceo-terminal",
       "source": "components/Shell.jsx",
-      "line": 392,
+      "line": 398,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "a",
@@ -38534,6 +38780,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38545,7 +38792,7 @@
     {
       "elementId": "component.components-shell.navigation.item-href-item-key",
       "source": "components/Shell.jsx",
-      "line": 405,
+      "line": 411,
       "column": 17,
       "surface": "component.components-shell",
       "tag": "Link",
@@ -38575,6 +38822,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38586,7 +38834,7 @@
     {
       "elementId": "component.components-shell.action.oi-anh-ai-dien",
       "source": "components/Shell.jsx",
-      "line": 415,
+      "line": 421,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38616,6 +38864,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38627,7 +38876,7 @@
     {
       "elementId": "component.components-shell.form-control.input",
       "source": "components/Shell.jsx",
-      "line": 419,
+      "line": 425,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "input",
@@ -38657,6 +38906,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38670,7 +38920,7 @@
     {
       "elementId": "component.components-shell.action.bao-mat-2-lop",
       "source": "components/Shell.jsx",
-      "line": 433,
+      "line": 439,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38700,6 +38950,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38711,7 +38962,7 @@
     {
       "elementId": "component.components-shell.action.ang-xuat",
       "source": "components/Shell.jsx",
-      "line": 436,
+      "line": 442,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38741,6 +38992,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38752,7 +39004,7 @@
     {
       "elementId": "component.components-shell.action.setopen-false",
       "source": "components/Shell.jsx",
-      "line": 445,
+      "line": 451,
       "column": 9,
       "surface": "component.components-shell",
       "tag": "div",
@@ -38782,6 +39034,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38796,7 +39049,7 @@
     {
       "elementId": "component.components-shell.action.mo-menu",
       "source": "components/Shell.jsx",
-      "line": 448,
+      "line": 454,
       "column": 13,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38826,6 +39079,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38837,14 +39091,14 @@
     {
       "elementId": "component.components-shell.action.ctrl-k",
       "source": "components/Shell.jsx",
-      "line": 454,
+      "line": 460,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
       "kind": "action",
       "label": "Ctrl+K",
       "handlerEvent": "onClick",
-      "handler": "() => setShowSearch(true)",
+      "handler": "() => ceoPortal ? router.push('/ceo-navigator') : setShowSearch(true)",
       "target": "",
       "insideForm": false,
       "disabledBinding": "",
@@ -38867,6 +39121,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -38878,7 +39133,7 @@
     {
       "elementId": "component.components-shell.action.thong-bao",
       "source": "components/Shell.jsx",
-      "line": 457,
+      "line": 463,
       "column": 15,
       "surface": "component.components-shell",
       "tag": "button",
@@ -38908,6 +39163,7 @@
         "POST '/api/avatar'"
       ],
       "routeCandidates": [
+        "'/ceo-navigator'",
         "'/dashboard'",
         "'/freelancer'",
         "'/login'",
@@ -39274,24 +39530,24 @@
     }
   ],
   "summary": {
-    "uiRoutes": 78,
+    "uiRoutes": 79,
     "apiRoutes": 133,
-    "interactiveElements": 1230,
-    "sourceFilesWithInteractions": 113,
-    "routesInPrimaryNavigation": 64,
+    "interactiveElements": 1237,
+    "sourceFilesWithInteractions": 114,
+    "routesInPrimaryNavigation": 65,
     "routesWithResourceCandidates": 42,
     "byKind": {
-      "action": 667,
-      "form-control": 380,
+      "action": 670,
+      "form-control": 381,
       "form-submit": 20,
-      "navigation": 163
+      "navigation": 166
     },
     "uxRiskCandidates": {
       "clickable_non_semantic": 86,
-      "control_binding_unverified": 325,
+      "control_binding_unverified": 326,
       "keyboard_path_unverified": 86,
       "possible_noop_button": 1,
-      "unlabelled_button_candidate": 62
+      "unlabelled_button_candidate": 65
     },
     "topInteractiveSources": [
       {

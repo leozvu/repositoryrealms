@@ -4,10 +4,10 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 ## Phạm vi
 
-- UI routes: **78**
+- UI routes: **79**
 - API routes: **133**
-- Interactive element definitions: **1230**
-- Source files có interaction: **113**
+- Interactive element definitions: **1237**
+- Source files có interaction: **114**
 - Routes có ERP resource candidate: **42**
 - Parse errors: **0**
 
@@ -15,20 +15,20 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 | Loại | Số lượng |
 | --- | --- |
-| action | 667 |
-| form-control | 380 |
+| action | 670 |
+| form-control | 381 |
 | form-submit | 20 |
-| navigation | 163 |
+| navigation | 166 |
 
 ## UX risk candidates cần review thủ công
 
 | Candidate | Số lượng |
 | --- | --- |
 | clickable_non_semantic | 86 |
-| control_binding_unverified | 325 |
+| control_binding_unverified | 326 |
 | keyboard_path_unverified | 86 |
 | possible_noop_button | 1 |
-| unlabelled_button_candidate | 62 |
+| unlabelled_button_candidate | 65 |
 
 Các candidate ưu tiên accessibility, keyboard, semantic control và possible no-op theo checklist UI/UX. Danh sách đầy đủ nằm trong `inventory.json` và `elements.csv`.
 
@@ -73,9 +73,9 @@ Các candidate ưu tiên accessibility, keyboard, semantic control và possible 
 | route.ceo-inbox.action.setselectedid-conversation-id | app/(app)/ceo-inbox/page.jsx:180 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-inbox.action.button.2 | app/(app)/ceo-inbox/page.jsx:193 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-inbox.form-control.textarea | app/(app)/ceo-inbox/page.jsx:193 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.ceo-overview.action.setfilter-all | app/(app)/ceo-overview/page.jsx:196 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-overview.action.setfilter-entity-id | app/(app)/ceo-overview/page.jsx:197 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-overview.action.load-filter | app/(app)/ceo-overview/page.jsx:214 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-navigator.form-control.input | app/(app)/ceo-navigator/page.jsx:134 | (không có nhãn tĩnh) | control_binding_unverified |
+| route.ceo-navigator.action.setscope-item-id | app/(app)/ceo-navigator/page.jsx:141 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-navigator.action.load | app/(app)/ceo-navigator/page.jsx:157 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 
 ## Authenticated routes chưa nằm trong primary navigation
 
