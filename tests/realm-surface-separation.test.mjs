@@ -35,9 +35,10 @@ test('the ERP shell retains the original business navigation and exposes Realm a
 
   assert.match(shell, /const NAV = ERP_NAV/);
   assert.match(shell, /ERP · CRM · 7 vai trò nghiệp vụ/);
-  assert.match(collaboration, /const href = realm \? '\/dashboard' : '\/realm'/);
+  assert.match(collaboration, /const href = realm \? '\/dashboard' : realmV2Available \? '\/realm-v2\/home' : '\/realm'/);
   assert.match(collaboration, /const label = realm \? 'ERP · CRM' : 'Mở Realm'/);
   assert.match(collaboration, /Mở văn phòng Realm tùy chọn/);
+  assert.match(collaboration, /pathname\.startsWith\('\/realm-v2'\)/);
 });
 
 test('the separation contract keeps synchronization below the presentation layer', () => {

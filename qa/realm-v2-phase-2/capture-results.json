@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2026-07-30T03:05:35.356Z",
+  "results": [
+    {
+      "slug": "work-management",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Quản lý công việc",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "action-center",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Trung tâm hành động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "work-management",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Quản lý công việc",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "action-center",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Trung tâm hành động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "work-management",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Quản lý công việc",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "action-center",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Trung tâm hành động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "work-management",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Quản lý công việc",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "action-center",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Trung tâm hành động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "work-management",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Quản lý công việc",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "action-center",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-2-qa",
+      "heading": "Trung tâm hành động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    }
+  ],
+  "actionChecks": [
+    {
+      "action": "task.block",
+      "entityId": "task-1",
+      "expectedVersion": 2,
+      "reasonCode": "dependency",
+      "reasonPresent": true,
+      "idempotencyKeyPresent": true
+    }
+  ],
+  "safetyChecks": [
+    {
+      "approvalDeepLinkPresent": true,
+      "directApproveButtonCount": 0,
+      "failClosedCopyPresent": true
+    }
+  ]
+}

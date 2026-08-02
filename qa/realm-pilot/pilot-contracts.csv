@@ -9,7 +9,7 @@ server-route-enforcement,server,app/(app)/realm/page.jsx,loadRealmPilotDecision 
 authenticated-policy-api,api,app/api/realm-demo/pilot/route.js,authenticatedUser() | export async function GET | export async function PUT | export async function PATCH,,,verified
 director-policy-write,server,lib/realm-pilot.js,if (!isDirector(sessionUser)) | realm_pilot_admin_forbidden | realm_pilot_roles_required,,,verified
 aggregate-private-metrics,server,lib/realm-pilot.js,eligibleUsers | aggregateOnly: true | performanceTracking: false | durationTracking: false | lastSeen: { gte: activeAfter },,,verified
-policy-aware-login,client,app/login/page.jsx,fetch('/api/realm-demo/pilot' | pilot.user?.allowed | destination = '/realm',,,verified
+policy-aware-login,client,app/login/LoginForm.jsx,fetch('/api/realm-demo/pilot' | pilot.user?.allowed | destination = '/realm',,,verified
 cross-surface-preference,client,lib/collaboration.js,persistWorkspaceSurface | window.fetch('/api/realm-demo/pilot' | preference: normalized | keepalive: true,,,verified
 both-surfaces-persist-choice,client,components/realm/RealmOffice.jsx,persistWorkspaceSurface('erp') | Mở workspace ERP CRM gốc | Mở ERP · CRM gốc,,,verified
 pilot-admin-control,client,components/realm/RealmPilotControl.jsx,Realm Pilot Control | Pilot theo cohort | Lưu chính sách pilot | không thay thế ERP,,,verified

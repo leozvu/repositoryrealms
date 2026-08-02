@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2026-07-30T15:06:38.474Z",
+  "results": [
+    {
+      "slug": "projects",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Project Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "chronicle",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Chronicle",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "projects",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Project Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "chronicle",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Chronicle",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "projects",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Project Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "chronicle",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Chronicle",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "projects",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Project Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "chronicle",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Chronicle",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "projects",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Project Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "chronicle",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-5-qa",
+      "heading": "Chronicle",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    }
+  ],
+  "mutationRequests": []
+}

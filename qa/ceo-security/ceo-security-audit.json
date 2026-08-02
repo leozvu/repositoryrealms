@@ -2,12 +2,12 @@
   "phase": "CEO-8",
   "generatedBy": "scripts/audit-ceo-security.mjs",
   "summary": {
-    "scannedFiles": 756,
+    "scannedFiles": 873,
     "secretFindings": 0,
-    "scopedTargetRoutes": 10,
-    "targetRoutes": 10,
-    "audienceBoundOutboundAdapters": 4,
-    "outboundAdapters": 4,
+    "scopedTargetRoutes": 11,
+    "targetRoutes": 11,
+    "audienceBoundOutboundAdapters": 5,
+    "outboundAdapters": 5,
     "chaosScenarios": 7,
     "migrationAdditive": true,
     "portalOnlyKillSwitch": true,
@@ -27,6 +27,11 @@
     {
       "file": "app/api/ceo/v1/snapshot/route.js",
       "scope": "SNAPSHOT_READ",
+      "guarded": true
+    },
+    {
+      "file": "app/api/ceo/v1/decisions/route.js",
+      "scope": "DECISIONS_READ",
       "guarded": true
     },
     {
@@ -76,6 +81,10 @@
     },
     {
       "file": "lib/ceo-unified-dashboard-admin.js",
+      "audienceHeader": true
+    },
+    {
+      "file": "lib/ceo-decision-queue-admin.js",
       "audienceHeader": true
     },
     {

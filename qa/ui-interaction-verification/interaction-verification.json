@@ -9,10 +9,10 @@
   "summary": {
     "finalCandidateElements": 0,
     "finalCandidateFlags": 0,
-    "guardedActions": 140,
+    "guardedActions": 137,
     "asyncButtonGuards": 74,
-    "disabledBindings": 62,
-    "localPendingStates": 4,
+    "disabledBindings": 52,
+    "localPendingStates": 11,
     "destructiveFlows": 6,
     "destructiveFlowsVerified": 6,
     "browserScenarios": 4
@@ -127,18 +127,6 @@
       "status": "verified"
     },
     {
-      "elementId": "route.ceo-commands.action.button",
-      "source": "app/(app)/ceo-commands/page.jsx",
-      "line": 246,
-      "label": "",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
       "elementId": "route.ceo-commands.action.reconcile-delivery",
       "source": "app/(app)/ceo-commands/page.jsx",
       "line": 262,
@@ -175,18 +163,6 @@
       "status": "verified"
     },
     {
-      "elementId": "route.ceo-inbox.action.button",
-      "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 176,
-      "label": "",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
       "elementId": "route.ceo-inbox.action.refresh",
       "source": "app/(app)/ceo-inbox/page.jsx",
       "line": 188,
@@ -211,18 +187,6 @@
       "status": "verified"
     },
     {
-      "elementId": "route.ceo-inbox.action.button.2",
-      "source": "app/(app)/ceo-inbox/page.jsx",
-      "line": 193,
-      "label": "",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
       "elementId": "route.ceo-inbox.form-submit.send",
       "source": "app/(app)/ceo-inbox/page.jsx",
       "line": 193,
@@ -237,7 +201,7 @@
     {
       "elementId": "route.ceo-overview.action.refresh-filter",
       "source": "app/(app)/ceo-overview/page.jsx",
-      "line": 186,
+      "line": 183,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -381,7 +345,7 @@
     {
       "elementId": "route.ceo-workforce.action.sync",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 205,
+      "line": 204,
       "label": "",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -393,20 +357,8 @@
     {
       "elementId": "route.ceo-workforce.form-submit.form",
       "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 220,
+      "line": 219,
       "label": "* / — / — / * / — / — / * / — / — / * / * / * / * / *",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
-      "elementId": "route.ceo-workforce.action.button",
-      "source": "app/(app)/ceo-workforce/page.jsx",
-      "line": 246,
-      "label": "",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
       "successState": "toast-or-state",
@@ -454,18 +406,6 @@
       "elementId": "route.copilot.form-submit.gui",
       "source": "app/(app)/copilot/page.jsx",
       "line": 75,
-      "label": "Gửi",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
-      "elementId": "route.copilot.action.gui",
-      "source": "app/(app)/copilot/page.jsx",
-      "line": 79,
       "label": "Gửi",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
@@ -643,18 +583,6 @@
       "status": "verified"
     },
     {
-      "elementId": "route.messages.action.ang-gui-gui",
-      "source": "app/(app)/messages/page.jsx",
-      "line": 231,
-      "label": "Đang gửi… / Gửi",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
       "elementId": "route.myday.action.ua-viec-len-mot-bac",
       "source": "app/(app)/myday/page.jsx",
       "line": 95,
@@ -697,18 +625,6 @@
       "label": "Số giờ ước lượng / Nhóm công việc / Độ phức tạp / Ghi chú phạm vi (không bắt buộc) / Hủy / Đang lưu… / Lưu estimate có receipt",
       "actionType": "data-action",
       "loadingState": "local-state",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
-      "elementId": "route.myday.action.ang-luu-luu-estimate-co-receipt",
-      "source": "app/(app)/myday/page.jsx",
-      "line": 138,
-      "label": "Đang lưu… / Lưu estimate có receipt",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
       "successState": "toast-or-state",
       "errorState": "handled-candidate",
       "confirmationState": "not-required",
@@ -1171,6 +1087,126 @@
       "status": "verified"
     },
     {
+      "elementId": "component.components-realm-v2-canonicalrealmcommunicationscreens.action.onselect-item",
+      "source": "components/realm-v2/CanonicalRealmCommunicationScreens.jsx",
+      "line": 117,
+      "label": "",
+      "actionType": "data-action",
+      "loadingState": "local-state",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-v2-canonicalrealmcommunicationscreens.form-submit.ang-gui-gui-vao-erp",
+      "source": "components/realm-v2/CanonicalRealmCommunicationScreens.jsx",
+      "line": 182,
+      "label": "Đang gửi… / Gửi vào ERP",
+      "actionType": "data-action",
+      "loadingState": "local-state",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-v2-canonicalrealmcommunicationscreens.form-submit.moi-chat-go-cua-moi-thoai-khong-kha-dung-ang-khong-lam-phien",
+      "source": "components/realm-v2/CanonicalRealmCommunicationScreens.jsx",
+      "line": 419,
+      "label": "Mời chat / Gõ cửa / Mời thoại / · không khả dụng / Đang Không làm phiền",
+      "actionType": "data-action",
+      "loadingState": "local-state",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-v2-canonicalrealmexperiencescreens.action.anh-dau-a-oc",
+      "source": "components/realm-v2/CanonicalRealmExperienceScreens.jsx",
+      "line": 90,
+      "label": "Đánh dấu đã đọc",
+      "actionType": "data-action",
+      "loadingState": "local-state",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-v2-canonicalrealmexperiencescreens.action.oc-tat-ca",
+      "source": "components/realm-v2/CanonicalRealmExperienceScreens.jsx",
+      "line": 146,
+      "label": "Đọc tất cả",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-v2-canonicalrealmexperiencescreens.action.title-description",
+      "source": "components/realm-v2/CanonicalRealmExperienceScreens.jsx",
+      "line": 326,
+      "label": "{title} / {description}",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-v2-canonicalrealmgovernancescreens.action.oi-soat",
+      "source": "components/realm-v2/CanonicalRealmGovernanceScreens.jsx",
+      "line": 159,
+      "label": "Đối soát",
+      "actionType": "data-action",
+      "loadingState": "local-state",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-v2-canonicalrealmgovernancescreens.form-submit.chon-entity-cau-truc-proposal-normalized-command-action-canonica",
+      "source": "components/realm-v2/CanonicalRealmGovernanceScreens.jsx",
+      "line": 263,
+      "label": "Chọn entity… / Cấu trúc proposal / Normalized command / {action} / Canonical resource / Authorization / Target entity revalidates / Business rules / RepositoryRealms allowlist / Id",
+      "actionType": "data-action",
+      "loadingState": "local-state",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-v2-canonicalrealmscreens.action.hoan-tat-bat-au",
+      "source": "components/realm-v2/CanonicalRealmScreens.jsx",
+      "line": 98,
+      "label": "Hoàn tất / Bắt đầu",
+      "actionType": "data-action",
+      "loadingState": "local-state",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
+      "elementId": "component.components-realm-v2-primitives.action.children",
+      "source": "components/realm-v2/Primitives.jsx",
+      "line": 9,
+      "label": "{children}",
+      "actionType": "data-action",
+      "loadingState": "disabled-binding",
+      "successState": "toast-or-state",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "status": "verified"
+    },
+    {
       "elementId": "component.components-realm-realmcreateactiondialog.action.gui-war-council-note",
       "source": "components/realm/RealmCreateActionDialog.jsx",
       "line": 49,
@@ -1199,18 +1235,6 @@
       "source": "components/realm/RealmFeedbackLauncher.jsx",
       "line": 152,
       "label": "Cho đội pilot biết điều gì đang cản trở công việc. Không cần rời Realm và không tạo một hệ thống dữ liệu thứ hai. / Loại phản hồi / Mức ảnh hưởng / Mô tả ngắn / * / /120 ký tự / Đi",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
-      "elementId": "component.components-realm-realmfeedbacklauncher.action.ang-gui-gui-vao-guild-support",
-      "source": "components/realm/RealmFeedbackLauncher.jsx",
-      "line": 198,
-      "label": "Đang gửi… / Gửi vào Guild Support",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
       "successState": "toast-or-state",
@@ -1255,34 +1279,10 @@
       "status": "verified"
     },
     {
-      "elementId": "component.components-realm-realmoffice.action.button.2",
-      "source": "components/realm/RealmOffice.jsx",
-      "line": 2319,
-      "label": "",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
       "elementId": "component.components-realm-realmoffice.form-submit.ten-hien-thi-class-trong-realm-mau-huy-hieu-ang-ong-bo-luu-ho-so",
       "source": "components/realm/RealmOffice.jsx",
       "line": 2350,
       "label": "Tên hiển thị / Class trong Realm / Màu huy hiệu / Đang đồng bộ… / Lưu hồ sơ",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
-      "elementId": "component.components-realm-realmoffice.action.ang-ong-bo-luu-ho-so",
-      "source": "components/realm/RealmOffice.jsx",
-      "line": 2371,
-      "label": "Đang đồng bộ… / Lưu hồ sơ",
       "actionType": "data-action",
       "loadingState": "disabled-binding",
       "successState": "toast-or-state",
@@ -1471,42 +1471,6 @@
       "status": "verified"
     },
     {
-      "elementId": "component.components-realm-rewardcontrolcenter.action.ang-luu-luu-budget-draft",
-      "source": "components/realm/RewardControlCenter.jsx",
-      "line": 288,
-      "label": "Đang lưu… / Lưu budget draft",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
-      "elementId": "component.components-realm-rewardcontrolcenter.action.ang-luu-luu-ban-nhap",
-      "source": "components/realm/RewardControlCenter.jsx",
-      "line": 298,
-      "label": "Đang lưu… / Lưu bản nháp",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
-      "elementId": "component.components-realm-rewardcontrolcenter.action.ang-gui",
-      "source": "components/realm/RewardControlCenter.jsx",
-      "line": 303,
-      "label": "Đang gửi…",
-      "actionType": "data-action",
-      "loadingState": "disabled-binding",
-      "successState": "toast-or-state",
-      "errorState": "handled-candidate",
-      "confirmationState": "not-required",
-      "status": "verified"
-    },
-    {
       "elementId": "component.components-realm-rewardcontrolcenter.action.ang-gui-gui-duyet.2",
       "source": "components/realm/RewardControlCenter.jsx",
       "line": 337,
@@ -1617,7 +1581,7 @@
     {
       "elementId": "component.components-shell.action.bat-thong-bao-thiet-bi",
       "source": "components/Shell.jsx",
-      "line": 177,
+      "line": 165,
       "label": "Bật thông báo thiết bị",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1629,7 +1593,7 @@
     {
       "elementId": "component.components-shell.action.oc-tat-ca",
       "source": "components/Shell.jsx",
-      "line": 188,
+      "line": 176,
       "label": "Đọc tất cả",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1641,7 +1605,7 @@
     {
       "elementId": "component.components-shell.action.tat-2fa",
       "source": "components/Shell.jsx",
-      "line": 232,
+      "line": 220,
       "label": "Tắt 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",
@@ -1653,7 +1617,7 @@
     {
       "elementId": "component.components-shell.action.bat-2fa",
       "source": "components/Shell.jsx",
-      "line": 233,
+      "line": 221,
       "label": "Bật 2FA",
       "actionType": "data-action",
       "loadingState": "async-button-guard",

@@ -17,6 +17,7 @@ const ringOrder = ['local_staging', 'read_only', 'ceo_sso', 'messaging', 'comman
 const evidenceKinds = ['backup', 'restore_test', 'canary', 'reconciliation', 'rollback'];
 const adapterFiles = [
   'lib/ceo-unified-dashboard-admin.js',
+  'lib/ceo-decision-queue-admin.js',
   'lib/ceo-identity-admin.js',
   'lib/ceo-messaging-admin.js',
   'lib/ceo-federation-admin.js',

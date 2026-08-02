@@ -1,8 +1,8 @@
 # CEO-8 security audit
 
 - Secret findings: **0**
-- Scoped target routes: **10/10**
-- Audience-bound outbound adapters: **4/4**
+- Scoped target routes: **11/11**
+- Audience-bound outbound adapters: **5/5**
 - Chaos scenarios: **7/7**
 - Additive migration: **yes**
 - Portal-only kill switch: **yes**

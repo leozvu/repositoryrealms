@@ -30,6 +30,7 @@ export default defineConfig({
       ...process.env,
       NEXTAUTH_URL: baseURL,
       NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'playwright-only-secret-0123456789abcdef',
+      REALM_V2_PREVIEW: 'true',
     },
   },
 });

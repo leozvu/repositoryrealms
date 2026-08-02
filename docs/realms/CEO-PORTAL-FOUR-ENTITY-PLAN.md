@@ -293,6 +293,53 @@ Implementation status: code complete on `codex/realms-demo` as an evidence-backe
 - Egolive first gets read dashboard and deep links; payout/settlement remains local until an independent finance review.
 - Every ring has backup, canary, reconciliation and rollback evidence.
 
+### CEO-12 — Group operations cockpit
+
+Implementation status: code complete on `codex/realm-design-system-v2-implementation`. The cockpit composes sanitized dashboard, rollout, command receipt, messaging and workforce read models. It degrades per source and never writes an entity business record.
+
+- One operational pulse across the four companies.
+- Priority queue for source outages, stale data, failed/pending receipts and rollout holds.
+- Quick links enter canonical Portal or entity workflows.
+- No GMV/revenue/cash mixing and no automatic resend.
+
+### CEO-13 — Unified decision queue
+
+Implementation status: code complete on `codex/realm-design-system-v2-implementation`. Production activation is intentionally gated by coordinated entity deployment and service-credential rotation.
+
+- Each entity exposes a separate `repositoryrealms.ceo.decision-feed` v1 projection under `ceo.decisions.read`.
+- The feed excludes payload, reference IDs, requester IDs, reviewer IDs and decision history.
+- Portal access requires Director authentication, an active CEO session and recent TOTP step-up.
+- SLA ranking is deterministic and amounts remain grouped by currency.
+- Portal provides only a signed SSO deep link; approve/reject stays in the owning ERP workflow with its authorization, maker-checker, receipt and audit.
+- One unavailable entity is shown as degraded and does not block the other companies.
+
+Activation gate: deploy the target endpoint to each approved entity, rotate its Portal service credential to include `ceo.decisions.read`, verify the `read_only` rollout evidence, then canary one entity before enabling all four. Never broaden the existing snapshot v1 contract to carry approval data.
+
+### CEO-14 — Executive daily briefing
+
+Implementation status: code complete on `codex/realm-design-system-v2-implementation`.
+
+- One deterministic briefing split into `Act now`, `Close today` and `Keep watching`.
+- Composes CEO-12 operational attention with CEO-13 decision SLA state and whitelisted dashboard aggregates.
+- Shows source availability and preserves partial results during adapter failure.
+- Vietnamese/English, responsive at 375/768/1024/1440 and keyboard-friendly 44px controls.
+- No generative decision making, invented facts, direct entity writes or silent financial aggregation.
+
+Exit gate: all four companies return a validated decision feed, a forced timeout proves graceful degradation, and every briefing link resolves to a canonical Portal or signed entity workflow.
+
+### CEO-15 — Universal company navigator
+
+Implementation status: code complete on `codex/realm-design-system-v2-implementation`. See `CEO-15-UNIVERSAL-COMPANY-NAVIGATOR.md`.
+
+- `Ctrl+K` in CEO Terminal opens one bilingual, keyboard-first workflow finder.
+- Portal workspaces remain locally available even when Entity Registry is degraded.
+- Entity workflows are generated from the entity capability profile, never by indexing business records.
+- Every entity launch uses the existing signed SSO authorization-code boundary and a relative allowlisted path.
+- The Portal never searches generic ERP `/api/data/*`, exposes registry secrets or executes a business action from the Navigator.
+- Mobile, tablet and desktop layouts preserve visible focus, 44px controls and reduced-motion behavior.
+
+Exit gate: the four entities expose the correct capability-aware workflow set, TOTP-locked sessions cannot launch entity SSO, Registry failure preserves Portal navigation, and entity deployments return 404 for `/ceo-navigator`.
+
 ## 6. Proposed deployment topology
 
 | Component | Suggested project | Database |

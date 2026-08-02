@@ -1,14 +1,13 @@
-// v3.40: manifest theo từng deployment. CEO Terminal cài lên điện thoại phải mang tên và
-// màn hình khởi động riêng (mở thẳng Tổng quan 4 công ty), không lẫn với app ERP công ty.
-const IS_CEO_PORTAL = process.env.NEXT_PUBLIC_CEO_GROUP_WORKFORCE === '1';
+import { deploymentBranding, isCeoPortalDeployment } from '@/lib/deployment-profile';
 
 export default function manifest() {
-  if (IS_CEO_PORTAL) {
+  const brand = deploymentBranding();
+  if (isCeoPortalDeployment()) {
     return {
-      name: 'Leoz Group — CEO Terminal',
-      short_name: 'CEO Terminal',
-      description: 'Trung tâm điều hành 4 công ty: số liệu hợp nhất, giao việc liên công ty, hộp thư và bản đồ vương quốc.',
-      start_url: '/ceo-overview',
+      name: `${brand.company} — ${brand.product}`,
+      short_name: brand.shortName,
+      description: brand.description,
+      start_url: brand.homePath,
       display: 'standalone',
       background_color: '#F4F0E7',
       theme_color: '#102219',

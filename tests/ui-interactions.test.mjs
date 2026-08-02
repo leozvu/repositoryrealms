@@ -32,7 +32,7 @@ test('shared async primitives guard double-submit and preserve failed forms', ()
 });
 
 test('login fields expose stable accessible labels and autocomplete contracts', () => {
-  const source = fs.readFileSync(path.join(root, 'app', 'login', 'page.jsx'), 'utf8');
+  const source = fs.readFileSync(path.join(root, 'app', 'login', 'LoginForm.jsx'), 'utf8');
   for (const id of ['login-email', 'login-password', 'login-otp']) {
     assert.ok(source.includes(`htmlFor="${id}"`));
     assert.ok(source.includes(`id="${id}"`));

@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2026-08-01T17:37:16.246Z",
+  "results": [
+    {
+      "slug": "employee-profile",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Hồ sơ nhân sự",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "recognition",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Recognition & Gold Ledger",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "employee-profile",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Hồ sơ nhân sự",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "recognition",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Recognition & Gold Ledger",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "employee-profile",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Hồ sơ nhân sự",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "recognition",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Recognition & Gold Ledger",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "employee-profile",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Hồ sơ nhân sự",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "recognition",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Recognition & Gold Ledger",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "employee-profile",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Hồ sơ nhân sự",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "recognition",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-7-qa",
+      "heading": "Recognition & Gold Ledger",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    }
+  ],
+  "mutationRequests": []
+}

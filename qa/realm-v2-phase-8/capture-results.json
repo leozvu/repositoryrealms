@@ -1,0 +1,226 @@
+{
+  "generatedAt": "2026-08-01T18:15:49.779Z",
+  "results": [
+    {
+      "slug": "notifications",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Thông báo",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "search",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Tìm kiếm toàn hệ thống",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "settings",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Cài đặt Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "mobile",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Không gian làm việc di động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "notifications",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Thông báo",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "search",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Tìm kiếm toàn hệ thống",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "settings",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Cài đặt Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "mobile",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Không gian làm việc di động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "notifications",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Thông báo",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "search",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Tìm kiếm toàn hệ thống",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "settings",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Cài đặt Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "mobile",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Không gian làm việc di động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "notifications",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Thông báo",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "search",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Tìm kiếm toàn hệ thống",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "settings",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Cài đặt Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "mobile",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Không gian làm việc di động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "notifications",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Thông báo",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "search",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Tìm kiếm toàn hệ thống",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "settings",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Cài đặt Realm",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "mobile",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-8-qa",
+      "heading": "Không gian làm việc di động",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    }
+  ],
+  "businessMutationRequests": []
+}
