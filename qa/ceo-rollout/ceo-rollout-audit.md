@@ -2,7 +2,7 @@
 
 - Rollout rings: **5/5**
 - Baseline evidence kinds: **5/5**
-- Guarded outbound adapters: **5/5**
+- Guarded outbound adapters: **6/6**
 - Private rollout routes: **3/3**
 - Additive, fail-closed migration: **yes**
 - Portal-only transitions: **yes**

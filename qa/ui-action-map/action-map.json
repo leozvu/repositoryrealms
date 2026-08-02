@@ -601,6 +601,65 @@
       }
     },
     {
+      "route": "/api/ceo/v1/decision-queue",
+      "source": "app/api/ceo/v1/decision-queue/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "CeoEntityMembership",
+            "CeoEntityRegistry",
+            "CeoPortalSession",
+            "CeoRolloutState"
+          ],
+          "roles": [],
+          "guards": [
+            "currentUser",
+            "isDirector"
+          ],
+          "statuses": [
+            400,
+            401,
+            403,
+            404,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
+      "route": "/api/ceo/v1/decisions",
+      "source": "app/api/ceo/v1/decisions/route.js",
+      "methods": {
+        "GET": {
+          "models": [
+            "ApiKey",
+            "Approval",
+            "CeoApiRateLimitBucket",
+            "Setting"
+          ],
+          "roles": [
+            "DIRECTOR"
+          ],
+          "guards": [],
+          "statuses": [
+            400,
+            401,
+            403,
+            429,
+            500,
+            503
+          ],
+          "permissionPolicy": "explicit-rbac",
+          "usesModuleGuard": false,
+          "hasErrorHandling": true
+        }
+      }
+    },
+    {
       "route": "/api/ceo/v1/directory",
       "source": "app/api/ceo/v1/directory/route.js",
       "methods": {
@@ -10755,6 +10814,274 @@
       "uxStateCandidates": []
     },
     {
+      "elementId": "route.ceo-briefing.action.load",
+      "source": "app/(app)/ceo-briefing/page.jsx",
+      "line": 128,
+      "column": 117,
+      "surface": "route.ceo-briefing",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET endpoint"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoBriefingPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [
+        "GET /api/ceo/v1/identity/session"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "CeoEntityMembership",
+        "CeoGlobalIdentity",
+        "CeoPortalSession",
+        "CeoRecoveryCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-briefing.navigation.ceo-overview",
+      "source": "app/(app)/ceo-briefing/page.jsx",
+      "line": 128,
+      "column": 12,
+      "surface": "route.ceo-briefing",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-overview",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-overview",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET endpoint"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoBriefingPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-briefing.navigation.entry-href",
+      "source": "app/(app)/ceo-briefing/page.jsx",
+      "line": 145,
+      "column": 33,
+      "surface": "route.ceo-briefing",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "entry.href",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "entry.href",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET endpoint"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoBriefingPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-briefing.navigation.totp",
+      "source": "app/(app)/ceo-briefing/page.jsx",
+      "line": 152,
+      "column": 202,
+      "surface": "route.ceo-briefing",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "TOTP",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET endpoint"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoBriefingPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-briefing.navigation.ceo-decisions",
+      "source": "app/(app)/ceo-briefing/page.jsx",
+      "line": 153,
+      "column": 12,
+      "surface": "route.ceo-briefing",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-decisions",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-decisions",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/identity/session'",
+        "GET endpoint"
+      ],
+      "routeCandidates": [],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoBriefingPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
       "elementId": "route.ceo-commands.navigation.ceo-overview",
       "source": "app/(app)/ceo-commands/page.jsx",
       "line": 195,
@@ -13023,6 +13350,315 @@
       "loadingState": "async-button-guard",
       "successState": "toast-or-state",
       "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-decisions.action.load",
+      "source": "app/(app)/ceo-decisions/page.jsx",
+      "line": 74,
+      "column": 117,
+      "surface": "route.ceo-decisions",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "load",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/decision-queue'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoDecisionsPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "data-action",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "load"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "GET /api/ceo/v1/decision-queue"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "handled-candidate",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-decisions.navigation.ceo-overview",
+      "source": "app/(app)/ceo-decisions/page.jsx",
+      "line": 74,
+      "column": 12,
+      "surface": "route.ceo-decisions",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "/ceo-overview",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-overview",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/decision-queue'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoDecisionsPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-decisions.navigation.totp",
+      "source": "app/(app)/ceo-decisions/page.jsx",
+      "line": 84,
+      "column": 110,
+      "surface": "route.ceo-decisions",
+      "tag": "Link",
+      "kind": "navigation",
+      "label": "TOTP",
+      "handlerEvent": "",
+      "handler": "",
+      "target": "/ceo-registry",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "navigation-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/decision-queue'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [],
+      "ownerComponent": "CeoDecisionsPage",
+      "effectiveHandlerEvent": "",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-decisions.action.setfilter-key",
+      "source": "app/(app)/ceo-decisions/page.jsx",
+      "line": 87,
+      "column": 115,
+      "surface": "route.ceo-decisions",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => setFilter(key)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "classified-local",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/decision-queue'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoDecisionsPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "local-state",
+      "mappingConfidence": "high",
+      "handlerChain": [],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [],
+      "contextModels": [],
+      "permissionPolicies": [],
+      "allowedRoles": [],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
+      "confirmationState": "not-required",
+      "uxStateCandidates": []
+    },
+    {
+      "elementId": "route.ceo-decisions.action.openentity-decision",
+      "source": "app/(app)/ceo-decisions/page.jsx",
+      "line": 93,
+      "column": 11,
+      "surface": "route.ceo-decisions",
+      "tag": "button",
+      "kind": "action",
+      "label": "",
+      "handlerEvent": "onClick",
+      "handler": "() => openEntity(decision)",
+      "target": "",
+      "insideForm": false,
+      "disabledBinding": "",
+      "actionStatus": "handler-candidate",
+      "mappingStatus": "handler-resolved",
+      "businessFeature": "",
+      "resourceCandidates": [],
+      "apiCandidates": [
+        "GET '/api/ceo/v1/decision-queue'",
+        "POST '/api/ceo/v1/sso/authorize'"
+      ],
+      "routeCandidates": [
+        "body.destination"
+      ],
+      "uxRiskCandidates": [
+        "unlabelled_button_candidate"
+      ],
+      "ownerComponent": "CeoDecisionsPage",
+      "effectiveHandlerEvent": "onClick",
+      "actionType": "navigation",
+      "mappingConfidence": "high",
+      "handlerChain": [
+        "openEntity"
+      ],
+      "delegatedCallbacks": [],
+      "delegatedBindings": [],
+      "usedBySurfaces": [],
+      "routeTargets": [
+        "body.destination"
+      ],
+      "apiCalls": [
+        "POST /api/ceo/v1/sso/authorize"
+      ],
+      "resourceOperations": [],
+      "contextResources": [],
+      "prismaModels": [
+        "AuditLog",
+        "CeoEntityMembership",
+        "CeoEntityRegistry",
+        "CeoPortalSession",
+        "CeoRolloutState",
+        "CeoSsoAuthorizationCode"
+      ],
+      "contextModels": [],
+      "permissionPolicies": [
+        "explicit-rbac"
+      ],
+      "allowedRoles": [
+        "DIRECTOR"
+      ],
+      "rowPolicy": false,
+      "scopedRead": false,
+      "browserActions": [
+        "window.location.assign"
+      ],
+      "helperCalls": [],
+      "localMutations": [],
+      "loadingState": "not-required",
+      "successState": "not-required",
+      "errorState": "not-required",
       "confirmationState": "not-required",
       "uxStateCandidates": []
     },
@@ -109922,31 +110558,31 @@
     }
   ],
   "summary": {
-    "elements": 1220,
-    "apiContracts": 131,
+    "elements": 1230,
+    "apiContracts": 133,
     "registryResources": 50,
     "byActionType": {
-      "local-state": 279,
-      "data-action": 178,
+      "local-state": 280,
+      "data-action": 180,
       "form-control": 380,
       "delegated-action": 117,
-      "navigation": 183,
+      "navigation": 190,
       "disabled-control": 18,
       "browser-action": 33,
       "helper-action": 32
     },
     "byMappingStatus": {
-      "classified-local": 850,
+      "classified-local": 857,
       "delegated-resolved": 58,
-      "handler-resolved": 195,
+      "handler-resolved": 198,
       "delegated": 117
     },
     "byConfidence": {
-      "high": 1162,
+      "high": 1172,
       "medium": 58
     },
     "uxStateCandidates": {},
-    "dataActions": 178,
+    "dataActions": 180,
     "delegatedBindings": 1426,
     "actionableUnresolved": 0
   }

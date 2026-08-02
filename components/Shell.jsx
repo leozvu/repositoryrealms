@@ -245,7 +245,7 @@ function TwoFAModal({ onClose }) {
 const NAV = ERP_NAV;
 const CEO_NAV = [
   { section: 'Điều hành tập đoàn' },
-  ...NAV.filter((item) => ['ceo-overview', 'ceo-world', 'ceo-commands', 'ceo-inbox'].includes(item.key)),
+  ...NAV.filter((item) => ['ceo-overview', 'ceo-briefing', 'ceo-decisions', 'ceo-world', 'ceo-commands', 'ceo-inbox'].includes(item.key)),
   { section: 'Năng lực & quản trị' },
   ...NAV.filter((item) => ['ceo-workforce', 'ceo-registry', 'ceo-security', 'ceo-rollout'].includes(item.key)),
 ];

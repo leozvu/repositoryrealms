@@ -4,10 +4,10 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 ## Phạm vi
 
-- UI routes: **76**
-- API routes: **131**
-- Interactive element definitions: **1220**
-- Source files có interaction: **111**
+- UI routes: **78**
+- API routes: **133**
+- Interactive element definitions: **1230**
+- Source files có interaction: **113**
 - Routes có ERP resource candidate: **42**
 - Parse errors: **0**
 
@@ -15,10 +15,10 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 | Loại | Số lượng |
 | --- | --- |
-| action | 663 |
+| action | 667 |
 | form-control | 380 |
 | form-submit | 20 |
-| navigation | 157 |
+| navigation | 163 |
 
 ## UX risk candidates cần review thủ công
 
@@ -28,7 +28,7 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 | control_binding_unverified | 325 |
 | keyboard_path_unverified | 86 |
 | possible_noop_button | 1 |
-| unlabelled_button_candidate | 58 |
+| unlabelled_button_candidate | 62 |
 
 Các candidate ưu tiên accessibility, keyboard, semantic control và possible no-op theo checklist UI/UX. Danh sách đầy đủ nằm trong `inventory.json` và `elements.csv`.
 
@@ -62,6 +62,10 @@ Các candidate ưu tiên accessibility, keyboard, semantic control và possible 
 | route.automation.action.e-e-stoppropagation-setmodal-mode-del-row-r | app/(app)/automation/page.jsx:127 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.calendar.action.setdaymodal-label-dow-i-fmtdm-d-evs | app/(app)/calendar/page.jsx:141 | (không có nhãn tĩnh) | clickable_non_semantic, keyboard_path_unverified |
 | route.calendar.action.d | app/(app)/calendar/page.jsx:163 | {d} | clickable_non_semantic, keyboard_path_unverified |
+| route.ceo-briefing.action.load | app/(app)/ceo-briefing/page.jsx:128 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-decisions.action.load | app/(app)/ceo-decisions/page.jsx:74 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-decisions.action.setfilter-key | app/(app)/ceo-decisions/page.jsx:87 | (không có nhãn tĩnh) | unlabelled_button_candidate |
+| route.ceo-decisions.action.openentity-decision | app/(app)/ceo-decisions/page.jsx:93 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-inbox.action.load | app/(app)/ceo-inbox/page.jsx:167 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-inbox.form-control.select | app/(app)/ceo-inbox/page.jsx:173 | — | control_binding_unverified |
 | route.ceo-inbox.form-control.select.2 | app/(app)/ceo-inbox/page.jsx:174 | (không có nhãn tĩnh) | control_binding_unverified |
@@ -72,10 +76,6 @@ Các candidate ưu tiên accessibility, keyboard, semantic control và possible 
 | route.ceo-overview.action.setfilter-all | app/(app)/ceo-overview/page.jsx:196 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-overview.action.setfilter-entity-id | app/(app)/ceo-overview/page.jsx:197 | (không có nhãn tĩnh) | unlabelled_button_candidate |
 | route.ceo-overview.action.load-filter | app/(app)/ceo-overview/page.jsx:214 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-registry.action.load | app/(app)/ceo-registry/page.jsx:265 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-registry.action.loadidentity | app/(app)/ceo-registry/page.jsx:288 | (không có nhãn tĩnh) | unlabelled_button_candidate |
-| route.ceo-registry.form-control.input | app/(app)/ceo-registry/page.jsx:294 | (không có nhãn tĩnh) | control_binding_unverified |
-| route.ceo-registry.form-control.input.2 | app/(app)/ceo-registry/page.jsx:298 | (không có nhãn tĩnh) | control_binding_unverified |
 
 ## Authenticated routes chưa nằm trong primary navigation
 

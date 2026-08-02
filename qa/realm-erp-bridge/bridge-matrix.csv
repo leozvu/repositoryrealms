@@ -49,7 +49,9 @@ analytics,Công ty,Scrying Observatory,Đài quan sát,Analytics (MRR/LTV),/anal
 okr,Công ty,Guild Objectives,Bảng mục tiêu,KPI / OKR,/okr,PM | AM | ACCOUNTANT | HR | LEAD | STAFF,,app/(app)/okr/page.jsx,verified
 automation,Công ty,Arcane Automation,Tháp cơ khí,Tự động hóa,/automation,DIRECTOR only,,app/(app)/automation/page.jsx,verified
 audit,Công ty,Royal Chronicle,Kho lưu trữ,Nhật ký hệ thống,/audit,DIRECTOR only,,app/(app)/audit/page.jsx,verified
-ceo-overview,Công ty,Royal Realm Overview,Phòng điều hành CEO,CEO · Tổng quan 4 công ty,/ceo-overview,DIRECTOR only,,app/(app)/ceo-overview/page.jsx,verified
+ceo-overview,Công ty,Royal Realm Overview,Phòng điều hành CEO,CEO · Trung tâm điều hành,/ceo-overview,DIRECTOR only,,app/(app)/ceo-overview/page.jsx,verified
+ceo-briefing,Công ty,Royal Morning Briefing,Phòng điều hành CEO,CEO · Briefing hôm nay,/ceo-briefing,DIRECTOR only,,app/(app)/ceo-briefing/page.jsx,verified
+ceo-decisions,Công ty,Royal Decision Docket,Phòng nghị sự CEO,CEO · Hàng đợi quyết định,/ceo-decisions,DIRECTOR only,,app/(app)/ceo-decisions/page.jsx,verified
 ceo-world,Công ty,Realm Federation Atlas,Bản đồ bốn vương quốc,CEO · Bản đồ 4 vương quốc,/ceo-world,DIRECTOR only,,app/(app)/ceo-world/page.jsx,verified
 ceo-commands,Công ty,Royal Dispatch,Phòng điều hành CEO,CEO · Điều phối liên công ty,/ceo-commands,DIRECTOR only,,app/(app)/ceo-commands/page.jsx,verified
 ceo-workforce,Công ty,Guild Workforce Exchange,Phòng điều hành CEO,CEO · Nhân sự trong group,/ceo-workforce,DIRECTOR only,,app/(app)/ceo-workforce/page.jsx,verified
