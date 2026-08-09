@@ -88,6 +88,35 @@ test('CEO-18 executive workspace isolates unsupported and timed-out entities whi
   assert.equal(result.invariants.directEntityWrites, false);
 });
 
+test('CEO-18 an open entity circuit degrades only that company', async () => {
+  const fixture = workspaceFixture();
+  fixture.entities[2].circuitState = 'open';
+  fixture.entities[2].circuitRetryAt = new Date(NOW.getTime() + 60_000);
+  const aimSnapshot = buildCeoExecutiveSnapshot({
+    identity: { id: 'aim' }, settings: { currency: 'VND' }, capabilities: { crm: false, support: false, livestream: false },
+    records: { activeHeadcount: 2 }, asOf: NOW,
+  });
+  const fetchImpl = async (url) => {
+    if (url.hostname === 'vnecom.test') throw new Error('circuit-open target must not be called');
+    if (url.pathname.endsWith('/capabilities')) {
+      return new Response(JSON.stringify({
+        entityId: url.hostname.split('.')[0],
+        endpoints: url.hostname === 'aim.test' ? { executiveSnapshot: '/api/ceo/v2/executive-snapshot' } : {},
+      }), { status: 200 });
+    }
+    return new Response(JSON.stringify(aimSnapshot), { status: 200 });
+  };
+  const result = await loadCeoExecutiveWorkspace(fixture.db, USER, RAW_SESSION, {}, {
+    now: NOW, hashSecret: HASH_SECRET, fetchImpl,
+    secretResolver: () => 'scoped-service-key',
+    allowedOriginResolver: (entity) => [entity.baseUrl], timeoutMs: 20,
+  });
+  assert.equal(result.summary.ready, 1);
+  assert.equal(result.summary.notSupported, 1);
+  assert.equal(result.summary.degraded, 1);
+  assert.equal(result.entities.find((row) => row.id === 'vnecom').errorCode, 'ceo_registry_circuit_open');
+});
+
 test('CEO-18 UI fails soft to the stable command set when capability negotiation is unavailable', () => {
   const page = fs.readFileSync(path.join(root, 'app/(app)/ceo-commands/page.jsx'), 'utf8');
   assert.match(page, /LEGACY_ACTIONS/);

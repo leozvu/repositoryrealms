@@ -80,6 +80,7 @@ async function main() {
   const portalOrigin = normalizeOrigin(required('portal-url'));
   const credential = readCredential(required('credential-file'));
   const entityId = String(required('entity')).trim().toLowerCase();
+  const redirectPath = argument('redirect-path', '/dashboard');
   const entityBaseOrigin = argument('entity-base-url')
     ? normalizeOrigin(argument('entity-base-url'))
     : null;
@@ -185,14 +186,14 @@ async function main() {
       };
     }, { requestedEntity: entityId });
 
-    const authorization = await page.evaluate(async ({ entityId: requestedEntity }) => {
+    const authorization = await page.evaluate(async ({ entityId: requestedEntity, redirectPath: requestedPath }) => {
       const response = await fetch('/api/ceo/v1/sso/authorize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entityId: requestedEntity, redirectPath: '/dashboard' }),
+        body: JSON.stringify({ entityId: requestedEntity, redirectPath: requestedPath }),
       });
       return { status: response.status, body: await response.json().catch(() => ({})) };
-    }, { entityId });
+    }, { entityId, redirectPath });
 
     if (authorization.status !== 200 || !authorization.body?.destination) {
       throw new Error(`SSO authorization failed with HTTP ${authorization.status}: ${authorization.body?.code || 'unknown'}.`);
@@ -238,7 +239,7 @@ async function main() {
       cookies,
     };
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-    const enteredEntityDashboard = new URL(report.finalUrl).pathname === '/dashboard';
+    const enteredRequestedSurface = new URL(report.finalUrl).pathname === redirectPath;
     const executiveReady = report.controlPlaneEvidence.executive.status === 200
       && report.controlPlaneEvidence.executive.summary?.registered === 4
       && report.controlPlaneEvidence.executive.summary?.ready === 4
@@ -247,7 +248,7 @@ async function main() {
       && report.controlPlaneEvidence.capabilities.entityId === entityId
       && report.controlPlaneEvidence.capabilities.source === 'entity'
       && report.controlPlaneEvidence.capabilities.actions.length > 0;
-    if (!report.sessionAuthenticated || !enteredEntityDashboard || !executiveReady || !capabilitiesReady) process.exitCode = 2;
+    if (!report.sessionAuthenticated || !enteredRequestedSurface || !executiveReady || !capabilitiesReady) process.exitCode = 2;
   } finally {
     await browser.close();
   }
