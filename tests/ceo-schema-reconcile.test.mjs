@@ -39,6 +39,8 @@ test('CEO schema reconciliation plans only the approved additive attendance and 
   const source = fs.readFileSync(new URL('../lib/ceo-schema-reconcile.js', import.meta.url), 'utf8');
   assert.match(source, /ADD COLUMN IF NOT EXISTS/);
   assert.match(source, /CREATE (UNIQUE )?INDEX IF NOT EXISTS/);
+  assert.match(source, /pg_try_advisory_xact_lock/);
+  assert.doesNotMatch(source, /pg_advisory_xact_lock\(/);
   assert.doesNotMatch(source, /DROP\s+(TABLE|COLUMN|SCHEMA)|TRUNCATE|DELETE\s+FROM/i);
 });
 
