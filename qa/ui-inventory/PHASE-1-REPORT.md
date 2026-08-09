@@ -4,31 +4,31 @@ Báo cáo này được sinh tự động từ AST bằng `npm run audit:ui:inve
 
 ## Phạm vi
 
-- UI routes: **79**
-- API routes: **133**
-- Interactive element definitions: **1237**
-- Source files có interaction: **114**
-- Routes có ERP resource candidate: **42**
+- UI routes: **81**
+- API routes: **136**
+- Interactive element definitions: **1270**
+- Source files có interaction: **118**
+- Routes có ERP resource candidate: **44**
 - Parse errors: **0**
 
 ## Phân loại element
 
 | Loại | Số lượng |
 | --- | --- |
-| action | 670 |
+| action | 690 |
 | form-control | 381 |
 | form-submit | 20 |
-| navigation | 166 |
+| navigation | 179 |
 
 ## UX risk candidates cần review thủ công
 
 | Candidate | Số lượng |
 | --- | --- |
-| clickable_non_semantic | 86 |
-| control_binding_unverified | 326 |
-| keyboard_path_unverified | 86 |
-| possible_noop_button | 1 |
-| unlabelled_button_candidate | 65 |
+| clickable_non_semantic | 84 |
+| control_binding_unverified | 325 |
+| keyboard_path_unverified | 84 |
+| possible_noop_button | 5 |
+| unlabelled_button_candidate | 69 |
 
 Các candidate ưu tiên accessibility, keyboard, semantic control và possible no-op theo checklist UI/UX. Danh sách đầy đủ nằm trong `inventory.json` và `elements.csv`.
 

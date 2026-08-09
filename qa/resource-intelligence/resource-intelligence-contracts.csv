@@ -13,8 +13,8 @@ manager-scope-and-reason,authorization,lib/resource-intelligence-admin.js,"hasAn
 cas-idempotency,safety,lib/resource-intelligence-admin.js,workVersion: command.expectedVersion | idempotencyKey | resource_intelligence_work_stale,,verified
 atomic-receipt-revision-audit,audit,lib/resource-intelligence-admin.js,realmActionReceipt.create | workEstimateRevision.create | workItemEvent.create | auditLog.create,,verified
 repository-realms-dispatch,parity,lib/repository-realms.js,action: 'task.estimate' | RESOURCE_INTELLIGENCE_ACTIONS.includes | executeResourceEstimateAction,,verified
-my-work-intelligence,ui,app/(app)/myday/page.jsx,Resource Intelligence · shadow mode | TimeLog hiện là dữ liệu tự khai báo | Cập nhật estimate,,verified
-team-work-intelligence,ui,app/(app)/teamwork/page.jsx,Nguồn lực theo bằng chứng có provenance | Manager adjustment | Lưu hiệu chỉnh có receipt,,verified
+my-work-intelligence,ui,app/(app)/myday/page.jsx,Estimate là khai báo phạm vi | TimeLog là dữ liệu tự khai báo | Cập nhật estimate,,verified
+team-work-intelligence,ui,app/(app)/teamwork/page.jsx,"TimeLog tự khai báo | business rule, receipt và audit | Lưu hiệu chỉnh có receipt",,verified
 responsive-accessible-intelligence,ux,app/(app)/teamwork/team-work.module.css,min-height:44px | @media(max-width:720px) | @media(prefers-reduced-motion:reduce),,verified
 phase2-tests,test,tests/resource-intelligence-admin.test.mjs,"CAS, receipt, revision, WorkItemEvent và audit atomically | Manager adjustment cần manager scope | Idempotent replay",,verified
 phase2-runbook,operations,docs/realms/PHASE-2-RESOURCE-INTELLIGENCE.md,Estimate không phải Actual | confidence ceiling | crmegoric-realms-demo,,verified

@@ -1,6 +1,6 @@
 import './globals.css';
 import './realm-canonical-v2.css';
-import { Be_Vietnam_Pro, Noto_Serif, Roboto_Mono } from 'next/font/google';
+import { Be_Vietnam_Pro, Roboto_Mono } from 'next/font/google';
 import { LanguageProvider } from '@/components/LanguageProvider';
 import { deploymentBranding } from '@/lib/deployment-profile';
 
@@ -9,13 +9,6 @@ const bodyFont = Be_Vietnam_Pro({
   weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
   variable: '--font-be-vietnam-pro',
-});
-
-const displayFont = Noto_Serif({
-  subsets: ['latin', 'vietnamese'],
-  weight: 'variable',
-  display: 'swap',
-  variable: '--font-noto-serif',
 });
 
 const monoFont = Roboto_Mono({
@@ -28,16 +21,14 @@ const monoFont = Roboto_Mono({
 export function generateMetadata() {
   const brand = deploymentBranding();
   return {
-    title: brand.kind === 'ceo-portal'
-      ? 'Leoz Group — CEO Terminal'
-      : 'CRMegoric ERP · CRM — Medieval Realms',
+    title: `${brand.company} · ${brand.product}`,
     description: brand.description,
   };
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi" suppressHydrationWarning className={`${bodyFont.variable} ${displayFont.variable} ${monoFont.variable}`}>
+    <html lang="vi" suppressHydrationWarning className={`${bodyFont.variable} ${monoFont.variable}`}>
       <body><LanguageProvider>{children}</LanguageProvider></body>
     </html>
   );

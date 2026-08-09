@@ -19,13 +19,18 @@ const STATUS = {
   quote: [['draft', 'Nháp'], ['sent', 'Đã gửi'], ['accepted', 'Chấp nhận'], ['rejected', 'Từ chối']],
 };
 
-export default function DocEditor({ kind, doc, clients, projects = [], services = [], allDocs, onSave, onClose }) {
+export default function DocEditor({ kind, doc, clients, projects = [], services = [], allDocs, onSave, onClose, embedded = false }) {
   const isInv = kind === 'invoice';
-  const [d, setD] = useState(() => doc ? { ...doc, items: parseItems(doc.items) } : {
+  const [dirty, setDirty] = useState(false);
+  const [d, setDoc] = useState(() => doc ? { ...doc, items: parseItems(doc.items) } : {
     code: nextCode(isInv ? 'INV' : 'BG', allDocs), clientId: clients[0]?.id || '', projectId: '',
     items: [{ desc: '', qty: 1, price: 0 }], vat: 8, status: 'draft', date: todayISO(),
     ...(isInv ? { dueDate: daysFromNow(15), recurring: false } : { note: '' }),
   });
+  const setD = (updater) => {
+    setDirty(true);
+    setDoc(updater);
+  };
   const toast = useToast();
   const setItem = (i, k, v) => setD(x => ({ ...x, items: x.items.map((it, j) => j === i ? { ...it, [k]: v } : it) }));
   const sub = d.items.reduce((s, it) => s + (+it.qty || 0) * (+it.price || 0), 0);
@@ -51,20 +56,26 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
     }
     else out.note = d.note || null;
     const result = await onSave(out);
-    if (result !== false && result !== null) onClose();
+    if (result !== false && result !== null) {
+      setDirty(false);
+      onClose();
+    }
   };
 
-  return (
-    <Modal title={(doc ? 'Sửa' : 'Tạo') + (isInv ? ' hóa đơn — ' : ' báo giá — ') + d.code} large onClose={onClose}
-      footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
-        <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={save}>Lưu {isInv ? 'hóa đơn' : 'báo giá'}</AsyncButton></>}>
+  const requestClose = () => {
+    if (dirty && !window.confirm('Bạn có thay đổi chưa lưu. Rời trình soạn và bỏ các thay đổi này?')) return;
+    onClose();
+  };
+
+  const editor = (
+    <div className="document-editor-body">
       <div className="form-grid" style={{ marginBottom: 16 }}>
         <div className="field"><label>Khách hàng <span className="req">*</span></label>
           <select value={d.clientId} onChange={e => setD({ ...d, clientId: e.target.value })}>
             {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
         {isInv && <div className="field"><label>Dự án</label>
           <select value={d.projectId || ''} onChange={e => setD({ ...d, projectId: e.target.value })}>
-            <option value="">— Không thuộc dự án —</option>
+            <option value="">Không thuộc dự án</option>
             {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></div>}
         <div className="field"><label>Ngày lập</label><input type="date" value={d.date} onChange={e => setD({ ...d, date: e.target.value })} /></div>
         {/* v3.21: đa tiền tệ — mặc định VNĐ, chọn ngoại tệ khi cần (hóa đơn XNK). */}
@@ -106,7 +117,7 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
               const sv = services.find(x => x.id === e.target.value);
               if (sv) setD(x => ({ ...x, items: [...x.items, { desc: sv.name, qty: 1, price: sv.price }] }));
             }}>
-            <option value="">— Thêm nhanh từ bảng giá dịch vụ —</option>
+            <option value="">Thêm nhanh từ bảng giá dịch vụ</option>
             {services.map(sv => <option key={sv.id} value={sv.id}>{sv.name} · {money(sv.price)}/{sv.unit || 'đv'}</option>)}
           </select>
         )}
@@ -118,6 +129,27 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
         {d.currency && d.currency !== 'VND' && +d.fxRate > 0 &&
           <div className="trow" style={{ fontSize: '.8rem', color: 'var(--muted)' }}><span>Quy đổi VNĐ (×{d.fxRate})</span><b>{money(sub * (1 + (+d.vat || 0) / 100) * (+d.fxRate || 1))}</b></div>}
       </div>
+    </div>
+  );
+
+  const title = `${doc ? 'Sửa' : 'Tạo'} ${isInv ? 'hóa đơn' : 'báo giá'} · ${d.code}`;
+  if (embedded) {
+    return (
+      <div className="document-workspace">
+        <header className="document-workspace-header">
+          <button className="btn btn-outline" onClick={requestClose}><Icon name="chevron" size={15} />Quay lại danh sách</button>
+          <div><span>{isInv ? 'Hóa đơn' : 'Báo giá'}</span><h2>{title}</h2><p>{dirty ? 'Có thay đổi chưa lưu' : 'Mọi thay đổi đã được lưu'}</p></div>
+          <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={save}><Icon name="save" size={15} />Lưu {isInv ? 'hóa đơn' : 'báo giá'}</AsyncButton>
+        </header>
+        {editor}
+      </div>
+    );
+  }
+  return (
+    <Modal title={title} large onClose={requestClose}
+      footer={<><button className="btn btn-outline" onClick={requestClose}>Hủy</button>
+        <AsyncButton className="btn btn-primary" pendingLabel="Đang lưu…" onClick={save}>Lưu {isInv ? 'hóa đơn' : 'báo giá'}</AsyncButton></>}>
+      {editor}
     </Modal>
   );
 }

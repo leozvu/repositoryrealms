@@ -7,12 +7,12 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), 'utf8');
 
-test('ERP shell declares the shared Phase 22 visual system without changing route structure', () => {
+test('ERP shell declares the workplace visual system without changing route structure', () => {
   const shell = read('components', 'Shell.jsx');
 
-  assert.match(shell, /repository-realms-workspace/);
-  assert.match(shell, /data-visual-system="phase-22"/);
-  assert.match(shell, /isRealmRoute[\s\S]*realm-immersive[\s\S]*repository-realms-workspace/);
+  assert.match(shell, /workspace-shell/);
+  assert.match(shell, /data-visual-system="workplace-2026"/);
+  assert.match(shell, /isLegacyRealm[\s\S]*realm-immersive[\s\S]*workspace-shell/);
   assert.match(shell, /realmV2Theme/);
 });
 

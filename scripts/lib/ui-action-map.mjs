@@ -611,6 +611,8 @@ function classifyAction(element, trace) {
   if (element.kind === 'navigation' || trace.routeTargets.size || element.target) return 'navigation';
   if (element.kind === 'form-control') return 'form-control';
   if (element.disabledBinding && !element.handler) return 'disabled-control';
+  if ((element.interactionParents || []).some((parent) => /\.(?:Trigger|Close)$/.test(parent))) return 'delegated-action';
+  if (/get(?:ToggleSorting|Resize)Handler|table\.(?:previous|next)Page/.test(element.handler || '')) return 'local-state';
   if (trace.resourceOps.size || trace.apiCalls.size) return 'data-action';
   if (trace.callbacks.size) return 'delegated-action';
   if (trace.browserActions.size) return 'browser-action';

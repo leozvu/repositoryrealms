@@ -8,7 +8,7 @@ const dashboardSource = await readFile(
 );
 
 test('dashboard declares onboarding state before the unauthenticated early return', () => {
-  const onboardingHook = dashboardSource.indexOf('const [onbHidden, setOnbHidden] = useState');
+  const onboardingHook = dashboardSource.indexOf('const [onboardingHidden, setOnboardingHidden] = useState');
   const unauthenticatedReturn = dashboardSource.indexOf('if (!user) return null;');
 
   assert.notEqual(onboardingHook, -1, 'onboarding hook must exist');

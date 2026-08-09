@@ -146,33 +146,55 @@ function HomeScreen() {
   if (!data.myWork) return <Panel title="Không thể tải Realm Home"><div className={styles.canonicalState}><StateView state="error"/><Button variant="secondary" icon="refresh" onClick={data.reload}>Tải lại an toàn</Button></div></Panel>;
 
   return (
-    <div className={styles.grid}>
+    <div className={styles.realmHome}>
       <PartialError errors={data.errors} onRetry={data.reload}/>
-      <section className={`${styles.grid} ${styles.grid4}`} aria-label="Tóm tắt vận hành cá nhân">
-        <MetricCard label="Việc đang mở" value={data.myWork.metrics.open} meta="ERP Task" icon="checklist" tone="success"/>
-        <MetricCard label="Cần chú ý" value={attention.length} meta="Chặn hoặc quá hạn" icon="warning" tone={attention.length ? 'warning' : 'success'}/>
-        <MetricCard label="Chờ bạn duyệt" value={approvals.length} meta="Approval ERP" icon="approval" tone={approvals.length ? 'warning' : 'success'}/>
-        <MetricCard label="Dự án đang góp sức" value={projectCount} meta="Theo Task được giao" icon="folder" tone="info"/>
+      <section className={styles.realmStatusStrip} aria-label="Tình trạng không gian làm việc">
+        <span><Icon name="checklist" size={16}/><strong>{data.myWork.metrics.open}</strong> việc đang mở</span>
+        <span data-alert={attention.length > 0 || undefined}><Icon name="warning" size={16}/><strong>{attention.length}</strong> cần chú ý</span>
+        <span data-alert={approvals.length > 0 || undefined}><Icon name="approval" size={16}/><strong>{approvals.length}</strong> chờ quyết định</span>
+        <span><Icon name="folder" size={16}/><strong>{projectCount}</strong> phòng dự án</span>
+        <SourcePill source="ERP" freshness={timeLabel(data.myWork.generatedAt)}/>
       </section>
 
-      <div className={styles.split}>
-        <div className={styles.grid}>
-          <Panel title="Bước tiếp theo" description="Ưu tiên theo hàng đợi cá nhân và deadline trong Task ERP." actions={<Link className={styles.button} data-variant="secondary" href="/realm-v2/my-work"><span>Xem toàn bộ</span><Icon name="chevron" size={14}/></Link>}>
-            {nextTask ? <CanonicalTaskCard task={nextTask} queue={nextTask.queue} busy={busyId === nextTask.id} onTransition={transition}/> : <div className={styles.canonicalEmpty}><Icon name="check"/><strong>Không còn việc đang mở</strong><span>Realm không tự tạo nhiệm vụ thay cho ERP.</span></div>}
-          </Panel>
-          <Panel title="Cần bạn chú ý" description="Chỉ gồm việc bị chặn hoặc đã quá hạn; không phải điểm số nhân sự.">
-            {attention.length ? <div className={styles.list}>{attention.map((task) => <Link href={`/tasks?focus=${encodeURIComponent(task.id)}&from=realm-v2`} className={styles.listItem} key={task.id}><span className={styles.listIcon}><Icon name={task.queue === 'blocked' ? 'lock' : 'clock'}/></span><span className={styles.listCopy}><strong>{task.title}</strong><span>{task.project?.name || 'Task ERP'} · {dateLabel(task.dueDate)}</span></span><Badge tone="danger">{task.queue === 'blocked' ? 'Bị chặn' : 'Quá hạn'}</Badge></Link>)}</div> : <div className={styles.canonicalEmpty}><Icon name="check"/><strong>Không có cảnh báo cá nhân</strong><span>Dữ liệu được kiểm tra tại {timeLabel(data.myWork.generatedAt)}.</span></div>}
-          </Panel>
-        </div>
+      <div className={styles.realmHomeLayout}>
+        <section className={styles.workplaceScene} aria-labelledby="realm-workplace-title">
+          <header className={styles.sceneHeader}>
+            <div><span>Không gian chung</span><h2 id="realm-workplace-title">Văn phòng hôm nay</h2><p>Chọn một khu vực để mở đúng công việc và bản ghi chuẩn.</p></div>
+            <span className={styles.presenceChip}><Icon name="people" size={15}/>Đang kết nối</span>
+          </header>
+          <div className={styles.roomFloor}>
+            <div className={styles.floorPath} aria-hidden="true"/>
+            <Link className={styles.spatialZone} data-zone="desk" href="/realm-v2/my-work">
+              <span><Icon name="checklist" size={22}/></span><strong>Bàn của tôi</strong><small>{data.myWork.metrics.open} việc đang mở</small>
+            </Link>
+            <Link className={styles.spatialZone} data-zone="team" href="/realm-v2/work-management">
+              <span><Icon name="people" size={22}/></span><strong>Phòng đội nhóm</strong><small>Phân bổ và trở ngại</small>
+            </Link>
+            <Link className={styles.spatialZone} data-zone="projects" href="/realm-v2/projects">
+              <span><Icon name="folder" size={22}/></span><strong>Phòng dự án</strong><small>{projectCount} dự án liên quan</small>
+            </Link>
+            <Link className={styles.spatialZone} data-zone="operations" href="/realm-v2/approvals" data-alert={approvals.length > 0 || undefined}>
+              <span><Icon name="approval" size={22}/></span><strong>Bàn vận hành</strong><small>{approvals.length} quyết định chờ</small>
+            </Link>
+            <Link className={styles.spatialZone} data-zone="inbox" href="/realm-v2/inbox" data-alert={notifications.some((item) => !item.readAt) || undefined}>
+              <span><Icon name="inbox" size={22}/></span><strong>Hộp thư</strong><small>{notifications.filter((item) => !item.readAt).length} chưa đọc</small>
+            </Link>
+            <Link className={styles.spatialZone} data-zone="chronicle" href="/realm-v2/chronicle">
+              <span><Icon name="timeline" size={22}/></span><strong>Biên niên</strong><small>Thay đổi và quyết định</small>
+            </Link>
+          </div>
+          <nav className={styles.zoneList} aria-label="Danh sách khu vực Realm">
+            <Link href="/realm-v2/my-work">Bàn của tôi</Link><Link href="/realm-v2/work-management">Phòng đội nhóm</Link><Link href="/realm-v2/projects">Phòng dự án</Link><Link href="/realm-v2/approvals">Bàn vận hành</Link><Link href="/realm-v2/inbox">Hộp thư</Link><Link href="/realm-v2/chronicle">Biên niên</Link>
+          </nav>
+        </section>
 
-        <aside className={styles.asideStack}>
-          <Panel title="Quyết định đang chờ" description="Giữ nguyên authorization và maker-checker của ERP.">
-            {approvals.length ? <div className={styles.list}>{approvals.slice(0, 4).map((approval) => <Link className={styles.listItem} href="/approvals" key={approval.id}><span className={styles.listIcon}><Icon name="approval"/></span><span className={styles.listCopy}><strong>{approval.title || approval.type || 'Yêu cầu phê duyệt'}</strong><span>{approval.requesterName || 'ERP Approval'} · {timeLabel(approval.createdAt)}</span></span><Icon name="chevron" size={14}/></Link>)}</div> : <div className={styles.canonicalEmpty}><Icon name="check"/><strong>Không có yêu cầu chờ duyệt</strong></div>}
+        <aside className={styles.realmActionRail}>
+          <Panel title="Việc tiếp theo" description="Ưu tiên từ hàng đợi ERP." actions={<Link className={styles.button} data-variant="secondary" href="/realm-v2/my-work">Toàn bộ</Link>}>
+            {nextTask ? <CanonicalTaskCard task={nextTask} queue={nextTask.queue} busy={busyId === nextTask.id} onTransition={transition} compact/> : <div className={styles.canonicalEmpty}><Icon name="check"/><strong>Không còn việc đang mở</strong></div>}
           </Panel>
-          <Panel title="Thay đổi gần đây" description="Thông báo theo đúng phạm vi tài khoản hiện tại.">
-            {notifications.length ? <div className={styles.list}>{notifications.slice(0, 5).map((item) => <Link href={item.route || '/dashboard'} className={styles.listItem} key={item.id}><span className={styles.listIcon}><Icon name="bell"/></span><span className={styles.listCopy}><strong>{item.title}</strong><span>{timeLabel(item.createdAt)}</span></span>{!item.readAt && <Badge tone="info">Mới</Badge>}</Link>)}</div> : <div className={styles.canonicalEmpty}><Icon name="inbox"/><strong>Chưa có thông báo mới</strong></div>}
+          <Panel title="Cần can thiệp" description="Trở ngại và quá hạn, không phải điểm nhân sự.">
+            {attention.length ? <div className={styles.list}>{attention.slice(0, 4).map((task) => <Link href={`/tasks?focus=${encodeURIComponent(task.id)}&from=realm-v2`} className={styles.listItem} key={task.id}><span className={styles.listIcon}><Icon name={task.queue === 'blocked' ? 'lock' : 'clock'}/></span><span className={styles.listCopy}><strong>{task.title}</strong><span>{task.project?.name || 'Công việc ERP'} · {dateLabel(task.dueDate)}</span></span><Badge tone="danger">{task.queue === 'blocked' ? 'Bị chặn' : 'Quá hạn'}</Badge></Link>)}</div> : <div className={styles.canonicalEmpty}><Icon name="check"/><strong>Không có cảnh báo cá nhân</strong></div>}
           </Panel>
-          <SourcePill source={data.myWork.source === 'erp-task' ? 'ERP Task' : 'RepositoryRealms'} freshness={timeLabel(data.myWork.generatedAt)}/>
         </aside>
       </div>
     </div>

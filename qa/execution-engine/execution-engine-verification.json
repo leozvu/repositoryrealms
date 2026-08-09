@@ -190,9 +190,9 @@
       "layer": "ui",
       "source": "app/(app)/myday/page.jsx",
       "signals": [
-        "Personal execution cockpit",
+        "PageHeader",
         "/api/execution/my-work",
-        "Task ERP"
+        "task.reprioritize"
       ],
       "missingSignals": [],
       "status": "verified"
@@ -202,9 +202,9 @@
       "layer": "ui",
       "source": "app/(app)/teamwork/page.jsx",
       "signals": [
-        "Team work orchestrator",
+        "title=\"Ngoại lệ và phân bổ công việc\"",
         "/api/execution/team-work",
-        "Canonical manager actions"
+        "ReceiptBar"
       ],
       "missingSignals": [],
       "status": "verified"

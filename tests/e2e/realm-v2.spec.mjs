@@ -1,8 +1,13 @@
 import { expect, test } from '@playwright/test';
 
-test('all 18 Realm v2 compositions require an authenticated product session', async ({ request }) => {
+test('Realm v2 compositions require a session while CEO-only areas fail closed on entity deployments', async ({ request }) => {
+  const ceoOnly = new Set(['command-center', 'world-map', 'ceo-terminal']);
   for (const slug of ['home', 'my-work', 'work-management', 'action-center', 'command-center', 'approvals', 'inbox', 'collaboration', 'projects', 'chronicle', 'world-map', 'ceo-terminal', 'employee-profile', 'recognition', 'notifications', 'search', 'settings', 'mobile']) {
     const response = await request.get(`/realm-v2/${slug}`, { maxRedirects: 0 });
+    if (ceoOnly.has(slug)) {
+      expect(response.status()).toBe(404);
+      continue;
+    }
     expect([307, 308]).toContain(response.status());
     expect(response.headers().location).toBe(`/login?callbackUrl=%2Frealm-v2%2F${slug}`);
   }

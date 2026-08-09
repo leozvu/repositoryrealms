@@ -13,8 +13,8 @@ repository-realms-canonical-route,parity,lib/repository-realms.js,executeExecuti
 my-work-api,api,app/api/execution/my-work/route.js,"loadMyWork | private, no-store",,verified
 team-work-api,api,app/api/execution/team-work/route.js,"loadTeamWork | private, no-store",,verified
 canonical-action-api,api,app/api/execution/actions/route.js,executeRepositoryRealmsAction | Idempotency-Key | emitEvent,,verified
-personal-cockpit,ui,app/(app)/myday/page.jsx,Personal execution cockpit | /api/execution/my-work | Task ERP,,verified
-manager-orchestrator,ui,app/(app)/teamwork/page.jsx,Team work orchestrator | /api/execution/team-work | Canonical manager actions,,verified
+personal-cockpit,ui,app/(app)/myday/page.jsx,PageHeader | /api/execution/my-work | task.reprioritize,,verified
+manager-orchestrator,ui,app/(app)/teamwork/page.jsx,"title=""Ngoại lệ và phân bổ công việc"" | /api/execution/team-work | ReceiptBar",,verified
 parallel-experience-nav,ui,lib/erp-navigation.js,"key: 'myday' | key: 'teamwork' | roles: ['PM', 'LEAD']",,verified
 responsive-accessible-controls,ux,app/(app)/teamwork/team-work.module.css,min-height:44px | @media(max-width:720px) | @media(prefers-reduced-motion:reduce),,verified
 execution-tests,test,tests/execution-engine-admin.test.mjs,work-version CAS | Reprioritize CAS queue version | Split tạo lineage,,verified

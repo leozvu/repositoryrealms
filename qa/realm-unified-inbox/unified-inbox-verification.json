@@ -84,7 +84,7 @@
       "layer": "client",
       "source": "components/Shell.jsx",
       "signals": [
-        "Raven Inbox · Thông báo ERP",
+        "aria-label=\"Thông báo\"",
         "NOTIFICATION_SYNC_EVENT",
         "fetch('/api/notifications'"
       ],

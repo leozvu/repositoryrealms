@@ -382,6 +382,11 @@ function extractElements({ ast, source, relativeFile, bindings, idCounts }) {
         || target,
     );
     const kind = elementKind(tag, attributes);
+    const interactionParents = ancestors
+      .filter((ancestor) => ancestor.type === 'JSXElement')
+      .map((ancestor) => jsxName(ancestor.openingElement?.name))
+      .filter(Boolean)
+      .slice(-4);
     const signature = label || target || handler || tag;
     const baseId = `${surface}.${kind}.${slug(signature, slug(tag))}`;
     const occurrence = (idCounts.get(baseId) || 0) + 1;
@@ -409,6 +414,7 @@ function extractElements({ ast, source, relativeFile, bindings, idCounts }) {
       label,
       handlerEvent: handlerName || '',
       handler,
+      interactionParents,
       target,
       insideForm,
       disabledBinding: attributes.get('disabled')?.code || attributes.get('aria-busy')?.code || '',

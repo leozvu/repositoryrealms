@@ -1,17 +1,23 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Badge, Forbidden, useToast } from '@/components/ui';
-import { money, fmtDate, todayISO, monthKey } from '@/lib/format';
+
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { useResource, Icon, FormModal, ConfirmDialog, Badge, Forbidden, useToast } from '@/components/ui';
+import { money, fmtDate, todayISO, monthKey, remainOf } from '@/lib/format';
 import FinancialIntelligencePanel from '@/components/finance/FinancialIntelligencePanel';
-import ledgerStyles from './finance-ledger.module.css';
+import PageHeader from '@/components/system/PageHeader';
+import DataTable from '@/components/system/DataTable';
+import StatePanel from '@/components/system/StatePanel';
 
 const CATEGORIES = ['Doanh thu dịch vụ', 'Doanh thu khác', 'Lương nhân sự', 'Ngân sách quảng cáo', 'Văn phòng', 'Công cụ / phần mềm', 'Marketing nội bộ', 'Thuế / phí', 'Khác'];
 
 export default function FinancePage() {
   const { rows, forbidden, create, update, remove } = useResource('transactions');
   const projects = useResource('projects');
-  const [f, setF] = useState('all');
-  const [m, setM] = useState('all');
+  const invoices = useResource('invoices');
+  const bills = useResource('vendorbills');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [monthFilter, setMonthFilter] = useState('all');
   const [modal, setModal] = useState(null);
   const [intelligence, setIntelligence] = useState(null);
   const [intelligenceLoading, setIntelligenceLoading] = useState(true);
@@ -28,12 +34,12 @@ export default function FinancePage() {
     fetch('/api/finance/intelligence', { cache: 'no-store', credentials: 'same-origin', signal: controller.signal })
       .then(async (response) => {
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error || 'Không thể tải Financial Intelligence.');
+        if (!response.ok) throw new Error(payload.error || 'Không thể tải phân tích tài chính.');
         if (active) setIntelligence(payload.financialIntelligence);
       })
       .catch((error) => {
         if (!active) return;
-        setIntelligenceError(error?.name === 'AbortError' ? 'ERP phản hồi quá lâu. Hãy thử tải lại.' : error.message);
+        setIntelligenceError(error?.name === 'AbortError' ? 'Hệ thống phản hồi quá lâu. Hãy thử tải lại.' : error.message);
       })
       .finally(() => {
         window.clearTimeout(timeout);
@@ -46,94 +52,151 @@ export default function FinancePage() {
     };
   }, [intelligenceRefresh]);
 
-  if (forbidden) return <Forbidden />;
-
-  const pName = id => projects.rows.find(p => p.id === id)?.name || '—';
-  const months = [...new Set(rows.map(t => monthKey(t.date)))].sort().reverse();
-  const visible = rows.filter(t => (f === 'all' || t.type === f) && (m === 'all' || monthKey(t.date) === m))
+  const projectName = (id) => projects.rows.find((project) => project.id === id)?.name || 'Không thuộc dự án';
+  const months = [...new Set(rows.map((transaction) => monthKey(transaction.date)))].sort().reverse();
+  const visible = rows
+    .filter((transaction) => (typeFilter === 'all' || transaction.type === typeFilter)
+      && (monthFilter === 'all' || monthKey(transaction.date) === monthFilter))
     .sort((a, b) => b.date.localeCompare(a.date));
-  const inc = visible.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const exp = visible.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const income = visible.filter((transaction) => transaction.type === 'income').reduce((sum, transaction) => sum + transaction.amount, 0);
+  const expense = visible.filter((transaction) => transaction.type === 'expense').reduce((sum, transaction) => sum + transaction.amount, 0);
+  const overdueInvoices = invoices.rows.filter((invoice) => !['paid', 'draft', 'void'].includes(invoice.status)
+    && invoice.dueDate && invoice.dueDate < todayISO());
+  const payable = bills.rows.filter((bill) => bill.status !== 'paid').reduce((sum, bill) => sum + (bill.amount || 0), 0);
+  const receivable = invoices.rows.filter((invoice) => !['paid', 'draft', 'void'].includes(invoice.status))
+    .reduce((sum, invoice) => sum + remainOf(invoice), 0);
 
-  const FIELDS = [
+  const fields = [
     { key: 'type', label: 'Loại', type: 'select', options: [{ value: 'income', label: 'Khoản thu' }, { value: 'expense', label: 'Khoản chi' }], required: true },
     { key: 'amount', label: 'Số tiền (đ)', type: 'number', required: true },
-    { key: 'category', label: 'Danh mục', type: 'select', options: CATEGORIES.map(c => ({ value: c, label: c })) },
+    { key: 'category', label: 'Danh mục', type: 'select', options: CATEGORIES.map((category) => ({ value: category, label: category })) },
     { key: 'date', label: 'Ngày', type: 'date', required: true },
-    { key: 'projectId', label: 'Thuộc dự án', type: 'select', options: [{ value: '', label: '— Không thuộc dự án —' }, ...projects.rows.map(p => ({ value: p.id, label: p.name }))] },
+    { key: 'projectId', label: 'Thuộc dự án', type: 'select', options: [{ value: '', label: 'Không thuộc dự án' }, ...projects.rows.map((project) => ({ value: project.id, label: project.name }))] },
     { key: 'desc', label: 'Diễn giải', type: 'textarea', full: true },
   ];
 
-  const exportCsv = () => {
-    const csvEsc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const lines = [['Ngày', 'Loại', 'Danh mục', 'Diễn giải', 'Dự án', 'Số tiền'].join(',')];
-    visible.forEach(t => lines.push([t.date, t.type === 'income' ? 'Thu' : 'Chi', csvEsc(t.category), csvEsc(t.desc), csvEsc(pName(t.projectId)), t.type === 'income' ? t.amount : -t.amount].join(',')));
-    const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `so-quy-${m}.csv`;
-    a.click(); URL.revokeObjectURL(a.href);
-    toast('Đã xuất CSV');
-  };
+  const columns = useMemo(() => [
+    { accessorKey: 'date', header: 'Ngày', size: 110, cell: ({ row }) => fmtDate(row.original.date) },
+    { accessorKey: 'type', header: 'Loại', size: 100, cell: ({ row }) => <Badge map="tx" k={row.original.type} />, meta: { exportValue: (row) => row.type === 'income' ? 'Thu' : 'Chi' } },
+    { accessorKey: 'category', header: 'Danh mục', size: 180 },
+    { accessorKey: 'desc', header: 'Diễn giải', size: 280, cell: ({ row }) => row.original.desc || 'Chưa có diễn giải' },
+    { id: 'project', header: 'Dự án', size: 180, cell: ({ row }) => projectName(row.original.projectId), meta: { exportValue: (row) => projectName(row.projectId) } },
+    {
+      accessorKey: 'amount', header: 'Số tiền', size: 150,
+      cell: ({ row }) => <strong className={row.original.type === 'income' ? 'amount-income' : 'amount-expense'}>{row.original.type === 'income' ? '+' : '−'}{money(row.original.amount)}</strong>,
+      meta: { exportValue: (row) => row.type === 'income' ? row.amount : -row.amount },
+    },
+    {
+      id: 'actions', header: '', size: 80, enableSorting: false, enableHiding: false, meta: { export: false },
+      cell: ({ row }) => (
+        <div className="row-actions">
+          <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: row.original })} aria-label={`Sửa giao dịch ${row.original.desc || row.original.category}`}><Icon name="edit" size={16} /></button>
+          <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: row.original })} aria-label={`Xóa giao dịch ${row.original.desc || row.original.category}`}><Icon name="trash" size={16} /></button>
+        </div>
+      ),
+    },
+  ], [projects.rows]);
+
+  if (forbidden) return <Forbidden />;
 
   return (
-    <>
-      <FinancialIntelligencePanel intelligence={intelligence} loading={intelligenceLoading} error={intelligenceError} onRetry={() => setIntelligenceRefresh((value) => value + 1)} />
+    <div className="finance-home">
+      <PageHeader
+        icon="finance"
+        meta="Tài chính"
+        title="Dòng tiền và việc cần xử lý"
+        description="Ưu tiên thu tiền, ngoại lệ và kiểm soát. Sổ giao dịch nằm ngay bên dưới để tra cứu và chỉnh sửa."
+        actions={<button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} />Ghi thu hoặc chi</button>}
+      />
 
-      <details className={ledgerStyles.ledger}>
-        <summary><span><Icon name="finance" size={18} /><strong>Sổ quỹ &amp; giao dịch</strong><small>{rows.length} bản ghi ERP · bộ lọc và CRUD gốc được giữ nguyên</small></span><Icon name="menu" size={17} /></summary>
-        <div className={ledgerStyles.content}>
-          <div className="grid kpi-grid" style={{ marginBottom: 16 }}>
-            <div className="card kpi"><span className="kpi-label">Tổng thu (bộ lọc)</span><div className="kpi-value" style={{ color: 'var(--accent)' }}>{money(inc)}</div></div>
-            <div className="card kpi"><span className="kpi-label">Tổng chi (bộ lọc)</span><div className="kpi-value" style={{ color: 'var(--danger)' }}>{money(exp)}</div></div>
-            <div className="card kpi"><span className="kpi-label">Chênh lệch</span><div className="kpi-value">{money(inc - exp)}</div></div>
-          </div>
-          <div className="toolbar">
-            <select className="filter" aria-label="Lọc loại giao dịch" value={f} onChange={e => setF(e.target.value)}>
-              <option value="all">Thu &amp; chi</option><option value="income">Chỉ thu</option><option value="expense">Chỉ chi</option>
+      {overdueInvoices.length > 0 && (
+        <StatePanel
+          compact
+          state="error"
+          title={`${overdueInvoices.length} hóa đơn đã quá hạn`}
+          description={`Tổng phải thu hiện tại ${money(receivable)}. Mở danh sách để xử lý thu tiền.`}
+          action={<Link className="btn btn-outline btn-sm" href="/invoices">Mở phải thu</Link>}
+        />
+      )}
+
+      <section className="finance-pulse" aria-label="Tóm tắt tài chính theo bộ lọc">
+        <div><span>Thu theo bộ lọc</span><strong className="amount-income">{money(income)}</strong></div>
+        <div><span>Chi theo bộ lọc</span><strong className="amount-expense">{money(expense)}</strong></div>
+        <div><span>Chênh lệch</span><strong>{money(income - expense)}</strong></div>
+        <div><span>Phải trả nhà cung cấp</span><strong>{money(payable)}</strong></div>
+      </section>
+
+      <FinancialIntelligencePanel
+        intelligence={intelligence}
+        loading={intelligenceLoading}
+        error={intelligenceError}
+        onRetry={() => setIntelligenceRefresh((value) => value + 1)}
+      />
+
+      <section className="finance-ledger-section" aria-labelledby="finance-ledger-title">
+        <div className="section-heading-row">
+          <div><h2 id="finance-ledger-title">Sổ giao dịch</h2><p>Mọi thay đổi vẫn ghi vào nguồn dữ liệu ERP hiện tại.</p></div>
+          <div className="ledger-filters">
+            <select aria-label="Lọc loại giao dịch" value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
+              <option value="all">Thu và chi</option><option value="income">Chỉ thu</option><option value="expense">Chỉ chi</option>
             </select>
-            <select className="filter" aria-label="Lọc tháng giao dịch" value={m} onChange={e => setM(e.target.value)}>
+            <select aria-label="Lọc tháng giao dịch" value={monthFilter} onChange={(event) => setMonthFilter(event.target.value)}>
               <option value="all">Tất cả các tháng</option>
-              {months.map(mo => <option key={mo} value={mo}>Tháng {mo.slice(5)}/{mo.slice(0, 4)}</option>)}
+              {months.map((month) => <option key={month} value={month}>Tháng {month.slice(5)}/{month.slice(0, 4)}</option>)}
             </select>
-            <div className="spacer"></div>
-            <button className="btn btn-outline" onClick={exportCsv}><Icon name="download" size={16} /><span>Xuất CSV</span></button>
-            <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Ghi thu / chi</span></button>
-          </div>
-          <div className="table-wrap">
-            <table>
-              <thead><tr><th>Ngày</th><th>Loại</th><th>Danh mục</th><th>Diễn giải</th><th>Dự án</th><th className="num">Số tiền</th><th></th></tr></thead>
-              <tbody>
-                {visible.map(t => (
-                  <tr key={t.id}>
-                    <td>{fmtDate(t.date)}</td>
-                    <td><Badge map="tx" k={t.type} /></td>
-                    <td>{t.category || '—'}</td>
-                    <td style={{ maxWidth: 280 }}>{t.desc || '—'}</td>
-                    <td>{pName(t.projectId)}</td>
-                    <td className="num" style={{ fontWeight: 700, color: t.type === 'income' ? 'var(--accent)' : 'var(--danger)' }}>
-                      {t.type === 'income' ? '+' : '−'}{money(t.amount)}</td>
-                    <td><div className="row-actions">
-                      <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: t })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
-                      <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: t })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
-                    </div></td>
-                  </tr>
-                ))}
-                {!visible.length && <tr><td colSpan={7}><EmptyState title="Chưa có giao dịch" /></td></tr>}
-              </tbody>
-            </table>
           </div>
         </div>
-      </details>
-      {modal?.mode === 'add' && <FormModal title="Ghi thu / chi" fields={FIELDS} data={{ type: 'expense', date: todayISO(), category: 'Khác' }}
-        onClose={() => setModal(null)} onSave={async d => {
-          const r = await create({ ...d, projectId: d.projectId || null });
-          if (r) toast(r._notice || 'Đã ghi sổ', r._blocked ? 'error' : 'success');
-        }} />}
-      {modal?.mode === 'edit' && <FormModal title="Sửa giao dịch" fields={FIELDS} data={{ ...modal.row, projectId: modal.row.projectId || '' }}
-        onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, { ...d, projectId: d.projectId || null }); toast('Đã cập nhật'); }} />}
-      {modal?.mode === 'del' && <ConfirmDialog msg="Xóa giao dịch này khỏi sổ quỹ?" onClose={() => setModal(null)}
-        onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
-    </>
+        <DataTable
+          data={visible}
+          columns={columns}
+          storageKey="finance-transactions"
+          searchPlaceholder="Tìm giao dịch"
+          emptyTitle="Chưa có giao dịch"
+          emptyDescription="Ghi khoản thu hoặc chi đầu tiên để bắt đầu sổ."
+          fileName={`so-giao-dich-${monthFilter}.csv`}
+          actions={<button className="btn btn-primary btn-sm" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={15} />Ghi giao dịch</button>}
+          renderMobile={(transaction) => (
+            <article className="mobile-record" key={transaction.id}>
+              <div><Badge map="tx" k={transaction.type} /><time>{fmtDate(transaction.date)}</time></div>
+              <strong>{transaction.desc || transaction.category}</strong>
+              <span className={transaction.type === 'income' ? 'amount-income' : 'amount-expense'}>{transaction.type === 'income' ? '+' : '−'}{money(transaction.amount)}</span>
+              <button className="btn btn-outline btn-sm" onClick={() => setModal({ mode: 'edit', row: transaction })}>Mở</button>
+            </article>
+          )}
+        />
+      </section>
+
+      {modal?.mode === 'add' && (
+        <FormModal
+          title="Ghi thu hoặc chi"
+          fields={fields}
+          data={{ type: 'expense', date: todayISO(), category: 'Khác' }}
+          onClose={() => setModal(null)}
+          onSave={async (data) => {
+            const result = await create({ ...data, projectId: data.projectId || null });
+            if (result) toast(result._notice || 'Đã ghi sổ', result._blocked ? 'error' : 'success');
+          }}
+        />
+      )}
+      {modal?.mode === 'edit' && (
+        <FormModal
+          title="Sửa giao dịch"
+          fields={fields}
+          data={{ ...modal.row, projectId: modal.row.projectId || '' }}
+          onClose={() => setModal(null)}
+          onSave={async (data) => {
+            await update(modal.row.id, { ...data, projectId: data.projectId || null });
+            toast('Đã cập nhật giao dịch');
+          }}
+        />
+      )}
+      {modal?.mode === 'del' && (
+        <ConfirmDialog
+          msg="Xóa giao dịch này khỏi sổ quỹ? Hành động sẽ được ghi lại trong nhật ký."
+          onClose={() => setModal(null)}
+          onYes={async () => { await remove(modal.row.id); toast('Đã xóa giao dịch'); }}
+        />
+      )}
+    </div>
   );
 }

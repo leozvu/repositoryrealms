@@ -5,6 +5,7 @@ import {
   DEPLOYMENT_KINDS,
   ceoPortalOrigin,
   deploymentBranding,
+  deploymentEntity,
   deploymentKind,
   isCeoPortalOnlyPath,
 } from '../lib/deployment-profile.js';
@@ -55,6 +56,23 @@ test('CEO-11 gives the portal a dedicated login, shell and v2 presentation', () 
   assert.match(login, /LEOZ GROUP · CONTROL PLANE/);
   assert.match(login, /ceoPortal \? '\/ceo-overview' : '\/dashboard'/);
   assert.match(login, /ceoPortal && <button[^>]+login-recovery-toggle/);
+});
+
+test('each entity deployment exposes its own pre-authentication workspace identity', () => {
+  const entities = [
+    ['aim', 'agency-erp-mu.vercel.app', 'AIm Agency'],
+    ['egoric', 'erp-egoric.vercel.app', 'Egoric Agency'],
+    ['vnecom', 'erp-vnecom.vercel.app', 'VNECOM LLC'],
+    ['egolive', 'erp-egolive.vercel.app', 'Egolive'],
+  ];
+  for (const [id, host, company] of entities) {
+    const env = { VERCEL_PROJECT_PRODUCTION_URL: host, NODE_ENV: 'production' };
+    assert.equal(deploymentEntity(env)?.id, id);
+    assert.equal(deploymentBranding(env).company, company);
+    assert.equal(deploymentBranding(env).homePath, '/dashboard');
+  }
+  assert.equal(deploymentBranding({ REPOSITORYREALMS_ENTITY_ID: 'egolive' }).company, 'Egolive');
+  assert.equal(deploymentBranding({ VERCEL_PROJECT_ID: 'prj_Hh4aZEj9q3hvULaUfC4GwFvxYii9' }).company, 'Egoric Agency');
 });
 
 test('all CEO navigation entries are portal-only while entity ERP keeps a safe portal link', () => {

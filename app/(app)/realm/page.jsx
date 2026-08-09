@@ -5,10 +5,11 @@ import { prisma } from '@/lib/prisma';
 import { loadRealmCompanyModules } from '@/lib/realm-access';
 import { createRealmErpBridge } from '@/lib/realm-business-bridge';
 import { loadRealmPilotDecision } from '@/lib/realm-pilot';
+import { realmV2PreviewEnabled } from '@/lib/realm-v2-contracts';
 
 export const metadata = {
-  title: 'Realm Office · CRMegoric ERP',
-  description: 'Không gian làm việc medieval dùng chung tài khoản, dữ liệu và phân quyền với CRMegoric ERP · CRM.',
+  title: 'Realm · RepositoryRealms',
+  description: 'Không gian làm việc dùng chung tài khoản, dữ liệu và phân quyền với RepositoryRealms.',
 };
 
 export default async function RealmPage({ searchParams }) {
@@ -21,6 +22,7 @@ export default async function RealmPage({ searchParams }) {
     loadRealmPilotDecision(prisma, user),
   ]);
   if (!pilot.allowed) redirect(`/dashboard?realm=${encodeURIComponent(pilot.code)}`);
+  if (realmV2PreviewEnabled()) redirect('/realm-v2/home');
   const query = await searchParams;
   const initialMode = query?.view === 'ledger' ? 'ledger' : 'world';
   const initialBridge = createRealmErpBridge({

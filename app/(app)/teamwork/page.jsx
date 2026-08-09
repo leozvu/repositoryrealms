@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Icon, Avatar, useToast } from '@/components/ui';
+import PageHeader from '@/components/system/PageHeader';
+import StatePanel from '@/components/system/StatePanel';
+import ReceiptBar from '@/components/system/ReceiptBar';
 import styles from './team-work.module.css';
 
 const OPEN = new Set(['todo', 'doing', 'in_progress', 'review', 'waiting', 'blocked']);
@@ -25,7 +28,7 @@ function IntelligenceBadge({ value }) {
   return (
     <div className={styles.intelligence} data-level={value.signal.level}>
       <span><strong>{value.signal.label}</strong> · {value.confidence.label}</span>
-      <span>Estimate {value.estimate.hours ? `${hours(value.estimate.hours)}h` : '—'} · TimeLog {hours(value.actual.hours)}h · Historical {value.historical.medianHours == null ? '—' : `${hours(value.historical.medianHours)}h/${value.historical.sampleSize} mẫu`}</span>
+      <span>Ước lượng {value.estimate.hours ? `${hours(value.estimate.hours)}h` : 'Chưa có'} · Thời gian khai báo {hours(value.actual.hours)}h · Lịch sử {value.historical.medianHours == null ? 'Chưa đủ' : `${hours(value.historical.medianHours)}h/${value.historical.sampleSize} mẫu`}</span>
       <small>{value.signal.explanation}</small>
     </div>
   );
@@ -107,7 +110,7 @@ function ActionPanel({ task, members, allTasks, busy, onClose, onAction }) {
   return (
     <section className={styles.actionPanel} aria-labelledby="execution-action-title">
       <div className={styles.panelHead}>
-        <div><p className={styles.eyebrow}>Canonical manager actions</p><h2 id="execution-action-title">Điều phối: {task.title}</h2></div>
+        <div><p className={styles.eyebrow}>Thao tác quản lý</p><h2 id="execution-action-title">Điều phối: {task.title}</h2></div>
         <button className="icon-btn" onClick={onClose} aria-label="Đóng bảng điều phối"><Icon name="x" size={18} /></button>
       </div>
       <p className={styles.panelNote}>Mỗi thao tác bên dưới đi qua RepositoryRealms, kiểm tra quyền, business rule, receipt và audit trước khi đổi Task ERP.</p>
@@ -122,7 +125,7 @@ function ActionPanel({ task, members, allTasks, busy, onClose, onAction }) {
           <button className="btn btn-primary" disabled={busy || !assigneeId || assigneeId === task.assigneeId} onClick={delegate}>Giao việc</button>
         </fieldset>
         <fieldset>
-          <legend>Blocker / escalation</legend>
+          <legend>Trở ngại và nâng cấp xử lý</legend>
           <label htmlFor="execution-reason-code">Nhóm lý do</label>
           <select id="execution-reason-code" value={reasonCode} onChange={(event) => setReasonCode(event.target.value)}>
             <option value="dependency">Phụ thuộc</option><option value="decision">Cần quyết định</option><option value="capacity">Thiếu năng lực xử lý</option><option value="external">Yếu tố bên ngoài</option>
@@ -134,7 +137,7 @@ function ActionPanel({ task, members, allTasks, busy, onClose, onAction }) {
             <select aria-label="Mức escalation" value={level} onChange={(event) => setLevel(Number(event.target.value))}>
               {[1, 2, 3].filter((value) => value > (task.escalationLevel || 0)).map((value) => <option key={value} value={value}>Level {value}</option>)}
             </select>
-            <button className="btn btn-outline" disabled={busy || !reason.trim() || level <= (task.escalationLevel || 0)} onClick={escalate}>Escalate</button>
+            <button className="btn btn-outline" disabled={busy || !reason.trim() || level <= (task.escalationLevel || 0)} onClick={escalate}>Nâng cấp xử lý</button>
           </div>
         </fieldset>
         <fieldset>
@@ -154,8 +157,8 @@ function ActionPanel({ task, members, allTasks, busy, onClose, onAction }) {
           <button className="btn btn-outline" disabled={busy || !mergeTitle.trim() || !mergeIds.length} onClick={merge}>Hợp nhất Task</button>
         </fieldset>
         <fieldset>
-          <legend>Resource Intelligence</legend>
-          <p className={styles.fieldHelp}>Manager adjustment giữ riêng khỏi TimeLog và historical; đây là cảnh báo vận hành, không phải điểm nhân sự.</p>
+          <legend>Phân tích nguồn lực</legend>
+          <p className={styles.fieldHelp}>Hiệu chỉnh của quản lý được giữ riêng khỏi thời gian khai báo và lịch sử. Đây là cảnh báo vận hành, không phải điểm nhân sự.</p>
           <label htmlFor="execution-estimate-hours">Estimate (giờ)</label>
           <input id="execution-estimate-hours" type="number" min="0.25" max="10000" step="0.25" value={estimateHours} onChange={(event) => setEstimateHours(event.target.value)} />
           <label htmlFor="execution-work-type">Nhóm công việc</label>
@@ -180,6 +183,7 @@ export default function TeamWorkPage() {
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState('');
   const [selected, setSelected] = useState(null);
+  const [receipt, setReceipt] = useState(null);
   const [drag, setDrag] = useState(null); // {memberId, task, index, overId} — kéo thả trong hàng đợi 1 nhân viên
 
   const load = useCallback(async () => {
@@ -214,6 +218,11 @@ export default function TeamWorkPage() {
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || 'Không thể điều phối Task.');
       toast('Task ERP đã được cập nhật và có receipt.');
+      setReceipt({
+        title: 'Đã cập nhật công việc',
+        detail: body.receipt?.id ? `Biên nhận ${body.receipt.id}` : `Thao tác ${command.action} đã được máy chủ chấp nhận.`,
+        time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+      });
       setSelected(null);
       await load();
     } catch (requestError) {
@@ -230,19 +239,22 @@ export default function TeamWorkPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.hero}>
-        <div><p className={styles.eyebrow}>Team work orchestrator</p><h1>Quản lý công việc</h1><p>Nhìn tất cả nhân viên thuộc quyền và hàng đợi việc của từng người. Kéo thả (hoặc nút Lên/Xuống) để sắp lại thứ tự ưu tiên cho nhân viên khi thấy chưa hợp lý; không xếp hạng con người và không suy diễn năng suất từ trạng thái online.</p></div>
-        <button className="btn btn-outline" onClick={load} disabled={loading}><Icon name="repeat" size={16} /> Làm mới</button>
-      </header>
+      <PageHeader
+        icon="people"
+        meta="Công việc đội nhóm"
+        title="Ngoại lệ và phân bổ công việc"
+        description="Tập trung vào việc bị chặn, quá hạn, vượt giới hạn và chưa có người phụ trách. Không xếp hạng con người."
+        actions={<button className="btn btn-outline" onClick={load} disabled={loading}><Icon name="repeat" size={16} /> Làm mới</button>}
+      />
       <section className={styles.metrics} aria-label="Tóm tắt team">
         {[
           ['Nhân sự', metrics.people], ['Việc đang mở', metrics.open], ['WIP', metrics.wip], ['Bị chặn', metrics.blocked],
           ['Quá hạn', metrics.overdue], ['Vượt WIP', metrics.overCapacity], ['Chưa giao', metrics.unassigned],
         ].map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}
       </section>
-      <div className={styles.policy} role="note"><Icon name="shield" size={18} /><span>Capacity chỉ là cảnh báo WIP để cân bằng luồng việc, không phải điểm hiệu suất cá nhân.</span></div>
+      <div className={styles.policy} role="note"><Icon name="shield" size={18} /><span>Sức chứa chỉ là cảnh báo giới hạn việc đang làm để cân bằng luồng việc, không phải điểm hiệu suất cá nhân.</span></div>
       <section className={styles.intelligenceSummary} aria-labelledby="team-resource-intelligence">
-        <div><p className={styles.eyebrow}>Resource Intelligence · shadow mode</p><h2 id="team-resource-intelligence">Nguồn lực theo bằng chứng có provenance</h2><p>TimeLog vẫn được gắn nhãn tự khai báo. Confidence tối đa medium cho tới khi governance bật validated evidence.</p></div>
+        <div><p className={styles.eyebrow}>Nguồn lực có bằng chứng</p><h2 id="team-resource-intelligence">Ước lượng và thời gian được trình bày đúng nguồn</h2><p>Thời gian làm việc vẫn được ghi rõ là tự khai báo. Mức tin cậy không được nâng cao khi chưa có bằng chứng xác thực.</p></div>
         <dl>
           <div><dt>Thiếu estimate</dt><dd>{intelligence.estimateMissing}</dd></div>
           <div><dt>Cần review</dt><dd>{intelligence.attention}</dd></div>
@@ -251,8 +263,9 @@ export default function TeamWorkPage() {
           <div><dt>TimeLog tự khai báo</dt><dd>{hours(intelligence.declaredLoggedHours)}h</dd></div>
         </dl>
       </section>
+      {receipt && <ReceiptBar {...receipt} action={<button className="icon-btn" onClick={() => setReceipt(null)} aria-label="Đóng biên nhận"><Icon name="x" size={15} /></button>} />}
       <div className={styles.live} aria-live="polite">{loading ? 'Đang đồng bộ Task ERP…' : error || `Đã đồng bộ ${metrics.open} việc đang mở.`}</div>
-      {error && <div className={styles.error} role="alert"><span>{error}</span><button className="btn btn-outline" onClick={load}>Thử lại</button></div>}
+      {error && <StatePanel compact state="error" title={error} action={<button className="btn btn-outline" onClick={load}>Thử lại</button>} />}
       {selected && <ActionPanel key={selected.id} task={selected} members={members} allTasks={allTasks} busy={busyId === selected.id} onClose={() => setSelected(null)} onAction={act} />}
       {!error && (model?.members || []).map((row) => {
         const openTasks = row.tasks.filter((task) => OPEN.has(task.status));
@@ -274,7 +287,7 @@ export default function TeamWorkPage() {
         <p>{model.unassigned.length} Task đang chờ PM phân công.</p>
         <div className={styles.taskList}>
           {model.unassigned.map((task) => <article key={task.id} className={styles.task}>
-            <div className={styles.taskOrder} aria-hidden="true">—</div>
+            <div className={styles.taskOrder} aria-hidden="true">·</div>
             <div className={styles.taskBody}><div className={styles.taskTitle}><h4>{task.title}</h4>{task.dueDate && <span>hạn {task.dueDate}</span>}</div><p>{task.project?.name || 'Việc chung'}</p></div>
             <div className={styles.taskActions}><button className="btn btn-primary btn-sm" onClick={() => setSelected(task)}>Điều phối</button></div>
           </article>)}

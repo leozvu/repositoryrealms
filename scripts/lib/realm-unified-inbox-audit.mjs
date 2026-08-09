@@ -16,7 +16,7 @@ const CONTRACTS = [
   { id: 'safe-route-contract', layer: 'contract', source: 'lib/notification-inbox.js', signals: ['normalizeNotificationRoute', "route.startsWith('//')", 'notificationRecordRoute', 'normalizeNotificationRow'] },
   { id: 'exact-record-notifications', layer: 'server', source: 'lib/events.js', signals: ["notificationRecordRoute('tasks'", "notificationRecordRoute('leads'", "notificationRecordRoute('tickets'"] },
   { id: 'exact-approval-notifications', layer: 'server', source: 'lib/approvals.js', signals: ["notificationRecordRoute('approvals', ap.id)"] },
-  { id: 'erp-inbox-shared-sync', layer: 'client', source: 'components/Shell.jsx', signals: ['Raven Inbox · Thông báo ERP', 'NOTIFICATION_SYNC_EVENT', "fetch('/api/notifications'"] },
+  { id: 'erp-inbox-shared-sync', layer: 'client', source: 'components/Shell.jsx', signals: ['aria-label="Thông báo"', 'NOTIFICATION_SYNC_EVENT', "fetch('/api/notifications'"] },
   { id: 'realm-inbox-shared-sync', layer: 'client', source: 'components/realm/RealmNotificationBell.jsx', signals: ['NOTIFICATION_SYNC_EVENT', 'window.setInterval(refresh, 15_000)', 'aria-labelledby', 'closePanel'] },
   { id: 'approval-deep-link-consumer', layer: 'client', source: 'app/(app)/approvals/page.jsx', signals: ["get('focus')", 'scrollIntoView', 'data-inbox-focus'] },
   { id: 'ticket-deep-link-consumer', layer: 'client', source: 'app/(app)/tickets/page.jsx', signals: ["get('focus')", "setModal({ mode: 'edit', row: ticket })"] },

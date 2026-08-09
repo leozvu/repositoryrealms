@@ -1,18 +1,27 @@
 # Deployment Manifest — RepositoryRealms
 
-Cập nhật: 2026-08-09. Control-plane release candidate: `codex/realm-design-system-v2-implementation @ 6c7a71e8e63d0d49335d8570be6214021ea044d1`.
+Cập nhật: 2026-08-09. Entity UX/UI release: `ux-ui-rehab`; CEO control-plane giữ nguyên.
 
 ## Production domains đang phục vụ
 
 | Entity | Vercel project | Domain | Schema | Stable deployment | Trạng thái |
 |---|---|---|---|---|---|
-| AIm Agency | `agency-erp` | `agency-erp-mu.vercel.app` | `public` | `dpl_2wdKb7RzMMtukGytCgufCnzhtJjA` | READY; `/login` 200 |
-| Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_BLw3joRx3EUPM5LDcR48xwXYtT1Q` | READY; `/login` 200 |
-| VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_3WTArswEcqM3zdUvP7wKCxx9Jnmh` | READY; `/login` 200 |
-| Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_AdvgYVquGvLnzUWrCQ5Lu6r3u3CP` | READY; `/login` 200 |
+| AIm Agency | `agency-erp` | `agency-erp-mu.vercel.app` | `public` | `dpl_6czBa3jbvLmK2mSBKzbnv5jyiqvT` | READY; UX rehab smoke PASS |
+| Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_DQgU5EBtPwihNL1DuJuXk9T3QYbS` | READY; UX rehab smoke PASS |
+| VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_A148KFQ5w9d8BGionGuUNDyQbqBc` | READY; UX rehab smoke PASS |
+| Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_42MbiE38n8Ug3iZJSha5MEhgyJ84` | READY; UX rehab smoke PASS |
 | CEO Terminal | `ceo-terminal-leoz` | `ceo-terminal-leoz.vercel.app` | `ceoportal` | `dpl_6ARCEAAYKhkAxK8oUg9gibCDY8ou` | READY; `/login` 200 |
 
-Không project nào trong bảng trên được promote trong lần tạo production-truth evidence ngày 2026-08-09. Các deployment tạm dùng production environment đều chạy với `--skip-domain`, sau đó bị xóa.
+UX/UI rehab được build thành bốn canary production-env với `--skip-domain`, smoke test trước cutover rồi mới promote. Kiểm tra hậu promote trên cả bốn domain: `/login` 200 và đúng entity brand; `/dashboard` 307 khi chưa đăng nhập; `/api/settings` 401; credentials provider sẵn sàng. Release không có thay đổi Prisma schema hoặc migration và không promote CEO Terminal.
+
+### Rollback evidence cho UX/UI rehab
+
+| Entity | Canary đã promote | Previous stable deployment |
+|---|---|---|
+| AIm Agency | `agency-j4haatkbb-leozs-projects-64a5f0c8.vercel.app` | `dpl_5SyEfVuneLtCf5wpsBXBpgaeotbW` |
+| Egoric Agency | `erp-egoric-ibqvzgr6n-leozs-projects-64a5f0c8.vercel.app` | `dpl_FjAfMgTg1uCmFySrXrd7xPo5wejJ` |
+| VNECOM LLC | `erp-vnecom-gk10tj7bi-leozs-projects-64a5f0c8.vercel.app` | `dpl_69L7bXo8puX94UAjLww3pAGi9ePc` |
+| Egolive | `erp-egolive-21ywbssbq-leozs-projects-64a5f0c8.vercel.app` | `dpl_B39QEDvdpiATRYYryxEBvBmTvXFX` |
 
 Ngoài phạm vi: Fretas, `erp-master-leoz`, LeozOps và contract `lead-snapshot v1`.
 
@@ -34,7 +43,7 @@ Snapshot cho thấy cả năm schema có 95 bảng Prisma. CEO Portal production
 
 ## Rollback
 
-1. Code: dùng stable deployment ID ở bảng trên; không rollback bằng cách viết lại Git history.
+1. Code: promote `Previous stable deployment` trong bảng rollback evidence; không rollback bằng cách viết lại Git history.
 2. Dữ liệu: chỉ restore từ bộ `20260809T040418Z` sau quyết định founder và rehearsal mới.
 3. CEO feature: hạ rollout ring/kill switch của Portal; local ERP login phải tiếp tục hoạt động.
 4. Không xóa hoặc ghi đè schema production để sửa drift.

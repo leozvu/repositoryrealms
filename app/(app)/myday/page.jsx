@@ -13,6 +13,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Icon, useToast } from '@/components/ui';
 import { compareWorkItems } from '@/lib/execution-engine';
+import PageHeader from '@/components/system/PageHeader';
+import StatePanel from '@/components/system/StatePanel';
 import styles from './my-work.module.css';
 
 const STATUS = {
@@ -27,7 +29,7 @@ const WORK_TYPES = [
 const COMPLEXITIES = [['small', 'Nhỏ'], ['medium', 'Vừa'], ['large', 'Lớn'], ['unknown', 'Chưa rõ']];
 
 function hours(value) {
-  return Number.isFinite(Number(value)) ? `${Number(value).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}h` : '—';
+  return Number.isFinite(Number(value)) ? `${Number(value).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}h` : 'Chưa có';
 }
 
 function todayISO() {
@@ -86,7 +88,7 @@ function TaskBlock({ task, index, today, busy, dragState, onDragStart, onDragOve
       onDragOver={e => { if (draggable && dragState.dragId) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; onDragOver(task, index); } }}
       onDrop={e => { e.preventDefault(); onDrop(task, index); }}
       onDragEnd={onDragEnd}
-      aria-label={`${task.title} — ưu tiên vị trí ${index + 1}`}
+      aria-label={`${task.title} · ưu tiên vị trí ${index + 1}`}
     >
       <div className={styles.blockHead}>
         <span className={styles.blockOrder} title="Thứ tự của bạn">{index + 1}</span>
@@ -98,7 +100,7 @@ function TaskBlock({ task, index, today, busy, dragState, onDragStart, onDragOve
       </div>
       <Link href={`/tasks?focus=${task.id}`} className={styles.blockTitle} title="Mở chi tiết việc" draggable={false}>{task.title}</Link>
       <p className={styles.blockMeta}>{task.project?.name || 'Việc chung'}{task.estHours ? ` · ${task.estHours}h` : ''}</p>
-      {task.blockReason && <p className={styles.blockReason} title={task.blockReason}>⛔ {task.blockReason}</p>}
+      {task.blockReason && <p className={styles.blockReason} title={task.blockReason}><Icon name="warning" size={14} /> {task.blockReason}</p>}
       <div className={styles.blockFoot}>
         <span className={styles.due} data-tone={tone}>{dueLabel(task.dueDate, today)}</span>
       </div>
@@ -123,7 +125,7 @@ function EstimatePanel({ task, busy, onClose, onSave }) {
   return (
     <section className={styles.estimatePanel} aria-labelledby="my-estimate-title">
       <div className={styles.panelHead}>
-        <div><p className={styles.eyebrow}>Declared estimate</p><h2 id="my-estimate-title">Ước lượng: {task.title}</h2></div>
+        <div><p className={styles.eyebrow}>Ước lượng phạm vi</p><h2 id="my-estimate-title">Ước lượng: {task.title}</h2></div>
         <button className="icon-btn" onClick={onClose} aria-label="Đóng form estimate"><Icon name="x" size={18} /></button>
       </div>
       <p>Estimate là khai báo phạm vi, không phải cam kết hiệu suất. Hệ thống giữ riêng estimate, TimeLog và historical để manager xem đúng ngữ cảnh.</p>
@@ -189,6 +191,23 @@ export default function MyDayPage() {
   }, [model, localOrder]);
 
   const displayed = openTasks;
+
+  const queueSections = useMemo(() => {
+    const blocked = displayed.filter((task) => ['blocked', 'waiting'].includes(task.status));
+    const now = displayed.filter((task) => !blocked.includes(task)
+      && (['doing', 'in_progress', 'review'].includes(task.status) || (daysLeft(task.dueDate, today) ?? 99) <= 1));
+    const claimed = new Set([...blocked, ...now].map((task) => task.id));
+    const remaining = displayed.filter((task) => !claimed.has(task.id));
+    const next = remaining.filter((task, index) => (daysLeft(task.dueDate, today) ?? 99) <= 7 || index < 5);
+    const nextIds = new Set(next.map((task) => task.id));
+    const later = remaining.filter((task) => !nextIds.has(task.id));
+    return [
+      { key: 'now', label: 'Làm ngay', icon: 'bolt', tasks: now },
+      { key: 'next', label: 'Tiếp theo', icon: 'tasks', tasks: next },
+      { key: 'blocked', label: 'Bị chặn', icon: 'warning', tasks: blocked },
+      { key: 'later', label: 'Để sau', icon: 'calendar', tasks: later },
+    ];
+  }, [displayed, today]);
 
   const completed = model?.queues?.completed || [];
   const ownerId = model?.queue?.ownerId;
@@ -270,7 +289,7 @@ export default function MyDayPage() {
         if (!response.ok) throw new Error(body.error || 'Không thể xếp theo deadline.');
         version += 1;
       }
-      toast('Đã xếp cả bảng theo deadline — kéo thả để chỉnh tiếp theo ý bạn.');
+      toast('Đã xếp cả bảng theo hạn. Kéo thả để chỉnh tiếp theo ý bạn.');
       await load();
     } catch (requestError) {
       toast(requestError.message || 'Không thể xếp theo deadline.', 'error');
@@ -287,17 +306,16 @@ export default function MyDayPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.hero}>
-        <div>
-          <p className={styles.eyebrow}>Personal execution cockpit</p>
-          <h1>{session?.user?.name ? `Việc của ${session.user.name.split(/\s+/).slice(-1)[0]}` : 'Việc của tôi'}</h1>
-          <p>Bảng này sắp xếp hoàn toàn theo ý bạn — kéo cục việc đến đâu nằm đó, thay đổi ghi thẳng vào Task ERP. Màu nền báo độ gấp: vàng còn 3 ngày, cam còn 2 ngày, hồng còn 1 ngày/quá hạn.</p>
-        </div>
-        <div className={styles.heroActions}>
+      <PageHeader
+        icon="work"
+        meta="Công việc cá nhân"
+        title={session?.user?.name ? `Việc của ${session.user.name.split(/\s+/).slice(-1)[0]}` : 'Việc của tôi'}
+        description="Làm ngay, tiếp theo, bị chặn và để sau. Thứ tự trong mỗi nhóm vẫn được ghi vào Task ERP."
+        actions={<div className={styles.heroActions}>
           <button className="btn btn-outline" onClick={load} disabled={loading}><Icon name="repeat" size={16} /> Làm mới</button>
           <Link className="btn btn-primary" href="/tasks"><Icon name="tasks" size={16} /> Bảng công việc</Link>
-        </div>
-      </header>
+        </div>}
+      />
 
       <section className={styles.metrics} aria-label="Tóm tắt công việc">
         {[
@@ -313,28 +331,36 @@ export default function MyDayPage() {
         <button className="btn btn-outline" disabled={sortingByDeadline || displayed.length < 2} onClick={sortByDeadline}>
           <Icon name="clock" size={14} /> {sortingByDeadline ? 'Đang xếp…' : 'Xếp cả bảng theo deadline'}
         </button>
-        <span className={styles.viewHint}>Thứ tự là CỦA BẠN — kéo thả (hoặc ▲▼) tùy ý, việc mới tự xếp theo deadline.</span>
+        <span className={styles.viewHint}>Thứ tự là của bạn. Kéo thả hoặc dùng nút lên xuống để điều chỉnh.</span>
       </div>
 
       <div className={styles.live} aria-live="polite">{loading ? 'Đang đồng bộ từ ERP…' : error || `Đã đồng bộ ${metrics.open} việc đang mở.`}</div>
-      {error && <div className={styles.error} role="alert"><span>{error}</span><button className="btn btn-outline" onClick={load}>Thử lại</button></div>}
+      {error && <StatePanel compact state="error" title={error} action={<button className="btn btn-outline" onClick={load}>Thử lại</button>} />}
 
       {estimateTask && <EstimatePanel key={`${estimateTask.id}:${estimateTask.workVersion}`} task={estimateTask} busy={busyId === estimateTask.id} onClose={() => setEstimateTask(null)} onSave={saveEstimate} />}
 
       {!error && (
-        <section className={styles.board} aria-label="Các cục việc đang mở">
-          {displayed.map((task, index) => (
-            <TaskBlock key={task.id} task={task} index={index} count={displayed.length} today={today}
-              busy={busyId === task.id || sortingByDeadline} dragState={dragState}
-              onDragStart={(t, i) => setDragState({ dragId: t.id, dragIndex: i, overId: null })}
-              onDragOver={(t) => setDragState((s) => s.overId === t.id ? s : { ...s, overId: t.id })}
-              onDrop={onDrop}
-              onDragEnd={() => setDragState({ dragId: null, dragIndex: -1, overId: null })}
-              onNudge={(t, from, to) => reorder(t, from, to)}
-              onTransition={transition} onEstimate={setEstimateTask} />
+        <div className={styles.queueSections} aria-label="Công việc đang mở">
+          {queueSections.filter((section) => section.tasks.length).map((section) => (
+            <section className={styles.queueSection} key={section.key} data-queue={section.key}>
+              <header><span><Icon name={section.icon} size={16} />{section.label}</span><strong>{section.tasks.length}</strong></header>
+              <div className={styles.board}>
+                {section.tasks.map((task) => {
+                  const index = displayed.findIndex((item) => item.id === task.id);
+                  return <TaskBlock key={task.id} task={task} index={index} count={displayed.length} today={today}
+                    busy={busyId === task.id || sortingByDeadline} dragState={dragState}
+                    onDragStart={(currentTask, currentIndex) => setDragState({ dragId: currentTask.id, dragIndex: currentIndex, overId: null })}
+                    onDragOver={(currentTask) => setDragState((state) => state.overId === currentTask.id ? state : { ...state, overId: currentTask.id })}
+                    onDrop={onDrop}
+                    onDragEnd={() => setDragState({ dragId: null, dragIndex: -1, overId: null })}
+                    onNudge={(currentTask, from, to) => reorder(currentTask, from, to)}
+                    onTransition={transition} onEstimate={setEstimateTask} />;
+                })}
+              </div>
+            </section>
           ))}
-          {!loading && !displayed.length && <p className={styles.empty}>Hôm nay bạn rảnh 🎉 — không có việc nào đang mở.</p>}
-        </section>
+          {!loading && !displayed.length && <StatePanel state="success" title="Không có việc nào đang mở" description="Bạn đã xử lý hết hàng đợi hiện tại." />}
+        </div>
       )}
 
       {!error && completed.length > 0 && (
@@ -348,9 +374,9 @@ export default function MyDayPage() {
 
       <section className={styles.intelligenceSummary} aria-labelledby="resource-intelligence-summary">
         <div>
-          <p className={styles.eyebrow}>Resource Intelligence · shadow mode</p>
-          <h2 id="resource-intelligence-summary">Estimate ≠ TimeLog ≠ Historical</h2>
-          <p>TimeLog hiện là dữ liệu tự khai báo, không phải quan sát tuyệt đối. Chỉ đưa cảnh báo có giải thích; không dùng làm điểm hiệu suất. Bấm ⏱ trên cục việc để Cập nhật estimate.</p>
+          <p className={styles.eyebrow}>Nguồn lực có bằng chứng</p>
+          <h2 id="resource-intelligence-summary">Ước lượng, thời gian khai báo và dữ liệu lịch sử</h2>
+          <p>TimeLog là dữ liệu tự khai báo. Hệ thống chỉ đưa cảnh báo có giải thích và không dùng làm điểm hiệu suất.</p>
         </div>
         <dl>
           <div><dt>Thiếu estimate</dt><dd>{intelligence.estimateMissing}</dd></div>

@@ -10,14 +10,13 @@ import CollaborationBridge, { WorkspaceSurfaceSwitch } from '@/components/collab
 import { GlobalSearch, NotificationsModal } from '@/components/Shell';
 import { areaBySlug, mobileDestinations, REALM_V2_AREAS } from '@/lib/realm-v2-contracts';
 import Icon from './Icon';
-import { SourcePill } from './Primitives';
 import styles from './realm-v2.module.css';
 
 const PAGE_COPY = {
   home: {
     eyebrow: 'Không gian điều hành cá nhân',
-    title: 'Realm Home',
-    description: 'Một nơi để thấy việc cần chú ý, quyết định đang chờ và bước tiếp theo — đồng bộ trực tiếp từ ERP.',
+    title: 'Không gian làm việc',
+    description: 'Mở đúng khu vực để tiếp tục công việc, xử lý ngoại lệ hoặc phối hợp với đội nhóm.',
   },
   'my-work': {
     eyebrow: 'Task ERP · Góc nhìn Realm',
@@ -26,8 +25,8 @@ const PAGE_COPY = {
   },
   'work-management': {
     eyebrow: 'Guild flow · Task ERP',
-    title: 'Quản lý công việc',
-    description: 'Điều phối luồng việc, WIP, blocker và workload trên cùng Task ERP — không chấm điểm hay xếp hạng nhân sự.',
+    title: 'Công việc đội nhóm',
+    description: 'Điều phối luồng việc, khối lượng đang xử lý, trở ngại và năng lực của đội nhóm.',
   },
   'action-center': {
     eyebrow: 'Ngoại lệ · Quyết định · Can thiệp',
@@ -36,8 +35,8 @@ const PAGE_COPY = {
   },
   'command-center': {
     eyebrow: 'Intent · Proposal · Governed execution',
-    title: 'Command Center',
-    description: 'Biến ý định thành proposal có cấu trúc; entity đích tự kiểm tra quyền, business rule và canonical receipt.',
+    title: 'Điều phối tác vụ',
+    description: 'Chuyển yêu cầu thành đề xuất có cấu trúc trước khi thực hiện trên bản ghi nghiệp vụ.',
   },
   approvals: {
     eyebrow: 'Maker · Checker · Policy · Evidence',
@@ -47,7 +46,7 @@ const PAGE_COPY = {
   inbox: {
     eyebrow: 'Conversation · Notification · Authorized context',
     title: 'Hộp thư hợp nhất',
-    description: 'Một điểm đọc và phản hồi trên cùng Conversation và Notification của ERP — không sao chép hội thoại sang store Realm.',
+    description: 'Đọc thông báo và tiếp tục hội thoại trong cùng ngữ cảnh công việc.',
   },
   collaboration: {
     eyebrow: 'Presence · Consent · Coordination',
@@ -56,18 +55,18 @@ const PAGE_COPY = {
   },
   projects: {
     eyebrow: 'Outcome · Delivery health · Canonical work',
-    title: 'Project Realm',
-    description: 'Một cockpit điều hành Project trên cùng Task, TimeLog, dependency và quyền ERP — không tạo project hay chỉ số song song.',
+    title: 'Phòng dự án',
+    description: 'Theo dõi kết quả, tiến độ, phụ thuộc và các công việc liên quan của từng dự án.',
   },
   chronicle: {
     eyebrow: 'Actor · Action · Record · Evidence',
-    title: 'Chronicle',
-    description: 'Dòng thay đổi tổ chức từ AuditLog ERP đã cấp quyền; chỉ hiển thị bằng chứng mà nguồn canonical thực sự cung cấp.',
+    title: 'Lịch sử thay đổi',
+    description: 'Theo dõi ai đã thay đổi bản ghi nào, vào thời điểm nào và bằng chứng liên quan.',
   },
   'world-map': {
     eyebrow: 'Federation · Presence · Source freshness',
-    title: 'Bản đồ bốn công ty',
-    description: 'Một góc nhìn không gian trên federation thật; mọi trạng thái đều có bản bảng tương đương và không biến presence thành điểm năng suất.',
+    title: 'Bản đồ công ty',
+    description: 'Xem trạng thái vận hành giữa các công ty, nguồn dữ liệu và thời điểm cập nhật.',
   },
   'ceo-terminal': {
     eyebrow: 'Portfolio truth · Executive decisions · Provenance',
@@ -81,8 +80,8 @@ const PAGE_COPY = {
   },
   recognition: {
     eyebrow: 'Contribution · Policy · Receipt',
-    title: 'Recognition & Gold Ledger',
-    description: 'Sổ ghi nhận append-only với nguồn, policy và receipt; Gold không phải lương, cấp bậc hay tiền tệ đầu cơ.',
+    title: 'Ghi nhận đóng góp',
+    description: 'Lưu vết đóng góp, chính sách áp dụng và biên nhận; không dùng để xếp hạng nhân sự.',
   },
   notifications: {
     eyebrow: 'Notification · Authorized route · User scope',
@@ -106,13 +105,17 @@ const PAGE_COPY = {
   },
 };
 
+const PRIMARY_NAVIGATION = [
+  ['Làm việc', ['home', 'my-work', 'work-management', 'projects']],
+  ['Phối hợp', ['inbox', 'chronicle']],
+  ['Điều hành', ['action-center', 'ceo-terminal']],
+];
+
 function groups() {
-  const result = new Map();
-  for (const area of REALM_V2_AREAS) {
-    if (!result.has(area.group)) result.set(area.group, []);
-    result.get(area.group).push(area);
-  }
-  return [...result.entries()];
+  return PRIMARY_NAVIGATION.map(([label, slugs]) => [
+    label,
+    slugs.map((itemSlug) => areaBySlug(itemSlug)).filter(Boolean),
+  ]);
 }
 
 function ProductShell({ user, company, slug, pilot, children }) {
@@ -198,6 +201,9 @@ function ProductShell({ user, company, slug, pilot, children }) {
             ))}
           </nav>
           <div className={styles.railFooter}>
+            <button type="button" className={styles.railToggle} onClick={() => setDrawerOpen(true)} aria-label="Mở tất cả điểm đến">
+              <Icon name="more"/><span>Tất cả khu vực</span>
+            </button>
             <button type="button" className={styles.railToggle} onClick={toggleRail} aria-label={collapsed ? 'Mở rộng điều hướng' : 'Thu gọn điều hướng'}>
               <Icon name="panel"/><span>{collapsed ? 'Mở rộng' : 'Thu gọn'}</span>
             </button>
@@ -231,11 +237,9 @@ function ProductShell({ user, company, slug, pilot, children }) {
             <header className={styles.pageHeader}>
               <div className={styles.pageHeaderCopy}>
                 <div className={styles.breadcrumbs}><span>Realm</span><Icon name="chevron" size={12}/><span>{areaBySlug(slug).labelVi}</span></div>
-                <span className={styles.eyebrow}>{page.eyebrow}</span>
                 <h1 ref={headingRef} tabIndex={-1}>{page.title}</h1>
                 <p className={styles.subtitle}>{page.description}</p>
               </div>
-              <div className={styles.pageActions}><SourcePill source="RepositoryRealms" freshness="Dữ liệu thật"/></div>
             </header>
             {children}
           </div>
@@ -261,8 +265,19 @@ function ProductShell({ user, company, slug, pilot, children }) {
           </section>
         </div>
       )}
-      {searchOpen && <GlobalSearch onClose={() => setSearchOpen(false)}/>} 
-      {notificationsOpen && <NotificationsModal dataRevision={notificationRevision} onClose={() => setNotificationsOpen(false)} onChanged={() => setNotificationRevision((value) => value + 1)}/>} 
+      {searchOpen && (
+        <GlobalSearch
+          commands={REALM_V2_AREAS.map((item) => ({ label: item.labelVi, href: `/realm-v2/${item.slug}`, icon: item.icon, group: item.group }))}
+          onClose={() => setSearchOpen(false)}
+        />
+      )}
+      {notificationsOpen && (
+        <NotificationsModal
+          dataRevision={notificationRevision}
+          onClose={() => setNotificationsOpen(false)}
+          onChanged={() => setNotificationRevision((value) => value + 1)}
+        />
+      )}
     </div>
   );
 }

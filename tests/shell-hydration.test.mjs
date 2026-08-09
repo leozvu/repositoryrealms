@@ -4,10 +4,8 @@ import test from 'node:test';
 
 const source = await readFile(new URL('../components/Shell.jsx', import.meta.url), 'utf8');
 
-test('topbar date is resolved after hydration in the employee timezone', () => {
-  assert.match(source, /const \[todayLabel, setTodayLabel\] = useState\(''\)/);
-  assert.match(source, /toLocaleDateString\(locale === 'en' \? 'en-US' : 'vi-VN'/);
-  assert.match(source, /<span id="today-label">\{todayLabel\}<\/span>/);
+test('topbar avoids rendering a server-timezone date that can conflict after hydration', () => {
+  assert.doesNotMatch(source, /id="today-label"/);
   assert.doesNotMatch(
     source,
     /<span id="today-label">\{new Date\(\)/,

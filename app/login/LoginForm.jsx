@@ -66,8 +66,8 @@ export default function LoginForm({ brand, ceoPortal = false }) {
       <main className="login-card" aria-labelledby="login-title">
         <div className="login-logo" aria-hidden="true">{brand.logoLetter}</div>
         {ceoPortal && <div className="login-context">LEOZ GROUP · CONTROL PLANE</div>}
-        <h1 className="login-title" id="login-title">{ceoPortal ? `${brand.company} — ${brand.product}` : 'Agency ERP'}</h1>
-        <p className="login-sub">{ceoPortal ? brand.subtitle : 'Đăng nhập vào hệ thống quản trị'}</p>
+        <h1 className="login-title" id="login-title">{ceoPortal ? `${brand.company} — ${brand.product}` : brand.company}</h1>
+        <p className="login-sub">{brand.subtitle}</p>
         {ceoPortal && <div className="ceo-login-scope" aria-label="Phạm vi CEO Terminal">
           <span>AIm Agency</span><span>Egoric Agency</span><span>Vnecom LLC</span><span>Egolive</span>
         </div>}

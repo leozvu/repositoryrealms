@@ -89,8 +89,8 @@ test('Realm v2 presentation adapts the original ERP shell without replacing its 
   assert.match(layout, /const v2Enabled = ceoPortal \|\| realmV2PreviewEnabled\(\)/);
   assert.match(layout, /realmV2Theme=\{v2Enabled\}/);
   assert.match(layout, /realmV2Available=\{!ceoPortal && realmV2PreviewEnabled\(\)\}/);
-  assert.match(shell, /repository-realms-workspace.*repository-realms-v2-workspace/s);
-  assert.match(shell, /data-visual-upgrade/);
+  assert.match(shell, /className=\{isLegacyRealm \? 'realm-immersive' : 'workspace-shell'\}/);
+  assert.match(shell, /data-visual-system="workplace-2026"/);
   assert.match(route, /REALM_V2_AREAS\.some\(area => area\.slug === slug\)/);
   assert.match(route, /\['notifications', 'search', 'settings', 'mobile'\]\.includes\(slug\)/);
   assert.match(route, /RealmV2ApplicationShell/);

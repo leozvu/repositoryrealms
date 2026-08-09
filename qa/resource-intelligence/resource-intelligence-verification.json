@@ -193,8 +193,8 @@
       "layer": "ui",
       "source": "app/(app)/myday/page.jsx",
       "signals": [
-        "Resource Intelligence · shadow mode",
-        "TimeLog hiện là dữ liệu tự khai báo",
+        "Estimate là khai báo phạm vi",
+        "TimeLog là dữ liệu tự khai báo",
         "Cập nhật estimate"
       ],
       "missingSignals": [],
@@ -205,8 +205,8 @@
       "layer": "ui",
       "source": "app/(app)/teamwork/page.jsx",
       "signals": [
-        "Nguồn lực theo bằng chứng có provenance",
-        "Manager adjustment",
+        "TimeLog tự khai báo",
+        "business rule, receipt và audit",
         "Lưu hiệu chỉnh có receipt"
       ],
       "missingSignals": [],
