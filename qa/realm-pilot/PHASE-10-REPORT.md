@@ -24,7 +24,7 @@ Phase 10 đưa Realm vào rollout có kiểm soát mà không thay thế ERP/CRM
 | authenticated-policy-api | api | app/api/realm-demo/pilot/route.js | verified |
 | director-policy-write | server | lib/realm-pilot.js | verified |
 | aggregate-private-metrics | server | lib/realm-pilot.js | verified |
-| policy-aware-login | client | app/login/page.jsx | verified |
+| policy-aware-login | client | app/login/LoginForm.jsx | verified |
 | cross-surface-preference | client | lib/collaboration.js | verified |
 | both-surfaces-persist-choice | client | components/realm/RealmOffice.jsx | verified |
 | pilot-admin-control | client | components/realm/RealmPilotControl.jsx | verified |

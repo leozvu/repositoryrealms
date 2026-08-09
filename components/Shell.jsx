@@ -9,13 +9,13 @@ import { initials } from '@/lib/format';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
 import { modOn } from '@/lib/modules';
 import { ERP_NAV } from '@/lib/erp-navigation';
-import { realmRecordHref } from '@/lib/realm-business-bridge';
 import CollaborationBridge, { WorkspaceSurfaceSwitch } from './collaboration/CollaborationBridge';
 import { useRealmChangeFeed } from './realm/useRealmChangeFeed';
 import { NOTIFICATION_SYNC_EVENT } from '@/lib/notification-inbox';
 import RealmFeedbackLauncher from './realm/RealmFeedbackLauncher';
 import RealmPilotOnboarding from './realm/RealmPilotOnboarding';
 import { LanguageSwitch, useLanguage } from './LanguageProvider';
+import { GLOBAL_SEARCH_GROUPS, searchGroupRows } from '@/lib/global-search-contract';
 
 /* v3.14: TỰ GẮN NHÃN CỘT CHO BẢNG.
    Toàn app có 19 trang bảng, mỗi bảng viết tay riêng. Trên điện thoại, bảng 8 cột buộc phải
@@ -58,25 +58,13 @@ function useTableLabels(pathname) {
 }
 
 // v3.4: tìm kiếm toàn cục Ctrl+K — gom mọi resource user được đọc
-const SEARCH_GROUPS = [
-  { res: 'clients', label: 'Khách hàng', icon: 'clients', text: r => [r.name, r.contact, r.industry, r.phone], title: r => r.name, sub: r => r.industry || '', href: r => `/clients/${r.id}` },
-  { res: 'leads', label: 'Khách tiềm năng', icon: 'leads', text: r => [r.name, r.company, r.phone, r.email], title: r => r.company || r.name, sub: r => r.name, href: r => realmRecordHref('lead', r.id) },
-  { res: 'projects', label: 'Dự án', icon: 'projects', text: r => [r.name, r.service], title: r => r.name, sub: r => r.service || '', href: r => realmRecordHref('project', r.id) },
-  { res: 'tasks', label: 'Công việc', icon: 'tasks', text: r => [r.title, r.note], title: r => r.title, sub: r => r.status, href: r => realmRecordHref('task', r.id) },
-  { res: 'invoices', label: 'Hóa đơn', icon: 'invoices', text: r => [r.code], title: r => r.code, sub: r => r.date, href: () => '/invoices' },
-  { res: 'tickets', label: 'Ticket', icon: 'check', text: r => [r.code, r.title], title: r => `${r.code}: ${r.title}`, sub: r => r.status, href: () => '/tickets' },
-  { res: 'vendors', label: 'Nhà cung cấp', icon: 'wallet', text: r => [r.name, r.type], title: r => r.name, sub: r => r.type || '', href: () => '/vendors' },
-  { res: 'contracts', label: 'Hợp đồng', icon: 'shield', text: r => [r.code, r.partner], title: r => `${r.code} — ${r.partner}`, sub: r => r.endDate || '', href: () => '/contracts' },
-  { res: 'users', label: 'Nhân sự', icon: 'staff', text: r => [r.name, r.email, r.title], title: r => r.name, sub: r => r.title || '', href: r => realmRecordHref('staff', r.id) },
-];
-
-function GlobalSearch({ onClose }) {
+export function GlobalSearch({ onClose }) {
   const [q, setQ] = useState('');
   const [data, setData] = useState({});
   const router = useRouter();
   useEffect(() => {
     let alive = true;
-    Promise.all(SEARCH_GROUPS.map(async g => {
+    Promise.all(GLOBAL_SEARCH_GROUPS.map(async g => {
       const res = await fetch('/api/data/' + g.res).catch(() => null);
       return [g.res, res?.ok ? await res.json() : []];
     })).then(pairs => alive && setData(Object.fromEntries(pairs)));
@@ -86,9 +74,9 @@ function GlobalSearch({ onClose }) {
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (needle.length < 2) return [];
-    return SEARCH_GROUPS.map(g => ({
+    return GLOBAL_SEARCH_GROUPS.map(g => ({
       ...g,
-      items: (data[g.res] || []).filter(r => g.text(r).filter(Boolean).join(' ').toLowerCase().includes(needle)).slice(0, 5),
+      items: searchGroupRows(g, data[g.res], needle, 5),
     })).filter(g => g.items.length);
   }, [q, data]);
 
@@ -142,7 +130,7 @@ async function subscribePush(vapidPublicKey) {
   return response.ok ? 'granted' : 'error';
 }
 
-function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
+export function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
   const [data, setData] = useState(null);
   const router = useRouter();
   const toast = useToast();
@@ -255,8 +243,14 @@ function TwoFAModal({ onClose }) {
 }
 
 const NAV = ERP_NAV;
+const CEO_NAV = [
+  { section: 'Điều hành tập đoàn' },
+  ...NAV.filter((item) => ['ceo-overview', 'ceo-navigator', 'ceo-briefing', 'ceo-decisions', 'ceo-world', 'ceo-commands', 'ceo-inbox'].includes(item.key)),
+  { section: 'Năng lực & quản trị' },
+  ...NAV.filter((item) => ['ceo-workforce', 'ceo-registry', 'ceo-security', 'ceo-rollout'].includes(item.key)),
+];
 
-export default function Shell({ user, company, realmPilot, children }) {
+export default function Shell({ user, company, realmPilot, realmV2Theme = false, realmV2Available = false, ceoPortal = false, ceoPortalOrigin = '', children }) {
   const { locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
@@ -290,6 +284,15 @@ export default function Shell({ user, company, realmPilot, children }) {
   const pathname = usePathname();
   const router = useRouter();
   const isRealmRoute = pathname === '/realm' || pathname.startsWith('/realm/');
+  useEffect(() => {
+    if (!realmV2Theme || isRealmRoute) return undefined;
+    document.documentElement.dataset.realmVisualSystem = 'v2';
+    return () => {
+      if (document.documentElement.dataset.realmVisualSystem === 'v2') {
+        delete document.documentElement.dataset.realmVisualSystem;
+      }
+    };
+  }, [isRealmRoute, realmV2Theme]);
   useTableLabels(pathname); // v3.14: bảng đọc được trên điện thoại
   const isFL = user?.userType === 'freelancer';
   // v3.11: freelancer chỉ được ở /freelancer — chuyển hướng nếu lạc sang trang nhân viên
@@ -302,14 +305,14 @@ export default function Shell({ user, company, realmPilot, children }) {
     if (cur && cur.mod && !modOn(cur.mod, modules)) router.replace('/dashboard');
   }, [pathname, modules, isFL, router]);
   const NAV_FL = [{ key: 'freelancer', label: 'Công việc của tôi', icon: 'tasks', roles: ['FREELANCER'] }];
-  const navList = isFL ? NAV_FL : NAV;
+  const navList = isFL ? NAV_FL : ceoPortal ? CEO_NAV : NAV;
   const current = navList.find(n => n.key && pathname.startsWith('/' + n.key));
   const myRoles = rolesOf(user);
   // v3.17: mục menu hiện khi (đúng vai trò) VÀ (phân hệ của nó đang bật). Mục lõi (không mod)
   // luôn qua modOn. Freelancer đi lối riêng.
   const visible = item => isFL
     ? true
-    : (!item.ceoPortalOnly || process.env.NEXT_PUBLIC_CEO_GROUP_WORKFORCE === '1')
+    : (!item.ceoPortalOnly || ceoPortal)
       && (!item.realmSurface || realmPilot?.allowed)
       && hasAny(user, item.roles)
       && modOn(item.mod, modules);
@@ -354,33 +357,48 @@ export default function Shell({ user, company, realmPilot, children }) {
   }, []);
 
   useEffect(() => { // v3.4: Ctrl+K mở tìm kiếm toàn cục
-    const h = e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setShowSearch(true); } };
+    const h = e => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (ceoPortal) router.push('/ceo-navigator');
+        else setShowSearch(true);
+      }
+    };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
-  }, []);
+  }, [ceoPortal, router]);
 
   return (
     <SessionProvider>
     <ToastProvider>
     <RoleLabelsCtx.Provider value={roleLabels}>
     <ModulesCtx.Provider value={modules}>
-      <CollaborationBridge />
-      {!isFL && realmPilot?.allowed && realmPilot?.config?.features?.feedback !== false && <RealmFeedbackLauncher />}
-      {!isFL && <RealmPilotOnboarding user={user} pilot={realmPilot} />}
+      {!ceoPortal && <CollaborationBridge />}
+      {!ceoPortal && !isFL && realmPilot?.allowed && realmPilot?.config?.features?.feedback !== false && <RealmFeedbackLauncher />}
+      {!ceoPortal && !isFL && <RealmPilotOnboarding user={user} pilot={realmPilot} />}
       <div
         id="app"
-        className={isRealmRoute ? 'realm-immersive' : 'repository-realms-workspace'}
+        className={isRealmRoute
+          ? 'realm-immersive'
+          : `repository-realms-workspace${realmV2Theme ? ' repository-realms-v2-workspace' : ''}`}
         data-visual-system="phase-22"
+        data-visual-upgrade={realmV2Theme ? 'realm-v2-canonical' : undefined}
+        data-deployment-kind={ceoPortal ? 'ceo-portal' : 'entity'}
       >
         <aside id="sidebar" className={open ? 'open' : ''}>
           <div className="brand">
-            <div className="brand-logo">{(company || 'A')[0].toUpperCase()}</div>
+            <div className="brand-logo">{ceoPortal ? 'L' : (company || 'A')[0].toUpperCase()}</div>
             <div className="brand-text">
               <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">ERP · CRM · 7 vai trò nghiệp vụ</span>
+              <span className="brand-sub">{ceoPortal ? 'CEO Terminal · 4 công ty' : 'ERP · CRM · 7 vai trò nghiệp vụ'}</span>
             </div>
           </div>
           <nav id="nav">
+            {!ceoPortal && myRoles.includes('DIRECTOR') && ceoPortalOrigin && (
+              <a className="nav-item ceo-portal-link" href={`${ceoPortalOrigin}/ceo-overview`} rel="noopener noreferrer">
+                <Icon name="link" size={18} /><span>Mở CEO Terminal</span>
+              </a>
+            )}
             {navList.map((item, i) => {
               if (item.section) {
                 const next = navList.findIndex((x, j) => j > i && x.section);
@@ -427,7 +445,7 @@ export default function Shell({ user, company, realmPilot, children }) {
           </div>
         </aside>
         {show2fa && <TwoFAModal onClose={() => setShow2fa(false)} />}
-        {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
+        {!ceoPortal && showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
         {showNotif && <NotificationsModal dataRevision={notificationRevision} onClose={() => setShowNotif(false)}
           onChanged={() => { setNotificationRevision((currentRevision) => currentRevision + 1); loadShellCounters(); }} />}
         <div id="backdrop" className={open ? 'show' : ''} onClick={() => setOpen(false)}></div>
@@ -436,9 +454,10 @@ export default function Shell({ user, company, realmPilot, children }) {
             <button id="menu-btn" onClick={() => setOpen(true)} aria-label="Mở menu"><Icon name="menu" /></button>
             <h1 id="page-title">{current?.label || 'Agency ERP'}</h1>
             <div className="topbar-right">
-              <WorkspaceSurfaceSwitch pilot={realmPilot} />
+              {!ceoPortal && <WorkspaceSurfaceSwitch pilot={realmPilot} realmV2Available={realmV2Available} />}
+              {ceoPortal && <span className="ceo-terminal-scope"><Icon name="shield" size={14} /> 4 entity · control plane</span>}
               <LanguageSwitch compact />
-              <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
+              <button className="btn btn-outline btn-sm" onClick={() => ceoPortal ? router.push('/ceo-navigator') : setShowSearch(true)} title={ceoPortal ? 'Mở Universal Company Navigator (Ctrl+K)' : 'Tìm kiếm toàn hệ thống (Ctrl+K)'}>
                 <Icon name="search" size={14} /><span> Ctrl+K</span>
               </button>
               <button className="btn btn-outline btn-sm" onClick={() => setShowNotif(true)} title="Thông báo" style={{ position: 'relative' }} aria-label="Thông báo">

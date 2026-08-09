@@ -4,8 +4,8 @@
   "summary": {
     "ringsPresent": 5,
     "evidenceKindsPresent": 5,
-    "outboundAdaptersGuarded": 5,
-    "outboundAdapters": 5,
+    "outboundAdaptersGuarded": 6,
+    "outboundAdapters": 6,
     "routesPresent": 3,
     "routes": 3,
     "migrationAdditive": true,
@@ -20,6 +20,10 @@
   "adapterChecks": [
     {
       "file": "lib/ceo-unified-dashboard-admin.js",
+      "guarded": true
+    },
+    {
+      "file": "lib/ceo-decision-queue-admin.js",
       "guarded": true
     },
     {

@@ -295,6 +295,22 @@ function collectBindings(ast, source) {
   };
 }
 
+function mergeBindings(...groups) {
+  const resources = new Set();
+  const apiCalls = new Map();
+  const routeTargets = new Set();
+  for (const group of groups) {
+    for (const resource of group.resources) resources.add(resource);
+    for (const call of group.apiCalls) apiCalls.set(`${call.method}:${call.endpoint}`, call);
+    for (const target of group.routeTargets) routeTargets.add(target);
+  }
+  return {
+    resources: [...resources].sort(),
+    apiCalls: [...apiCalls.values()].sort((a, b) => a.line - b.line || a.endpoint.localeCompare(b.endpoint)),
+    routeTargets: [...routeTargets].sort(),
+  };
+}
+
 function elementKind(tag, attributes) {
   if (tag === 'form') return 'form-submit';
   if (FORM_CONTROL_TAGS.has(tag)) return 'form-control';
@@ -519,6 +535,17 @@ export function buildUiInventory(root) {
       const route = pageRouteFromFile(relativeFile);
       const nav = routeNavigation(route, navigation);
       const roles = nav?.roles || (route === '/freelancer' ? ['FREELANCER'] : []);
+      let routeBindings = bindings;
+      // The login route intentionally keeps deployment branding on the server
+      // while its credential form remains a client component. Inventory both
+      // halves as one route contract so API and redirect coverage is not lost.
+      if (relativeFile === 'app/login/page.jsx') {
+        const clientSource = path.join(absoluteRoot, 'app', 'login', 'LoginForm.jsx');
+        if (fs.existsSync(clientSource)) {
+          const clientText = fs.readFileSync(clientSource, 'utf8');
+          routeBindings = mergeBindings(bindings, collectBindings(parseSource(clientText, 'app/login/LoginForm.jsx'), clientText));
+        }
+      }
       uiRoutes.push({
         route,
         source: relativeFile,
@@ -529,9 +556,9 @@ export function buildUiInventory(root) {
         navSection: nav?.section || '',
         roles,
         module: nav?.module || '',
-        resourceCandidates: bindings.resources,
-        apiCandidates: bindings.apiCalls.map((call) => `${call.method} ${call.endpoint}`),
-        routeCandidates: bindings.routeTargets,
+        resourceCandidates: routeBindings.resources,
+        apiCandidates: routeBindings.apiCalls.map((call) => `${call.method} ${call.endpoint}`),
+        routeCandidates: routeBindings.routeTargets,
         mappingStatus: 'unreviewed',
       });
     }

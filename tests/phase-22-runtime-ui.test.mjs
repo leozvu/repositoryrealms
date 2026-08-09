@@ -12,7 +12,8 @@ test('ERP shell declares the shared Phase 22 visual system without changing rout
 
   assert.match(shell, /repository-realms-workspace/);
   assert.match(shell, /data-visual-system="phase-22"/);
-  assert.match(shell, /isRealmRoute \? 'realm-immersive' : 'repository-realms-workspace'/);
+  assert.match(shell, /isRealmRoute[\s\S]*realm-immersive[\s\S]*repository-realms-workspace/);
+  assert.match(shell, /realmV2Theme/);
 });
 
 test('ERP and login consume generated map, material and ornament assets as decorative layers', () => {

@@ -1,45 +1,47 @@
-# Deployment Manifest — Leoz Group ERP/CRM + CEO Terminal
+# Deployment Manifest — RepositoryRealms
 
-Cập nhật: 2026-07-26 · Baseline canonical: `main @ 64ef8c7` (PR #5 — v3.42 cổng nhận lead, CI xanh: migration-chain + verify) · Người lập: Claude
+Cập nhật: 2026-08-09. Control-plane release candidate: `codex/realm-design-system-v2-implementation @ 6c7a71e8e63d0d49335d8570be6214021ea044d1`.
 
-## Bảng entity
+## Production domains đang phục vụ
 
-| Entity | Vercel project | Domain | Commit | Postgres schema | Migration level | Modules bật | Backup gần nhất | Rollback target |
-|---|---|---|---|---|---|---|---|---|
-| Egoric Agency | `erp-egoric` | erp-egoric.vercel.app | `64ef8c7` | `egoric` | ✅ diff-sạch với schema.prisma (ledger đủ 23 migration) | ALL (agency mặc định) | `backups/20260726-180503/egoric.json` | deployment Ready liền trước trên Vercel + backup JSON |
-| AIm Agency | `agency-erp` | agency-erp-mu.vercel.app | `64ef8c7` | `public` | ✅ diff-sạch | ALL (agency mặc định) | `backups/20260726-180503/public.json` | như trên |
-| Vnecom LLC | `erp-vnecom` | erp-vnecom.vercel.app | `64ef8c7` | `vnecom` | ✅ diff-sạch | ALL (agency mặc định) | `backups/20260726-180503/vnecom.json` | như trên |
-| Egolive | `erp-egolive` | erp-egolive.vercel.app | `64ef8c7` | `egolive` | ✅ diff-sạch | tasks, commissions, freelancers, reviews, livestream | `backups/20260726-180503/egolive.json` | như trên |
-| Sandbox test | `erp-crm-test` | erp-crm-test.vercel.app | `64ef8c7` | `crmtest` | ✅ diff-sạch | ALL | (dữ liệu demo — không cần) | redeploy bất kỳ |
-| CEO Terminal | `ceo-terminal-leoz` | ceo-terminal-leoz.vercel.app | `bf5270b` | `ceoportal` | ✅ diff-sạch | ALL (chỉ dùng trang CEO) | `backups/20260726-180503/` (registry/receipts nằm trong schema riêng) | như trên |
+| Entity | Vercel project | Domain | Schema | Stable deployment | Trạng thái |
+|---|---|---|---|---|---|
+| AIm Agency | `agency-erp` | `agency-erp-mu.vercel.app` | `public` | `dpl_2wdKb7RzMMtukGytCgufCnzhtJjA` | READY; `/login` 200 |
+| Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_BLw3joRx3EUPM5LDcR48xwXYtT1Q` | READY; `/login` 200 |
+| VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_3WTArswEcqM3zdUvP7wKCxx9Jnmh` | READY; `/login` 200 |
+| Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_AdvgYVquGvLnzUWrCQ5Lu6r3u3CP` | READY; `/login` 200 |
+| CEO Terminal | `ceo-terminal-leoz` | `ceo-terminal-leoz.vercel.app` | `ceoportal` | `dpl_6ARCEAAYKhkAxK8oUg9gibCDY8ou` | READY; `/login` 200 |
 
-Ngoài phạm vi: **Fretas** (`erp-fretas`) — thuộc đơn vị khác, KHÔNG nối terminal (key đã thu hồi, registry disabled) và **đã gỡ khỏi `db-push-all.ps1` / `deploy-all.ps1`** từ v3.42, nên không còn nhận schema mới hay code mới từ đây. Vẫn nằm trong `scripts/backup-db.js` — sao lưu là bảo vệ, không ghi đè; bỏ ra sẽ khiến dữ liệu của họ trong Supabase này mất lưới an toàn. **Master Dashboard cũ** (`erp-master-leoz`) — repo riêng, không thuộc manifest này.
+Không project nào trong bảng trên được promote trong lần tạo production-truth evidence ngày 2026-08-09. Các deployment tạm dùng production environment đều chạy với `--skip-domain`, sau đó bị xóa.
 
-## Đợt phát hành v3.42 — 26/7/2026
+Ngoài phạm vi: Fretas, `erp-master-leoz`, LeozOps và contract `lead-snapshot v1`.
 
-Migration `20260726090000_add_v342_lead_intake` (cộng thêm thuần: 5 cột nullable + 3 chỉ mục) áp tuần tự lên 4 schema, có đối chứng số dòng 15 bảng + dấu vân tay email tài khoản **trước và sau**:
+## Backup gần nhất đã restore-test
 
-| Công ty | Tài khoản trước → sau | Lead trước → sau | Cột mới | Kết |
-|---|---|---|---|---|
-| AIm | 1 → 1 | 0 → 0 | 5/5 | ✅ |
-| Egoric | 14 → 14 | 0 → 0 | 5/5 | ✅ |
-| Vnecom LLC | 2 → 2 | 0 → 0 | 5/5 | ✅ |
-| Egolive | 1 → 1 | 0 → 0 | 5/5 | ✅ |
+- Thư mục ngoài repository: `C:\Users\Asus\AppData\Local\CRMegoricBackups\20260809T040418Z`.
+- Archive key ngoài repository: `C:\Users\Asus\AppData\Local\CRMegoricBackups\keys\ceo12-20260809.archive.key`.
+- Key ACL: chỉ tài khoản Windows `LAPTOP-0FKLAPQP\Asus` và `SYSTEM`.
+- Mã hóa: AES-256-GCM + gzip; checksum SHA-256 cho từng file và manifest.
+- Phạm vi: đúng 5 schema `public`, `egoric`, `vnecom`, `egolive`, `ceoportal`; không gồm Fretas.
+- Restore rehearsal: PASS 5/5 trên các schema staging tạm; row count khớp; 51 foreign key/schema được phục hồi; mọi schema rehearsal đã drop.
+- Production database chỉ được đọc bằng transaction `READ ONLY`.
 
-**0 ô lệch** trên toàn bộ User / Lead / Client / Project / Task / Quote / Invoice / Transaction / Activity / Contract / Notification / Attendance / Payroll / Setting / AuditLog của cả 4 công ty. Smoke sau deploy: `/login` = 200 và `/api/lead-intake` = **404** trên cả 4 — cổng nhận lead mặc định ĐÓNG, chưa công ty nào bị lộ endpoint.
+Chi tiết evidence: `docs/realms/CEO-12-PRODUCTION-TRUTH-EVIDENCE.md`.
 
-## Định nghĩa "Migration level"
+## Schema gate hiện tại
 
-Các schema entity đồng bộ bằng `prisma db push` (không có bảng `_prisma_migrations`). Mức chuẩn = `prisma migrate diff --from-url <schema> --to-schema-datamodel prisma/schema.prisma` **không lệch** — đã xác minh cho cả 6 schema ngày 23–24/7. Migration ledger trong repo (22 file, mới nhất `20260723120000_add_v339_service_lines_company_docs_avatar`) được CI `migration-chain` xác nhận tương đương datamodel ("No difference detected").
+Snapshot cho thấy cả năm schema có 95 bảng Prisma. CEO Portal production từng trả `P2022` khi đọc bằng model Prisma hiện tại, nghĩa là có column drift so với release candidate; công cụ backup đã đọc các cột thực tế và chứng minh dữ liệu có thể restore vào schema hiện tại. Không được promote CEO Terminal trước khi chạy migration diff, backup gate và additive migration plan.
 
-## Quy trình rollback
+## Rollback
 
-1. Vercel: `vercel rollback` về deployment Ready liền trước của project tương ứng (mỗi project giữ nguyên lịch sử deployment).
-2. Dữ liệu (chỉ khi sự cố dữ liệu, không tự động): `npm run restore` từ `backups/<timestamp>/<schema>.json` — quyết định bởi founder.
-3. CEO Terminal: hạ ring qua trang CEO · Rollout (fail-closed, không mất dữ liệu số liệu cũ).
+1. Code: dùng stable deployment ID ở bảng trên; không rollback bằng cách viết lại Git history.
+2. Dữ liệu: chỉ restore từ bộ `20260809T040418Z` sau quyết định founder và rehearsal mới.
+3. CEO feature: hạ rollout ring/kill switch của Portal; local ERP login phải tiếp tục hoạt động.
+4. Không xóa hoặc ghi đè schema production để sửa drift.
 
-## Cách tái lập manifest
+## Release discipline
 
-- Deploy chuẩn: từ `main`, `vercel link --project <tên> && vercel deploy --prod` (hoặc chờ auto-deploy khi đã bật Git integration).
-- Kiểm schema: `npx prisma migrate diff --from-url "<DIRECT_URL>?schema=<s>" --to-schema-datamodel prisma/schema.prisma --exit-code`.
-- Backup: `npm run backup` (giữ 14 bản gần nhất trong `backups/`).
+- Mọi business action đi qua RepositoryRealms Authorization → Business Rules → Receipt → Audit.
+- CEO Terminal không ghi trực tiếp business table của entity.
+- ERP của từng entity giữ workflow và dữ liệu riêng; Realm là giao diện tùy chọn.
+- Trước promote: migration diff, authenticated SSO E2E, contract tests, chaos suite, canary và rollback evidence đều phải xanh.

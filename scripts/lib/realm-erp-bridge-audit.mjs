@@ -18,7 +18,7 @@ const RECORD_FLOWS = [
   { id: 'embassy-lead', realm: 'Embassy opportunity', erp: 'Lead detail', source: 'components/realm/RoyalEmbassy.jsx', signals: ['onOpenLead', 'Mở Lead ERP'], target: '/leads?focus=:id' },
   { id: 'lead-focus', realm: 'Realm deep-link', erp: 'Lead modal', source: 'app/(app)/leads/page.jsx', signals: ["get('focus')", "setModal({ mode: 'edit', row: lead })"], target: 'Lead FormModal' },
   { id: 'embassy-client', realm: 'Embassy alliance', erp: 'Client detail', source: 'components/realm/RoyalEmbassy.jsx', signals: ['onOpenClient', 'Mở Client ERP'], target: '/clients/:id' },
-  { id: 'global-search', realm: 'Shared navigation', erp: 'Exact record', source: 'components/Shell.jsx', signals: ["realmRecordHref('lead'", "realmRecordHref('task'", "realmRecordHref('project'", "realmRecordHref('staff'"], target: 'record-aware routes' },
+  { id: 'global-search', realm: 'Shared ERP and Realm search', erp: 'Exact record', source: 'lib/global-search-contract.js', signals: ["realmRecordHref('lead'", "realmRecordHref('task'", "realmRecordHref('project'", "realmRecordHref('staff'"], target: 'record-aware routes' },
 ];
 
 const BROWSER_SCENARIOS = [

@@ -584,7 +584,7 @@ a.link:hover{text-decoration:underline}
 }
 
 /* ============ v2.0 additions: login + auth ============ */
-.login-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;position:relative;isolation:isolate;overflow:hidden;background:#091710;padding:30px 20px}
+.login-wrap{min-height:100dvh;display:flex;align-items:center;justify-content:center;position:relative;isolation:isolate;overflow-x:hidden;overflow-y:auto;background:#091710;padding:30px 20px}
 .login-wrap::before{content:'';position:absolute;inset:-3%;z-index:-2;background:var(--rr-art-map) center/cover no-repeat;opacity:.42;filter:saturate(.82) contrast(1.05);pointer-events:none}
 .login-wrap::after{content:'';position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 50% 45%,rgba(13,42,28,.18),rgba(4,14,9,.82) 72%),linear-gradient(145deg,rgba(7,22,14,.45),rgba(4,13,9,.82));pointer-events:none}
 .login-card{position:relative;isolation:isolate;background-color:var(--card);background-image:linear-gradient(rgba(255,252,245,.965),rgba(247,239,222,.98)),var(--rr-art-stone);background-position:center;background-size:auto,420px auto;border:1px solid #B69751;border-radius:10px;box-shadow:0 28px 80px rgba(0,0,0,.56);width:100%;max-width:448px;padding:42px 56px 40px}
@@ -597,10 +597,22 @@ a.link:hover{text-decoration:underline}
 .login-card .field{margin-bottom:14px}
 .login-card .field input,.login-card .btn{min-height:44px}
 .login-card .field input{border-color:#C8B68B;background:rgba(255,252,245,.86)}
+.login-submit,.login-recovery-toggle{width:100%;justify-content:center;min-height:44px}
+.login-recovery-toggle{margin-top:10px}
+.login-context{text-align:center;color:#846426;font-size:.68rem;font-weight:800;letter-spacing:.16em;margin-bottom:7px}
+.ceo-login-scope{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:-6px 0 18px}
+.ceo-login-scope span{display:flex;align-items:center;justify-content:center;min-height:32px;padding:5px 8px;border:1px solid rgba(133,100,38,.24);border-radius:7px;background:rgba(255,252,245,.62);color:#66542F;font-size:.7rem;font-weight:700;text-align:center}
+.login-wrap[data-deployment-kind='ceo-portal']::before{opacity:.3;filter:saturate(.68) contrast(1.12)}
+.login-wrap[data-deployment-kind='ceo-portal']::after{background:radial-gradient(circle at 50% 42%,rgba(42,105,72,.22),rgba(3,12,8,.9) 74%),linear-gradient(145deg,rgba(7,22,14,.32),rgba(3,10,7,.9))}
+.login-wrap[data-deployment-kind='ceo-portal'] .login-card{max-width:486px;margin-block:auto;padding:48px 72px 58px;background-image:linear-gradient(rgba(255,252,245,.975),rgba(242,235,218,.985)),var(--rr-art-stone);box-shadow:0 32px 90px rgba(0,0,0,.62),0 0 0 1px rgba(220,183,101,.2)}
+.login-wrap[data-deployment-kind='ceo-portal'] .login-title{font-size:1.4rem;color:#102219}
+.login-wrap[data-deployment-kind='ceo-portal'] .login-sub{color:#526158;font-weight:600}
 @media(max-width:520px){
   .login-wrap{padding:22px 18px}
   .login-card{padding:38px 46px 34px}
   .login-card::before{inset:-9px;opacity:.68}
+  .ceo-login-scope{grid-template-columns:1fr}
+  .login-wrap[data-deployment-kind='ceo-portal'] .login-card{padding:42px 52px 50px}
 }
 .role-chip{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.03em}
 .role-DIRECTOR{background:#EDE9FE;color:#7C3AED}

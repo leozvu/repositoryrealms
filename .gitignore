@@ -24,3 +24,4 @@ qa/production-observation/reports/
 # file tạm phiên làm việc — chứa secret, KHÔNG commit
 *.tmp
 .tmp-*.mjs
+.env*

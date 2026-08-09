@@ -35,6 +35,48 @@ test('English UI copy translates dynamic Realm status without translating record
   assert.equal(translateUiCopy('Khóa sổ chiến dịch Rồng Xanh', 'en'), 'Blue Dragon Operations Window');
 });
 
+test('Phase 4 Inbox and Collaboration copy is available in English without translating record names', () => {
+  assert.equal(translateUiCopy('Hộp thư hợp nhất', 'en'), 'Unified Inbox');
+  assert.equal(translateUiCopy('Điều phối cộng tác', 'en'), 'Collaboration');
+  assert.equal(translateUiCopy('Không hiển thị raw heartbeat, thời lượng online, Task, Gold hoặc điểm hiệu suất.', 'en'), 'Raw heartbeat, online duration, Tasks, Gold, and performance scores are never displayed.');
+  assert.equal(translateUiCopy('Message record đã được lưu: msg_01', 'en'), 'Message record saved: msg_01');
+  assert.equal(translateUiCopy('Contact request đã được ghi nhận: contact_01.', 'en'), 'Contact request recorded: contact_01.');
+  assert.equal(translateUiCopy('Chiến dịch mùa thu', 'en'), 'Chiến dịch mùa thu');
+});
+
+test('Phase 5 Project Realm and Chronicle copy is available in English without translating record names', () => {
+  assert.equal(translateUiCopy('Project Realm', 'en'), 'Project Realm');
+  assert.equal(translateUiCopy('Tín hiệu cần quyết định', 'en'), 'Signals requiring a decision');
+  assert.equal(translateUiCopy('Chronicle này là AuditLog ERP chỉ đọc.', 'en'), 'This Chronicle is the read-only ERP AuditLog.');
+  assert.equal(translateUiCopy('Không sửa lịch sử tại đây.', 'en'), 'History cannot be edited here.');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
+test('Phase 6 World Map and CEO Terminal copy preserves executive accounting meanings', () => {
+  assert.equal(translateUiCopy('Bản đồ bốn công ty', 'en'), 'Four-company Map');
+  assert.equal(translateUiCopy('Danh sách công ty tương đương', 'en'), 'Equivalent company list');
+  assert.equal(translateUiCopy('Không phải recognized revenue', 'en'), 'Not recognized revenue');
+  assert.equal(translateUiCopy('GMV không phải revenue', 'en'), 'GMV is not revenue');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
+test('Phase 7 Employee Profile and Recognition copy preserves privacy and Gold meaning', () => {
+  assert.equal(translateUiCopy('Hồ sơ nhân sự', 'en'), 'Employee Profile');
+  assert.equal(translateUiCopy('Kỹ năng & bằng chứng', 'en'), 'Skills & evidence');
+  assert.equal(translateUiCopy('Số dư hiện tại', 'en'), 'Current balance');
+  assert.equal(translateUiCopy('Hạn mức policy cá nhân', 'en'), 'Personal policy limit');
+  assert.equal(translateUiCopy('Mở Hội đồng Gold', 'en'), 'Open Gold Council');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
+test('Phase 8 final experience copy is available in English without translating record names', () => {
+  assert.equal(translateUiCopy('Thông báo', 'en'), 'Notifications');
+  assert.equal(translateUiCopy('Tìm kiếm toàn hệ thống', 'en'), 'Search & Commands');
+  assert.equal(translateUiCopy('Cài đặt Realm', 'en'), 'Realm Settings');
+  assert.equal(translateUiCopy('Không gian làm việc di động', 'en'), 'Mobile Workspace');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
 test('every Vietnamese ERP navigation label has an English counterpart', () => {
   const vietnamese = /[À-ỹĐđ]/;
   const missing = ERP_NAV

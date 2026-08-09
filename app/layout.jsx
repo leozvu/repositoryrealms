@@ -1,6 +1,8 @@
 import './globals.css';
+import './realm-canonical-v2.css';
 import { Be_Vietnam_Pro, Noto_Serif, Roboto_Mono } from 'next/font/google';
 import { LanguageProvider } from '@/components/LanguageProvider';
+import { deploymentBranding } from '@/lib/deployment-profile';
 
 const bodyFont = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
@@ -23,10 +25,15 @@ const monoFont = Roboto_Mono({
   variable: '--font-roboto-mono',
 });
 
-export const metadata = {
-  title: 'CRMegoric ERP · CRM — Medieval Realms',
-  description: 'Hệ thống ERP và CRM đầy đủ với lớp trải nghiệm medieval, Realm, Quest, Gold và Tavern.',
-};
+export function generateMetadata() {
+  const brand = deploymentBranding();
+  return {
+    title: brand.kind === 'ceo-portal'
+      ? 'Leoz Group — CEO Terminal'
+      : 'CRMegoric ERP · CRM — Medieval Realms',
+    description: brand.description,
+  };
+}
 
 export default function RootLayout({ children }) {
   return (

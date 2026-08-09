@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2026-07-30T09:13:35.331Z",
+  "results": [
+    {
+      "slug": "inbox",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Hộp thư hợp nhất",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "collaboration",
+      "viewport": "desktop-1440",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Điều phối cộng tác",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "inbox",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Hộp thư hợp nhất",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "collaboration",
+      "viewport": "laptop-1024",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Điều phối cộng tác",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "inbox",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Hộp thư hợp nhất",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "collaboration",
+      "viewport": "tablet-768",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Điều phối cộng tác",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "inbox",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Hộp thư hợp nhất",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "collaboration",
+      "viewport": "phone-390",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Điều phối cộng tác",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "inbox",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Hộp thư hợp nhất",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "collaboration",
+      "viewport": "phone-375",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-4-qa",
+      "heading": "Điều phối cộng tác",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    }
+  ],
+  "messageChecks": [
+    {
+      "conversationId": "conv-campaign",
+      "content": "Đã nhận. Mình sẽ kiểm tra Task ERP ngay.",
+      "recordVisible": true,
+      "directAttachmentControls": 0
+    }
+  ],
+  "collaborationChecks": [
+    {
+      "targetUserId": "user-mai",
+      "sourceSurface": "realm",
+      "idempotencyKeyPresent": true,
+      "surveillanceCopyVisible": true,
+      "fakeCoViewingButtonCount": 0
+    }
+  ]
+}
