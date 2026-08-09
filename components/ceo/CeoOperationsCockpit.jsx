@@ -42,6 +42,8 @@ const COPY = {
     focus: 'Ưu tiên điều hành hợp nhất',
     focusHint: 'Phê duyệt, rủi ro dự án, receipt, tin nhắn và đối soát Egolive trên cùng một hàng đợi.',
     focusClear: 'Không có việc khẩn cấp từ các nguồn đang khả dụng.',
+    executiveV2: 'Executive contract v2', pendingApprovals: 'Phê duyệt đang chờ', openIncidents: 'Sự cố đang mở', activeWork: 'Work item đang chạy', weightedForecast: 'Forecast có trọng số',
+    notSupported: 'chờ entity nâng contract', contractReady: 'entity sẵn sàng', noData: '—',
   },
   en: {
     eyebrow: 'CEO-12 · GROUP OPERATIONS COCKPIT',
@@ -77,6 +79,8 @@ const COPY = {
     focus: 'Unified executive priorities',
     focusHint: 'Approvals, project risk, receipts, messages, and Egolive reconciliation in one queue.',
     focusClear: 'No urgent item exists in the currently available sources.',
+    executiveV2: 'Executive contract v2', pendingApprovals: 'Pending approvals', openIncidents: 'Open incidents', activeWork: 'Active work items', weightedForecast: 'Weighted forecast',
+    notSupported: 'awaiting entity contract', contractReady: 'entities ready', noData: '—',
   },
 };
 
@@ -125,6 +129,7 @@ const SOURCE_ENDPOINTS = [
   ['commands', '/api/ceo/v1/command-gateway?limit=100', true],
   ['conversations', '/api/ceo/v1/messaging/conversations', true],
   ['decisions', '/api/ceo/v1/decision-queue', true],
+  ['executive', '/api/ceo/v2/executive-workspace', true],
 ];
 
 function dateTime(value, locale) {
@@ -142,7 +147,7 @@ function age(value, locale) {
 export default function CeoOperationsCockpit({ dashboard, identityReady, locale = 'vi', entityId = 'all' }) {
   const c = COPY[locale] || COPY.vi;
   const attentionCopy = ATTENTION_COPY[locale] || ATTENTION_COPY.vi;
-  const [operations, setOperations] = useState({ rollout: null, commands: null, conversations: null, workforce: null, decisions: null });
+  const [operations, setOperations] = useState({ rollout: null, commands: null, conversations: null, workforce: null, decisions: null, executive: null });
   const [sourceStates, setSourceStates] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -150,21 +155,22 @@ export default function CeoOperationsCockpit({ dashboard, identityReady, locale 
     const targets = SOURCE_ENDPOINTS.filter(([, , protectedSource]) => !protectedSource || identityReady);
     const locked = Object.fromEntries(SOURCE_ENDPOINTS.filter(([, , protectedSource]) => protectedSource && !identityReady).map(([key]) => [key, 'locked']));
     const results = await Promise.all(targets.map(async ([key, endpoint]) => {
-      const response = await fetch(endpoint, { cache: 'no-store' }).catch(() => null);
+      const url = key === 'executive' && entityId !== 'all' ? `${endpoint}?entityId=${encodeURIComponent(entityId)}` : endpoint;
+      const response = await fetch(url, { cache: 'no-store' }).catch(() => null);
       const body = response ? await response.json().catch(() => null) : null;
       return { key, ok: Boolean(response?.ok && body), body };
     }));
     setOperations((current) => ({
       ...current,
       ...Object.fromEntries(results.filter((result) => result.ok).map((result) => [result.key, result.body])),
-      ...(identityReady ? {} : { commands: null, conversations: null, decisions: null }),
+      ...(identityReady ? {} : { commands: null, conversations: null, decisions: null, executive: null }),
     }));
     setSourceStates({
       ...locked,
       ...Object.fromEntries(results.map((result) => [result.key, result.ok ? 'available' : 'unavailable'])),
     });
     setLoading(false);
-  }, [identityReady]);
+  }, [entityId, identityReady]);
 
   useEffect(() => {
     let active = true;
@@ -193,6 +199,23 @@ export default function CeoOperationsCockpit({ dashboard, identityReady, locale 
     dashboard,
   }), [dashboard, model, operations.decisions]);
   const executiveFocus = [...briefing.sections.now, ...briefing.sections.today].slice(0, 6);
+  const executiveMetrics = useMemo(() => {
+    const rows = (operations.executive?.entities || []).filter((row) => row.status === 'ready' && row.snapshot);
+    const forecast = new Map();
+    let approvals = 0; let incidents = 0; let work = 0;
+    for (const row of rows) {
+      const sections = row.snapshot.sections || {};
+      approvals += Number(sections.approvals?.pendingCount || 0);
+      incidents += Number(sections.incidents?.openCount || 0);
+      work += Number(sections.capacity?.activeWorkItems || 0);
+      if (sections.forecast?.available) {
+        const currency = sections.forecast.currency || row.snapshot.currency || 'VND';
+        forecast.set(currency, (forecast.get(currency) || 0) + Number(sections.forecast.weightedPipeline || 0));
+      }
+    }
+    const forecastLabel = [...forecast.entries()].map(([currency, value]) => `${new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'vi-VN', { notation: 'compact', maximumFractionDigits: 1 }).format(value)} ${currency}`).join(' · ');
+    return { rows: rows.length, approvals, incidents, work, forecastLabel };
+  }, [locale, operations.executive]);
 
   return <section className={styles.cockpit} aria-labelledby="ceo-operations-cockpit-title" aria-busy={loading || undefined}>
     <header className={styles.header}>
@@ -221,6 +244,13 @@ export default function CeoOperationsCockpit({ dashboard, identityReady, locale 
       <article><span><Icon name="shield" size={18} /></span><div><small>{c.receipts}</small><strong>{model.metrics.openReceipts}</strong></div></article>
       <article><span><Icon name="mail" size={18} /></span><div><small>{c.replies}</small><strong>{model.metrics.recentReplies}</strong></div></article>
       <article><span><Icon name="staff" size={18} /></span><div><small>{c.people}</small><strong>{model.metrics.groupPeople}</strong><em>{model.metrics.crossEntityPeople} {c.crossEntity}</em></div></article>
+    </div>
+
+    <div className={styles.metrics} aria-label={c.executiveV2}>
+      <article><span><Icon name="check" size={18} /></span><div><small>{c.pendingApprovals}</small><strong>{executiveMetrics.rows ? executiveMetrics.approvals : c.noData}</strong><em>{operations.executive?.summary?.ready || 0}/{operations.executive?.summary?.registered || 0} {c.contractReady}</em></div></article>
+      <article><span><Icon name="alert" size={18} /></span><div><small>{c.openIncidents}</small><strong>{executiveMetrics.rows ? executiveMetrics.incidents : c.noData}</strong><em>{operations.executive?.summary?.notSupported || 0} {c.notSupported}</em></div></article>
+      <article><span><Icon name="tasks" size={18} /></span><div><small>{c.activeWork}</small><strong>{executiveMetrics.rows ? executiveMetrics.work : c.noData}</strong><em>{c.executiveV2}</em></div></article>
+      <article><span><Icon name="trendUp" size={18} /></span><div><small>{c.weightedForecast}</small><strong>{executiveMetrics.forecastLabel || c.noData}</strong><em>{c.executiveV2}</em></div></article>
     </div>
 
     <section className={styles.executiveFocus} aria-labelledby="ceo-executive-focus-title">

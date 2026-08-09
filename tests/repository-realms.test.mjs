@@ -10,7 +10,7 @@ import {
 const USER = { id: 'staff-1', name: 'Mai Anh', roles: ['STAFF'] };
 
 test('Phase 21 parity catalog measures business invariants instead of matching buttons or API shapes', () => {
-  assert.equal(REPOSITORY_REALMS_ACTION_CONTRACTS.length, 18);
+  assert.equal(REPOSITORY_REALMS_ACTION_CONTRACTS.length, 21);
   for (const contract of REPOSITORY_REALMS_ACTION_CONTRACTS) {
     assert.equal(contract.parity.presentationIndependent, true);
     assert.equal(contract.parity.buttonMatchingRequired, false);
@@ -27,6 +27,9 @@ test('Phase 21 parity catalog measures business invariants instead of matching b
   assert.equal(repositoryRealmsSurface('task.estimate'), 'command');
   assert.equal(repositoryRealmsSurface('lead.transition'), 'embassy');
   assert.equal(repositoryRealmsSurface('task.create'), 'ceo-command');
+  assert.equal(repositoryRealmsSurface('task.adjust'), 'ceo-command');
+  assert.equal(repositoryRealmsSurface('project.status.request'), 'ceo-command');
+  assert.equal(repositoryRealmsSurface('incident.acknowledge'), 'ceo-command');
   assert.equal(repositoryRealmsSurface('approval.request'), 'ceo-command');
 });
 

@@ -24,6 +24,7 @@ test('CEO-11 exposes control-plane paths only on the CEO deployment', () => {
     '/ceo-overview', '/ceo-navigator', '/ceo-briefing', '/ceo-decisions', '/ceo-world', '/ceo-commands', '/ceo-workforce', '/ceo-inbox', '/ceo-registry', '/ceo-security', '/ceo-rollout',
     '/realm-v2/command-center', '/realm-v2/world-map', '/realm-v2/ceo-terminal',
     '/api/ceo/v1/dashboard', '/api/ceo/v1/decision-queue', '/api/ceo/v1/registry/aim', '/api/ceo/v1/identity/session', '/api/ceo/v1/staff/sso',
+    '/api/ceo/v2/executive-workspace',
   ]) assert.equal(isCeoPortalOnlyPath(path), true, path);
 
   // Entity-side contract endpoints must stay reachable for federation and receipts.
@@ -31,6 +32,7 @@ test('CEO-11 exposes control-plane paths only on the CEO deployment', () => {
     '/api/ceo/v1/capabilities', '/api/ceo/v1/health', '/api/ceo/v1/snapshot', '/api/ceo/v1/decisions', '/api/ceo/v1/commands',
     '/api/ceo/v1/commands/receipts', '/api/ceo/v1/directory/profile', '/api/ceo/v1/federation/presence',
     '/api/ceo/v1/messaging/deliver', '/api/ceo/v1/messaging/feed', '/api/ceo/v1/sso/callback',
+    '/api/ceo/v2/executive-snapshot',
   ]) assert.equal(isCeoPortalOnlyPath(path), false, path);
 
   const middleware = text('middleware.js');

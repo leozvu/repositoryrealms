@@ -1,6 +1,6 @@
 # Deployment Manifest — RepositoryRealms
 
-Cập nhật: 2026-08-09. Control-plane release candidate: `codex/realm-design-system-v2-implementation @ 6c7a71e8e63d0d49335d8570be6214021ea044d1`.
+Cập nhật: 2026-08-09. Control-plane release branch: `codex/realm-design-system-v2-implementation`; exact release commit được ghi trong CEO-18 evidence sau canary.
 
 ## Production domains đang phục vụ
 
@@ -10,7 +10,7 @@ Cập nhật: 2026-08-09. Control-plane release candidate: `codex/realm-design-s
 | Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_BLw3joRx3EUPM5LDcR48xwXYtT1Q` | READY; `/login` 200 |
 | VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_3WTArswEcqM3zdUvP7wKCxx9Jnmh` | READY; `/login` 200 |
 | Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_AdvgYVquGvLnzUWrCQ5Lu6r3u3CP` | READY; `/login` 200 |
-| CEO Terminal | `ceo-terminal-leoz` | `ceo-terminal-leoz.vercel.app` | `ceoportal` | `dpl_6ARCEAAYKhkAxK8oUg9gibCDY8ou` | READY; `/login` 200 |
+| CEO Terminal | `ceo-terminal-leoz` | `ceo-terminal-leoz.vercel.app` | `ceoportal` | `dpl_ByF5RCHvBxYcY5VmES6a12WHAHRm` | READY; `/login` 200; pre-CEO-18 stable |
 
 Không project nào trong bảng trên được promote trong lần tạo production-truth evidence ngày 2026-08-09. Các deployment tạm dùng production environment đều chạy với `--skip-domain`, sau đó bị xóa.
 
@@ -30,7 +30,7 @@ Chi tiết evidence: `docs/realms/CEO-12-PRODUCTION-TRUTH-EVIDENCE.md`.
 
 ## Schema gate hiện tại
 
-Snapshot cho thấy cả năm schema có 95 bảng Prisma. CEO Portal production từng trả `P2022` khi đọc bằng model Prisma hiện tại, nghĩa là có column drift so với release candidate; công cụ backup đã đọc các cột thực tế và chứng minh dữ liệu có thể restore vào schema hiện tại. Không được promote CEO Terminal trước khi chạy migration diff, backup gate và additive migration plan.
+Snapshot cho thấy cả năm schema có 95 bảng Prisma. CEO Portal đã được additive reconciliation; Prisma diff bằng 0 và 324 row được giữ nguyên. Pre-change và post-schema encrypted backups đều được giữ ngoài repository.
 
 ## Rollback
 

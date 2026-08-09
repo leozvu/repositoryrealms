@@ -37,3 +37,7 @@ Không commit backup, archive key, database URL, credential hoặc PII vào Git.
 ## Finding phải xử lý trước rollout
 
 CEO Portal production phát hiện Prisma `P2022` khi đọc theo model release candidate. Đây là bằng chứng column drift, không phải mất dữ liệu: raw snapshot có 324 rows và restore vào schema hiện tại đã PASS. Bước kế tiếp là tạo migration-diff evidence và additive migration plan; tuyệt đối không `db push` mù vào production.
+
+## Reconciliation update
+
+Sau additive reconciliation, Prisma diff của schema CEO Portal bằng 0 và row count vẫn 324. Post-schema encrypted backup nằm tại `C:\Users\Asus\AppData\Local\CRMegoricBackups\20260809T043642Z`; manifest SHA-256 `8272D0708A067E2BBFDB371EE1872479FECB1663D767C81E86E461D176665191`. Finding `P2022` đã đóng; backup ban đầu vẫn được giữ làm pre-change recovery point.

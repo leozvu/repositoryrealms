@@ -340,6 +340,18 @@ Implementation status: code complete on `codex/realm-design-system-v2-implementa
 
 Exit gate: the four entities expose the correct capability-aware workflow set, TOTP-locked sessions cannot launch entity SSO, Registry failure preserves Portal navigation, and entity deployments return 404 for `/ceo-navigator`.
 
+### CEO-16 — Capability-negotiated Command Center
+
+Implementation status: code complete on `codex/realm-design-system-v2-implementation`. Action availability is negotiated with each target entity, and every mutation remains receipt/audit-bound. See `CEO-16-COMMAND-CENTER.md`.
+
+### CEO-17 — Executive Data Contract v2
+
+Implementation status: code complete as an additive v2 contract. Snapshot v1 and lead-snapshot v1 are untouched. Unsupported entity versions degrade explicitly instead of returning invented zeroes. See `CEO-17-EXECUTIVE-DATA-CONTRACT-V2.md`.
+
+### CEO-18 — Deep QA and controlled release
+
+Implementation status: build and local chaos gates complete; canary and post-deploy evidence are required before stable promotion. See `CEO-18-RELEASE-EVIDENCE.md`.
+
 ## 6. Proposed deployment topology
 
 | Component | Suggested project | Database |

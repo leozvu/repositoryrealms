@@ -12,7 +12,7 @@ import {
   sanitizeCeoCommandReceipt,
 } from '../lib/ceo-command-gateway.js';
 import { executeCeoEntityCommand } from '../lib/ceo-command-target-admin.js';
-import { dispatchCeoCommand, reconcileCeoCommand } from '../lib/ceo-command-gateway-admin.js';
+import { dispatchCeoCommand, loadCeoCommandCapabilities, reconcileCeoCommand } from '../lib/ceo-command-gateway-admin.js';
 import { hashCeoIdentitySecret } from '../lib/ceo-identity.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -30,15 +30,19 @@ function envelope(action, payload, overrides = {}) {
     actorSubject: 'ceo_global_subject',
     action,
     scope: definition.scope,
-    idempotencyKey: `ceo-command:${action.replace('.', '-')}:0001`,
-    correlationId: `ceo-correlation:${action.replace('.', '-')}:0001`,
+    idempotencyKey: `ceo-command:${action.replaceAll('.', '-')}:0001`,
+    correlationId: `ceo-correlation:${action.replaceAll('.', '-')}:0001`,
     payload,
     ...overrides,
   };
 }
 
 function targetFixture() {
-  const state = { tasks: [], approvals: [], notifications: [], changes: [], receipts: [], audits: [], emitted: [] };
+  const state = {
+    tasks: [{ id: 'task-existing', title: 'Existing task', assigneeId: null, status: 'todo', priority: 'medium', estHours: 2, dueDate: null, updatedAt: NOW }],
+    tickets: [{ id: 'incident-1', code: 'INC-1', title: 'Known incident', status: 'open', source: 'incident_registry', updatedAt: NOW }],
+    approvals: [], notifications: [], changes: [], receipts: [], audits: [], emitted: [],
+  };
   const users = [
     { id: 'staff-1', email: 'staff@aim.test', name: 'Staff One', role: 'STAFF', roles: '["STAFF"]', status: 'active', userType: 'employee' },
     { id: 'pm-1', email: 'pm@aim.test', name: 'Project Manager', role: 'PM', roles: '["PM"]', status: 'active', userType: 'employee' },
@@ -59,8 +63,24 @@ function targetFixture() {
         ? { sharedWithCeoPortal: true, consentedAt: NOW, revokedAt: null }
         : null,
     },
-    project: { findUnique: async ({ where }) => where.id === 'project-1' ? { id: 'project-1' } : null },
-    task: { create: async ({ data }) => { const row = { id: `task-${++id}`, ...data }; state.tasks.push(row); return row; } },
+    project: { findUnique: async ({ where }) => where.id === 'project-1' ? { id: 'project-1', name: 'Project One' } : null },
+    task: {
+      create: async ({ data }) => { const row = { id: `task-${++id}`, updatedAt: NOW, ...data }; state.tasks.push(row); return row; },
+      findUnique: async ({ where }) => state.tasks.find((row) => row.id === where.id) || null,
+      updateMany: async ({ where, data }) => {
+        const row = state.tasks.find((item) => item.id === where.id && item.updatedAt.getTime() === where.updatedAt.getTime() && !where.status.notIn.includes(item.status));
+        if (!row) return { count: 0 };
+        Object.assign(row, data, { updatedAt: new Date(NOW.getTime() + 1_000) }); return { count: 1 };
+      },
+    },
+    ticket: {
+      findUnique: async ({ where }) => state.tickets.find((row) => row.id === where.id) || null,
+      updateMany: async ({ where, data }) => {
+        const row = state.tickets.find((item) => item.id === where.id && item.source === where.source && item.status === where.status && item.updatedAt.getTime() === where.updatedAt.getTime());
+        if (!row) return { count: 0 };
+        Object.assign(row, data, { updatedAt: new Date(NOW.getTime() + 1_000) }); return { count: 1 };
+      },
+    },
     approval: { create: async ({ data }) => { const row = { id: `approval-${++id}`, ...data }; state.approvals.push(row); return row; } },
     notification: { createMany: async ({ data }) => { state.notifications.push(...data); return { count: data.length }; } },
     realmChangeEvent: {
@@ -139,7 +159,8 @@ function canonicalReceipt(command, id = 'target-receipt-1') {
       action: command.action, scope: command.scope, correlationId: command.correlationId,
       resource: ['approval.request', 'group_workforce.request'].includes(command.action)
         ? 'approvals'
-        : command.action === 'announcement.send' ? 'notifications' : 'tasks',
+        : command.action === 'announcement.send' ? 'notifications'
+          : command.action === 'incident.acknowledge' ? 'tickets' : 'tasks',
       recordId: command.action === 'announcement.send' ? null : 'record-1', resultCount: 1,
       committedAt: NOW.toISOString(), replayed: false,
     },
@@ -151,11 +172,51 @@ function canonicalReceipt(command, id = 'target-receipt-1') {
 }
 
 test('CEO-5 command contract rejects unknown actions, unknown payload fields and scope confusion', () => {
-  assert.equal(CEO_COMMAND_DEFINITIONS.length, 5);
+  assert.equal(CEO_COMMAND_DEFINITIONS.length, 8);
   assert.throws(() => normalizeCeoCommandEnvelope(envelope('task.create', { title: 'Create report', amount: 10 })), (error) => error.code === 'ceo_command_payload_unknown_field');
   assert.throws(() => normalizeCeoCommandEnvelope({ ...envelope('task.create', { title: 'Create report' }), scope: 'command.approval.request' }), (error) => error.code === 'ceo_command_scope_mismatch');
   assert.throws(() => normalizeCeoCommandEnvelope({ ...envelope('task.create', { title: 'Create report' }), action: 'payroll.write' }), (error) => error.code === 'ceo_command_unsupported');
   assert.equal(hashCeoCommandPayload({ b: 2, a: 1 }), hashCeoCommandPayload({ a: 1, b: 2 }));
+});
+
+test('CEO-16 task adjustment uses compare-and-swap and cannot change workflow status', async () => {
+  const fixture = targetFixture();
+  const input = envelope('task.adjust', {
+    taskId: 'task-existing', expectedUpdatedAt: NOW.toISOString(), assigneeEmail: 'staff@aim.test', priority: 'high', estHours: 6,
+  });
+  const result = await executeCeoEntityCommand(fixture.db, DIRECTOR, input, NOW, { entityId: 'aim', enabledCapabilities: ['delivery'], emitImpl: fixture.emitImpl });
+  assert.equal(result.receipt.resource, 'tasks');
+  const row = fixture.state.tasks.find((task) => task.id === 'task-existing');
+  assert.equal(row.assigneeId, 'staff-1');
+  assert.equal(row.priority, 'high');
+  assert.equal(row.status, 'todo');
+  const stale = envelope(
+    'task.adjust',
+    { taskId: 'task-existing', expectedUpdatedAt: NOW.toISOString(), dueDate: '2026-07-30' },
+    { idempotencyKey: 'ceo-command:task-adjust:stale', correlationId: 'ceo-correlation:task-adjust:stale' },
+  );
+  await assert.rejects(
+    executeCeoEntityCommand(fixture.db, DIRECTOR, stale, NOW, { entityId: 'aim', enabledCapabilities: ['delivery'], emitImpl: null }),
+    (error) => error.code === 'ceo_command_task_version_conflict',
+  );
+});
+
+test('CEO-16 project update is a linked request task and incident acknowledgement is CAS-bound', async () => {
+  const project = targetFixture();
+  await executeCeoEntityCommand(project.db, DIRECTOR, envelope('project.status.request', {
+    projectId: 'project-1', message: 'Send delivery status', targetEmail: 'pm@aim.test', priority: 'high', dueDate: '2026-07-23',
+  }), NOW, { entityId: 'aim', enabledCapabilities: ['delivery'], emitImpl: null });
+  const request = project.state.tasks.find((row) => row.id !== 'task-existing');
+  assert.equal(request.title, 'Status update · Project One');
+  assert.equal(request.assigneeId, 'pm-1');
+
+  const incident = targetFixture();
+  const result = await executeCeoEntityCommand(incident.db, DIRECTOR, envelope('incident.acknowledge', {
+    incidentId: 'incident-1', expectedUpdatedAt: NOW.toISOString(),
+  }), NOW, { entityId: 'aim', enabledCapabilities: ['support'], emitImpl: null });
+  assert.equal(result.receipt.resource, 'tickets');
+  assert.equal(incident.state.tickets[0].status, 'in_progress');
+  assert.doesNotMatch(incident.state.audits[0].detail, /Known incident/);
 });
 
 test('group workforce request is consent-bound, cross-entity and owned by the employing entity', async () => {
@@ -240,14 +301,14 @@ test('target entity atomically creates a task, canonical receipt and payload-fre
   const input = envelope('task.create', { title: 'Create campaign report', assigneeEmail: 'staff@aim.test', projectId: 'project-1', priority: 'high', estHours: 4 });
   const result = await executeCeoEntityCommand(db, DIRECTOR, input, NOW, { entityId: 'aim', enabledCapabilities: ['delivery'], emitImpl });
   assert.equal(result.receipt.resource, 'tasks');
-  assert.equal(state.tasks.length, 1);
+  assert.equal(state.tasks.length, 2);
   assert.equal(state.receipts.length, 1);
   assert.equal(state.audits.length, 1);
   assert.doesNotMatch(state.audits[0].detail, /Create campaign report|staff@aim\.test/);
   assert.equal(state.emitted.length, 1);
   const replay = await executeCeoEntityCommand(db, DIRECTOR, input, NOW, { entityId: 'aim', enabledCapabilities: ['delivery'], emitImpl });
   assert.equal(replay.idempotent, true);
-  assert.equal(state.tasks.length, 1);
+  assert.equal(state.tasks.length, 2);
   assert.equal(state.emitted.length, 1);
   await assert.rejects(
     executeCeoEntityCommand(db, DIRECTOR, { ...input, payload: { ...input.payload, title: 'Different task' } }, NOW, { entityId: 'aim', enabledCapabilities: ['delivery'], emitImpl }),
@@ -283,6 +344,24 @@ test('Portal stores only delivery metadata and validates RepositoryRealms eviden
   assert.equal(fixture.state.deliveries[0].payloadHash.length, 64);
   assert.equal(fixture.state.deliveries[0].idempotencyKeyHash.length, 64);
   assert.equal(JSON.stringify(fixture.state.deliveries).includes(input.idempotencyKey), false);
+});
+
+test('CEO-16 negotiates command actions from the target capability contract', async () => {
+  const fixture = portalFixture();
+  fixture.context.fetchImpl = async (_url, options) => {
+    assert.equal(options.method, 'GET');
+    return new Response(JSON.stringify({
+      entityId: 'aim', contractVersion: '1.0.0', asOf: NOW.toISOString(),
+      capabilities: { commands: [
+        { action: 'task.create' }, { action: 'status.request' }, { action: 'payroll.write' },
+      ] },
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const result = await loadCeoCommandCapabilities(
+    fixture.db, fixture.user, RAW_SESSION, 'aim', fixture.context,
+  );
+  assert.deepEqual(result.actions, ['task.create', 'status.request']);
+  assert.equal(result.source, 'entity');
 });
 
 test('timeout degrades to pending confirmation and receipt reconciliation never resends the business command', async () => {
