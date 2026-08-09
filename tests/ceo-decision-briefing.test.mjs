@@ -72,12 +72,13 @@ test('CEO14 briefing places critical decisions before today/watch without invent
       metrics: { sourcesAvailable: 1, sourcesRegistered: 1, openReceipts: 2 },
       attention: [{ code: 'command.receipt_pending', severity: 'warning', count: 2, href: '/ceo-commands', entityIds: ['egoric'] }],
     },
-    dashboard: { portfolio: { delivery: { tasksOverdue: 3, projectsLate: 1 }, support: { slaBreaches: 0 } } },
+    dashboard: { portfolio: { delivery: { tasksOverdue: 3, projectsLate: 1 }, support: { slaBreaches: 0 }, livestream: { pendingReconciliation: 2 } } },
     now,
   });
   assert.equal(briefing.state, 'critical');
   assert.equal(briefing.sections.now[0].code, 'decision.sla_critical');
   assert.ok(briefing.sections.today.some((entry) => entry.code === 'delivery.tasks_overdue'));
+  assert.ok(briefing.sections.today.some((entry) => entry.code === 'livestream.pending_reconciliation'));
   assert.equal(briefing.invariants.aiDecisionMaking, false);
   assert.equal(briefing.invariants.inventedFacts, false);
   assert.equal(briefing.invariants.directEntityDatabaseWrites, false);

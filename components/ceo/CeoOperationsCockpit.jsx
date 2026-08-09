@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Icon } from '@/components/ui';
+import { buildCeoDailyBriefing } from '@/lib/ceo-daily-briefing';
 import { buildCeoTerminalCockpit } from '@/lib/ceo-terminal-cockpit';
 import styles from './ceo-operations-cockpit.module.css';
 
@@ -17,6 +18,8 @@ const COPY = {
     inbox: 'Nhắn tin cho các công ty',
     workforce: 'Điều phối nhân sự group',
     world: 'Mở bản đồ công ty',
+    briefing: 'Mở briefing điều hành',
+    decisions: 'Mở hàng đợi phê duyệt',
     sources: 'Nguồn đang hoạt động',
     receipts: 'Receipt cần xử lý',
     replies: 'Phản hồi gần nhất',
@@ -36,6 +39,9 @@ const COPY = {
     active: 'Đang hoạt động', hold: 'Đang giữ', paused: 'Tạm dừng', unknown: 'Chưa rõ',
     sourceAvailable: 'Sẵn sàng', sourceUnavailable: 'Gián đoạn', sourceLocked: 'Cần step-up',
     loading: 'Đang tổng hợp luồng vận hành…',
+    focus: 'Ưu tiên điều hành hợp nhất',
+    focusHint: 'Phê duyệt, rủi ro dự án, receipt, tin nhắn và đối soát Egolive trên cùng một hàng đợi.',
+    focusClear: 'Không có việc khẩn cấp từ các nguồn đang khả dụng.',
   },
   en: {
     eyebrow: 'CEO-12 · GROUP OPERATIONS COCKPIT',
@@ -47,6 +53,8 @@ const COPY = {
     inbox: 'Message company teams',
     workforce: 'Coordinate group workforce',
     world: 'Open company map',
+    briefing: 'Open executive briefing',
+    decisions: 'Open approval queue',
     sources: 'Available sources',
     receipts: 'Receipts requiring attention',
     replies: 'Recent replies',
@@ -66,6 +74,9 @@ const COPY = {
     active: 'Active', hold: 'On hold', paused: 'Paused', unknown: 'Unknown',
     sourceAvailable: 'Ready', sourceUnavailable: 'Degraded', sourceLocked: 'Step-up required',
     loading: 'Composing the operating picture…',
+    focus: 'Unified executive priorities',
+    focusHint: 'Approvals, project risk, receipts, messages, and Egolive reconciliation in one queue.',
+    focusClear: 'No urgent item exists in the currently available sources.',
   },
 };
 
@@ -81,6 +92,12 @@ const ATTENTION_COPY = {
     'rollout.migration_required': ['Control plane chưa đủ migration', 'Rollout state của một hoặc nhiều công ty chưa sẵn sàng.'],
     'rollout.review_required': ['Ring kết nối cần được rà soát', 'Một hoặc nhiều công ty đang hold/paused theo chính sách rollout.'],
     'terminal.source_degraded': ['Một nguồn cockpit đang gián đoạn', 'Các phần còn lại vẫn hoạt động; mở Security để điều tra theo từng adapter.'],
+    'decision.sla_critical': ['Phê duyệt đã quá SLA nghiêm trọng', 'Mở workflow của công ty sở hữu để ra quyết định.'],
+    'decision.sla_warning': ['Phê duyệt cần chốt hôm nay', 'Quyết định vẫn được thực thi trong ERP gốc.'],
+    'delivery.tasks_overdue': ['Công việc đang quá hạn', 'Mở công ty sở hữu để điều phối đúng record.'],
+    'delivery.projects_late': ['Dự án đang trễ', 'Rà soát milestone và nguồn lực tại ERP sở hữu.'],
+    'support.sla_breaches': ['Ticket đã vi phạm SLA', 'Mở Support của công ty sở hữu để xử lý.'],
+    'livestream.pending_reconciliation': ['Ca live chờ đối soát', 'GMV và tiền thực nhận vẫn tách biệt cho tới khi Egolive đối soát.'],
   },
   en: {
     'identity.step_up_required': ['Activate the protected CEO session', 'Commands, messages, and deep links require the CEO session plus TOTP step-up.'],
@@ -93,6 +110,12 @@ const ATTENTION_COPY = {
     'rollout.migration_required': ['Control-plane migration is incomplete', 'Rollout state is unavailable for one or more companies.'],
     'rollout.review_required': ['Connection ring needs review', 'One or more companies are intentionally held or paused by rollout policy.'],
     'terminal.source_degraded': ['A cockpit source is degraded', 'Other sources remain usable; investigate the affected adapter in Security.'],
+    'decision.sla_critical': ['Approval is severely over SLA', 'Open the owning company workflow to decide.'],
+    'decision.sla_warning': ['Approval must close today', 'The decision still executes in the original ERP.'],
+    'delivery.tasks_overdue': ['Tasks are overdue', 'Enter the owning company to coordinate the canonical record.'],
+    'delivery.projects_late': ['Projects are late', 'Review milestones and capacity in the owning ERP.'],
+    'support.sla_breaches': ['Tickets breached SLA', 'Open the owning company Support workflow.'],
+    'livestream.pending_reconciliation': ['Live sessions await reconciliation', 'GMV and net receipts stay separate until Egolive reconciles them.'],
   },
 };
 
@@ -101,6 +124,7 @@ const SOURCE_ENDPOINTS = [
   ['workforce', '/api/ceo/v1/staff/links'],
   ['commands', '/api/ceo/v1/command-gateway?limit=100', true],
   ['conversations', '/api/ceo/v1/messaging/conversations', true],
+  ['decisions', '/api/ceo/v1/decision-queue', true],
 ];
 
 function dateTime(value, locale) {
@@ -118,7 +142,7 @@ function age(value, locale) {
 export default function CeoOperationsCockpit({ dashboard, identityReady, locale = 'vi', entityId = 'all' }) {
   const c = COPY[locale] || COPY.vi;
   const attentionCopy = ATTENTION_COPY[locale] || ATTENTION_COPY.vi;
-  const [operations, setOperations] = useState({ rollout: null, commands: null, conversations: null, workforce: null });
+  const [operations, setOperations] = useState({ rollout: null, commands: null, conversations: null, workforce: null, decisions: null });
   const [sourceStates, setSourceStates] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -133,7 +157,7 @@ export default function CeoOperationsCockpit({ dashboard, identityReady, locale 
     setOperations((current) => ({
       ...current,
       ...Object.fromEntries(results.filter((result) => result.ok).map((result) => [result.key, result.body])),
-      ...(identityReady ? {} : { commands: null, conversations: null }),
+      ...(identityReady ? {} : { commands: null, conversations: null, decisions: null }),
     }));
     setSourceStates({
       ...locked,
@@ -163,6 +187,12 @@ export default function CeoOperationsCockpit({ dashboard, identityReady, locale 
 
   const sourceLabel = (state) => state === 'available' ? c.sourceAvailable : state === 'locked' ? c.sourceLocked : c.sourceUnavailable;
   const sourceStateLabel = (state) => c[state] || state;
+  const briefing = useMemo(() => buildCeoDailyBriefing({
+    cockpit: model,
+    decisionQueue: operations.decisions,
+    dashboard,
+  }), [dashboard, model, operations.decisions]);
+  const executiveFocus = [...briefing.sections.now, ...briefing.sections.today].slice(0, 6);
 
   return <section className={styles.cockpit} aria-labelledby="ceo-operations-cockpit-title" aria-busy={loading || undefined}>
     <header className={styles.header}>
@@ -181,6 +211,8 @@ export default function CeoOperationsCockpit({ dashboard, identityReady, locale 
         <Link href="/ceo-inbox"><Icon name="mail" size={17} />{c.inbox}</Link>
         <Link href="/ceo-workforce"><Icon name="staff" size={17} />{c.workforce}</Link>
         <Link href="/ceo-world"><Icon name="link" size={17} />{c.world}</Link>
+        <Link href="/ceo-briefing"><Icon name="dashboard" size={17} />{c.briefing}</Link>
+        <Link href="/ceo-decisions"><Icon name="check" size={17} />{c.decisions}</Link>
       </div>
     </div>
 
@@ -190,6 +222,18 @@ export default function CeoOperationsCockpit({ dashboard, identityReady, locale 
       <article><span><Icon name="mail" size={18} /></span><div><small>{c.replies}</small><strong>{model.metrics.recentReplies}</strong></div></article>
       <article><span><Icon name="staff" size={18} /></span><div><small>{c.people}</small><strong>{model.metrics.groupPeople}</strong><em>{model.metrics.crossEntityPeople} {c.crossEntity}</em></div></article>
     </div>
+
+    <section className={styles.executiveFocus} aria-labelledby="ceo-executive-focus-title">
+      <header><div><h3 id="ceo-executive-focus-title">{c.focus}</h3><p>{c.focusHint}</p></div><span>{executiveFocus.length}</span></header>
+      {executiveFocus.length ? <ol>{executiveFocus.map((entry, index) => {
+        const [title, description] = attentionCopy[entry.code] || [entry.code, ''];
+        return <li key={`${entry.code}:${index}`} className={styles[entry.severity]}>
+          <Icon name={entry.severity === 'critical' ? 'alert' : 'clock'} size={17} />
+          <div><strong>{entry.context?.title || title}</strong><p>{description}</p>{entry.entityIds.length > 0 && <small>{entry.entityIds.join(' · ')}</small>}</div>
+          <b>{entry.count}</b><Link href={entry.href}>{c.open}<Icon name="link" size={13} /></Link>
+        </li>;
+      })}</ol> : <div className={styles.focusClear}><Icon name="check" size={18} />{c.focusClear}</div>}
+    </section>
 
     <div className={styles.workspace}>
       <section className={styles.attention} aria-labelledby="ceo-attention-title">
