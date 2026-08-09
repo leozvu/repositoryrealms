@@ -1561,6 +1561,66 @@ model CeoEntityCommandReceipt {
   @@index([resource, recordId])
 }
 
+// Phase 14 — dedicated LeozOps task command control plane. Approval rows contain
+// fingerprints and actor/credential identifiers only; business payload stays in
+// the canonical Task row and is never copied into this ledger.
+model LeozOpsTaskCommandApproval {
+  id                   String    @id @default(cuid())
+  idempotencyKey       String    @unique
+  correlationId        String    @unique
+  kind                 String
+  targetEntityId       String
+  approvedBySubject    String
+  requestFingerprint   String
+  previewFingerprint   String
+  subjectCommandId     String?
+  approvalCredentialId String
+  approvedAt           DateTime
+  expiresAt            DateTime
+  consumedAt           DateTime?
+  consumedByCommandId  String?
+  createdAt            DateTime  @default(now())
+
+  @@index([kind, targetEntityId, expiresAt])
+  @@index([subjectCommandId, kind, expiresAt])
+  @@index([approvalCredentialId, approvedAt])
+}
+
+// One durable create receipt plus, at most, one separately approved rollback.
+// No arbitrary resource/action/URL fields exist: this table can represent only
+// the dedicated unassigned task.create contract.
+model LeozOpsTaskCommand {
+  id                         String    @id @default(cuid())
+  idempotencyKey             String    @unique
+  correlationId              String    @unique
+  targetEntityId             String
+  actorSubject               String
+  requestFingerprint         String
+  previewFingerprint         String
+  approvalId                 String    @unique
+  taskId                     String    @unique
+  taskStateFingerprint       String
+  executionResultFingerprint String
+  executionCredentialId      String
+  status                     String    @default("active")
+  rollbackReceiptId          String?   @unique
+  rollbackIdempotencyKey     String?   @unique
+  rollbackCorrelationId      String?   @unique
+  rollbackActorSubject       String?
+  rollbackRequestFingerprint String?
+  rollbackPreviewFingerprint String?
+  rollbackApprovalId         String?   @unique
+  rollbackResultFingerprint  String?
+  rollbackCredentialId       String?
+  rolledBackAt               DateTime?
+  createdAt                  DateTime  @default(now())
+
+  @@index([targetEntityId, status, createdAt])
+  @@index([actorSubject, createdAt])
+  @@index([executionCredentialId, createdAt])
+  @@index([rollbackCredentialId, rolledBackAt])
+}
+
 // ===== CEO-6: federated directory and unified inbox =====
 // Directory sharing is opt-in per local employee. The Portal may cache only these
 // explicitly shared fields; salary, phone, performance and business records are excluded.

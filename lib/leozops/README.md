@@ -31,6 +31,7 @@ This code ships with every business deployment. A route exists only where its op
 | `LEOZOPS_REVIEW_ENABLED` | `true` enables the internal Director review inbox; anything else returns 404 |
 | `LEOZOPS_COMMAND_ENABLED` | `true` exposes the Director-session command surfaces; anything else returns 404 |
 | `LEOZOPS_EXECUTION_ENABLED` | Separate deployment gate required before runtime activation or execution |
+| `LEOZOPS_TASK_COMMAND_ENABLED` | `true` exposes the dedicated external `egoric.task.create.v1` source contract; anything else returns 404 |
 | `LEOZOPS_CONFIRMATION_SECRET` | Server-only HMAC secret (at least 32 characters) for one-intent confirmation tokens |
 | `LEOZOPS_CAP_FOLLOWUP_ENABLED` | Enables only `lead.followup.create` preparation/execution |
 | `LEOZOPS_CAP_EXPECTED_CLOSE_ENABLED` | Enables only `lead.expected_close.update` preparation/execution |
@@ -38,7 +39,11 @@ This code ships with every business deployment. A route exists only where its op
 | `LEOZOPS_CAP_LEAD_TRANSITION_ENABLED` | Reserved default-off transition capability; not bound to current proposals |
 | `LEOZOPS_CRON_SECRET` | Separate server-only credential for the GET job runner |
 
-All three raw keys must be different. None creates a session, maps to an `ApiKey` database row or grants access to normal application APIs.
+The snapshot, brief, and proposal raw keys must be different. None creates a
+session, maps to an `ApiKey` database row or grants access to normal application
+APIs. The Phase 14 task command is a separate audience-bound service contract:
+it uses explicit `ApiKey` scope rows listed in
+`docs/LEOZOPS-TASK-COMMAND-CONTRACT.md` and never accepts those route keys.
 
 Generate one key at a time and keep the raw value in a secret manager:
 
