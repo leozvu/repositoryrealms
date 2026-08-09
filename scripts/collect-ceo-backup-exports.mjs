@@ -20,6 +20,16 @@ const EXPECTED = Object.freeze([
   ['portal', 'ceoportal', 'ceo-terminal-leoz'],
 ]);
 
+export function selectBackupTargets(rawOnly = null) {
+  if (!rawOnly) return EXPECTED;
+  const requested = new Set(String(rawOnly).split(',').map((value) => value.trim()).filter(Boolean));
+  const selected = EXPECTED.filter(([entity]) => requested.has(entity));
+  const unknown = [...requested].filter((entity) => !EXPECTED.some(([known]) => known === entity));
+  if (unknown.length) throw new Error(`Unknown backup target: ${unknown.join(', ')}.`);
+  if (!selected.length) throw new Error('At least one backup target is required.');
+  return selected;
+}
+
 function argument(name, required = true) {
   const index = process.argv.indexOf(`--${name}`);
   const value = index >= 0 ? process.argv[index + 1] : null;
@@ -157,11 +167,12 @@ async function collect() {
   const protectedRoot = argument('vercel-protected-root', false);
   const entityReleaseSha = argument('entity-release-sha', false) || argument('release-sha', false) || releaseSha();
   const portalReleaseSha = argument('portal-release-sha', false) || argument('release-sha', false) || releaseSha();
+  const targets = selectBackupTargets(argument('only', false));
   if (fs.existsSync(outputDirectory)) throw new Error('Backup output already exists.');
   fs.mkdirSync(outputDirectory, { recursive: true });
   const entries = [];
   try {
-    for (const [entity, schema, project] of EXPECTED) {
+    for (const [entity, schema, project] of targets) {
       const sourceReleaseSha = entity === 'portal' ? portalReleaseSha : entityReleaseSha;
       const result = await download({ entity, schema, project, endpoint: argument(`${entity}-url`), secret, protectedRoot, sourceReleaseSha });
       fs.writeFileSync(path.join(outputDirectory, result.entry.file), result.encrypted, { flag: 'wx', mode: 0o600 });

@@ -8,7 +8,7 @@ import {
   parseEnvText,
   withSchema,
 } from '../scripts/lib/ceo-production-truth.mjs';
-import { initializeSecretFile, readBackupSecret } from '../scripts/collect-ceo-backup-exports.mjs';
+import { initializeSecretFile, readBackupSecret, selectBackupTargets } from '../scripts/collect-ceo-backup-exports.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -55,6 +55,13 @@ test('CEO production truth creates a one-time backup secret without overwriting 
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
   }
+});
+
+test('CEO production truth can collect a bounded diagnostic subset without widening the schema allowlist', () => {
+  assert.deepEqual(selectBackupTargets('portal').map(([entity, schema]) => [entity, schema]), [['portal', 'ceoportal']]);
+  assert.deepEqual(selectBackupTargets('aim,egoric').map(([entity]) => entity), ['aim', 'egoric']);
+  assert.throws(() => selectBackupTargets('fretas'), /Unknown backup target/);
+  assert.throws(() => selectBackupTargets(','), /At least one backup target/);
 });
 
 test('CEO production truth reads legacy schemas without requiring every current Prisma column', () => {
