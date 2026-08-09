@@ -81,6 +81,7 @@ async function main() {
   const credential = readCredential(required('credential-file'));
   const entityId = String(required('entity')).trim().toLowerCase();
   const redirectPath = argument('redirect-path', '/dashboard');
+  const viaWorldUi = flag('via-world-ui');
   const entityBaseOrigin = argument('entity-base-url')
     ? normalizeOrigin(argument('entity-base-url'))
     : null;
@@ -114,8 +115,13 @@ async function main() {
   }
   const page = await context.newPage();
   const callback = { seen: false, status: null, setCookieNames: [], location: null };
+  const authorizationTrace = { seen: false, status: null };
 
   page.on('response', async (response) => {
+    if (response.url().includes('/api/ceo/v1/sso/authorize')) {
+      authorizationTrace.seen = true;
+      authorizationTrace.status = response.status();
+    }
     if (!response.url().includes('/api/ceo/v1/sso/callback')) return;
     callback.seen = true;
     callback.status = response.status();
@@ -186,26 +192,40 @@ async function main() {
       };
     }, { requestedEntity: entityId });
 
-    const authorization = await page.evaluate(async ({ entityId: requestedEntity, redirectPath: requestedPath }) => {
-      const response = await fetch('/api/ceo/v1/sso/authorize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entityId: requestedEntity, redirectPath: requestedPath }),
-      });
-      return { status: response.status, body: await response.json().catch(() => ({})) };
-    }, { entityId, redirectPath });
+    let authorizationStatus;
+    if (viaWorldUi) {
+      await page.goto(`${portalOrigin}/ceo-world`, { waitUntil: 'domcontentloaded', timeout });
+      const kingdomCode = page.locator('code').filter({ hasText: new RegExp(`^${entityId}$`, 'i') });
+      await kingdomCode.waitFor({ state: 'visible', timeout });
+      const kingdom = page.locator('article').filter({ has: kingdomCode });
+      if (await kingdom.count() !== 1) throw new Error(`World map does not expose exactly one ${entityId} kingdom.`);
+      const gateway = kingdom.getByRole('button', { name: /Đi qua gateway|Enter gateway/i });
+      await gateway.waitFor({ state: 'visible', timeout });
+      await gateway.click();
+      await page.waitForURL((url) => url.origin !== portalOrigin, { timeout });
+      authorizationStatus = authorizationTrace.status;
+    } else {
+      const authorization = await page.evaluate(async ({ entityId: requestedEntity, redirectPath: requestedPath }) => {
+        const response = await fetch('/api/ceo/v1/sso/authorize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ entityId: requestedEntity, redirectPath: requestedPath }),
+        });
+        return { status: response.status, body: await response.json().catch(() => ({})) };
+      }, { entityId, redirectPath });
 
-    if (authorization.status !== 200 || !authorization.body?.destination) {
-      throw new Error(`SSO authorization failed with HTTP ${authorization.status}: ${authorization.body?.code || 'unknown'}.`);
+      if (authorization.status !== 200 || !authorization.body?.destination) {
+        throw new Error(`SSO authorization failed with HTTP ${authorization.status}: ${authorization.body?.code || 'unknown'}.`);
+      }
+      authorizationStatus = authorization.status;
+      const destination = new URL(authorization.body.destination);
+      if (entityBaseOrigin) {
+        const entityBase = new URL(entityBaseOrigin);
+        destination.protocol = entityBase.protocol;
+        destination.host = entityBase.host;
+      }
+      await page.goto(destination.toString(), { waitUntil: 'domcontentloaded', timeout });
     }
-
-    const destination = new URL(authorization.body.destination);
-    if (entityBaseOrigin) {
-      const entityBase = new URL(entityBaseOrigin);
-      destination.protocol = entityBase.protocol;
-      destination.host = entityBase.host;
-    }
-    await page.goto(destination.toString(), { waitUntil: 'domcontentloaded', timeout });
     await page.waitForLoadState('networkidle', { timeout: Math.min(timeout, 5_000) }).catch(() => {});
     const entityOrigin = new URL(page.url()).origin;
     const sessionResponse = await context.request.get(`${entityOrigin}/api/auth/session`, {
@@ -228,7 +248,8 @@ async function main() {
       identityBootstrapStatus: identityBootstrap.status,
       portalChecks,
       controlPlaneEvidence,
-      authorizationStatus: authorization.status,
+      authorizationMode: viaWorldUi ? 'world-ui' : 'direct-api',
+      authorizationStatus,
       callback,
       finalUrl: page.url(),
       sessionStatus: sessionResponse.status(),
