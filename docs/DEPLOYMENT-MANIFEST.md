@@ -6,22 +6,24 @@ Cập nhật: 2026-08-09. Entity UX/UI release: `ux-ui-rehab`; CEO control-plane
 
 | Entity | Vercel project | Domain | Schema | Stable deployment | Trạng thái |
 |---|---|---|---|---|---|
-| AIm Agency | `agency-erp` | `agency-erp-mu.vercel.app` | `public` | `dpl_6czBa3jbvLmK2mSBKzbnv5jyiqvT` | READY; UX rehab smoke PASS |
-| Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_DQgU5EBtPwihNL1DuJuXk9T3QYbS` | READY; UX rehab smoke PASS |
-| VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_A148KFQ5w9d8BGionGuUNDyQbqBc` | READY; UX rehab smoke PASS |
-| Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_42MbiE38n8Ug3iZJSha5MEhgyJ84` | READY; UX rehab smoke PASS |
+| AIm Agency | `agency-erp` | `agency-erp-mu.vercel.app` | `public` | `dpl_FA7hhE9SZZZs38jSX5W7U11qyvQR` | READY; i18n hotfix smoke PASS |
+| Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_5c5Wdqa55SA52RVn7s7UzJRAmSL4` | READY; i18n hotfix smoke PASS |
+| VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_5ShmwXjuVAyVXbV547ChURCLzN6e` | READY; i18n hotfix smoke PASS |
+| Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_FFn1c5yzrYi4vbfmgCxtg7ttiz9D` | READY; i18n hotfix smoke PASS |
 | CEO Terminal | `ceo-terminal-leoz` | `ceo-terminal-leoz.vercel.app` | `ceoportal` | `dpl_6ARCEAAYKhkAxK8oUg9gibCDY8ou` | READY; `/login` 200 |
 
 UX/UI rehab được build thành bốn canary production-env với `--skip-domain`, smoke test trước cutover rồi mới promote. Kiểm tra hậu promote trên cả bốn domain: `/login` 200 và đúng entity brand; `/dashboard` 307 khi chưa đăng nhập; `/api/settings` 401; credentials provider sẵn sàng. Release không có thay đổi Prisma schema hoặc migration và không promote CEO Terminal.
+
+Hotfix i18n `eeddc85` cũng đi qua canary → `/login` 200 → promote. Kiểm tra Playwright hậu promote trên cả bốn domain đã thao tác VI → EN → VI, xác nhận `html lang`, locale lưu trong trình duyệt và copy đăng nhập cùng chuyển đúng ngôn ngữ. Hotfix không thay đổi schema hoặc dữ liệu nghiệp vụ.
 
 ### Rollback evidence cho UX/UI rehab
 
 | Entity | Canary đã promote | Previous stable deployment |
 |---|---|---|
-| AIm Agency | `agency-j4haatkbb-leozs-projects-64a5f0c8.vercel.app` | `dpl_5SyEfVuneLtCf5wpsBXBpgaeotbW` |
-| Egoric Agency | `erp-egoric-ibqvzgr6n-leozs-projects-64a5f0c8.vercel.app` | `dpl_FjAfMgTg1uCmFySrXrd7xPo5wejJ` |
-| VNECOM LLC | `erp-vnecom-gk10tj7bi-leozs-projects-64a5f0c8.vercel.app` | `dpl_69L7bXo8puX94UAjLww3pAGi9ePc` |
-| Egolive | `erp-egolive-21ywbssbq-leozs-projects-64a5f0c8.vercel.app` | `dpl_B39QEDvdpiATRYYryxEBvBmTvXFX` |
+| AIm Agency | `agency-pmx9jrpbe-leozs-projects-64a5f0c8.vercel.app` | `dpl_6czBa3jbvLmK2mSBKzbnv5jyiqvT` |
+| Egoric Agency | `erp-egoric-mt5u63hk8-leozs-projects-64a5f0c8.vercel.app` | `dpl_DQgU5EBtPwihNL1DuJuXk9T3QYbS` |
+| VNECOM LLC | `erp-vnecom-nonp3duku-leozs-projects-64a5f0c8.vercel.app` | `dpl_A148KFQ5w9d8BGionGuUNDyQbqBc` |
+| Egolive | `erp-egolive-9j3d1qxe6-leozs-projects-64a5f0c8.vercel.app` | `dpl_42MbiE38n8Ug3iZJSha5MEhgyJ84` |
 
 Ngoài phạm vi: Fretas, `erp-master-leoz`, LeozOps và contract `lead-snapshot v1`.
 
