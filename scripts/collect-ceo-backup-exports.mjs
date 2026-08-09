@@ -109,7 +109,7 @@ function downloadProtected({ entity, project, endpoint, secret, root: protectedR
   }
 }
 
-async function download({ entity, schema, project, endpoint, secret, protectedRoot }) {
+async function download({ entity, schema, project, endpoint, secret, protectedRoot, sourceReleaseSha }) {
   let encrypted;
   let headers;
   if (protectedRoot) {
@@ -144,6 +144,7 @@ async function download({ entity, schema, project, endpoint, secret, protectedRo
       rows: Object.values(counts).reduce((sum, value) => sum + Number(value || 0), 0),
       encryptedSha256: sha256(encrypted),
       databaseFingerprint: headers.get('x-ceo-database-fingerprint') || null,
+      sourceReleaseSha,
     },
   };
 }
@@ -154,12 +155,15 @@ async function collect() {
   const secret = readBackupSecret(secretFile);
   const outputDirectory = path.join(path.resolve(argument('output')), stamp());
   const protectedRoot = argument('vercel-protected-root', false);
+  const entityReleaseSha = argument('entity-release-sha', false) || argument('release-sha', false) || releaseSha();
+  const portalReleaseSha = argument('portal-release-sha', false) || argument('release-sha', false) || releaseSha();
   if (fs.existsSync(outputDirectory)) throw new Error('Backup output already exists.');
   fs.mkdirSync(outputDirectory, { recursive: true });
   const entries = [];
   try {
     for (const [entity, schema, project] of EXPECTED) {
-      const result = await download({ entity, schema, project, endpoint: argument(`${entity}-url`), secret, protectedRoot });
+      const sourceReleaseSha = entity === 'portal' ? portalReleaseSha : entityReleaseSha;
+      const result = await download({ entity, schema, project, endpoint: argument(`${entity}-url`), secret, protectedRoot, sourceReleaseSha });
       fs.writeFileSync(path.join(outputDirectory, result.entry.file), result.encrypted, { flag: 'wx', mode: 0o600 });
       entries.push(result.entry);
       console.log(`COLLECT ${schema}: ${result.entry.tables} tables, ${result.entry.rows} rows`);
@@ -168,7 +172,8 @@ async function collect() {
       format: 'repositoryrealms.ceo.backup-manifest',
       version: 1,
       createdAt: new Date().toISOString(),
-      releaseSha: argument('release-sha', false) || releaseSha(),
+      releaseSha: entityReleaseSha === portalReleaseSha ? entityReleaseSha : null,
+      releaseSet: { entity: entityReleaseSha, portal: portalReleaseSha },
       collectorSha: releaseSha(),
       encryptedAtRest: true,
       source: 'ephemeral-unpromoted-production-environment-deployments',

@@ -197,12 +197,12 @@ function restoreRows(model, rows) {
     .map(([key, value]) => [key, scalarValue(scalarFields.get(key), value)])));
 }
 
-function prismaExecutable(root) {
-  return path.join(root, 'node_modules', '.bin', process.platform === 'win32' ? 'prisma.cmd' : 'prisma');
+function prismaCli(root) {
+  return path.join(root, 'node_modules', 'prisma', 'build', 'index.js');
 }
 
 function pushEmptySchema({ root, databaseUrl, directUrl }) {
-  const result = spawnSync(prismaExecutable(root), ['db', 'push', '--schema', path.join(root, 'prisma', 'schema.prisma'), '--skip-generate'], {
+  const result = spawnSync(process.execPath, [prismaCli(root), 'db', 'push', '--schema', path.join(root, 'prisma', 'schema.prisma'), '--skip-generate'], {
     cwd: root,
     env: { ...process.env, DATABASE_URL: databaseUrl, DIRECT_URL: directUrl },
     encoding: 'utf8',
@@ -237,7 +237,7 @@ export async function rehearseRestore({ root, directUrl, payload, rehearsalSchem
     const constraints = await foreignKeys(rehearsal, rehearsalSchema);
     for (const constraint of constraints) {
       await rehearsal.$executeRawUnsafe(
-        `ALTER TABLE ${quoteIdentifier(rehearsalSchema)}.${quoteIdentifier(constraint.table_name)} DROP CONSTRAINT ${quoteIdentifier(constraint.name)}`,
+        `ALTER TABLE ${quoteIdentifier(rehearsalSchema)}.${quoteDatabaseIdentifier(constraint.table_name)} DROP CONSTRAINT ${quoteDatabaseIdentifier(constraint.name)}`,
       );
     }
     for (const model of Prisma.dmmf.datamodel.models) {
@@ -248,7 +248,7 @@ export async function rehearseRestore({ root, directUrl, payload, rehearsalSchem
     }
     for (const constraint of constraints) {
       await rehearsal.$executeRawUnsafe(
-        `ALTER TABLE ${quoteIdentifier(rehearsalSchema)}.${quoteIdentifier(constraint.table_name)} ADD CONSTRAINT ${quoteIdentifier(constraint.name)} ${constraint.definition}`,
+        `ALTER TABLE ${quoteIdentifier(rehearsalSchema)}.${quoteDatabaseIdentifier(constraint.table_name)} ADD CONSTRAINT ${quoteDatabaseIdentifier(constraint.name)} ${constraint.definition}`,
       );
     }
     const mismatches = [];
