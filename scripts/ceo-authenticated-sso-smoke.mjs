@@ -2,6 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import { totp } from '../lib/totp.js';
 
@@ -14,6 +15,10 @@ function required(name) {
   const value = argument(name);
   if (!value) throw new Error(`Missing --${name}.`);
   return value;
+}
+
+function flag(name) {
+  return process.argv.includes(`--${name}`);
 }
 
 function normalizeOrigin(value) {
@@ -47,14 +52,65 @@ function cookieMetadata(cookie) {
   };
 }
 
+function resolveVercelProtectionBypass(portalOrigin) {
+  const command = process.platform === 'win32'
+    ? {
+      executable: process.env.ComSpec || 'cmd.exe',
+      args: ['/d', '/s', '/c', `npx vercel@latest curl "${portalOrigin}/login" -v --silent`],
+    }
+    : {
+      executable: 'npx',
+      args: ['vercel@latest', 'curl', `${portalOrigin}/login`, '-v', '--silent'],
+    };
+  const result = spawnSync(command.executable, command.args, {
+    encoding: 'utf8',
+    windowsHide: true,
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  const transcript = `${result.stdout || ''}\n${result.stderr || ''}`.replace(/\u001b\[[0-9;]*m/g, '');
+  const match = transcript.match(/^> x-vercel-protection-bypass:\s*(.+)$/im);
+  const value = match?.[1]?.trim();
+  if (result.status !== 0 || !value) {
+    throw new Error('Unable to obtain a Vercel Deployment Protection bypass from the authenticated CLI.');
+  }
+  return value;
+}
+
 async function main() {
   const portalOrigin = normalizeOrigin(required('portal-url'));
   const credential = readCredential(required('credential-file'));
   const entityId = String(required('entity')).trim().toLowerCase();
+  const entityBaseOrigin = argument('entity-base-url')
+    ? normalizeOrigin(argument('entity-base-url'))
+    : null;
   const timeout = Number(argument('timeout-ms', '45000'));
   const headless = argument('headed', '0') !== '1';
+  const protectedOrigins = new Map();
+  if (flag('vercel-protected')) {
+    protectedOrigins.set(portalOrigin, resolveVercelProtectionBypass(portalOrigin));
+  }
   const browser = await chromium.launch({ headless });
   const context = await browser.newContext();
+  if (protectedOrigins.size > 0) {
+    await context.route('**/*', async (route) => {
+      const request = route.request();
+      let requestOrigin = null;
+      try {
+        requestOrigin = new URL(request.url()).origin;
+      } catch {
+        requestOrigin = null;
+      }
+      const protectionBypass = protectedOrigins.get(requestOrigin);
+      if (!protectionBypass) return route.continue();
+      return route.continue({
+        headers: {
+          ...request.headers(),
+          'x-vercel-protection-bypass': protectionBypass,
+          'x-vercel-set-bypass-cookie': 'true',
+        },
+      });
+    });
+  }
   const page = await context.newPage();
   const callback = { seen: false, status: null, setCookieNames: [], location: null };
 
@@ -101,7 +157,33 @@ async function main() {
       ['workforce', '/api/ceo/v1/staff/links'],
       ['rollout', '/api/ceo/v1/rollout'],
       ['registry', '/api/ceo/v1/registry'],
+      ['executive', '/api/ceo/v2/executive-workspace'],
     ]);
+
+    const controlPlaneEvidence = await page.evaluate(async ({ requestedEntity }) => {
+      const [executiveResponse, capabilityResponse] = await Promise.all([
+        fetch('/api/ceo/v2/executive-workspace', { cache: 'no-store' }),
+        fetch(`/api/ceo/v1/command-gateway/capabilities?entityId=${encodeURIComponent(requestedEntity)}`, { cache: 'no-store' }),
+      ]);
+      const executive = await executiveResponse.json().catch(() => ({}));
+      const capabilities = await capabilityResponse.json().catch(() => ({}));
+      return {
+        executive: {
+          status: executiveResponse.status,
+          summary: executive?.summary || null,
+          entities: Array.isArray(executive?.entities)
+            ? executive.entities.map((row) => ({ id: row.id, status: row.status, errorCode: row.errorCode || null }))
+            : [],
+        },
+        capabilities: {
+          status: capabilityResponse.status,
+          entityId: capabilities?.entityId || null,
+          source: capabilities?.source || null,
+          actions: Array.isArray(capabilities?.actions) ? capabilities.actions : [],
+          code: capabilities?.code || null,
+        },
+      };
+    }, { requestedEntity: entityId });
 
     const authorization = await page.evaluate(async ({ entityId: requestedEntity }) => {
       const response = await fetch('/api/ceo/v1/sso/authorize', {
@@ -116,7 +198,13 @@ async function main() {
       throw new Error(`SSO authorization failed with HTTP ${authorization.status}: ${authorization.body?.code || 'unknown'}.`);
     }
 
-    await page.goto(authorization.body.destination, { waitUntil: 'domcontentloaded', timeout });
+    const destination = new URL(authorization.body.destination);
+    if (entityBaseOrigin) {
+      const entityBase = new URL(entityBaseOrigin);
+      destination.protocol = entityBase.protocol;
+      destination.host = entityBase.host;
+    }
+    await page.goto(destination.toString(), { waitUntil: 'domcontentloaded', timeout });
     await page.waitForLoadState('networkidle', { timeout: Math.min(timeout, 5_000) }).catch(() => {});
     const entityOrigin = new URL(page.url()).origin;
     const sessionResponse = await context.request.get(`${entityOrigin}/api/auth/session`, {
@@ -127,24 +215,39 @@ async function main() {
     const cookies = (await context.cookies(entityOrigin))
       .filter((cookie) => cookie.name.includes('next-auth.session-token'))
       .map(cookieMetadata);
+    const sessionAuthenticated = Boolean(session?.user?.id && session?.user?.email);
+    if (sessionAuthenticated && new URL(page.url()).pathname === '/login') {
+      await page.goto(`${entityOrigin}/dashboard`, { waitUntil: 'domcontentloaded', timeout });
+      await page.waitForLoadState('networkidle', { timeout: Math.min(timeout, 5_000) }).catch(() => {});
+    }
 
     const report = {
       entityId,
       portalAuthenticated: true,
       identityBootstrapStatus: identityBootstrap.status,
       portalChecks,
+      controlPlaneEvidence,
       authorizationStatus: authorization.status,
       callback,
       finalUrl: page.url(),
       sessionStatus: sessionResponse.status(),
-      sessionAuthenticated: Boolean(session?.user?.id && session?.user?.email),
+      sessionAuthenticated,
       sessionRole: session?.user?.role || null,
       sessionRoles: Array.isArray(session?.user?.roles) ? session.user.roles : [],
       sessionAccessDisabled: session?.user?.accessDisabled ?? null,
       cookies,
     };
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-    if (!report.sessionAuthenticated) process.exitCode = 2;
+    const enteredEntityDashboard = new URL(report.finalUrl).pathname === '/dashboard';
+    const executiveReady = report.controlPlaneEvidence.executive.status === 200
+      && report.controlPlaneEvidence.executive.summary?.registered === 4
+      && report.controlPlaneEvidence.executive.summary?.ready === 4
+      && report.controlPlaneEvidence.executive.summary?.degraded === 0;
+    const capabilitiesReady = report.controlPlaneEvidence.capabilities.status === 200
+      && report.controlPlaneEvidence.capabilities.entityId === entityId
+      && report.controlPlaneEvidence.capabilities.source === 'entity'
+      && report.controlPlaneEvidence.capabilities.actions.length > 0;
+    if (!report.sessionAuthenticated || !enteredEntityDashboard || !executiveReady || !capabilitiesReady) process.exitCode = 2;
   } finally {
     await browser.close();
   }

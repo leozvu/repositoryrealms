@@ -6,13 +6,13 @@ Cập nhật: 2026-08-09. Control-plane release branch: `codex/realm-design-syst
 
 | Entity | Vercel project | Domain | Schema | Stable deployment | Trạng thái |
 |---|---|---|---|---|---|
-| AIm Agency | `agency-erp` | `agency-erp-mu.vercel.app` | `public` | `dpl_2wdKb7RzMMtukGytCgufCnzhtJjA` | READY; `/login` 200 |
-| Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_BLw3joRx3EUPM5LDcR48xwXYtT1Q` | READY; `/login` 200 |
-| VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_3WTArswEcqM3zdUvP7wKCxx9Jnmh` | READY; `/login` 200 |
-| Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_AdvgYVquGvLnzUWrCQ5Lu6r3u3CP` | READY; `/login` 200 |
-| CEO Terminal | `ceo-terminal-leoz` | `ceo-terminal-leoz.vercel.app` | `ceoportal` | `dpl_ByF5RCHvBxYcY5VmES6a12WHAHRm` | READY; `/login` 200; pre-CEO-18 stable |
+| AIm Agency | `agency-erp` | `agency-erp-mu.vercel.app` | `public` | `dpl_5SyEfVuneLtCf5wpsBXBpgaeotbW` | READY; pool bounded; authenticated CEO SSO PASS |
+| Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_FjAfMgTg1uCmFySrXrd7xPo5wejJ` | READY; pool bounded; authenticated CEO SSO PASS |
+| VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_69L7bXo8puX94UAjLww3pAGi9ePc` | READY; pool bounded; authenticated CEO SSO PASS |
+| Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_B39QEDvdpiATRYYryxEBvBmTvXFX` | READY; pool bounded; authenticated CEO SSO PASS |
+| CEO Terminal | `ceo-terminal-leoz` | `ceo-terminal-leoz.vercel.app` | `ceoportal` | `dpl_CCpgYtuUe9uMJqrdGTDbzPHtQvCC` | READY; CEO-18 stable; authenticated SSO PASS 4/4 |
 
-Không project nào trong bảng trên được promote trong lần tạo production-truth evidence ngày 2026-08-09. Các deployment tạm dùng production environment đều chạy với `--skip-domain`, sau đó bị xóa.
+CEO Terminal được promote sau protected-canary gate ngày 2026-08-09. Sau khi stable drill phát hiện shared Postgres `EMAXCONN`, cả bốn entity được build canary bằng immutable commit `b0af34b`, không đổi schema/data, rồi promote theo ring. `origin/main` và nhánh LeozOps không bị sửa hoặc merge trong release này.
 
 Ngoài phạm vi: Fretas, `erp-master-leoz`, LeozOps và contract `lead-snapshot v1`.
 
@@ -34,7 +34,7 @@ Snapshot cho thấy cả năm schema có 95 bảng Prisma. CEO Portal đã đư�
 
 ## Rollback
 
-1. Code: dùng stable deployment ID ở bảng trên; không rollback bằng cách viết lại Git history.
+1. Code: dùng stable deployment ID ở bảng trên; rollback CEO về `dpl_ByF5RCHvBxYcY5VmES6a12WHAHRm`, AIm về `dpl_2wdKb7RzMMtukGytCgufCnzhtJjA`, Egoric về `dpl_BLw3joRx3EUPM5LDcR48xwXYtT1Q`, VNECOM về `dpl_3WTArswEcqM3zdUvP7wKCxx9Jnmh`, Egolive về `dpl_wHrAprGqtDLMo6VnjQPr7qM8UZd4`; không rollback bằng cách viết lại Git history.
 2. Dữ liệu: chỉ restore từ bộ `20260809T040418Z` sau quyết định founder và rehearsal mới.
 3. CEO feature: hạ rollout ring/kill switch của Portal; local ERP login phải tiếp tục hoạt động.
 4. Không xóa hoặc ghi đè schema production để sửa drift.
