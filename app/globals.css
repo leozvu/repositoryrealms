@@ -794,6 +794,7 @@ body{background:var(--bg);color:var(--fg)}
 #app.workspace-shell .sidebar-footer{border-top:1px solid #263241;padding:12px 16px;display:grid;gap:2px;color:#7E8B9D}
 #app.workspace-shell .sidebar-footer span{font-size:.64rem;text-transform:uppercase;letter-spacing:.07em}
 #app.workspace-shell .sidebar-footer strong{font-size:.7rem;color:#B8C4D2;font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#app.workspace-shell .sidebar-language-row{display:none}
 
 #app.workspace-shell #main{margin-left:236px;min-width:0;min-height:100dvh;background:var(--bg)}
 #app.workspace-shell #topbar{
@@ -918,6 +919,8 @@ kbd{padding:3px 5px;border:1px solid var(--border);border-radius:4px;background:
   #app.workspace-shell #menu-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px}
   #app.workspace-shell .topbar-right{gap:5px}
   #app.workspace-shell .topbar-right .language-switch,#app.workspace-shell .topbar-right .workspace-surface-switch{display:none}
+  #app.workspace-shell .sidebar-language-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid #263241}
+  #app.workspace-shell .sidebar-language-row .language-switch{border-color:#344154;background:#17202D}
   #app.workspace-shell #view{padding:18px 14px 94px}
   .ceo-terminal-tabs{top:62px;padding-inline:12px}
   #app.workspace-shell #backdrop.show{display:block;width:100%;height:100%;border-radius:0}

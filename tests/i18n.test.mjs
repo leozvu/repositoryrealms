@@ -35,6 +35,44 @@ test('English UI copy translates dynamic Realm status without translating record
   assert.equal(translateUiCopy('Khóa sổ chiến dịch Rồng Xanh', 'en'), 'Blue Dragon Operations Window');
 });
 
+test('workplace rehab copy switches the entity shell and action-first home completely', () => {
+  const copy = {
+    'Khách hàng · Dự án · Tài chính': 'Clients · Projects · Finance',
+    'Mở CEO Terminal': 'Open CEO Terminal',
+    'Trang chủ': 'Home',
+    'Bán hàng': 'Sales',
+    'Quản trị và hệ thống': 'Administration & system',
+    'Cần bạn xử lý': 'Needs your action',
+    'Nhịp vận hành': 'Operating pulse',
+    'Thay đổi đáng chú ý': 'Notable changes',
+    'Dòng tiền và việc cần xử lý': 'Cash flow and work requiring action',
+    'Ngoại lệ và phân bổ công việc': 'Exceptions and work allocation',
+  };
+  for (const [vietnamese, english] of Object.entries(copy)) {
+    assert.equal(translateUiCopy(vietnamese, 'en'), english, vietnamese);
+    assert.equal(translateUiCopy(vietnamese, 'vi'), vietnamese, vietnamese);
+  }
+});
+
+test('workplace rehab dynamic status preserves record names while translating UI context', () => {
+  assert.equal(translateUiCopy('Chào Quân', 'en'), 'Hello, Quân');
+  assert.equal(translateUiCopy('Từ Nguyễn Minh An', 'en'), 'From Nguyễn Minh An');
+  assert.equal(translateUiCopy('Quá hạn 5 ngày', 'en'), 'Overdue by 5 days');
+  assert.equal(translateUiCopy('1 dự án trễ', 'en'), '1 late project');
+  assert.equal(translateUiCopy('4 cơ hội', 'en'), '4 opportunities');
+  assert.equal(translateUiCopy('1 hóa đơn quá hạn, tổng 43 triệu chưa thu — cần nhắc nợ ngay.', 'en'), '1 overdue invoice, with 43 triệu still uncollected — follow up now.');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
+test('mobile workspace keeps a reachable language switch in the navigation drawer', () => {
+  const shell = fs.readFileSync(new URL('../components/Shell.jsx', import.meta.url), 'utf8');
+  const css = fs.readFileSync(new URL('../app/globals.css', import.meta.url), 'utf8');
+  const feedbackCss = fs.readFileSync(new URL('../components/realm/realm-feedback-launcher.module.css', import.meta.url), 'utf8');
+  assert.match(shell, /sidebar-language-row[^\n]+LanguageSwitch compact/);
+  assert.match(css, /sidebar-language-row\{display:flex/);
+  assert.match(feedbackCss, /bottom:\s*calc\(84px[^;]+;\s*z-index:\s*44/);
+});
+
 test('Phase 4 Inbox and Collaboration copy is available in English without translating record names', () => {
   assert.equal(translateUiCopy('Hộp thư hợp nhất', 'en'), 'Unified Inbox');
   assert.equal(translateUiCopy('Điều phối cộng tác', 'en'), 'Collaboration');

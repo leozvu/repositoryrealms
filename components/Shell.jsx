@@ -697,6 +697,7 @@ export default function Shell({
                 <div className="sidebar-footer">
                   <span>Không gian làm việc</span>
                   <strong>{roles.map((role) => roleLabels[role] || role).join(' · ')}</strong>
+                  <div className="sidebar-language-row"><span>Ngôn ngữ</span><LanguageSwitch compact /></div>
                 </div>
               </aside>
 

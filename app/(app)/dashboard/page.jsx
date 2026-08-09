@@ -11,6 +11,7 @@ import { reconcile, activePoints } from '@/lib/livestream';
 import PageHeader from '@/components/system/PageHeader';
 import ActionQueue from '@/components/system/ActionQueue';
 import StatePanel from '@/components/system/StatePanel';
+import { useLanguage } from '@/components/LanguageProvider';
 
 function shortDue(date) {
   if (!date) return '';
@@ -33,6 +34,7 @@ function PulseRow({ label, value, detail, href, tone }) {
 }
 
 export default function Dashboard() {
+  const { locale } = useLanguage();
   const { data: session } = useSession();
   const user = session?.user;
   const tasks = useResource('tasks');
@@ -173,7 +175,7 @@ export default function Dashboard() {
     <div className="role-home">
       <PageHeader
         icon="home"
-        meta={new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' })}
+        meta={new Date().toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN', { weekday: 'long', day: 'numeric', month: 'long' })}
         title={`Chào ${user.name?.split(/\s+/).slice(-1)[0] || 'bạn'}`}
         description="Bắt đầu từ việc cần hành động, sau đó mới xem số liệu và thay đổi gần đây."
         actions={<Link className="btn btn-primary" href="/myday"><Icon name="work" size={16} />Mở việc của tôi</Link>}

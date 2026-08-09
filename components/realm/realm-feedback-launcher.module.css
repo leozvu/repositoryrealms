@@ -74,7 +74,9 @@
 .successActions a, .successActions button { min-height: 44px; }
 
 @media (max-width: 680px) {
-  .launcher { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  /* Stay above the mobile nav and below the navigation drawer. Otherwise the
+     floating pilot action can intercept taps on drawer controls such as VI/EN. */
+  .launcher { right: 12px; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 44; }
   .typeGrid { grid-template-columns: 1fr; }
   .actions, .successActions { flex-direction: column-reverse; }
   .actions button, .successActions a, .successActions button { width: 100%; justify-content: center; }
