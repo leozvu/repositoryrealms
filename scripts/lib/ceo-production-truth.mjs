@@ -10,6 +10,7 @@ export const CEO_BACKUP_VERSION = 1;
 export const CEO_REHEARSAL_PREFIX = 'rr_rehearsal_';
 
 const IDENTIFIER = /^[a-z][a-z0-9_]{0,62}$/;
+const DATABASE_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]{0,62}$/;
 
 export function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
@@ -18,6 +19,12 @@ export function sha256(value) {
 function quoteIdentifier(value) {
   const normalized = String(value || '');
   if (!IDENTIFIER.test(normalized)) throw new Error(`Unsafe PostgreSQL identifier: ${normalized}`);
+  return `"${normalized}"`;
+}
+
+function quoteDatabaseIdentifier(value) {
+  const normalized = String(value || '');
+  if (!DATABASE_IDENTIFIER.test(normalized)) throw new Error(`Unsafe PostgreSQL database identifier: ${normalized}`);
   return `"${normalized}"`;
 }
 
@@ -119,22 +126,28 @@ async function tableNames(db, schema) {
   return new Set(rows.map((row) => row.table_name));
 }
 
+export async function readPrismaSchemaSnapshot(db, schema) {
+  const existing = await tableNames(db, schema);
+  const data = {};
+  const counts = {};
+  for (const model of Prisma.dmmf.datamodel.models) {
+    const table = modelTable(model);
+    if (!existing.has(table)) continue;
+    const rows = await db.$queryRawUnsafe(
+      `SELECT * FROM ${quoteDatabaseIdentifier(schema)}.${quoteDatabaseIdentifier(table)}`,
+    );
+    data[model.name] = rows;
+    counts[model.name] = rows.length;
+  }
+  return { data, counts };
+}
+
 export async function backupSchema({ directUrl, schema, company, sourceGroup, encryptionSecret }) {
   const db = new PrismaClient({ datasources: { db: { url: withSchema(directUrl, schema) } } });
   try {
     return await db.$transaction(async (tx) => {
       await tx.$executeRawUnsafe('SET TRANSACTION READ ONLY');
-      const existing = await tableNames(tx, schema);
-      const data = {};
-      const counts = {};
-      for (const model of Prisma.dmmf.datamodel.models) {
-        const table = modelTable(model);
-        const delegate = delegateName(model.name);
-        if (!existing.has(table) || !tx[delegate]) continue;
-        const rows = await tx[delegate].findMany();
-        data[model.name] = rows;
-        counts[model.name] = rows.length;
-      }
+      const { data, counts } = await readPrismaSchemaSnapshot(tx, schema);
       const payload = {
         format: 'repositoryrealms.ceo.schema-snapshot',
         version: 1,
@@ -179,7 +192,9 @@ function scalarValue(type, value) {
 
 function restoreRows(model, rows) {
   const scalarFields = new Map(model.fields.filter((field) => field.kind === 'scalar').map((field) => [field.name, field.type]));
-  return rows.map((row) => Object.fromEntries(Object.entries(row).map(([key, value]) => [key, scalarValue(scalarFields.get(key), value)])));
+  return rows.map((row) => Object.fromEntries(Object.entries(row)
+    .filter(([key]) => scalarFields.has(key))
+    .map(([key, value]) => [key, scalarValue(scalarFields.get(key), value)])));
 }
 
 function prismaExecutable(root) {

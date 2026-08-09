@@ -56,3 +56,10 @@ test('CEO production truth creates a one-time backup secret without overwriting 
     fs.rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test('CEO production truth reads legacy schemas without requiring every current Prisma column', () => {
+  const source = fs.readFileSync(new URL('../scripts/lib/ceo-production-truth.mjs', import.meta.url), 'utf8');
+  assert.match(source, /SELECT \* FROM/);
+  assert.match(source, /scalarFields\.has\(key\)/);
+  assert.doesNotMatch(source, /tx\[delegate\]\.findMany/);
+});
