@@ -33,6 +33,7 @@ test('CEO15 exposes only workflows supported by each entity capability profile',
   assert.equal(catalog.items.some((item) => item.id === 'entity:egoric:livestream'), false);
   assert.ok(catalog.items.some((item) => item.id === 'entity:egoric:crm'));
   assert.equal(catalog.items.some((item) => item.id === 'entity:egolive:crm'), false);
+  assert.ok(catalog.items.some((item) => item.id === 'entity:egoric:calendar' && item.redirectPath === '/calendar'));
 });
 
 test('CEO15 requires step-up for entity SSO but keeps Portal navigation available', () => {
