@@ -3,6 +3,7 @@ import {
   authorizeCeoBackupExport,
   CeoBackupExportError,
   createDeploymentBackupExport,
+  safeCeoBackupExportDiagnostic,
 } from '@/lib/ceo-backup-export';
 
 export const runtime = 'nodejs';
@@ -28,8 +29,10 @@ export async function GET(request) {
     });
   } catch (error) {
     const known = error instanceof CeoBackupExportError;
+    const diagnostic = known ? undefined : safeCeoBackupExportDiagnostic(error);
+    if (!known) console.error('[CEO backup export]', diagnostic);
     return NextResponse.json(
-      { error: known ? error.message : 'Backup export failed.', code: known ? error.code : 'ceo_backup_export_failed' },
+      { error: known ? error.message : 'Backup export failed.', code: known ? error.code : 'ceo_backup_export_failed', diagnostic },
       { status: known ? error.status : 500, headers: { 'Cache-Control': 'private, no-store' } },
     );
   }

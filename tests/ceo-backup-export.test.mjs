@@ -5,6 +5,7 @@ import {
   authorizeCeoBackupExport,
   CeoBackupExportError,
   deploymentBackupSchema,
+  safeCeoBackupExportDiagnostic,
 } from '../lib/ceo-backup-export.js';
 
 const secret = 'b'.repeat(64);
@@ -29,4 +30,10 @@ test('CEO backup route is node-only, encrypted, expiring and cache-disabled', ()
   assert.match(source, /application\/vnd\.repositoryrealms\.encrypted-backup/);
   assert.match(source, /private, no-store/);
   assert.doesNotMatch(source, /DATABASE_URL|DIRECT_URL|PrismaClient/);
+});
+
+test('CEO backup diagnostics expose only a bounded error category and Prisma code', () => {
+  const diagnostic = safeCeoBackupExportDiagnostic({ name: 'PrismaClientKnownRequestError', code: 'P2022', message: 'secret database URL' });
+  assert.deepEqual(diagnostic, { category: 'PrismaClientKnownRequestError', prismaCode: 'P2022' });
+  assert.equal(JSON.stringify(diagnostic).includes('secret'), false);
 });

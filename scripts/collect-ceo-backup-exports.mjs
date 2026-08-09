@@ -57,12 +57,13 @@ function normalizeEndpoint(rawUrl) {
   return url.toString();
 }
 
-function npxExecutable() {
-  return process.platform === 'win32' ? 'npx.cmd' : 'npx';
-}
-
 function runVercel(args, options = {}) {
-  const result = spawnSync(npxExecutable(), ['--yes', 'vercel@58.9.0', ...args], {
+  const windows = process.platform === 'win32';
+  const executable = windows ? 'pwsh.exe' : 'npx';
+  const executableArgs = windows
+    ? ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', '& npx @args', '--yes', 'vercel@58.9.0', ...args]
+    : ['--yes', 'vercel@58.9.0', ...args];
+  const result = spawnSync(executable, executableArgs, {
     cwd: options.cwd,
     encoding: options.encoding,
     windowsHide: true,
@@ -100,7 +101,7 @@ function downloadProtected({ entity, project, endpoint, secret, root: protectedR
       '--deployment', normalizeEndpoint(endpoint).replace('/api/ceo/v1/backup-export', ''),
       '--scope', 'leozs-projects-64a5f0c8', '--yes', '--',
       '--silent', '--show-error', '--max-time', '300', '--dump-header', headerFile,
-      '--header', `x-ceo-backup-export-key: ${secret}`,
+      '--header', `x-ceo-backup-export-key:${secret}`,
     ], { cwd: workingDirectory, encoding: null, stdio: ['ignore', 'pipe', 'pipe'] });
     return { encrypted: Buffer.from(result.stdout), headers: latestHeaderBlock(fs.readFileSync(headerFile, 'utf8')) };
   } finally {
