@@ -55,6 +55,9 @@ test('CEO-11 gives the portal a dedicated login, shell and v2 presentation', () 
   assert.match(login, /LEOZ GROUP · CONTROL PLANE/);
   assert.match(login, /ceoPortal \? '\/ceo-overview' : '\/dashboard'/);
   assert.match(login, /ceoPortal && <button[^>]+login-recovery-toggle/);
+  assert.match(login, /fetch\('\/api\/ceo\/v1\/identity\/session'/);
+  assert.match(login, /identity\.session\?\.stepUp !== true/);
+  assert.match(login, /body: JSON\.stringify\(\{ otp, deviceLabel:/);
 });
 
 test('all CEO navigation entries are portal-only while entity ERP keeps a safe portal link', () => {
