@@ -55,6 +55,21 @@ test('CEO backup schema contract captures columns, constraints and indexes witho
   assert.equal(contract.columns[0].column_name, 'id');
   assert.equal(contract.constraints[0].constraint_name, 'User_pkey');
   assert.equal(contract.indexes[0].index_name, 'User_pkey');
+  assert.deepEqual(contract.migrations, []);
   assert.match(contract.sha256, /^[a-f0-9]{64}$/);
   assert.equal('data' in contract, false);
+});
+
+test('CEO backup schema contract includes bounded Prisma migration evidence when the ledger exists', async () => {
+  const db = {
+    async $queryRawUnsafe(sql) {
+      if (sql.includes('information_schema.columns')) return [{ table_name: '_prisma_migrations', column_name: 'id' }];
+      if (sql.includes('pg_constraint')) return [];
+      if (sql.includes('pg_indexes')) return [];
+      return [{ migration_name: '20260726090000_add_v342_lead_intake', checksum: 'abc', applied_steps_count: 1 }];
+    },
+  };
+  const contract = await readDatabaseSchemaContract(db, 'ceoportal');
+  assert.deepEqual(contract.migrations.map((row) => row.migration_name), ['20260726090000_add_v342_lead_intake']);
+  assert.equal(JSON.stringify(contract).includes('logs'), false);
 });

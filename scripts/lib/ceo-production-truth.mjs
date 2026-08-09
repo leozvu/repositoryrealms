@@ -152,7 +152,16 @@ export async function readDatabaseSchemaContract(db, schema) {
       ORDER BY tablename, indexname
     `, schema),
   ]);
-  const contract = { columns, constraints, indexes };
+  const hasMigrationLedger = columns.some((column) => column.table_name === '_prisma_migrations');
+  const migrations = hasMigrationLedger
+    ? await db.$queryRawUnsafe(`
+        SELECT migration_name, checksum, started_at, finished_at, rolled_back_at,
+               applied_steps_count
+        FROM ${quoteDatabaseIdentifier(schema)}."_prisma_migrations"
+        ORDER BY started_at, migration_name
+      `)
+    : [];
+  const contract = { columns, constraints, indexes, migrations };
   return {
     ...contract,
     sha256: sha256(JSON.stringify(contract, portableReplacer)),
