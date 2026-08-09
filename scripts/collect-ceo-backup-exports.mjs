@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   CEO_BACKUP_FORMAT,
@@ -12,11 +13,11 @@ import {
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const EXPECTED = Object.freeze([
-  ['aim', 'public'],
-  ['egoric', 'egoric'],
-  ['vnecom', 'vnecom'],
-  ['egolive', 'egolive'],
-  ['portal', 'ceoportal'],
+  ['aim', 'public', 'agency-erp'],
+  ['egoric', 'egoric', 'erp-egoric'],
+  ['vnecom', 'vnecom', 'erp-vnecom'],
+  ['egolive', 'egolive', 'erp-egolive'],
+  ['portal', 'ceoportal', 'ceo-terminal-leoz'],
 ]);
 
 function argument(name, required = true) {
@@ -56,16 +57,75 @@ function normalizeEndpoint(rawUrl) {
   return url.toString();
 }
 
-async function download({ entity, schema, endpoint, secret }) {
-  const response = await fetch(normalizeEndpoint(endpoint), {
-    method: 'GET',
-    headers: { 'x-ceo-backup-export-key': secret },
-    cache: 'no-store',
-    signal: AbortSignal.timeout(300_000),
+function npxExecutable() {
+  return process.platform === 'win32' ? 'npx.cmd' : 'npx';
+}
+
+function runVercel(args, options = {}) {
+  const result = spawnSync(npxExecutable(), ['--yes', 'vercel@58.9.0', ...args], {
+    cwd: options.cwd,
+    encoding: options.encoding,
+    windowsHide: true,
+    timeout: options.timeout || 360_000,
+    maxBuffer: 512 * 1024 * 1024,
+    stdio: options.stdio,
   });
-  if (!response.ok) throw new Error(`${entity} backup export failed with HTTP ${response.status}.`);
-  if (response.headers.get('x-ceo-backup-schema') !== schema) throw new Error(`${entity} returned the wrong schema.`);
-  const encrypted = Buffer.from(await response.arrayBuffer());
+  if (result.status !== 0) throw new Error(`Vercel protected request failed (exit ${result.status}).`);
+  return result;
+}
+
+function latestHeaderBlock(raw) {
+  const blocks = String(raw || '').split(/\r?\n\r?\n/).map((value) => value.trim()).filter((value) => /^HTTP\//i.test(value));
+  const block = blocks.at(-1) || '';
+  const headers = new Map();
+  for (const line of block.split(/\r?\n/).slice(1)) {
+    const separator = line.indexOf(':');
+    if (separator > 0) headers.set(line.slice(0, separator).trim().toLowerCase(), line.slice(separator + 1).trim());
+  }
+  return headers;
+}
+
+function downloadProtected({ entity, project, endpoint, secret, root: protectedRoot }) {
+  const workingDirectory = path.join(path.resolve(protectedRoot), entity);
+  fs.mkdirSync(workingDirectory, { recursive: true });
+  runVercel(['link', '--project', project, '--scope', 'leozs-projects-64a5f0c8', '--yes', '--no-color'], {
+    cwd: workingDirectory,
+    encoding: 'utf8',
+    stdio: ['ignore', 'ignore', 'pipe'],
+  });
+  const headerFile = path.join(workingDirectory, 'response.headers');
+  try {
+    const result = runVercel([
+      'curl', '/api/ceo/v1/backup-export',
+      '--deployment', normalizeEndpoint(endpoint).replace('/api/ceo/v1/backup-export', ''),
+      '--scope', 'leozs-projects-64a5f0c8', '--yes', '--',
+      '--silent', '--show-error', '--max-time', '300', '--dump-header', headerFile,
+      '--header', `x-ceo-backup-export-key: ${secret}`,
+    ], { cwd: workingDirectory, encoding: null, stdio: ['ignore', 'pipe', 'pipe'] });
+    return { encrypted: Buffer.from(result.stdout), headers: latestHeaderBlock(fs.readFileSync(headerFile, 'utf8')) };
+  } finally {
+    try { fs.rmSync(headerFile, { force: true }); } catch {}
+  }
+}
+
+async function download({ entity, schema, project, endpoint, secret, protectedRoot }) {
+  let encrypted;
+  let headers;
+  if (protectedRoot) {
+    ({ encrypted, headers } = downloadProtected({ entity, project, endpoint, secret, root: protectedRoot }));
+  } else {
+    const response = await fetch(normalizeEndpoint(endpoint), {
+      method: 'GET',
+      headers: { 'x-ceo-backup-export-key': secret },
+      cache: 'no-store',
+      redirect: 'manual',
+      signal: AbortSignal.timeout(300_000),
+    });
+    if (!response.ok) throw new Error(`${entity} backup export failed with HTTP ${response.status}.`);
+    encrypted = Buffer.from(await response.arrayBuffer());
+    headers = response.headers;
+  }
+  if (headers.get('x-ceo-backup-schema') !== schema) throw new Error(`${entity} returned the wrong schema.`);
   const envelope = JSON.parse(encrypted.toString('utf8'));
   if (envelope.format !== CEO_BACKUP_FORMAT) throw new Error(`${entity} returned an unsupported backup.`);
   const payload = decryptBackup(encrypted, secret);
@@ -82,7 +142,7 @@ async function download({ entity, schema, endpoint, secret }) {
       tables: Object.keys(counts).length,
       rows: Object.values(counts).reduce((sum, value) => sum + Number(value || 0), 0),
       encryptedSha256: sha256(encrypted),
-      databaseFingerprint: response.headers.get('x-ceo-database-fingerprint') || null,
+      databaseFingerprint: headers.get('x-ceo-database-fingerprint') || null,
     },
   };
 }
@@ -92,12 +152,13 @@ async function collect() {
   if (process.argv.includes('--initialize-secret')) initializeSecretFile(secretFile);
   const secret = readBackupSecret(secretFile);
   const outputDirectory = path.join(path.resolve(argument('output')), stamp());
+  const protectedRoot = argument('vercel-protected-root', false);
   if (fs.existsSync(outputDirectory)) throw new Error('Backup output already exists.');
   fs.mkdirSync(outputDirectory, { recursive: true });
   const entries = [];
   try {
-    for (const [entity, schema] of EXPECTED) {
-      const result = await download({ entity, schema, endpoint: argument(`${entity}-url`), secret });
+    for (const [entity, schema, project] of EXPECTED) {
+      const result = await download({ entity, schema, project, endpoint: argument(`${entity}-url`), secret, protectedRoot });
       fs.writeFileSync(path.join(outputDirectory, result.entry.file), result.encrypted, { flag: 'wx', mode: 0o600 });
       entries.push(result.entry);
       console.log(`COLLECT ${schema}: ${result.entry.tables} tables, ${result.entry.rows} rows`);
