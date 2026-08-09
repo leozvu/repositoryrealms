@@ -248,6 +248,159 @@ model Lead {
   @@index([ownerId, stage])
 }
 
+// LeozOps Sprint 1C — append-only proposal metadata. A proposal is not an
+// approval, command, execution or receipt and has no relation that can mutate a Lead.
+// Only pseudonymous lead refs plus integrity hashes are persisted; no Lead PII.
+model LeozOpsActionProposal {
+  id                       String   @id @default(cuid())
+  idempotencyKeyHash       String   @unique
+  correlationId            String   @unique
+  requesterFingerprint     String
+  briefId                  String
+  sourceSnapshotId         String
+  signalId                 String
+  signalType               String
+  actionType               String
+  reasonCode               String
+  leadRefs                 String   @default("[]")
+  evidenceHash             String
+  payloadHash              String
+  status                   String   @default("proposed")
+  expiresAt                DateTime
+  createdAt                DateTime @default(now())
+
+  @@index([requesterFingerprint, createdAt])
+  @@index([status, expiresAt, createdAt])
+  @@index([briefId, signalId])
+}
+
+// LeozOps Sprint 1D — one immutable human-review fact per proposal.
+// "accept" records attention only; it grants no approval or execution authority.
+model LeozOpsProposalReview {
+  id                  String   @id @default(cuid())
+  proposalId          String   @unique
+  correlationId       String   @unique
+  decision            String
+  reasonCode          String
+  governanceMode      String   @default("single_operator_explicit_review")
+  reviewerId          String
+  proposalPayloadHash String
+  reviewedAt          DateTime @default(now())
+
+  @@index([reviewerId, reviewedAt])
+  @@index([decision, reviewedAt])
+}
+
+// LeozOps Sprints 1E-1J — a reviewed proposal may prepare a separate command
+// intent, but review acceptance never creates or executes one implicitly.
+model LeozOpsCommandIntent {
+  id                       String                 @id @default(cuid())
+  proposalId               String
+  reviewId                 String
+  idempotencyKeyHash       String                 @unique
+  correlationId            String                 @unique
+  capability               String
+  riskLevel                String
+  targetRef                String
+  payload                  String
+  payloadHash              String
+  expectedStateHash        String
+  preview                  String
+  confirmationTokenHash    String
+  repositoryIdempotencyKey String                 @unique
+  status                   String                 @default("prepared")
+  workVersion              Int                    @default(1)
+  preparedById             String
+  confirmedById            String?
+  confirmedAt              DateTime?
+  repositoryReceiptId      String?
+  lastErrorCode            String?
+  budgetConsumedAt         DateTime?
+  expiresAt                DateTime
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  events                   LeozOpsCommandEvent[]
+  jobs                     LeozOpsCommandJob[]
+
+  @@index([proposalId, createdAt])
+  @@index([status, expiresAt, createdAt])
+  @@index([preparedById, createdAt])
+  @@index([repositoryReceiptId])
+}
+
+// Append-only status facts make recovery and reconciliation explainable even
+// though the command-intent row carries a CAS-friendly current-state pointer.
+model LeozOpsCommandEvent {
+  id          String   @id @default(cuid())
+  intentId    String
+  intent      LeozOpsCommandIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
+  sequence    Int
+  status      String
+  actorId     String?
+  reasonCode  String?
+  receiptId   String?
+  createdAt   DateTime @default(now())
+
+  @@unique([intentId, sequence])
+  @@index([status, createdAt])
+  @@index([receiptId])
+}
+
+// Durable payload-free queue. Jobs can be leased and retried, but RepositoryRealms
+// idempotency remains the final authority against duplicate business mutations.
+model LeozOpsCommandJob {
+  id            String   @id @default(cuid())
+  intentId      String
+  intent        LeozOpsCommandIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
+  kind          String   @default("execute_reconcile")
+  status        String   @default("pending")
+  runAt         DateTime @default(now())
+  attemptCount  Int      @default(0)
+  maxAttempts   Int      @default(5)
+  lockToken     String?  @unique
+  lockedAt      DateTime?
+  lastErrorCode String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([intentId, kind])
+  @@index([status, runAt, createdAt])
+  @@index([lockedAt])
+}
+
+// Missing control means fail closed. Enabling execution requires both deployment
+// flags and this Director-controlled database gate; the kill switch always wins.
+model LeozOpsRuntimeControl {
+  id                  String   @id @default("global")
+  executionEnabled    Boolean  @default(false)
+  killSwitchActive    Boolean  @default(true)
+  dailyActionLimit    Int      @default(5)
+  circuitState        String   @default("closed")
+  consecutiveFailures Int      @default(0)
+  circuitOpenedAt     DateTime?
+  circuitRetryAt      DateTime?
+  recordVersion       Int      @default(1)
+  updatedById         String?
+  updatedAt           DateTime @updatedAt
+}
+
+// Durable counters are shared across serverless instances and contain only
+// hashed subjects plus operational scope—never a raw key or business payload.
+model LeozOpsQuotaBucket {
+  bucketKey       String   @id
+  scope           String
+  subjectHash     String
+  windowStartedAt DateTime
+  expiresAt       DateTime
+  requestCount    Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([scope, windowStartedAt])
+  @@index([subjectHash, expiresAt])
+  @@index([expiresAt])
+}
+
 model Service {
   id        String  @id @default(cuid())
   name      String
@@ -1406,6 +1559,66 @@ model CeoEntityCommandReceipt {
   @@index([actorSubject, createdAt])
   @@index([targetEntityId, action, createdAt])
   @@index([resource, recordId])
+}
+
+// Phase 14 — dedicated LeozOps task command control plane. Approval rows contain
+// fingerprints and actor/credential identifiers only; business payload stays in
+// the canonical Task row and is never copied into this ledger.
+model LeozOpsTaskCommandApproval {
+  id                   String    @id @default(cuid())
+  idempotencyKey       String    @unique
+  correlationId        String    @unique
+  kind                 String
+  targetEntityId       String
+  approvedBySubject    String
+  requestFingerprint   String
+  previewFingerprint   String
+  subjectCommandId     String?
+  approvalCredentialId String
+  approvedAt           DateTime
+  expiresAt            DateTime
+  consumedAt           DateTime?
+  consumedByCommandId  String?
+  createdAt            DateTime  @default(now())
+
+  @@index([kind, targetEntityId, expiresAt])
+  @@index([subjectCommandId, kind, expiresAt])
+  @@index([approvalCredentialId, approvedAt])
+}
+
+// One durable create receipt plus, at most, one separately approved rollback.
+// No arbitrary resource/action/URL fields exist: this table can represent only
+// the dedicated unassigned task.create contract.
+model LeozOpsTaskCommand {
+  id                         String    @id @default(cuid())
+  idempotencyKey             String    @unique
+  correlationId              String    @unique
+  targetEntityId             String
+  actorSubject               String
+  requestFingerprint         String
+  previewFingerprint         String
+  approvalId                 String    @unique
+  taskId                     String    @unique
+  taskStateFingerprint       String
+  executionResultFingerprint String
+  executionCredentialId      String
+  status                     String    @default("active")
+  rollbackReceiptId          String?   @unique
+  rollbackIdempotencyKey     String?   @unique
+  rollbackCorrelationId      String?   @unique
+  rollbackActorSubject       String?
+  rollbackRequestFingerprint String?
+  rollbackPreviewFingerprint String?
+  rollbackApprovalId         String?   @unique
+  rollbackResultFingerprint  String?
+  rollbackCredentialId       String?
+  rolledBackAt               DateTime?
+  createdAt                  DateTime  @default(now())
+
+  @@index([targetEntityId, status, createdAt])
+  @@index([actorSubject, createdAt])
+  @@index([executionCredentialId, createdAt])
+  @@index([rollbackCredentialId, rolledBackAt])
 }
 
 // ===== CEO-6: federated directory and unified inbox =====

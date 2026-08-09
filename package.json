@@ -11,6 +11,7 @@
     "db:seed": "node prisma/seed.js",
     "migration:ci": "prisma migrate deploy && prisma migrate diff --from-schema-datasource prisma/schema.prisma --to-schema-datamodel prisma/schema.prisma --exit-code",
     "test": "node --test --test-concurrency=1 \"tests/**/*.test.mjs\"",
+    "test:leozops": "node --test --test-concurrency=1 \"tests/leozops-*.test.mjs\"",
     "test:coverage": "node --test --test-concurrency=1 --experimental-test-coverage --test-coverage-lines=90 --test-coverage-functions=85 --test-coverage-branches=75 \"tests/**/*.test.mjs\"",
     "test:e2e": "playwright test",
     "audit:evidence:governance": "node scripts/audit-work-evidence-governance.mjs",
@@ -143,12 +144,13 @@
   "overrides": {
     "sharp": "0.35.3",
     "next": {
-      "postcss": "8.5.18"
+      "postcss": "8.5.26"
     },
     "next-auth": {
       "nodemailer": "9.0.3",
       "uuid": "11.1.1"
     },
-    "postcss": "8.5.18"
+    "postcss": "8.5.26",
+    "nanoid": "3.3.18"
   }
 }
