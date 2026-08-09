@@ -126,6 +126,39 @@ async function tableNames(db, schema) {
   return new Set(rows.map((row) => row.table_name));
 }
 
+export async function readDatabaseSchemaContract(db, schema) {
+  if (!IDENTIFIER.test(String(schema || ''))) throw new Error('Invalid database schema.');
+  const [columns, constraints, indexes] = await Promise.all([
+    db.$queryRawUnsafe(`
+      SELECT table_name, column_name, ordinal_position, data_type, udt_name,
+             is_nullable, column_default
+      FROM information_schema.columns
+      WHERE table_schema = $1
+      ORDER BY table_name, ordinal_position
+    `, schema),
+    db.$queryRawUnsafe(`
+      SELECT r.relname AS table_name, c.conname AS constraint_name,
+             c.contype AS constraint_type, pg_get_constraintdef(c.oid) AS definition
+      FROM pg_constraint c
+      JOIN pg_class r ON r.oid = c.conrelid
+      JOIN pg_namespace n ON n.oid = r.relnamespace
+      WHERE n.nspname = $1
+      ORDER BY r.relname, c.conname
+    `, schema),
+    db.$queryRawUnsafe(`
+      SELECT tablename AS table_name, indexname AS index_name, indexdef AS definition
+      FROM pg_indexes
+      WHERE schemaname = $1
+      ORDER BY tablename, indexname
+    `, schema),
+  ]);
+  const contract = { columns, constraints, indexes };
+  return {
+    ...contract,
+    sha256: sha256(JSON.stringify(contract, portableReplacer)),
+  };
+}
+
 export async function readPrismaSchemaSnapshot(db, schema) {
   const existing = await tableNames(db, schema);
   const data = {};
@@ -147,7 +180,10 @@ export async function backupSchema({ directUrl, schema, company, sourceGroup, en
   try {
     return await db.$transaction(async (tx) => {
       await tx.$executeRawUnsafe('SET TRANSACTION READ ONLY');
-      const { data, counts } = await readPrismaSchemaSnapshot(tx, schema);
+      const [{ data, counts }, schemaContract] = await Promise.all([
+        readPrismaSchemaSnapshot(tx, schema),
+        readDatabaseSchemaContract(tx, schema),
+      ]);
       const payload = {
         format: 'repositoryrealms.ceo.schema-snapshot',
         version: 1,
@@ -157,6 +193,7 @@ export async function backupSchema({ directUrl, schema, company, sourceGroup, en
         company,
         counts,
         data,
+        schemaContract,
       };
       const encrypted = encryptBackup(payload, encryptionSecret);
       return {

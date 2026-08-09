@@ -24,6 +24,7 @@ export async function GET(request) {
         'X-CEO-Backup-Tables': String(backup.tables),
         'X-CEO-Backup-Rows': String(backup.rows),
         'X-CEO-Database-Fingerprint': backup.databaseFingerprint,
+        'X-CEO-Schema-Contract-Sha256': backup.schemaContractSha256,
         'X-Content-Type-Options': 'nosniff',
       },
     });

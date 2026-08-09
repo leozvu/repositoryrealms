@@ -7,6 +7,7 @@ import {
   deploymentBackupSchema,
   safeCeoBackupExportDiagnostic,
 } from '../lib/ceo-backup-export.js';
+import { readDatabaseSchemaContract } from '../scripts/lib/ceo-production-truth.mjs';
 
 const secret = 'b'.repeat(64);
 const request = (value) => ({ headers: { get: (name) => name === 'x-ceo-backup-export-key' ? value : null } });
@@ -36,4 +37,24 @@ test('CEO backup diagnostics expose only a bounded error category and Prisma cod
   const diagnostic = safeCeoBackupExportDiagnostic({ name: 'PrismaClientKnownRequestError', code: 'P2022', message: 'secret database URL' });
   assert.deepEqual(diagnostic, { category: 'PrismaClientKnownRequestError', prismaCode: 'P2022' });
   assert.equal(JSON.stringify(diagnostic).includes('secret'), false);
+});
+
+test('CEO backup schema contract captures columns, constraints and indexes without row data', async () => {
+  const calls = [];
+  const db = {
+    async $queryRawUnsafe(sql, schema) {
+      calls.push({ sql, schema });
+      if (sql.includes('information_schema.columns')) return [{ table_name: 'User', column_name: 'id', ordinal_position: 1 }];
+      if (sql.includes('pg_constraint')) return [{ table_name: 'User', constraint_name: 'User_pkey' }];
+      return [{ table_name: 'User', index_name: 'User_pkey' }];
+    },
+  };
+  const contract = await readDatabaseSchemaContract(db, 'ceoportal');
+  assert.equal(calls.length, 3);
+  assert.ok(calls.every((call) => call.schema === 'ceoportal'));
+  assert.equal(contract.columns[0].column_name, 'id');
+  assert.equal(contract.constraints[0].constraint_name, 'User_pkey');
+  assert.equal(contract.indexes[0].index_name, 'User_pkey');
+  assert.match(contract.sha256, /^[a-f0-9]{64}$/);
+  assert.equal('data' in contract, false);
 });
