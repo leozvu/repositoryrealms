@@ -1,0 +1,43 @@
+name: AIm canonical sync guard
+
+on:
+  push:
+    branches:
+      - "codex/aim-agency-takeover"
+  pull_request:
+    branches:
+      - "codex/aim-agency-takeover"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aim-canonical-sync-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  canonical-sync:
+    name: Canonical branch is included
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out proposed AIm revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch RepositoryRealms canonical branch
+        run: >-
+          git fetch --no-tags origin
+          +refs/heads/codex/realm-design-system-v2-implementation:refs/remotes/origin/codex/realm-design-system-v2-implementation
+
+      - name: Reject a takeover revision behind canonical
+        shell: bash
+        run: |
+          canonical_ref="origin/codex/realm-design-system-v2-implementation"
+          if ! git merge-base --is-ancestor "$canonical_ref" HEAD; then
+            echo "::error::AIm takeover is behind $canonical_ref. Merge the canonical branch before continuing."
+            exit 1
+          fi
+
+          echo "AIm takeover contains $(git rev-parse --short "$canonical_ref")."
