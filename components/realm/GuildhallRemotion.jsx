@@ -6,6 +6,7 @@ import scene from './guildhall-shell.module.css';
 
 const ENVIRONMENT_FRAMES = 360;
 const ACTOR_FRAMES = 120;
+const INTERACTION_FRAMES = 120;
 
 const DUST_MOTES = Object.freeze([
   { x: 9, y: 70, size: 3, drift: 18, delay: 7, opacity: 0.32 },
@@ -88,29 +89,89 @@ function LivingEnvironmentComposition({ imageUrl, imageAlt, reducedMotion }) {
   );
 }
 
-function ActorComposition({ spriteUrl, moving, facing, player, accent, reducedMotion }) {
+function actorActionPose(action, frame, reducedMotion) {
+  if (!action || reducedMotion) return { x: 0, y: 0, rotation: 0, scale: 1 };
+  const wave = Math.sin(frame * 0.42);
+  const slowWave = Math.sin(frame * 0.16);
+  if (action === 'craft') {
+    const strike = (frame % 20) / 20;
+    return { x: wave * 1.2, y: strike < 0.2 ? 3 : -Math.sin(strike * Math.PI) * 2, rotation: strike < 0.2 ? 4 : -5, scale: 1 };
+  }
+  if (action === 'portal') return { x: slowWave * 1.5, y: -5 - Math.abs(slowWave) * 3, rotation: wave * 1.1, scale: 1.025 };
+  if (action === 'signal') return { x: wave * 1.5, y: -Math.abs(wave) * 3, rotation: wave * 2.4, scale: 1 };
+  if (action === 'salute') return { x: 0, y: -Math.abs(wave) * 1.2, rotation: wave * 0.35, scale: 1.02 };
+  if (action === 'count') return { x: wave * 0.7, y: Math.abs(wave) * 1.8, rotation: wave * 1.3, scale: 0.99 };
+  return { x: slowWave * 0.5, y: Math.abs(wave) * 1.2, rotation: wave * 0.7, scale: 0.995 };
+}
+
+function ActorComposition({ spriteUrl, moving, facing, player, accent, action, actionPhase, reducedMotion }) {
   const frame = useCurrentFrame();
   const motionFrame = reducedMotion ? 0 : frame;
+  const activeAction = actionPhase === 'interacting' ? action : null;
+  const pose = actorActionPose(activeAction, motionFrame, reducedMotion);
   const idle = Math.sin(motionFrame / 15);
-  const stride = moving ? Math.sin(motionFrame * 0.72) : idle * 0.16;
-  const bob = reducedMotion ? 0 : moving ? Math.abs(stride) * -7 : idle * -1.2;
+  const stride = moving && !activeAction ? Math.sin(motionFrame * 0.72) : idle * 0.16;
+  const bob = reducedMotion ? 0 : moving && !activeAction ? Math.abs(stride) * -7 : idle * -1.2;
   const leanDirection = facing === 'left' ? -1 : facing === 'right' ? 1 : 0;
-  const lean = reducedMotion ? 0 : moving ? leanDirection * 2.4 + stride * 0.8 : idle * 0.25;
+  const lean = reducedMotion ? 0 : moving && !activeAction ? leanDirection * 2.4 + stride * 0.8 : idle * 0.25;
   const shadowScale = reducedMotion ? 1 : 1 - Math.abs(bob) * 0.018;
   const ringPulse = reducedMotion ? 1 : 0.96 + Math.sin(motionFrame / 8) * 0.035;
   const footstep = ((motionFrame % 18) / 18);
+  const effectPulse = reducedMotion ? 0.7 : 0.5 + Math.sin(motionFrame * 0.32) * 0.25;
 
   return (
     <AbsoluteFill className={scene.actorCanvas}>
       {player && <span className={scene.actorPlayerRing} style={{ borderColor: accent, transform: `translateX(-50%) rotateX(68deg) scale(${ringPulse})` }} />}
-      {moving && !reducedMotion && (
+      {moving && !activeAction && !reducedMotion && (
         <span className={scene.actorFootstep} style={{ opacity: (1 - footstep) * 0.24, transform: `translateX(-50%) rotateX(68deg) scale(${0.5 + footstep * 0.8})` }} />
       )}
       <span className={scene.actorContactShadow} style={{ transform: `translateX(-50%) scaleX(${shadowScale})`, opacity: 0.64 - Math.abs(bob) * 0.025 }} />
-      <span className={scene.actorBody} style={{ transform: `translate3d(-50%, ${bob}px, 0) rotate(${lean}deg)` }}>
+      {activeAction && (
+        <span className={scene.actorActionEffect} data-action={activeAction} style={{ '--action-accent': accent, opacity: effectPulse }}>
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+        </span>
+      )}
+      <span className={scene.actorBody} style={{ transform: `translate3d(calc(-50% + ${pose.x}px), ${bob + pose.y}px, 0) rotate(${lean + pose.rotation}deg) scale(${pose.scale})` }}>
         <span className={scene.actorRim} style={{ background: `linear-gradient(135deg, color-mix(in srgb, ${accent} 36%, transparent), transparent 54%)` }} />
         <img src={spriteUrl} alt="" aria-hidden="true" draggable="false" />
       </span>
+    </AbsoluteFill>
+  );
+}
+
+function ObjectInteractionComposition({ accent, action, phase, reducedMotion }) {
+  const frame = useCurrentFrame();
+  const motionFrame = reducedMotion ? 0 : frame;
+  const traveling = phase === 'traveling';
+  const pulse = reducedMotion ? 1 : 0.9 + Math.sin(motionFrame * 0.24) * 0.1;
+  const rotation = reducedMotion ? 0 : motionFrame * (traveling ? 0.55 : 1.15);
+  const sparkProgress = (motionFrame % 36) / 36;
+  return (
+    <AbsoluteFill className={scene.objectInteractionCanvas} style={{ '--interaction-accent': accent }} data-action={action} data-phase={phase}>
+      <span className={scene.objectInteractionGround} style={{ transform: `translate(-50%, -50%) rotate(${rotation}deg) scale(${pulse})` }} />
+      <span className={scene.objectInteractionOrbit} style={{ transform: `translate(-50%, -50%) rotate(${-rotation * 0.72}deg) scale(${1.05 + (pulse - 1) * 0.7})` }} />
+      <span className={scene.objectInteractionCore} style={{ opacity: traveling ? 0.5 : 0.8, transform: `translate(-50%, -50%) scale(${pulse})` }} />
+      {[0, 1, 2, 3, 4, 5].map((index) => {
+        const angle = index / 6 * Math.PI * 2 + motionFrame * 0.018;
+        const radius = 28 + sparkProgress * 24;
+        return (
+          <i
+            key={index}
+            className={scene.objectInteractionSpark}
+            style={{
+              left: `${50 + Math.cos(angle) * radius}%`,
+              top: `${50 + Math.sin(angle) * radius * 0.48}%`,
+              opacity: reducedMotion ? 0.42 : (1 - sparkProgress) * (traveling ? 0.34 : 0.72),
+              transform: `translate(-50%, -50%) scale(${0.65 + sparkProgress})`,
+            }}
+          />
+        );
+      })}
     </AbsoluteFill>
   );
 }
@@ -134,7 +195,7 @@ export function GuildhallAtmosphere({ imageUrl, imageAlt, reducedMotion }) {
   );
 }
 
-export function RealmActorMotion({ spriteUrl, moving, facing, player, accent, reducedMotion }) {
+export function RealmActorMotion({ spriteUrl, moving, facing, player, accent, action = null, actionPhase = null, reducedMotion }) {
   return (
     <Player
       className={scene.actorPlayer}
@@ -147,7 +208,26 @@ export function RealmActorMotion({ spriteUrl, moving, facing, player, accent, re
       loop
       controls={false}
       numberOfSharedAudioTags={0}
-      inputProps={{ spriteUrl, moving, facing, player, accent, reducedMotion }}
+      inputProps={{ spriteUrl, moving, facing, player, accent, action, actionPhase, reducedMotion }}
+      style={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}
+    />
+  );
+}
+
+export function RealmObjectInteractionMotion({ accent, action, phase, reducedMotion }) {
+  return (
+    <Player
+      className={scene.objectInteractionPlayer}
+      component={ObjectInteractionComposition}
+      durationInFrames={INTERACTION_FRAMES}
+      compositionWidth={180}
+      compositionHeight={180}
+      fps={30}
+      autoPlay={!reducedMotion}
+      loop
+      controls={false}
+      numberOfSharedAudioTags={0}
+      inputProps={{ accent, action, phase, reducedMotion }}
       style={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}
     />
   );

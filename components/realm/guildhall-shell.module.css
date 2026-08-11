@@ -278,6 +278,48 @@
     linear-gradient(180deg, rgba(7, 12, 10, .2), transparent 42%);
 }
 
+.routeOverlay { position: absolute; z-index: 118; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.routeOverlay polyline {
+  fill: none;
+  stroke: rgba(233, 202, 128, .66);
+  stroke-width: .28;
+  stroke-dasharray: 1.15 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 5px rgba(225, 189, 104, .5));
+}
+.objectInteractionAnchor {
+  position: absolute;
+  z-index: 132;
+  top: var(--interaction-y);
+  left: var(--interaction-x);
+  display: block;
+  width: 158px;
+  height: 158px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.objectInteractionPlayer { position: absolute !important; inset: 0; overflow: visible !important; pointer-events: none; }
+.objectInteractionCanvas { overflow: visible; }
+.objectInteractionGround, .objectInteractionOrbit, .objectInteractionCore {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  pointer-events: none;
+  transform-origin: center;
+}
+.objectInteractionGround { width: 68%; height: 34%; border: 2px solid color-mix(in srgb, var(--interaction-accent) 78%, #f1dfaf); border-radius: 50%; box-shadow: 0 0 20px color-mix(in srgb, var(--interaction-accent) 38%, transparent), inset 0 0 16px color-mix(in srgb, var(--interaction-accent) 16%, transparent); }
+.objectInteractionGround::before, .objectInteractionGround::after { position: absolute; inset: 18%; border: 1px solid color-mix(in srgb, var(--interaction-accent) 50%, transparent); border-radius: inherit; content: ""; }
+.objectInteractionGround::after { inset: 38% 6%; border-right: 0; border-left: 0; border-radius: 0; }
+.objectInteractionOrbit { width: 48%; height: 48%; border: 1px dashed color-mix(in srgb, var(--interaction-accent) 72%, transparent); border-radius: 50%; }
+.objectInteractionCore { width: 24%; height: 12%; border-radius: 50%; background: color-mix(in srgb, var(--interaction-accent) 36%, transparent); box-shadow: 0 0 22px var(--interaction-accent); }
+.objectInteractionSpark { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: color-mix(in srgb, var(--interaction-accent) 74%, #fff1c7); box-shadow: 0 0 8px var(--interaction-accent); }
+.objectInteractionCanvas[data-action="craft"] .objectInteractionGround { border-radius: 14%; transform-origin: center; }
+.objectInteractionCanvas[data-action="portal"] .objectInteractionOrbit { border-style: solid; box-shadow: 0 0 22px color-mix(in srgb, var(--interaction-accent) 35%, transparent); }
+.objectInteractionCanvas[data-phase="traveling"] .objectInteractionCore { opacity: .46; }
+
 .worldTitle {
   position: fixed;
   z-index: 12;
@@ -335,6 +377,9 @@
 .hotspot strong { font-size: .68rem; font-weight: 720; }
 .hotspot small { margin-top: 2px; color: rgba(238, 232, 218, .48); font-size: .54rem; }
 .hotspotActive { border-color: rgba(225, 189, 104, .5); box-shadow: 0 15px 45px rgba(0,0,0,.42), inset 0 0 0 1px rgba(225,189,104,.08); }
+.hotspotTarget { z-index: 158; border-color: rgba(233, 202, 128, .58); color: #fff8e8; box-shadow: 0 15px 45px rgba(0,0,0,.44), 0 0 0 3px rgba(225,189,104,.08); }
+.hotspotTarget > span:first-child { color: #f2d38b; background: rgba(183,148,77,.19); }
+.hotspotInteracting { border-color: rgba(245, 217, 151, .82); box-shadow: 0 15px 45px rgba(0,0,0,.44), 0 0 24px rgba(225,189,104,.26); }
 
 .figure {
   position: absolute;
@@ -360,6 +405,18 @@
 .actorContactShadow { position: absolute; z-index: 1; bottom: 17px; left: 50%; width: 54%; height: 12%; border-radius: 50%; background: radial-gradient(ellipse, rgba(0,0,0,.8), rgba(0,0,0,.08) 72%, transparent); filter: blur(2px); transform-origin: center; }
 .actorPlayerRing, .actorFootstep { position: absolute; z-index: 0; bottom: 8px; left: 50%; width: 68%; height: 31%; border: 2px solid rgba(238, 199, 104, .65); border-radius: 50%; box-shadow: 0 0 20px rgba(220, 177, 79, .22), inset 0 0 16px rgba(220, 177, 79, .1); transform-origin: center; }
 .actorFootstep { z-index: 0; border-width: 1px; border-color: rgba(238, 222, 185, .55); box-shadow: none; }
+.actorActionEffect { position: absolute; z-index: 2; bottom: 25px; left: 50%; width: 88%; height: 70%; pointer-events: none; transform: translateX(-50%); }
+.actorActionEffect::before { position: absolute; right: 9%; bottom: 4%; left: 9%; height: 25%; border: 1px solid color-mix(in srgb, var(--action-accent) 70%, transparent); border-radius: 50%; box-shadow: 0 0 15px color-mix(in srgb, var(--action-accent) 30%, transparent); content: ""; transform: rotateX(66deg); }
+.actorActionEffect i { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: color-mix(in srgb, var(--action-accent) 72%, #fff4d1); box-shadow: 0 0 8px var(--action-accent); }
+.actorActionEffect i:nth-child(1) { top: 8%; left: 22%; }
+.actorActionEffect i:nth-child(2) { top: 21%; right: 13%; }
+.actorActionEffect i:nth-child(3) { top: 47%; left: 7%; }
+.actorActionEffect i:nth-child(4) { top: 58%; right: 6%; }
+.actorActionEffect i:nth-child(5) { top: 72%; left: 30%; }
+.actorActionEffect i:nth-child(6) { top: 35%; left: 56%; }
+.actorActionEffect[data-action="craft"]::after { position: absolute; top: 28%; right: 3%; width: 34%; height: 2px; background: var(--action-accent); box-shadow: 0 0 12px var(--action-accent); content: ""; transform: rotate(-38deg); transform-origin: right center; }
+.actorActionEffect[data-action="portal"]::before { right: 16%; bottom: 0; left: 16%; height: 76%; border-width: 2px; transform: none; }
+.actorActionEffect[data-action="salute"] i:nth-child(n+4) { display: none; }
 .figureIdentity {
   position: absolute;
   z-index: 8;
@@ -419,6 +476,30 @@
 .nearbyPrompt strong, .nearbyPrompt small { display: block; text-align: left; }
 .nearbyPrompt strong { font-size: .68rem; }
 .nearbyPrompt small { margin-top: 2px; color: rgba(238,232,218,.5); font-size: .53rem; }
+
+.journeyTracker {
+  position: fixed;
+  z-index: 27;
+  top: 132px;
+  right: clamp(24px, 4vw, 64px);
+  display: grid;
+  width: min(286px, calc(100vw - 48px));
+  grid-template-columns: 1fr auto;
+  gap: 2px 14px;
+  padding: 10px 12px;
+  border-left: 2px solid #d7b465;
+  color: #f2ead8;
+  background: rgba(7, 12, 10, .88);
+  box-shadow: 0 16px 42px rgba(0,0,0,.34);
+  backdrop-filter: blur(13px);
+}
+.journeyTracker > span { grid-column: 1; color: #d6b56c; font-size: .5rem; font-weight: 760; letter-spacing: .09em; text-transform: uppercase; }
+.journeyTracker > strong { grid-column: 1; font-family: "General Sans", var(--font-sans), sans-serif; font-size: .76rem; font-weight: 720; }
+.journeyTracker > small { grid-row: 1 / span 2; grid-column: 2; align-self: center; max-width: 120px; color: rgba(238,232,218,.54); font-size: .51rem; text-align: right; }
+.journeyTracker > i { grid-column: 1 / -1; height: 2px; margin-top: 5px; overflow: hidden; background: rgba(225,189,104,.12); }
+.journeyTracker > i b { display: block; height: 100%; background: #d7b465; box-shadow: 0 0 9px rgba(225,189,104,.55); transition: width .18s linear; }
+.journeyTracker[data-phase="interacting"] { border-left-color: #eee0b9; }
+.journeyTracker[data-phase="engaged"] { border-left-color: #7cc39b; }
 
 .signalControl { position: fixed; z-index: 24; right: clamp(22px, 3vw, 42px); bottom: 124px; }
 .signalControl > button { display: flex; min-height: 40px; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid rgba(222,205,162,.15); border-radius: 8px; color: rgba(238,232,218,.7); background: rgba(8,13,11,.82); backdrop-filter: blur(12px); }
@@ -575,11 +656,14 @@
   .worldTitle p { max-width: 34ch; margin-top: 6px; font-size: .64rem; }
   .sceneHint { top: 145px; right: 18px; }
   .sceneHint small { display: none; }
+  .journeyTracker { top: 68px; right: 10px; width: min(246px, calc(100vw - 20px)); padding: 8px 10px; }
+  .journeyTracker > small { max-width: 96px; }
   .scenePlate { width: calc((100dvh - 108px) * 2.246); min-width: 1180px; }
   .hotspot { min-width: 0; width: 38px; height: 38px; padding: 0; border-radius: 9px; transform: translate(-50%, -50%); }
   .hotspot > span:first-child { width: 100%; height: 100%; }
   .hotspot > span:last-child { display: none; }
   .figure { width: 62px; height: 86px; }
+  .objectInteractionAnchor { width: 112px; height: 112px; }
   .actorBody img { height: 100%; }
   .sceneHint { display: none; }
   .mobileDpad { display: grid; bottom: 105px; left: 12px; }

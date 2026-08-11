@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '@/components/ui';
 import { useLanguage } from '@/components/LanguageProvider';
 import { isInVoiceRange } from '@/lib/realm-protocol';
 import { realmGeneratedCharacterArchetype, realmGeneratedCharacterUrl } from '@/lib/realm-generated-art';
+import { findRealmPath } from '@/lib/realm-navigation';
 import { REALM_EMOTES } from '@/lib/realm-social';
-import { GuildhallAtmosphere, RealmActorMotion } from './GuildhallRemotion';
+import { GuildhallAtmosphere, RealmActorMotion, RealmObjectInteractionMotion } from './GuildhallRemotion';
 import {
   ROOMS,
   WORLD,
@@ -69,6 +70,21 @@ const COMMAND_OBJECT = Object.freeze({
 });
 
 const SCENE_OBJECTS = Object.freeze([COMMAND_OBJECT, ...WORLD_OBJECTS]);
+
+export const OBJECT_INTERACTIONS = Object.freeze({
+  'command-dais': Object.freeze({ action: 'salute', verb: 'Trình diện', progress: 'Đang báo cáo ưu tiên', accent: '#d7b465' }),
+  'guild-roster': Object.freeze({ action: 'read', verb: 'Tra sổ bộ', progress: 'Đang xác nhận hồ sơ và quyền truy cập', accent: '#7cc39b' }),
+  'war-table': Object.freeze({ action: 'plan', verb: 'Bày bản đồ', progress: 'Đang mở kế hoạch chiến dịch', accent: '#aa9bd6' }),
+  'treasury-chest': Object.freeze({ action: 'count', verb: 'Kiểm kê Gold', progress: 'Đang đối chiếu sổ Gold', accent: '#e2bb62' }),
+  'tavern-board': Object.freeze({ action: 'signal', verb: 'Thắp tín hiệu', progress: 'Đang kết nối Quảng trường Đèn', accent: '#cf7278' }),
+  'quest-board': Object.freeze({ action: 'quest', verb: 'Nhận chỉ dẫn', progress: 'Đang đọc nhiệm vụ hôm nay', accent: '#7ab1cb' }),
+  'realm-gate': Object.freeze({ action: 'portal', verb: 'Mở cổng', progress: 'Đang đồng bộ hành trình', accent: '#76c7b1' }),
+  'arcane-forge': Object.freeze({ action: 'craft', verb: 'Kích hoạt lò rèn', progress: 'Đang chuẩn bị Xưởng Guild', accent: '#df8d55' }),
+});
+
+const AUTO_TRAVEL_SPEED = 28;
+const MANUAL_TRAVEL_SPEED = 4.5;
+const ARRIVAL_DISTANCE = 0.14;
 
 const STATUS_COLORS = Object.freeze({
   available: '#7cc39b',
@@ -133,7 +149,7 @@ function usePrefersReducedMotion() {
   return reducedMotion;
 }
 
-function RealmFigure({ person, player = false, moving = false, facing = 'down', emote, onSelect, interactionLabel, reducedMotion }) {
+function RealmFigure({ person, player = false, moving = false, facing = 'down', action, actionPhase, emote, onSelect, interactionLabel, reducedMotion }) {
   const projected = projectPosition(person);
   const identity = person;
   const archetype = realmGeneratedCharacterArchetype(identity);
@@ -147,6 +163,8 @@ function RealmFigure({ person, player = false, moving = false, facing = 'down', 
         facing={facing}
         player={player}
         accent={accent}
+        action={action}
+        actionPhase={actionPhase}
         reducedMotion={reducedMotion}
       />
       <span className={scene.figureIdentity}>
@@ -187,16 +205,67 @@ export default function GuildhallScene({
   const reducedMotion = usePrefersReducedMotion();
   const plateRef = useRef(null);
   const positionRef = useRef(normalizeWorldPosition(position));
-  const targetRef = useRef(null);
+  const routeRef = useRef(null);
   const keysRef = useRef(new Set());
   const facingRef = useRef('down');
   const activeObjectRef = useRef(null);
+  const startInteractionRef = useRef(null);
+  const interactionTimerRef = useRef(null);
   const callbacksRef = useRef({ onPosition, onNearby, onObjectOpen });
   const peopleRef = useRef({ staff, remotePlayers });
   const [visualPosition, setVisualPosition] = useState(positionRef.current);
   const [moving, setMoving] = useState(false);
+  const [journey, setJourney] = useState(null);
   const [signalOpen, setSignalOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
+
+  const cancelJourney = useCallback(() => {
+    routeRef.current = null;
+    if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
+    interactionTimerRef.current = null;
+    setJourney(null);
+  }, []);
+
+  const routeTo = useCallback((destination, object = null) => {
+    const target = normalizeWorldPosition(destination);
+    const path = findRealmPath({
+      start: positionRef.current,
+      target,
+      cols: WORLD.cols,
+      rows: WORLD.rows,
+      isWalkable: isWorldPositionWalkable,
+    });
+    if (!path.length) return false;
+    if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
+    interactionTimerRef.current = null;
+    routeRef.current = { path, index: 0, object, total: path.length };
+    if (object) {
+      const interaction = OBJECT_INTERACTIONS[object.id] || OBJECT_INTERACTIONS['quest-board'];
+      setJourney({ objectId: object.id, phase: 'traveling', remaining: path.length, total: path.length, ...interaction });
+    } else {
+      setJourney(null);
+    }
+    return true;
+  }, []);
+
+  const startObjectInteraction = useCallback((object) => {
+    if (!object) return;
+    routeRef.current = null;
+    const interaction = OBJECT_INTERACTIONS[object.id] || OBJECT_INTERACTIONS['quest-board'];
+    setMoving(false);
+    setJourney({ objectId: object.id, phase: 'interacting', remaining: 0, total: 1, ...interaction });
+    if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
+    interactionTimerRef.current = window.setTimeout(() => {
+      callbacksRef.current.onObjectOpen(object);
+      setJourney((current) => current?.objectId === object.id ? { ...current, phase: 'engaged' } : current);
+      interactionTimerRef.current = window.setTimeout(() => {
+        setJourney((current) => current?.objectId === object.id ? null : current);
+        interactionTimerRef.current = null;
+      }, reducedMotion ? 80 : 900);
+    }, reducedMotion ? 80 : 560);
+  }, [reducedMotion]);
+
+  startInteractionRef.current = startObjectInteraction;
 
   useEffect(() => { callbacksRef.current = { onPosition, onNearby, onObjectOpen }; }, [onNearby, onObjectOpen, onPosition]);
   useEffect(() => { peopleRef.current = { staff, remotePlayers }; }, [remotePlayers, staff]);
@@ -211,10 +280,14 @@ export default function GuildhallScene({
   useEffect(() => {
     const moveTo = (event) => {
       if (event.detail?.x == null || event.detail?.y == null) return;
-      targetRef.current = normalizeWorldPosition(event.detail);
+      routeTo(event.detail);
     };
     window.addEventListener('realm:move', moveTo);
     return () => window.removeEventListener('realm:move', moveTo);
+  }, [routeTo]);
+
+  useEffect(() => () => {
+    if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -224,12 +297,12 @@ export default function GuildhallScene({
       const key = event.key.toLowerCase();
       if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd'].includes(key)) {
         event.preventDefault();
-        targetRef.current = null;
+        cancelJourney();
         keysRef.current.add(key);
       }
       if (key === 'e' && activeObjectRef.current) {
         event.preventDefault();
-        callbacksRef.current.onObjectOpen(activeObjectRef.current);
+        startInteractionRef.current(activeObjectRef.current);
       }
     };
     const up = (event) => keysRef.current.delete(event.key.toLowerCase());
@@ -239,37 +312,50 @@ export default function GuildhallScene({
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
     };
-  }, []);
+  }, [cancelJourney]);
 
   useEffect(() => {
     let frame = 0;
     let previous = performance.now();
     let lastVisual = 0;
     let lastSync = 0;
+    let lastJourneySync = 0;
     const tick = (now) => {
-      const dt = Math.min((now - previous) / 1000, 0.05);
+      const elapsed = Math.min((now - previous) / 1000, 0.12);
       previous = now;
       const keys = keysRef.current;
       let dx = Number(keys.has('d') || keys.has('arrowright')) - Number(keys.has('a') || keys.has('arrowleft'));
       let dy = Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'));
-      const target = targetRef.current;
-      if (!dx && !dy && target) {
-        const tx = target.x - positionRef.current.x;
-        const ty = target.y - positionRef.current.y;
-        const remaining = Math.hypot(tx, ty);
-        if (remaining < 0.14) targetRef.current = null;
-        else {
-          dx = tx / remaining;
-          dy = ty / remaining;
+      let activeRoute = routeRef.current;
+      let routeRemaining = Number.POSITIVE_INFINITY;
+      if (!dx && !dy && activeRoute) {
+        let waypoint = activeRoute.path[activeRoute.index];
+        let remaining = waypoint ? distance(positionRef.current, waypoint) : 0;
+        while (waypoint && remaining < ARRIVAL_DISTANCE) {
+          activeRoute.index += 1;
+          waypoint = activeRoute.path[activeRoute.index];
+          remaining = waypoint ? distance(positionRef.current, waypoint) : 0;
+        }
+        if (!waypoint) {
+          routeRef.current = null;
+          if (activeRoute.object) startInteractionRef.current(activeRoute.object);
+          activeRoute = null;
+        } else {
+          routeRemaining = remaining;
+          dx = (waypoint.x - positionRef.current.x) / remaining;
+          dy = (waypoint.y - positionRef.current.y) / remaining;
         }
       }
       const isMoving = Boolean(dx || dy);
       if (isMoving) {
         const length = Math.hypot(dx, dy) || 1;
-        const speed = 4.5 * dt;
+        const speed = activeRoute
+          ? AUTO_TRAVEL_SPEED * elapsed
+          : MANUAL_TRAVEL_SPEED * Math.min(elapsed, 0.05);
+        const step = activeRoute ? Math.min(speed, routeRemaining) : speed;
         const current = positionRef.current;
-        const nextX = current.x + dx / length * speed;
-        const nextY = current.y + dy / length * speed;
+        const nextX = current.x + dx / length * step;
+        const nextY = current.y + dy / length * step;
         const xCandidate = { x: nextX, y: current.y };
         const yCandidate = { x: isWorldPositionWalkable(xCandidate) ? nextX : current.x, y: nextY };
         positionRef.current = {
@@ -277,6 +363,13 @@ export default function GuildhallScene({
           y: isWorldPositionWalkable(yCandidate) ? nextY : current.y,
         };
         facingRef.current = directionFromDelta(dx, dy, facingRef.current);
+      }
+      if (activeRoute?.object && now - lastJourneySync > 180) {
+        lastJourneySync = now;
+        const remaining = Math.max(0, activeRoute.path.length - activeRoute.index);
+        setJourney((current) => current?.objectId === activeRoute.object.id && current.phase === 'traveling'
+          ? { ...current, remaining }
+          : current);
       }
       if (now - lastVisual > 34) {
         lastVisual = now;
@@ -318,19 +411,31 @@ export default function GuildhallScene({
 
   const projectedPlayer = projectPosition(visualPosition);
   const activeObject = WORLD_OBJECTS.find((object) => object.id === activeObjectRef.current?.id) || null;
+  const journeyObject = SCENE_OBJECTS.find((object) => object.id === journey?.objectId) || null;
+  const journeyCopy = journeyObject ? OBJECT_COPY[journeyObject.id] : null;
+  const journeyPoint = journeyObject ? (OBJECT_SCENE_POINTS[journeyObject.id] || projectPosition(journeyObject)) : null;
+  const routePoints = journey?.phase === 'traveling' && routeRef.current
+    ? [projectedPlayer, ...routeRef.current.path.slice(routeRef.current.index).map(projectPosition)]
+    : [];
+  if (routePoints.length && journeyPoint) routePoints[routePoints.length - 1] = journeyPoint;
+  const journeyProgress = journey?.phase === 'traveling'
+    ? clamp(1 - journey.remaining / Math.max(1, journey.total), 0.05, 0.92)
+    : journey ? 1 : 0;
 
   const moveOnPlate = (event) => {
     if (event.button !== 0 || !plateRef.current) return;
     const rect = plateRef.current.getBoundingClientRect();
-    targetRef.current = sceneToWorld({
+    routeTo(sceneToWorld({
       x: (event.clientX - rect.left) / rect.width * 100,
       y: (event.clientY - rect.top) / rect.height * 100,
-    });
+    }));
   };
 
   const pressDirection = (key, pressed) => {
-    targetRef.current = null;
-    if (pressed) keysRef.current.add(key);
+    if (pressed) {
+      cancelJourney();
+      keysRef.current.add(key);
+    }
     else keysRef.current.delete(key);
   };
 
@@ -343,25 +448,45 @@ export default function GuildhallScene({
           reducedMotion={reducedMotion}
         />
         <span className={scene.environmentShade} aria-hidden="true" />
+        {routePoints.length > 1 && (
+          <svg className={scene.routeOverlay} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points={routePoints.map((point) => `${point.x},${point.y}`).join(' ')} />
+          </svg>
+        )}
+        {journeyObject && journeyPoint && (
+          <span
+            className={scene.objectInteractionAnchor}
+            style={{ '--interaction-x': `${journeyPoint.x}%`, '--interaction-y': `${journeyPoint.y}%` }}
+            aria-hidden="true"
+          >
+            <RealmObjectInteractionMotion
+              accent={journey.accent}
+              action={journey.action}
+              phase={journey.phase}
+              reducedMotion={reducedMotion}
+            />
+          </span>
+        )}
         {SCENE_OBJECTS.map((object) => {
           const projected = OBJECT_SCENE_POINTS[object.id] || projectPosition(object);
           const copy = OBJECT_COPY[object.id] || { title: object.name, detail: object.hint, icon: 'work' };
+          const objectJourney = journey?.objectId === object.id ? journey : null;
           return (
             <button
               type="button"
               key={object.id}
-              className={`${scene.hotspot} ${activePanel === object.panel ? scene.hotspotActive : ''}`}
+              className={`${scene.hotspot} ${activePanel === object.panel ? scene.hotspotActive : ''} ${objectJourney ? scene.hotspotTarget : ''} ${objectJourney?.phase === 'interacting' ? scene.hotspotInteracting : ''}`}
               style={{ '--hotspot-x': `${projected.x}%`, '--hotspot-y': `${projected.y}%` }}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={(event) => {
                 event.stopPropagation();
-                targetRef.current = normalizeWorldPosition({ x: object.x, y: object.y + 1.1 });
-                onObjectOpen(object);
+                routeTo({ x: object.x, y: object.y + 1.1 }, object);
               }}
               aria-label={`${t(copy.title)}: ${t(copy.detail)}`}
+              aria-pressed={Boolean(objectJourney)}
             >
               <span><Icon name={copy.icon} size={16} /></span>
-              <span><strong>{copy.title}</strong><small>{copy.detail}</small></span>
+              <span><strong>{t(copy.title)}</strong><small>{t(objectJourney ? objectJourney.verb : copy.detail)}</small></span>
             </button>
           );
         })}
@@ -380,6 +505,8 @@ export default function GuildhallScene({
           player
           moving={moving}
           facing={facingRef.current}
+          action={journey?.action}
+          actionPhase={journey?.phase}
           emote={activeEmotes[sessionId]}
           reducedMotion={reducedMotion}
         />
@@ -389,18 +516,27 @@ export default function GuildhallScene({
       </div>
 
       <div className={scene.sceneHint}>
-        <span><i />{ROOM_COPY[projectedPlayer.room.id] || projectedPlayer.room.name}</span>
-        <small>Nhấp để đi · WASD để di chuyển · E để mở bàn gần nhất</small>
+        <span><i />{t(ROOM_COPY[projectedPlayer.room.id] || projectedPlayer.room.name)}</span>
+        <small>{t('Nhấp để đi · WASD để di chuyển · E để tương tác')}</small>
       </div>
 
+      {journey && journeyObject && journeyCopy && (
+        <div className={scene.journeyTracker} role="status" aria-live="polite" data-phase={journey.phase}>
+          <span>{t(journey.phase === 'traveling' ? 'Đang di chuyển' : journey.phase === 'interacting' ? journey.verb : 'Bàn làm việc đã mở')}</span>
+          <strong>{t(journeyCopy.title)}</strong>
+          <small>{t(journey.phase === 'traveling' ? 'WASD để hủy hành trình' : journey.progress)}</small>
+          <i aria-hidden="true"><b style={{ width: `${journeyProgress * 100}%` }} /></i>
+        </div>
+      )}
+
       {activeObject && (
-        <button type="button" className={scene.nearbyPrompt} onClick={() => onObjectOpen(activeObject)}>
-          <kbd>E</kbd><span><strong>{activeObject.name}</strong><small>{activeObject.hint}</small></span>
+        <button type="button" className={scene.nearbyPrompt} onClick={() => startObjectInteraction(activeObject)}>
+          <kbd>E</kbd><span><strong>{t(OBJECT_INTERACTIONS[activeObject.id]?.verb || activeObject.name)}</strong><small>{t(activeObject.name)}</small></span>
         </button>
       )}
 
       <div className={scene.signalControl}>
-        <button type="button" aria-expanded={signalOpen} onClick={() => { setSignalOpen((open) => !open); setLocationOpen(false); }}><Icon name="bolt" size={17} /><span>Ra hiệu</span></button>
+        <button type="button" aria-expanded={signalOpen} onClick={() => { setSignalOpen((open) => !open); setLocationOpen(false); }}><Icon name="bolt" size={17} /><span>{t('Ra hiệu')}</span></button>
         {signalOpen && (
           <div className={scene.signalMenu}>
             {REALM_EMOTES.map((emote) => <button type="button" key={emote.id} onClick={() => { onEmote(emote.id); setSignalOpen(false); }}>{emote.label}</button>)}
@@ -409,10 +545,10 @@ export default function GuildhallScene({
       </div>
 
       <div className={scene.locationControl}>
-        <button type="button" aria-label={t('Mở danh sách địa điểm')} aria-expanded={locationOpen} onClick={() => { setLocationOpen((open) => !open); setSignalOpen(false); }}><Icon name="map" size={17} /><span>Địa điểm</span></button>
+        <button type="button" aria-label={t('Mở danh sách địa điểm')} aria-expanded={locationOpen} onClick={() => { setLocationOpen((open) => !open); setSignalOpen(false); }}><Icon name="map" size={17} /><span>{t('Địa điểm')}</span></button>
         {locationOpen && (
           <div className={scene.locationMenu}>
-            <header><span>Guildhall</span><strong>Đi thẳng tới bàn làm việc</strong></header>
+            <header><span>Guildhall</span><strong>{t('Chọn đích đến · nhân vật sẽ tự tìm đường')}</strong></header>
             {SCENE_OBJECTS.map((object) => {
               const copy = OBJECT_COPY[object.id] || { title: object.name, detail: object.hint, icon: 'work' };
               return (
@@ -421,12 +557,11 @@ export default function GuildhallScene({
                   key={object.id}
                   aria-label={`${t('Mở')} ${t(copy.title)}`}
                   onClick={() => {
-                    targetRef.current = normalizeWorldPosition({ x: object.x, y: object.y + 1.1 });
-                    onObjectOpen(object);
+                    routeTo({ x: object.x, y: object.y + 1.1 }, object);
                     setLocationOpen(false);
                   }}
                 >
-                  <Icon name={copy.icon} size={16} /><span><strong>{copy.title}</strong><small>{copy.detail}</small></span>
+                  <Icon name={copy.icon} size={16} /><span><strong>{t(copy.title)}</strong><small>{t(OBJECT_INTERACTIONS[object.id]?.verb || copy.detail)}</small></span>
                 </button>
               );
             })}

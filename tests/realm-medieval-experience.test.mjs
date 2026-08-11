@@ -69,6 +69,11 @@ test('Reforged Guildhall makes the spatial world primary without replacing busin
   assert.match(scene, /guildhall-environment\.png/);
   assert.match(scene, /GuildhallAtmosphere/);
   assert.match(scene, /RealmActorMotion/);
+  assert.match(scene, /RealmObjectInteractionMotion/);
+  assert.match(scene, /OBJECT_INTERACTIONS/);
+  assert.match(scene, /findRealmPath/);
+  assert.match(scene, /phase: 'traveling'/);
+  assert.match(scene, /phase: 'interacting'/);
   assert.match(scene, /isInVoiceRange/);
   assert.match(scene, /realmGeneratedCharacterUrl/);
   assert.match(scene, /realmGeneratedCharacterArchetype/);
@@ -93,6 +98,8 @@ test('Reforged Guildhall makes the spatial world primary without replacing busin
   assert.match(remotion, /numberOfSharedAudioTags=\{0\}/);
   assert.match(remotion, /LivingEnvironmentComposition/);
   assert.match(remotion, /ActorComposition/);
+  assert.match(remotion, /ObjectInteractionComposition/);
+  assert.match(remotion, /actorActionPose/);
   const generatedArt = source('lib/realm-generated-art.js');
   assert.match(generatedArt, /High Elf/);
   assert.match(generatedArt, /Dwarf/);
