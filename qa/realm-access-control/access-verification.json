@@ -507,8 +507,9 @@
       "id": "world-navigation",
       "source": "components/realm/RealmOffice.jsx",
       "signals": [
-        "realmAccessForPanel(businessBridge?.access, item.id)",
-        "disabled={!access.allowed}"
+        "const access = realmAccessForPanel(businessBridge?.access, panel)",
+        "<GuildhallScene",
+        "onObjectOpen={openObject}"
       ],
       "missingSignals": [],
       "status": "verified"

@@ -47,26 +47,36 @@ test('the medieval visual system uses repository assets and remains motion-acces
   assert.match(css, /prefers-reduced-motion/);
 });
 
-test('Living Guildhall makes the spatial world primary without replacing business capabilities', () => {
+test('Reforged Guildhall makes the spatial world primary without replacing business capabilities', () => {
   const office = source('components/realm/RealmOffice.jsx');
+  const scene = source('components/realm/GuildhallScene.jsx');
   const motion = source('components/realm/LivingGuildhallMotion.jsx');
-  const css = source('components/realm/realm-office.module.css');
+  const css = source('components/realm/guildhall-shell.module.css');
   const manifest = JSON.parse(source('package.json'));
 
-  assert.match(office, /The Living Guildhall/);
-  assert.match(office, /Council Voice/);
-  assert.match(office, /Kho bạc Gold/);
+  assert.match(office, /<GuildhallScene/);
+  assert.match(office, /Guildhall của đội ngũ/);
+  assert.match(office, /<MediaDock/);
+  assert.match(office, /<LedgerMode/);
+  assert.match(office, /setLedgerView\('personal'\)/);
   assert.match(office, /data-realm-ledger-root/);
   assert.match(office, /data-realm-ledger-tabs/);
   assert.match(office, /data-realm-ledger-section/);
   assert.match(office, /RoyalTreasuryExchange/);
   assert.match(office, /RewardControlCenter/);
   assert.match(office, /useProximityMedia/);
+  assert.match(scene, /guildhall-environment\.png/);
+  assert.match(scene, /isInVoiceRange/);
+  assert.match(scene, /realmGeneratedCharacterUrl/);
+  assert.match(scene, /window\.addEventListener\('realm:move'/);
+  assert.match(scene, /'arrowup'.*'w'.*'s'.*'d'/);
   assert.match(motion, /prefers-reduced-motion: reduce/);
   assert.match(motion, /ScrollTrigger/);
-  assert.match(css, /Living Guildhall: quiet medieval prestige/);
-  assert.match(css, /\.presenceRibbon/);
-  assert.match(css, /\.locationAccordion/);
+  assert.match(css, /\.commandBar/);
+  assert.match(css, /\.scenePlate/);
+  assert.match(css, /\.actionDock/);
+  assert.match(css, /\.surface/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
   assert.equal(manifest.dependencies.gsap, '^3.15.0');
   assert.equal(manifest.dependencies['@gsap/react'], '^2.1.2');
 });

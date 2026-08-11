@@ -3,7 +3,7 @@ presentation-only-context,22,privacy,lib/realm-experience.js,"REALM_EXPERIENCE_S
 no-record-context,22,privacy,tests/realm-experience.test.mjs,"'recordId' in context, false | 'campaignId' in context, false",,verified
 permission-safe-restore,22,client,components/realm/RealmOffice.jsx,experienceHydratedRef | realmAccessForPanel | realmAccessForSurface | ? 'ledger' | 'briefing',,verified
 realm-erp-handoff,22,navigation,components/realm/RealmOffice.jsx,persistWorkspaceSurface | 'erp_handoff' | ERP · CRM,,verified
-mobile-destination-navigation,22,responsive,components/realm/RealmOffice.jsx,realm-mobile-destination | mobileNavigator | ledger:personal,,verified
+mobile-contextual-navigation,22,responsive,components/realm/RealmOffice.jsx,guild.actionDock | Hành động chính trong Guildhall | setLedgerView('personal'),,verified
 responsive-safe-area,22,style,components/realm/realm-office.module.css,@media (max-width: 620px) | env(safe-area-inset-bottom) | .mobileNavigator | min-height: 44px,,verified
 accessible-navigation,22,accessibility,components/realm/RealmOffice.jsx,"skipLink | aria-live=""polite"" | tabIndex={-1}",,verified
 accessible-onboarding,22,accessibility,components/realm/RealmPilotOnboarding.jsx,"role=""progressbar"" | aria-valuemin=""1"" | không lưu record",,verified
@@ -24,5 +24,5 @@ feedback-loop-signal,23,feedback,components/realm/RealmFeedbackLauncher.jsx,even
 four-journey-evidence,23,measurement,lib/realm-experience.js,"['guild', 'war', 'treasury', 'tavern'] | id: 'four-journey-coverage'",,verified
 deterministic-experience-tests,23,test,tests/realm-experience.test.mjs,Phase 22 continuity context | Phase 23 scorecard is advisory | preserves unrelated configuration,,verified
 experience-auth-boundary-e2e,23,e2e,tests/e2e/realm-smoke.spec.mjs,'/api/realm-demo/experience' | preserve the ERP authentication boundary,,verified
-continuity-responsive-e2e,23,e2e,tests/e2e/realm-smoke.spec.mjs,Realm presentation context restores without persisting business identifiers | name: 'Khu vực' | 'ledger:treasury',,verified
+continuity-responsive-e2e,23,e2e,tests/e2e/realm-smoke.spec.mjs,Realm presentation context restores without persisting business identifiers | name: 'Chronicle' | ledgerView: 'treasury',,verified
 phase23-runbook,23,operations,docs/realms/PHASE-23-EXPERIENCE-PILOT.md,advisory | không tạo event log tăng vô hạn | Go / no-go,,verified

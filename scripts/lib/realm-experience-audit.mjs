@@ -6,7 +6,7 @@ const CONTRACTS = [
   { id: 'no-record-context', phase: 22, layer: 'privacy', source: 'tests/realm-experience.test.mjs', signals: ["'recordId' in context, false", "'campaignId' in context, false"] },
   { id: 'permission-safe-restore', phase: 22, layer: 'client', source: 'components/realm/RealmOffice.jsx', signals: ['experienceHydratedRef', 'realmAccessForPanel', 'realmAccessForSurface', "? 'ledger'", "'briefing'"] },
   { id: 'realm-erp-handoff', phase: 22, layer: 'navigation', source: 'components/realm/RealmOffice.jsx', signals: ['persistWorkspaceSurface', "'erp_handoff'", 'ERP · CRM'] },
-  { id: 'mobile-destination-navigation', phase: 22, layer: 'responsive', source: 'components/realm/RealmOffice.jsx', signals: ['realm-mobile-destination', 'mobileNavigator', 'ledger:personal'] },
+  { id: 'mobile-contextual-navigation', phase: 22, layer: 'responsive', source: 'components/realm/RealmOffice.jsx', signals: ['guild.actionDock', 'Hành động chính trong Guildhall', "setLedgerView('personal')"] },
   { id: 'responsive-safe-area', phase: 22, layer: 'style', source: 'components/realm/realm-office.module.css', signals: ['@media (max-width: 620px)', 'env(safe-area-inset-bottom)', '.mobileNavigator', 'min-height: 44px'] },
   { id: 'accessible-navigation', phase: 22, layer: 'accessibility', source: 'components/realm/RealmOffice.jsx', signals: ['skipLink', 'aria-live="polite"', 'tabIndex={-1}'] },
   { id: 'accessible-onboarding', phase: 22, layer: 'accessibility', source: 'components/realm/RealmPilotOnboarding.jsx', signals: ['role="progressbar"', 'aria-valuemin="1"', 'không lưu record'] },
@@ -27,7 +27,7 @@ const CONTRACTS = [
   { id: 'four-journey-evidence', phase: 23, layer: 'measurement', source: 'lib/realm-experience.js', signals: ["['guild', 'war', 'treasury', 'tavern']", "id: 'four-journey-coverage'"] },
   { id: 'deterministic-experience-tests', phase: 23, layer: 'test', source: 'tests/realm-experience.test.mjs', signals: ['Phase 22 continuity context', 'Phase 23 scorecard is advisory', 'preserves unrelated configuration'] },
   { id: 'experience-auth-boundary-e2e', phase: 23, layer: 'e2e', source: 'tests/e2e/realm-smoke.spec.mjs', signals: ["'/api/realm-demo/experience'", 'preserve the ERP authentication boundary'] },
-  { id: 'continuity-responsive-e2e', phase: 23, layer: 'e2e', source: 'tests/e2e/realm-smoke.spec.mjs', signals: ['Realm presentation context restores without persisting business identifiers', "name: 'Khu vực'", "'ledger:treasury'"] },
+  { id: 'continuity-responsive-e2e', phase: 23, layer: 'e2e', source: 'tests/e2e/realm-smoke.spec.mjs', signals: ['Realm presentation context restores without persisting business identifiers', "name: 'Chronicle'", "ledgerView: 'treasury'"] },
   { id: 'phase23-runbook', phase: 23, layer: 'operations', source: 'docs/realms/PHASE-23-EXPERIENCE-PILOT.md', signals: ['advisory', 'không tạo event log tăng vô hạn', 'Go / no-go'] },
 ];
 

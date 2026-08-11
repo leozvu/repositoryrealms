@@ -180,7 +180,7 @@
       "signals": [
         "persistWorkspaceSurface('erp')",
         "Mở workspace ERP CRM gốc",
-        "Mở ERP · CRM gốc"
+        "ERP · CRM"
       ],
       "missingSignals": [],
       "forbiddenSignals": [],
