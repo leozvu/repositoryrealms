@@ -51,6 +51,7 @@ test('Reforged Guildhall makes the spatial world primary without replacing busin
   const office = source('components/realm/RealmOffice.jsx');
   const scene = source('components/realm/GuildhallScene.jsx');
   const motion = source('components/realm/LivingGuildhallMotion.jsx');
+  const remotion = source('components/realm/GuildhallRemotion.jsx');
   const css = source('components/realm/guildhall-shell.module.css');
   const manifest = JSON.parse(source('package.json'));
 
@@ -66,19 +67,38 @@ test('Reforged Guildhall makes the spatial world primary without replacing busin
   assert.match(office, /RewardControlCenter/);
   assert.match(office, /useProximityMedia/);
   assert.match(scene, /guildhall-environment\.png/);
+  assert.match(scene, /GuildhallAtmosphere/);
+  assert.match(scene, /RealmActorMotion/);
   assert.match(scene, /isInVoiceRange/);
   assert.match(scene, /realmGeneratedCharacterUrl/);
+  assert.match(scene, /realmGeneratedCharacterArchetype/);
   assert.match(scene, /window\.addEventListener\('realm:move'/);
   assert.match(scene, /'arrowup'.*'w'.*'s'.*'d'/);
   assert.match(motion, /prefers-reduced-motion: reduce/);
   assert.match(motion, /ScrollTrigger/);
   assert.match(css, /\.commandBar/);
   assert.match(css, /\.scenePlate/);
+  assert.match(css, /\.sceneOcclusion/);
+  assert.match(css, /\.actorContactShadow/);
   assert.match(css, /\.actionDock/);
   assert.match(css, /\.surface/);
   assert.match(css, /prefers-reduced-motion: reduce/);
   assert.equal(manifest.dependencies.gsap, '^3.15.0');
   assert.equal(manifest.dependencies['@gsap/react'], '^2.1.2');
+  assert.equal(manifest.dependencies.remotion, '^4.0.508');
+  assert.equal(manifest.dependencies['@remotion/player'], '^4.0.508');
+  assert.match(remotion, /from '@remotion\/player'/);
+  assert.match(remotion, /useCurrentFrame/);
+  assert.match(remotion, /autoPlay=\{!reducedMotion\}/);
+  assert.match(remotion, /numberOfSharedAudioTags=\{0\}/);
+  assert.match(remotion, /LivingEnvironmentComposition/);
+  assert.match(remotion, /ActorComposition/);
+  const generatedArt = source('lib/realm-generated-art.js');
+  assert.match(generatedArt, /High Elf/);
+  assert.match(generatedArt, /Dwarf/);
+  assert.match(generatedArt, /Moon Elf/);
+  assert.match(generatedArt, /Halfling/);
+  assert.match(generatedArt, /Half-Orc/);
 });
 
 test('new medieval Realm copy switches fully between Vietnamese and English', () => {

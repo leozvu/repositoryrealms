@@ -227,9 +227,50 @@
   touch-action: none;
 }
 
-.environment { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.environmentPlayer { position: absolute !important; z-index: 0; inset: 0; overflow: hidden !important; pointer-events: none; }
+.remotionEnvironment { overflow: hidden; background: #070b0a; }
+.remotionEnvironmentImage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+.remotionMoonWash {
+  background:
+    radial-gradient(ellipse at 24% 9%, rgba(112, 166, 208, .22), transparent 29%),
+    radial-gradient(ellipse at 92% 30%, rgba(95, 151, 203, .14), transparent 23%);
+  mix-blend-mode: screen;
+}
+.remotionLightShaft {
+  position: absolute;
+  top: -16%;
+  left: 15%;
+  width: 15%;
+  height: 96%;
+  background: linear-gradient(100deg, transparent, rgba(149, 193, 222, .48), transparent);
+  filter: blur(22px);
+  mix-blend-mode: screen;
+  transform-origin: top center;
+}
+.remotionTorchGlow {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 202, 103, .62) 0, rgba(235, 135, 45, .19) 29%, transparent 69%);
+  filter: blur(9px);
+  mix-blend-mode: screen;
+  transform-origin: center;
+}
+.remotionDustField { overflow: hidden; }
+.remotionDustField span {
+  position: absolute;
+  border-radius: 50%;
+  background: #f4ddb0;
+  box-shadow: 0 0 10px rgba(244, 221, 176, .75);
+  mix-blend-mode: screen;
+}
+.remotionVignette {
+  background:
+    radial-gradient(ellipse at 50% 47%, transparent 40%, rgba(1, 4, 3, .16) 75%, rgba(1, 3, 2, .48) 100%),
+    linear-gradient(180deg, rgba(2, 5, 4, .12), transparent 39%, rgba(2, 5, 4, .12));
+}
 .environmentShade {
   position: absolute;
+  z-index: 4;
   inset: 0;
   pointer-events: none;
   background:
@@ -269,7 +310,7 @@
 
 .hotspot {
   position: absolute;
-  z-index: 8;
+  z-index: 145;
   top: var(--hotspot-y);
   left: var(--hotspot-x);
   display: flex;
@@ -287,7 +328,7 @@
   transform: translate(-50%, -50%);
   transition: border-color .25s ease, background .25s ease, transform .35s cubic-bezier(.22, 1, .36, 1);
 }
-.hotspot:hover { z-index: 14; border-color: rgba(225, 189, 104, .45); background: rgba(12, 20, 16, .94); transform: translate(-50%, -53%) scale(1.035); }
+.hotspot:hover { z-index: 160; border-color: rgba(225, 189, 104, .45); background: rgba(12, 20, 16, .94); transform: translate(-50%, -53%) scale(1.035); }
 .hotspot:active { transform: translate(-50%, -50%) scale(.985); }
 .hotspot > span:first-child { display: grid; width: 30px; height: 30px; flex: none; place-items: center; border-radius: 7px; color: #d8ba72; background: rgba(183, 148, 77, .11); }
 .hotspot strong, .hotspot small { display: block; white-space: nowrap; }
@@ -297,29 +338,65 @@
 
 .figure {
   position: absolute;
-  z-index: 11;
   top: var(--figure-y);
   left: var(--figure-x);
   display: block;
-  width: 52px;
-  height: 72px;
+  width: 92px;
+  height: 126px;
   padding: 0;
   border: 0;
   color: #f5efdf;
   background: transparent;
-  filter: drop-shadow(0 11px 7px rgba(0, 0, 0, .62));
-  transform: translate(-50%, -78%);
+  filter: drop-shadow(0 12px 9px rgba(0, 0, 0, .5));
+  transform: translate(-50%, -84%) scale(var(--figure-scale, 1));
+  transform-origin: 50% 100%;
   transition: top .09s linear, left .09s linear;
 }
-.figure img { position: absolute; z-index: 2; bottom: 8px; left: 50%; width: auto; height: 58px; pointer-events: none; image-rendering: auto; transform: translateX(-50%); }
-.figureShadow { position: absolute; z-index: 1; bottom: 7px; left: 50%; width: 29px; height: 10px; border-radius: 50%; background: rgba(0,0,0,.58); filter: blur(2px); transform: translateX(-50%); }
-.figureStatus { position: absolute; z-index: 4; right: 2px; bottom: 9px; width: 7px; height: 7px; border: 1px solid #111a16; border-radius: 50%; background: var(--figure-status); box-shadow: 0 0 9px color-mix(in srgb, var(--figure-status) 70%, transparent); }
-.figureName { position: absolute; z-index: 4; bottom: -4px; left: 50%; max-width: 92px; padding: 2px 5px; overflow: hidden; border-radius: 3px; color: rgba(247, 241, 228, .9); background: rgba(5, 9, 8, .72); font-size: .47rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; transform: translateX(-50%); }
-.figurePlayer { z-index: 13; }
-.figurePlayer::before { position: absolute; z-index: 0; right: 2px; bottom: 2px; left: 2px; height: 42px; border: 1px solid rgba(238, 199, 104, .6); border-radius: 50%; content: ""; box-shadow: 0 0 24px rgba(220, 177, 79, .25); transform: perspective(40px) rotateX(72deg); }
-.figureMoving img { animation: figureWalk .48s ease-in-out infinite alternate; }
+.actorPlayer { position: absolute !important; inset: 0; overflow: visible !important; pointer-events: none; }
+.actorCanvas { overflow: visible; }
+.actorBody { position: absolute; z-index: 3; bottom: 20px; left: 50%; width: 76%; height: 79%; transform-origin: 50% 96%; }
+.actorBody img { position: absolute; z-index: 2; bottom: 0; left: 50%; width: auto; height: 100%; pointer-events: none; image-rendering: auto; transform: translateX(-50%); }
+.actorRim { position: absolute; z-index: 1; inset: 5% 8% 4%; border-radius: 46% 46% 38% 38%; filter: blur(9px); opacity: .7; }
+.actorContactShadow { position: absolute; z-index: 1; bottom: 17px; left: 50%; width: 54%; height: 12%; border-radius: 50%; background: radial-gradient(ellipse, rgba(0,0,0,.8), rgba(0,0,0,.08) 72%, transparent); filter: blur(2px); transform-origin: center; }
+.actorPlayerRing, .actorFootstep { position: absolute; z-index: 0; bottom: 8px; left: 50%; width: 68%; height: 31%; border: 2px solid rgba(238, 199, 104, .65); border-radius: 50%; box-shadow: 0 0 20px rgba(220, 177, 79, .22), inset 0 0 16px rgba(220, 177, 79, .1); transform-origin: center; }
+.actorFootstep { z-index: 0; border-width: 1px; border-color: rgba(238, 222, 185, .55); box-shadow: none; }
+.figureIdentity {
+  position: absolute;
+  z-index: 8;
+  bottom: -8px;
+  left: 50%;
+  display: grid;
+  grid-template-columns: 7px auto;
+  align-items: center;
+  gap: 0 5px;
+  max-width: 140px;
+  padding: 4px 7px;
+  overflow: hidden;
+  border: 1px solid rgba(231, 217, 183, .15);
+  border-radius: 5px;
+  color: rgba(247, 241, 228, .94);
+  background: linear-gradient(180deg, rgba(7, 12, 10, .92), rgba(5, 9, 8, .8));
+  box-shadow: 0 8px 22px rgba(0,0,0,.34);
+  text-align: left;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+.figureIdentity strong { min-width: 0; overflow: hidden; font-size: .48rem; font-weight: 760; line-height: 1.1; text-overflow: ellipsis; }
+.figureIdentity small { grid-column: 2; margin-top: 2px; color: rgba(238,232,218,.46); font-size: .37rem; line-height: 1; }
+.figureStatus { width: 6px; height: 6px; grid-row: 1 / span 2; border: 1px solid #111a16; border-radius: 50%; background: var(--figure-status); box-shadow: 0 0 9px color-mix(in srgb, var(--figure-status) 70%, transparent); }
+.figurePlayer .figureIdentity { border-color: rgba(225, 189, 104, .4); }
 .figureEmote { position: absolute; z-index: 6; top: -13px; left: 50%; max-width: 112px; padding: 5px 7px; border: 1px solid rgba(208, 188, 143, .28); border-radius: 6px; color: #2b2418; background: #eee8da; box-shadow: 0 8px 20px rgba(0,0,0,.28); font-size: .55rem; font-weight: 800; white-space: nowrap; transform: translateX(-50%); }
-@keyframes figureWalk { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(-3px); } }
+
+.sceneOcclusion {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: url('/realms/assets/guildhall-reforged/guildhall-environment.png') center / 100% 100% no-repeat;
+}
+.occlusionStrategy { z-index: 84; clip-path: polygon(55% 32%, 77% 31%, 82% 58%, 57% 63%); }
+.occlusionCouncil { z-index: 87; clip-path: polygon(34% 39%, 53% 40%, 57% 63%, 36% 69%); }
+.occlusionTreasury { z-index: 89; clip-path: polygon(13% 53%, 30% 52%, 31% 68%, 16% 72%); }
 
 .nearbyPrompt {
   position: fixed;
@@ -502,8 +579,8 @@
   .hotspot { min-width: 0; width: 38px; height: 38px; padding: 0; border-radius: 9px; transform: translate(-50%, -50%); }
   .hotspot > span:first-child { width: 100%; height: 100%; }
   .hotspot > span:last-child { display: none; }
-  .figure { width: 44px; height: 64px; }
-  .figure img { height: 51px; }
+  .figure { width: 62px; height: 86px; }
+  .actorBody img { height: 100%; }
   .sceneHint { display: none; }
   .mobileDpad { display: grid; bottom: 105px; left: 12px; }
   .signalControl { right: 12px; bottom: 106px; }

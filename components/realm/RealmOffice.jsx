@@ -101,7 +101,19 @@ import guild from './guildhall-shell.module.css';
 
 const PROFILE_STORAGE_KEY = 'crmegoric-realms-profile-v1';
 const GUEST_ID_STORAGE_KEY = 'crmegoric-realms-guest-id-v1';
-const PROFILE_ROLES = ['Realm Builder', 'Questsmith', 'Guild Master', 'Alchemist', 'Scout'];
+const PROFILE_ROLES = [
+  'High Elf · Guild Steward',
+  'Dwarf · Forge Engineer',
+  'Human · Goldkeeper',
+  'Moon Elf · Archivist',
+  'Halfling · Community Host',
+  'Half-Orc · Project Warden',
+  'Realm Builder',
+  'Questsmith',
+  'Guild Master',
+  'Alchemist',
+  'Scout',
+];
 const ERP_SYNC_REQUESTED = process.env.NEXT_PUBLIC_REALM_ERP_SYNC === '1';
 const GENERATED_ART_REQUESTED = realmGeneratedArtEnabled();
 const ENVIRONMENT_ART_REQUESTED = realmGeneratedEnvironmentEnabled();
@@ -2359,7 +2371,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
           <div className={styles.profilePreview}>
             <span className={styles.profileAvatar} style={{ '--avatar-color': profileDraft.color }}>
               <span className={styles.portraitFallback}>{initials(profileDraft.name || DEFAULT_PROFILE.name)}</span>
-              <img className={styles.portraitImage} src={realmGeneratedCharacterPortraitUrl(profileDraft.name || DEFAULT_PROFILE.name)} alt="" aria-hidden="true" />
+              <img className={styles.portraitImage} src={realmGeneratedCharacterPortraitUrl(profileDraft)} alt="" aria-hidden="true" />
               <RealPortrait userId={viewerRealUserId} className={styles.portraitImage} />
             </span>
             <span><strong>{profileDraft.name || DEFAULT_PROFILE.name}</strong><small>{profileDraft.role}</small></span>

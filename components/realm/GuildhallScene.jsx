@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '@/components/ui';
 import { useLanguage } from '@/components/LanguageProvider';
 import { isInVoiceRange } from '@/lib/realm-protocol';
-import { realmGeneratedCharacterUrl } from '@/lib/realm-generated-art';
+import { realmGeneratedCharacterArchetype, realmGeneratedCharacterUrl } from '@/lib/realm-generated-art';
 import { REALM_EMOTES } from '@/lib/realm-social';
+import { GuildhallAtmosphere, RealmActorMotion } from './GuildhallRemotion';
 import {
   ROOMS,
   WORLD,
@@ -19,12 +20,12 @@ import {
 import scene from './guildhall-shell.module.css';
 
 const SCENE_ROOMS = Object.freeze({
-  guild: Object.freeze({ x: 73, y: 18, w: 20, h: 24 }),
-  war: Object.freeze({ x: 55, y: 27, w: 22, h: 25 }),
-  treasury: Object.freeze({ x: 8, y: 36, w: 26, h: 27 }),
-  tavern: Object.freeze({ x: 28, y: 13, w: 25, h: 20 }),
-  hall: Object.freeze({ x: 32, y: 37, w: 29, h: 31 }),
-  forge: Object.freeze({ x: 67, y: 53, w: 24, h: 24 }),
+  guild: Object.freeze({ x: 75, y: 41, w: 13, h: 21 }),
+  war: Object.freeze({ x: 53, y: 28, w: 27, h: 32 }),
+  treasury: Object.freeze({ x: 15, y: 49, w: 18, h: 27 }),
+  tavern: Object.freeze({ x: 37, y: 25, w: 13, h: 13 }),
+  hall: Object.freeze({ x: 28, y: 65, w: 32, h: 14 }),
+  forge: Object.freeze({ x: 67, y: 60, w: 19, h: 17 }),
 });
 
 const OBJECT_COPY = Object.freeze({
@@ -54,7 +55,7 @@ const OBJECT_SCENE_POINTS = Object.freeze({
   'treasury-chest': Object.freeze({ x: 20, y: 50 }),
   'tavern-board': Object.freeze({ x: 37, y: 22 }),
   'quest-board': Object.freeze({ x: 50, y: 44 }),
-  'realm-gate': Object.freeze({ x: 42, y: 72 }),
+  'realm-gate': Object.freeze({ x: 27, y: 81 }),
   'arcane-forge': Object.freeze({ x: 78, y: 66 }),
 });
 
@@ -118,19 +119,50 @@ function initials(name) {
   return String(name || '?').split(/\s+/).filter(Boolean).slice(-2).map((part) => part[0]).join('').toUpperCase();
 }
 
-function RealmFigure({ person, player = false, moving = false, facing = 'down', emote, onSelect, interactionLabel }) {
+function usePrefersReducedMotion() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener?.('change', update);
+    return () => media.removeEventListener?.('change', update);
+  }, []);
+
+  return reducedMotion;
+}
+
+function RealmFigure({ person, player = false, moving = false, facing = 'down', emote, onSelect, interactionLabel, reducedMotion }) {
   const projected = projectPosition(person);
-  const identity = player ? person.name : person.id || person.userId || person.name;
+  const identity = person;
+  const archetype = realmGeneratedCharacterArchetype(identity);
+  const accent = STATUS_COLORS[person.status] || STATUS_COLORS.available;
+  const depthScale = clamp(0.76 + projected.y * 0.0042, 0.88, 1.12);
   const content = (
     <>
-      <span className={scene.figureShadow} />
-      <img src={realmGeneratedCharacterUrl(identity, facing)} alt="" aria-hidden="true" />
-      <span className={scene.figureStatus} style={{ '--figure-status': STATUS_COLORS[person.status] || STATUS_COLORS.available }} />
-      <span className={scene.figureName}>{player ? 'Bạn' : person.name}</span>
+      <RealmActorMotion
+        spriteUrl={realmGeneratedCharacterUrl(identity, facing)}
+        moving={moving}
+        facing={facing}
+        player={player}
+        accent={accent}
+        reducedMotion={reducedMotion}
+      />
+      <span className={scene.figureIdentity}>
+        <span className={scene.figureStatus} style={{ '--figure-status': accent }} />
+        <strong>{player ? 'Bạn' : person.name}</strong>
+        <small>{archetype.race} · {archetype.role}</small>
+      </span>
       {emote && <span className={scene.figureEmote}>{emote.mark || emote.label}</span>}
     </>
   );
-  const style = { '--figure-x': `${projected.x}%`, '--figure-y': `${projected.y}%` };
+  const style = {
+    '--figure-x': `${projected.x}%`,
+    '--figure-y': `${projected.y}%`,
+    '--figure-scale': depthScale,
+    zIndex: 20 + Math.round(projected.y),
+  };
   const className = `${scene.figure} ${player ? scene.figurePlayer : ''} ${moving ? scene.figureMoving : ''}`;
   if (!onSelect) return <span className={className} style={style} data-room={projected.room.id}>{content}</span>;
   return <button type="button" className={className} style={style} data-room={projected.room.id} onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); onSelect(person); }} aria-label={interactionLabel || `Mở tương tác với ${person.name}`}>{content}</button>;
@@ -152,6 +184,7 @@ export default function GuildhallScene({
   onEmote,
 }) {
   const { t } = useLanguage();
+  const reducedMotion = usePrefersReducedMotion();
   const plateRef = useRef(null);
   const positionRef = useRef(normalizeWorldPosition(position));
   const targetRef = useRef(null);
@@ -304,7 +337,11 @@ export default function GuildhallScene({
   return (
     <section className={scene.sceneStage} aria-label={t('Không gian Guildhall tương tác')}>
       <div ref={plateRef} className={scene.scenePlate} onPointerDown={moveOnPlate} data-room={projectedPlayer.room.id}>
-        <img className={scene.environment} src="/realms/assets/guildhall-reforged/guildhall-environment.png" alt={t('Đại sảnh Guildhall nhìn từ trên cao với bàn hội đồng, bàn dự án, kho bạc và khu nhân sự')} draggable="false" />
+        <GuildhallAtmosphere
+          imageUrl="/realms/assets/guildhall-reforged/guildhall-environment.png"
+          imageAlt={t('Đại sảnh Guildhall nhìn từ trên cao với bàn hội đồng, bàn dự án, kho bạc và khu nhân sự')}
+          reducedMotion={reducedMotion}
+        />
         <span className={scene.environmentShade} aria-hidden="true" />
         {SCENE_OBJECTS.map((object) => {
           const projected = OBJECT_SCENE_POINTS[object.id] || projectPosition(object);
@@ -335,15 +372,20 @@ export default function GuildhallScene({
             emote={activeEmotes[person.id]}
             onSelect={onPerson}
             interactionLabel={`${t('Mở tương tác với')} ${person.name}`}
+            reducedMotion={reducedMotion}
           />
         ))}
         <RealmFigure
-          person={{ ...visualPosition, id: sessionId, name: playerProfile.name, status: playerStatus }}
+          person={{ ...visualPosition, id: sessionId, name: playerProfile.name, role: playerProfile.role, status: playerStatus }}
           player
           moving={moving}
           facing={facingRef.current}
           emote={activeEmotes[sessionId]}
+          reducedMotion={reducedMotion}
         />
+        <span className={`${scene.sceneOcclusion} ${scene.occlusionStrategy}`} aria-hidden="true" />
+        <span className={`${scene.sceneOcclusion} ${scene.occlusionCouncil}`} aria-hidden="true" />
+        <span className={`${scene.sceneOcclusion} ${scene.occlusionTreasury}`} aria-hidden="true" />
       </div>
 
       <div className={scene.sceneHint}>

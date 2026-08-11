@@ -9,6 +9,7 @@ test-results/
 *.db-journal
 .DS_Store
 .claude/
+.codex-runtime/
 
 .vercel
 supabase/

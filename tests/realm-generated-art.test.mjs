@@ -141,16 +141,20 @@ test('character asset catalog contains six complete four-direction sets', () => 
     [...new Set(assets.map((asset) => asset.direction))],
     [...REALM_GENERATED_DIRECTIONS],
   );
-  assert.ok(assets.every((asset) => asset.url.endsWith('.png')));
+  assert.ok(assets.every((asset) => asset.url.endsWith('.webp')));
 });
 
 test('identity maps deterministically to a bounded character slot and URL', () => {
   const first = realmGeneratedCharacterSlot('user-42');
   assert.equal(realmGeneratedCharacterSlot('user-42'), first);
   assert.ok(first >= 1 && first <= 6);
-  assert.match(realmGeneratedCharacterUrl('user-42', 'left'), /character-0[1-6]-left\.png$/);
+  assert.match(realmGeneratedCharacterUrl('user-42', 'left'), /character-0[1-6]-left\.webp$/);
   assert.match(realmGeneratedCharacterKey('user-42', 'up'), /^0[1-6]:up$/);
-  assert.match(realmGeneratedCharacterPortraitUrl('user-42'), /characters\/directions\/character-0[1-6]-down\.png$/);
+  assert.match(realmGeneratedCharacterPortraitUrl('user-42'), /guildhall-reforged\/characters\/character-0[1-6]-down\.webp$/);
+  assert.equal(realmGeneratedCharacterSlot({ name: 'A', role: 'High Elf · Guild Steward' }), 1);
+  assert.equal(realmGeneratedCharacterSlot({ name: 'B', role: 'Dwarf · Forge Engineer' }), 2);
+  assert.equal(realmGeneratedCharacterSlot({ name: 'C', role: 'Moon Elf · Archivist' }), 4);
+  assert.equal(realmGeneratedCharacterSlot({ name: 'D', role: 'Half-Orc · Project Warden' }), 6);
 });
 
 test('movement delta resolves a stable top-down facing direction', () => {
