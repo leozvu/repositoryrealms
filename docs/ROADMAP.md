@@ -2,6 +2,12 @@
 
 Cập nhật 2026-07-24 · Chốt bởi founder (Vũ Lương Sơn) · Nhánh làm việc `fix/crm-erp`
 
+## Realm flagship spatial rebuild
+
+Kế hoạch đang hoạt động cho việc đập và xây lại `/realm-demo` theo chuẩn spatial coworking medieval-fantasy, với game feel và quality gate benchmark AAA: [`docs/realms/REALM-AAA-SPATIAL-REBUILD-PLAN.md`](realms/REALM-AAA-SPATIAL-REBUILD-PLAN.md).
+
+Kế hoạch này là nguồn sự thật cho world runtime mới. Nó bảo toàn business capability, RepositoryRealms authorization, receipt, audit và ERP fallback; đồng thời thay thế kiến trúc single-image, DOM hotspot, static character và panel-first interaction hiện tại.
+
 ## Ba quyết định định hình sản phẩm
 
 | Câu hỏi | Quyết định | Hệ quả |
