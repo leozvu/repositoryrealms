@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Icon, Avatar, useToast } from '@/components/ui';
+import { Icon, Avatar, FormModal, useResource, useToast } from '@/components/ui';
+import { daysFromNow } from '@/lib/format';
 import styles from './team-work.module.css';
 
 const OPEN = new Set(['todo', 'doing', 'in_progress', 'review', 'waiting', 'blocked']);
@@ -175,11 +176,13 @@ function ActionPanel({ task, members, allTasks, busy, onClose, onAction }) {
 
 export default function TeamWorkPage() {
   const toast = useToast();
+  const projects = useResource('projects');
   const [model, setModel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState('');
   const [selected, setSelected] = useState(null);
+  const [creating, setCreating] = useState(false);
   const [drag, setDrag] = useState(null); // {memberId, task, index, overId} — kéo thả trong hàng đợi 1 nhân viên
 
   const load = useCallback(async () => {
@@ -203,6 +206,41 @@ export default function TeamWorkPage() {
     ...(model?.unassigned || []),
   ], [model]);
   const members = (model?.members || []).map((row) => row.member);
+
+  const createDelegation = async (draft) => {
+    setBusyId('new-task');
+    try {
+      const response = await fetch('/api/execution/actions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': `team-work:task.delegate.create:${crypto.randomUUID()}`,
+        },
+        body: JSON.stringify({
+          action: 'task.delegate.create',
+          entityId: `task-draft:${crypto.randomUUID()}`,
+          title: draft.title,
+          assigneeId: draft.assigneeId,
+          projectId: draft.projectId || null,
+          dueDate: draft.dueDate || null,
+          priority: 'medium',
+          note: draft.note || null,
+        }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || 'Không thể giao việc mới.');
+      if (!body?.repository?.receiptId) throw new Error('Task chưa có receipt xác nhận.');
+      toast('Đã giao việc mới, người nhận sẽ có thông báo và receipt.');
+      setCreating(false);
+      await load();
+      return true;
+    } catch (requestError) {
+      toast(requestError.message || 'Không thể giao việc mới.', 'error');
+      return false;
+    } finally {
+      setBusyId('');
+    }
+  };
 
   const act = async (command) => {
     setBusyId(command.entityId);
@@ -232,7 +270,10 @@ export default function TeamWorkPage() {
     <div className={styles.page}>
       <header className={styles.hero}>
         <div><p className={styles.eyebrow}>Team work orchestrator</p><h1>Quản lý công việc</h1><p>Nhìn tất cả nhân viên thuộc quyền và hàng đợi việc của từng người. Kéo thả (hoặc nút Lên/Xuống) để sắp lại thứ tự ưu tiên cho nhân viên khi thấy chưa hợp lý; không xếp hạng con người và không suy diễn năng suất từ trạng thái online.</p></div>
-        <button className="btn btn-outline" onClick={load} disabled={loading}><Icon name="repeat" size={16} /> Làm mới</button>
+        <div className={styles.heroActions}>
+          <button className="btn btn-primary" onClick={() => setCreating(true)} disabled={loading || !members.length}><Icon name="plus" size={16} /> Giao việc mới</button>
+          <button className="btn btn-outline" onClick={load} disabled={loading}><Icon name="repeat" size={16} /> Làm mới</button>
+        </div>
       </header>
       <section className={styles.metrics} aria-label="Tóm tắt team">
         {[
@@ -280,6 +321,19 @@ export default function TeamWorkPage() {
           </article>)}
         </div>
       </section>}
+      {creating && <FormModal
+        title="Giao việc mới"
+        fields={[
+          { key: 'title', label: 'Tên công việc', required: true, full: true },
+          { key: 'assigneeId', label: 'Giao cho', required: true, type: 'select', options: [{ value: '', label: '— Chọn người thuộc quyền —' }, ...members.map((member) => ({ value: member.id, label: member.name }))] },
+          { key: 'projectId', label: 'Dự án', type: 'select', options: [{ value: '', label: '— Việc chung —' }, ...projects.rows.map((project) => ({ value: project.id, label: project.name }))] },
+          { key: 'dueDate', label: 'Deadline', type: 'date' },
+          { key: 'note', label: 'Mô tả / kết quả mong đợi', type: 'textarea', full: true },
+        ]}
+        data={{ assigneeId: '', projectId: '', dueDate: daysFromNow(3), note: '' }}
+        onClose={() => setCreating(false)}
+        onSave={createDelegation}
+      />}
     </div>
   );
 }

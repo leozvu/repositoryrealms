@@ -29,9 +29,9 @@ export async function POST(req, { params }) {
   if (!user) return NextResponse.json({ error: 'unauthorized — thiếu hoặc sai Bearer API key', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  let data = await req.json();
-  if (cfg.beforeCreate) data = await cfg.beforeCreate(data, user, prisma);
   try {
+    let data = await req.json();
+    if (cfg.beforeCreate) data = await cfg.beforeCreate(data, user, prisma);
     const icp = await interceptWrite(params.resource, null, data, user);
     if (icp?.block) return NextResponse.json({ _blocked: true, _notice: icp.block });
     if (icp?.data) data = icp.data;

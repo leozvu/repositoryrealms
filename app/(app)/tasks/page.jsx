@@ -8,7 +8,7 @@ import { hasAny } from '@/lib/perm';
 const RECUR_OPTS = [{ value: '', label: 'Không lặp' }, { value: 'weekly', label: 'Hàng tuần' }, { value: 'monthly', label: 'Hàng tháng' }];
 
 /* ---------- v3.7: modal chi tiết việc — form + checklist + bình luận + ghi giờ ---------- */
-function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, onDelete, onClose }) {
+function TaskDetailModal({ task, projects, users, allTasks, isMgmt, canEditAssignee, me, onSave, onDelete, onClose }) {
   // v3.13: lọc ngay ở server theo taskId/projectId. Trước đây mỗi lần MỞ MỘT công việc là
   // kéo về NGUYÊN bảng TaskComment + TimeLog + TaskEvent + Phase của cả công ty rồi lọc
   // bằng JS trong trình duyệt — 30 người mở việc cả ngày, mỗi lần vài chục nghìn dòng.
@@ -78,9 +78,9 @@ function TaskDetailModal({ task, projects, users, allTasks, isMgmt, me, onSave, 
             {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select></div>
         <div className="field"><label>Người phụ trách</label>
-          <select value={f.assigneeId} onChange={e => set('assigneeId', e.target.value)} disabled={!isMgmt && task.assigneeId !== me?.id}>
+          <select value={f.assigneeId} onChange={e => set('assigneeId', e.target.value)} disabled={!canEditAssignee}>
             {users.filter(u => u.status === 'active').map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-          </select></div>
+          </select>{isMgmt && !canEditAssignee && <div className="hint">Trưởng nhóm phân công lại theo phạm vi team tại màn Quản lý công việc.</div>}</div>
         <div className="field"><label>Trạng thái</label>
           <select value={f.status} onChange={e => set('status', e.target.value)}>
             {TASK_COLS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
@@ -188,7 +188,7 @@ export default function TasksPage() {
   const { data: session } = useSession();
   const user = session?.user;
   const isMgmt = hasAny(user, ['PM', 'LEAD']); // quản lý công việc: PM, Trưởng nhóm + GĐ
-  const { rows, loading, create, update, remove } = useResource('tasks');
+  const { rows, loading, create, update, remove, refresh } = useResource('tasks');
   const projects = useResource('projects');
   const users = useResource('users');
   const teams = useResource('teams');
@@ -247,7 +247,7 @@ export default function TasksPage() {
   ];
   // Thêm công việc: quản lý chọn được người phụ trách bất kỳ; nhân viên tự thêm cho MÌNH.
   const ADD_FIELDS = isMgmt
-    ? [BASE_FIELDS[0], BASE_FIELDS[1], { key: 'assigneeId', label: 'Người phụ trách', type: 'select', options: activeStaff.map(u => ({ value: u.id, label: u.name })) }, BASE_FIELDS[2]]
+    ? [BASE_FIELDS[0], BASE_FIELDS[1], { key: 'assigneeId', label: 'Người phụ trách', type: 'select', options: [{ value: '', label: '— Chưa phân công —' }, ...subordinates.map(u => ({ value: u.id, label: u.name }))] }, BASE_FIELDS[2]]
     : BASE_FIELDS;
   const ASSIGN_FIELDS = [
     BASE_FIELDS[0],
@@ -262,6 +262,55 @@ export default function TasksPage() {
     && (label === 'all' || parseItems(t.labels).includes(label)));
   const canDrag = t => isMgmt || t.assigneeId === user?.id;
   const blockers = t => parseItems(t.dependsOn).map(id => rows.find(r => r.id === id)).filter(d => d && d.status !== 'done');
+
+  const delegateTask = async (draft) => {
+    const response = await fetch('/api/execution/actions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': `tasks:task.delegate.create:${crypto.randomUUID()}`,
+      },
+      body: JSON.stringify({
+        action: 'task.delegate.create',
+        entityId: `task-draft:${crypto.randomUUID()}`,
+        title: draft.title,
+        assigneeId: draft.assigneeId,
+        projectId: draft.projectId || null,
+        dueDate: draft.dueDate || null,
+        priority: 'medium',
+        note: draft.note || null,
+      }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || 'Không thể giao việc.', 'error'); return false; }
+    if (!body?.repository?.receiptId) { toast('Task chưa có receipt xác nhận.', 'error'); return false; }
+    await refresh();
+    return true;
+  };
+
+  const assignExistingTask = async (task, draft) => {
+    const response = await fetch('/api/execution/actions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': `tasks:task.assign:${task.id}:${crypto.randomUUID()}`,
+      },
+      body: JSON.stringify({
+        action: 'task.assign',
+        entityId: task.id,
+        expectedAssigneeId: task.assigneeId || null,
+        assigneeId: draft.assigneeId,
+        expectedDueDate: task.dueDate || null,
+        dueDate: draft.dueDate || null,
+        expectedPriority: task.priority || 'medium',
+        priority: draft.priority || 'medium',
+      }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) { toast(body.error || 'Không thể phân công lại.', 'error'); return false; }
+    if (!body?.repository?.receiptId) { toast('Phân công chưa có receipt xác nhận.', 'error'); return false; }
+    return true;
+  };
 
   const drop = async (status, tid) => {
     setOverCol(null);
@@ -278,6 +327,16 @@ export default function TasksPage() {
   const bulkUpdate = async data => {
     for (const id of sel) await update(id, data);
     toast(`Đã cập nhật ${sel.size} việc`); setSel(new Set()); setSelMode(false);
+  };
+  const bulkAssign = async (assigneeId) => {
+    let changed = 0;
+    for (const id of sel) {
+      const task = rows.find(row => row.id === id);
+      if (task && await assignExistingTask(task, { assigneeId, dueDate: task.dueDate, priority: task.priority })) changed += 1;
+    }
+    await refresh();
+    toast(`Đã phân công ${changed}/${sel.size} việc với receipt.`);
+    setSel(new Set()); setSelMode(false);
   };
 
   // v3.12: tuổi việc + thẻ dùng chung
@@ -369,9 +428,9 @@ export default function TasksPage() {
       {selMode && sel.size > 0 && (
         <div className="card" style={{ marginBottom: 12, padding: '10px 14px', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', borderLeft: '4px solid var(--primary)' }}>
           <b style={{ fontSize: '.85rem' }}>Đã chọn {sel.size} việc:</b>
-          <select className="filter" defaultValue="" onChange={e => { if (e.target.value) { bulkUpdate({ assigneeId: e.target.value }); e.target.value = ''; } }}>
+          <select className="filter" defaultValue="" onChange={e => { if (e.target.value) { bulkAssign(e.target.value); e.target.value = ''; } }}>
             <option value="">Gán cho…</option>
-            {users.rows.filter(u => u.status === 'active').map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+            {subordinates.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
           </select>
           <select className="filter" defaultValue="" onChange={e => { if (e.target.value) { bulkUpdate({ status: e.target.value }); e.target.value = ''; } }}>
             <option value="">Đổi trạng thái…</option>
@@ -399,22 +458,36 @@ export default function TasksPage() {
       {modal?.mode === 'add' && <FormModal title={isMgmt ? 'Thêm công việc' : 'Thêm việc cho tôi'} fields={ADD_FIELDS}
         data={{ priority: 'medium', dueDate: daysFromNow(3), projectId: proj !== 'all' ? proj : '', recur: '' }}
         onClose={() => setModal(null)}
-        onSave={async d => { await create({ ...d, status: 'todo', assigneeId: isMgmt ? (d.assigneeId || null) : user?.id, projectId: d.projectId || null, recur: d.recur || null, estHours: +d.estHours || 0 }); toast('Đã thêm công việc'); }} />}
+        onSave={async d => {
+          if (isMgmt && d.assigneeId) {
+            const delegated = await delegateTask(d);
+            if (!delegated) return false;
+            toast(`Đã giao việc cho ${userName(d.assigneeId)} — có receipt và audit.`);
+            return true;
+          }
+          await create({ ...d, status: 'todo', assigneeId: isMgmt ? null : user?.id, projectId: d.projectId || null, recur: d.recur || null, estHours: +d.estHours || 0 });
+          toast('Đã thêm công việc');
+          return true;
+        }} />}
       {modal?.mode === 'assign' && <FormModal title="Giao việc" fields={ASSIGN_FIELDS}
         data={{ priority: 'medium', dueDate: daysFromNow(3), projectId: proj !== 'all' ? proj : '', recur: '', assigneeId: '' }}
         onClose={() => setModal(null)}
         onSave={async d => {
           if (!d.assigneeId) { toast('Chọn người nhận việc', 'error'); return false; }
-          const r = await create({ ...d, status: 'todo', projectId: d.projectId || null, recur: d.recur || null, estHours: +d.estHours || 0 });
-          if (r) toast(`Đã giao việc cho ${userName(d.assigneeId)} — người nhận sẽ có thông báo 🔔`);
+          const r = await delegateTask(d);
+          if (r) toast(`Đã giao việc cho ${userName(d.assigneeId)} — người nhận sẽ có thông báo và receipt.`);
+          return r;
         }} />}
       {modal?.mode === 'edit' && <TaskDetailModal task={modal.row} projects={projects.rows} users={users.rows} allTasks={rows}
-        isMgmt={isMgmt} me={user} onClose={() => setModal(null)}
+        isMgmt={isMgmt} canEditAssignee={isCompanyMgmt} me={user} onClose={() => setModal(null)}
         onDelete={() => setModal({ mode: 'del', row: modal.row })}
         onSave={async f => {
+          const assignmentChanged = isCompanyMgmt && f.assigneeId && f.assigneeId !== modal.row.assigneeId;
+          if (assignmentChanged && !(await assignExistingTask(modal.row, f))) return false;
           const result = await update(modal.row.id, {
-            title: f.title, projectId: f.projectId || null, assigneeId: f.assigneeId || null,
-            priority: f.priority, status: f.status, dueDate: f.dueDate || null, recur: f.recur || null,
+            title: f.title, projectId: f.projectId || null,
+            ...(!assignmentChanged ? { assigneeId: f.assigneeId || null, priority: f.priority, dueDate: f.dueDate || null } : {}),
+            status: f.status, recur: f.recur || null,
             estHours: +f.estHours || 0, phaseId: f.phaseId || null, labels: JSON.stringify(f.labels || []),
             note: f.note, dependsOn: JSON.stringify(f.dependsOn || []), checklist: JSON.stringify(f.checklist || []),
           });

@@ -22,7 +22,10 @@ export async function PUT(req, { params }) {
   if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
-  if (cfg.canWriteRow && !cfg.canWriteRow(row, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  const rowWritable = cfg.canWriteRowAsync
+    ? await cfg.canWriteRowAsync(row, user, prisma)
+    : !cfg.canWriteRow || cfg.canWriteRow(row, user);
+  if (!rowWritable) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   let data = await req.json();
   delete data.id;
   if (cfg.filterUpdate) data = cfg.filterUpdate(data, user);
@@ -65,7 +68,10 @@ export async function DELETE(req, { params }) {
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
   // v3.7: xóa cũng phải qua kiểm tra hàng (VD bình luận chỉ chủ nhân xóa; GĐ luôn được)
-  if (cfg.canWriteRow && !isDirector(user) && !cfg.canWriteRow(row, user)) {
+  const rowDeletable = cfg.canWriteRowAsync
+    ? await cfg.canWriteRowAsync(row, user, prisma)
+    : !cfg.canWriteRow || cfg.canWriteRow(row, user);
+  if (!isDirector(user) && !rowDeletable) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   }
   try {

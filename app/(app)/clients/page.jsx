@@ -5,11 +5,12 @@ import { useSession } from 'next-auth/react';
 import { useResource, useServiceLines, Icon, FormModal, ConfirmDialog, EmptyState, ExportCsv, useToast } from '@/components/ui';
 import { ActivitiesModal } from '@/components/Activities';
 import { initials } from '@/lib/format';
-import { hasAny } from '@/lib/perm';
+import { hasAny, isDirector } from '@/lib/perm';
 
 export default function ClientsPage() {
   const { data: session } = useSession();
   const isMgmt = hasAny(session?.user, ['AM']); // CRM write: Account/Sales + Giám đốc
+  const canDeleteClient = isDirector(session?.user);
   const { rows, create, update, remove } = useResource('clients');
   const serviceLines = useServiceLines(); // v3.37: mảng dịch vụ theo công ty (thêm/sửa trong Cài đặt)
   const [q, setQ] = useState('');
@@ -64,7 +65,7 @@ export default function ClientsPage() {
                     <button className="icon-btn" style={{ color: 'var(--primary)' }} title="Nhật ký & lịch hẹn"
                       onClick={() => setModal({ mode: 'acts', row: c })}><Icon name="clock" size={16} /></button>
                     <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: c })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
-                    <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: c })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
+                    {canDeleteClient && <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: c })} aria-label="Xóa"><Icon name="trash" size={16} /></button>}
                   </div></td>
                 )}
               </tr>
@@ -77,7 +78,7 @@ export default function ClientsPage() {
         onSave={async d => { await create(d); toast('Đã thêm khách hàng'); }} />}
       {modal?.mode === 'edit' && <FormModal title="Sửa khách hàng" fields={FIELDS} data={modal.row} onClose={() => setModal(null)}
         onSave={async d => { await update(modal.row.id, d); toast('Đã cập nhật'); }} />}
-      {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa khách hàng "${modal.row.name}"?`} onClose={() => setModal(null)}
+      {canDeleteClient && modal?.mode === 'del' && <ConfirmDialog msg={`Xóa khách hàng "${modal.row.name}"?`} onClose={() => setModal(null)}
         onYes={async () => { const r = await remove(modal.row.id); if (r) toast('Đã xóa'); }} />}
       {modal?.mode === 'acts' && <ActivitiesModal refType="client" refId={modal.row.id} name={modal.row.name} onClose={() => setModal(null)} />}
     </>

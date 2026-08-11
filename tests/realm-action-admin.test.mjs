@@ -27,6 +27,7 @@ function taskDb(overrides = {}) {
       findMany: async () => [],
     },
     user: { findUnique: async () => overrides.target || { id: 'staff-2', teamId: 'delivery', status: 'active', userType: 'employee' } },
+    team: { findMany: async () => overrides.managedTeams || [] },
     $transaction: async (fn) => fn(tx),
   };
   return { db, calls };
@@ -108,6 +109,52 @@ test('Trưởng Guild không thể phân công ra ngoài team', async () => {
     idempotencyKey: `${KEY}:outside-team`,
   }), (error) => error.code === 'realm_assignment_target_outside_scope');
   assert.equal(scoped.calls.update, null);
+});
+
+test('Trưởng nhóm đứng tên Team vẫn giao được Task chưa phân cho thành viên thuộc quyền', async () => {
+  const scoped = taskDb({
+    before: {
+      id: 'task-1', title: 'Unassigned work', assigneeId: null, status: 'todo',
+      dueDate: null, priority: 'medium', dependsOn: '[]', assignee: null,
+    },
+    target: { id: 'staff-2', teamId: 'delivery', status: 'active', userType: 'employee' },
+    managedTeams: [{ id: 'delivery' }],
+  });
+  const result = await executeRealmRecordAction(scoped.db, { id: 'lead-1', name: 'Lead', roles: ['LEAD'] }, {
+    action: 'task.assign', entityId: 'task-1', expectedAssigneeId: null, assigneeId: 'staff-2',
+    expectedDueDate: null, dueDate: '2026-07-24', expectedPriority: 'medium', priority: 'medium',
+    idempotencyKey: `${KEY}:managed-team`,
+  });
+  assert.equal(result.action.type, 'task.assign');
+  assert.equal(scoped.calls.update.data.assigneeId, 'staff-2');
+});
+
+test('PM tạo và giao Task mới qua RepositoryRealms với receipt, event và audit atomically', async () => {
+  const calls = { task: null, receipt: null, event: null, audit: null };
+  const tx = {
+    task: { create: async ({ data }) => { calls.task = data; return { id: 'task-new', ...data }; } },
+    realmActionReceipt: { create: async ({ data }) => { calls.receipt = data; return { id: 'receipt-new', ...data }; } },
+    workItemEvent: { create: async ({ data }) => { calls.event = data; return data; } },
+    auditLog: { create: async ({ data }) => { calls.audit = data; return data; } },
+  };
+  const db = {
+    realmActionReceipt: { findUnique: async () => null },
+    user: { findUnique: async () => ({ id: 'staff-2', teamId: 'delivery', status: 'active', userType: 'employee' }) },
+    project: { findUnique: async () => ({ id: 'project-1' }) },
+    team: { findMany: async () => [] },
+    $transaction: async (fn) => fn(tx),
+  };
+  const result = await executeRealmRecordAction(db, { id: 'pm-1', name: 'PM', roles: ['PM'] }, {
+    action: 'task.delegate.create', entityId: 'task-draft:123456789', title: 'Gửi báo cáo tuần',
+    assigneeId: 'staff-2', projectId: 'project-1', dueDate: '2026-07-24', priority: 'medium', note: 'Chốt trước 16:00',
+    idempotencyKey: `${KEY}:delegate-create`,
+  });
+  assert.equal(result.event, 'create');
+  assert.equal(result.action.resultId, 'task-new');
+  assert.equal(calls.task.assigneeId, 'staff-2');
+  assert.equal(calls.receipt.action, 'task.delegate.create');
+  assert.equal(calls.event.taskId, 'task-new');
+  assert.equal(calls.audit.refId, 'task-new');
 });
 
 test('Realm không cho mở lại Quest done hoặc sửa Task ngoài scope', async () => {

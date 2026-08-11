@@ -128,10 +128,31 @@ test('task: nhân viên không tự gán việc cho người khác', () => {
   assert.deepEqual(forged, { title: 'x' });
 });
 
-test('task: nhân viên chỉ sửa việc của mình', () => {
+test('task: nhân viên chỉ sửa việc của mình', async () => {
   assert.equal(RESOURCES.tasks.canWriteRow({ assigneeId: 'nv' }, NV), true);
   assert.equal(RESOURCES.tasks.canWriteRow({ assigneeId: 'nguoi-khac' }, NV), false);
   assert.equal(RESOURCES.tasks.canWriteRow({ assigneeId: 'nguoi-khac' }, PM), true);
+});
+
+test('task: Trưởng nhóm chỉ sửa và giao việc trong team do mình quản lý', async () => {
+  const LEAD = { id: 'lead', roles: ['LEAD'], userType: 'employee' };
+  const prisma = {
+    team: { findMany: async () => [{ id: 'team-a' }] },
+    user: { findUnique: async ({ where }) => ({ id: where.id, teamId: where.id === 'member-a' ? 'team-a' : 'team-b' }) },
+  };
+  assert.equal(await RESOURCES.tasks.canWriteRowAsync({ assigneeId: 'member-a' }, LEAD, prisma), true);
+  assert.equal(await RESOURCES.tasks.canWriteRowAsync({ assigneeId: 'member-b' }, LEAD, prisma), false);
+  await assert.rejects(
+    RESOURCES.tasks.beforeCreate({ title: 'Ngoài team', assigneeId: 'member-b' }, LEAD, prisma),
+    /chỉ được giao việc trong team/,
+  );
+  assert.equal((await RESOURCES.tasks.beforeCreate({ title: 'Trong team', assigneeId: 'member-a' }, LEAD, prisma)).assigneeId, 'member-a');
+});
+
+test('task: nhân viên tạo việc luôn bị buộc về chính mình ở server', async () => {
+  const created = await RESOURCES.tasks.beforeCreate({ title: 'Tự tạo', assigneeId: 'nguoi-khac', workVersion: 99 }, NV, {});
+  assert.equal(created.assigneeId, NV.id);
+  assert.equal(created.workVersion, undefined);
 });
 
 /* ===== bộ lọc server ===== */

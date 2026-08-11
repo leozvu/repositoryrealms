@@ -15,12 +15,13 @@ const cellBg = h => h > CAP ? 'rgba(220,38,38,.14)' : h >= 30 ? 'rgba(5,150,105,
 export default function ResourcesPage() {
   const { data: session } = useSession();
   const canSee = hasAny(session?.user, ['PM', 'HR', 'LEAD']);
-  const canAssign = hasAny(session?.user, ['PM']); // gán việc: PM + GĐ
+  const canAssign = hasAny(session?.user, ['PM', 'LEAD']); // gán việc: PM, Trưởng nhóm + GĐ
   const users = useResource('users');
   const timelogs = useResource('timelogs');
   const tasks = useResource('tasks');
   const projects = useResource('projects');
   const leaves = useResource('leaves');
+  const teams = useResource('teams');
   const [assignTo, setAssignTo] = useState(null); // user được gán
   const toast = useToast();
   if (session && !canSee) return <Forbidden />;
@@ -29,7 +30,16 @@ export default function ResourcesPage() {
   const pName = id => projects.rows.find(p => p.id === id)?.name || 'Việc chung';
 
   // Nhân sự nội bộ active trừ Giám đốc (freelancer tính riêng ở "Hôm nay")
-  const staff = users.rows.filter(u => u.status === 'active' && u.userType !== 'freelancer' && !rolesOf(u).includes('DIRECTOR'));
+  const currentUser = session?.user;
+  const companyManager = hasAny(currentUser, ['PM']);
+  const managedTeamIds = new Set([
+    ...(currentUser?.teamId ? [currentUser.teamId] : []),
+    ...teams.rows.filter(team => team.leadId === currentUser?.id).map(team => team.id),
+  ]);
+  const staff = users.rows.filter(u => u.status === 'active'
+    && u.userType !== 'freelancer'
+    && !rolesOf(u).includes('DIRECTOR')
+    && (companyManager || !rolesOf(currentUser).includes('LEAD') || managedTeamIds.has(u.teamId)));
   if (!staff.length) return <EmptyState title="Chưa có nhân sự" />;
 
   // 4 tuần gần nhất, mốc thứ Hai
@@ -113,7 +123,7 @@ export default function ResourcesPage() {
                         : 'Không có việc đang làm / đến hạn hôm nay — có thể nhận thêm việc.'}
                   </div>
                 </div>
-                {canAssign && state === 'free' && <button className="btn btn-outline btn-sm" onClick={() => setAssignTo(u)} disabled={!unassigned.length}>+ Giao việc</button>}
+                {canAssign && !isFL && state === 'free' && <button className="btn btn-outline btn-sm" onClick={() => setAssignTo(u)} disabled={!unassigned.length}>+ Giao việc</button>}
               </div>
             );
           })}
@@ -172,8 +182,28 @@ export default function ResourcesPage() {
                   <div className="act-sub">{pName(t.projectId)}{t.dueDate ? ` · hạn ${fmtDate(t.dueDate)}` : ''}</div>
                 </div>
                 <AsyncButton className="btn btn-outline btn-sm" disabled={tasks.mutating} pendingLabel="Đang gán…" onClick={async () => {
-                  const r = await tasks.update(t.id, { assigneeId: assignTo.id });
-                  if (r) toast(`Đã gán "${t.title}" cho ${assignTo.name} — họ sẽ nhận chuông thông báo`);
+                  const response = await fetch('/api/execution/actions', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Idempotency-Key': `resources:task.assign:${t.id}:${crypto.randomUUID()}`,
+                    },
+                    body: JSON.stringify({
+                      action: 'task.assign',
+                      entityId: t.id,
+                      expectedAssigneeId: null,
+                      assigneeId: assignTo.id,
+                      expectedDueDate: t.dueDate || null,
+                      dueDate: t.dueDate || null,
+                      expectedPriority: t.priority || 'medium',
+                      priority: t.priority || 'medium',
+                    }),
+                  });
+                  const body = await response.json().catch(() => ({}));
+                  if (!response.ok) return toast(body.error || 'Không thể gán việc.', 'error');
+                  if (!body?.repository?.receiptId) return toast('Task chưa có receipt xác nhận.', 'error');
+                  await tasks.refresh();
+                  toast(`Đã gán "${t.title}" cho ${assignTo.name} — họ sẽ nhận chuông thông báo`);
                 }}>Gán</AsyncButton>
               </div>
             ))}

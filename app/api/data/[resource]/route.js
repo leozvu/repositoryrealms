@@ -47,15 +47,15 @@ export async function POST(req, { params }) {
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
-  let data = await req.json();
-  if (cfg.beforeCreate) data = await cfg.beforeCreate(data, user, prisma);
-  // v3.21: validate chạy CẢ khi tạo mới (trước đây chỉ chạy ở PUT). Ràng buộc nghiệp vụ/pháp lý
-  // phải chặn ở server, không chỉ ở trình duyệt — VD lô hàng XNK đi thị trường cấm.
-  if (cfg.validate) {
-    const err = await cfg.validate(null, data, prisma);
-    if (err) return NextResponse.json({ error: err }, { status: 400 });
-  }
   try {
+    let data = await req.json();
+    if (cfg.beforeCreate) data = await cfg.beforeCreate(data, user, prisma);
+    // v3.21: validate chạy CẢ khi tạo mới (trước đây chỉ chạy ở PUT). Ràng buộc nghiệp vụ/pháp lý
+    // phải chặn ở server, không chỉ ở trình duyệt — VD lô hàng XNK đi thị trường cấm.
+    if (cfg.validate) {
+      const err = await cfg.validate(null, data, prisma);
+      if (err) return NextResponse.json({ error: err }, { status: 400 });
+    }
     const icp = await interceptWrite(params.resource, null, data, user);
     if (icp?.block) return NextResponse.json({ _blocked: true, _notice: icp.block });
     if (icp?.data) data = icp.data;

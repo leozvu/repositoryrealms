@@ -1,12 +1,17 @@
 'use client';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
 import { DocLinksModal } from '@/components/DocLinks';
 import { money, fmtDate, todayISO, daysFromNow } from '@/lib/format';
+import { hasAny, isDirector } from '@/lib/perm';
 
 const TYPE_LABEL = { client: ['HĐ khách hàng', 'b-blue'], vendor: ['HĐ nhà cung cấp', 'b-violet'], labor: ['HĐ lao động', 'b-gray'] };
 
 export default function ContractsPage() {
+  const { data: session } = useSession();
+  const canWriteContract = hasAny(session?.user, ['ACCOUNTANT']);
+  const canDeleteContract = isDirector(session?.user);
   const { rows, forbidden, create, update, remove } = useResource('contracts');
   const [f, setF] = useState('all');
   const [modal, setModal] = useState(null);
@@ -77,7 +82,7 @@ export default function ContractsPage() {
           {Object.entries(TYPE_LABEL).map(([v, [l]]) => <option key={v} value={v}>{l}</option>)}
         </select>
         <div className="spacer"></div>
-        <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm hợp đồng</span></button>
+        {canWriteContract && <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm hợp đồng</span></button>}
       </div>
       <div className="table-wrap">
         <table>
@@ -100,8 +105,8 @@ export default function ContractsPage() {
                   <td><div className="row-actions">
                     <button className="icon-btn" title="In phiếu hợp đồng (PDF qua hộp thoại in)" onClick={() => printContract(c)}><Icon name="print" size={16} /></button>
                     <button className="icon-btn" title="Tài liệu / bản scan hợp đồng" onClick={() => setModal({ mode: 'docs', row: c })}>📎</button>
-                    <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: c })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
-                    <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: c })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
+                    {canWriteContract && <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: c })} aria-label="Sửa"><Icon name="edit" size={16} /></button>}
+                    {canDeleteContract && <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: c })} aria-label="Xóa"><Icon name="trash" size={16} /></button>}
                   </div></td>
                 </tr>
               );
@@ -110,12 +115,12 @@ export default function ContractsPage() {
           </tbody>
         </table>
       </div>
-      {modal?.mode === 'add' && <FormModal title="Thêm hợp đồng" fields={FIELDS} data={{ type: 'client', status: 'active', signDate: todayISO() }}
+      {canWriteContract && modal?.mode === 'add' && <FormModal title="Thêm hợp đồng" fields={FIELDS} data={{ type: 'client', status: 'active', signDate: todayISO() }}
         onClose={() => setModal(null)} onSave={async d => { await create({ ...d, value: +d.value || 0 }); toast('Đã thêm hợp đồng'); }} />}
-      {modal?.mode === 'edit' && <FormModal title="Sửa hợp đồng" fields={FIELDS} data={modal.row}
+      {canWriteContract && modal?.mode === 'edit' && <FormModal title="Sửa hợp đồng" fields={FIELDS} data={modal.row}
         onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, { ...d, value: +d.value || 0 }); toast('Đã cập nhật'); }} />}
       {modal?.mode === 'docs' && <DocLinksModal refType="contract" refId={modal.row.id} name={modal.row.code} onClose={() => setModal(null)} />}
-      {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa hợp đồng ${modal.row.code}?`}
+      {canDeleteContract && modal?.mode === 'del' && <ConfirmDialog msg={`Xóa hợp đồng ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
     </>
   );
