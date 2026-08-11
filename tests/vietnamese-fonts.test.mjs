@@ -7,13 +7,16 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), 'utf8');
 
-test('global fonts bundle Vietnamese glyphs instead of relying on runtime Google CSS', () => {
+test('global body, mono and heritage fonts bundle Vietnamese glyphs without runtime Google CSS', () => {
   const layout = read('app', 'layout.jsx');
 
-  assert.match(layout, /Be_Vietnam_Pro, Roboto_Mono/);
+  assert.match(layout, /Be_Vietnam_Pro/);
+  assert.match(layout, /Cormorant_Garamond/);
+  assert.match(layout, /Roboto_Mono/);
   assert.doesNotMatch(layout, /Noto_Serif/);
-  assert.equal((layout.match(/'vietnamese'/g) || []).length, 2);
+  assert.equal((layout.match(/'vietnamese'/g) || []).length, 3);
   assert.match(layout, /variable: '--font-be-vietnam-pro'/);
+  assert.match(layout, /variable: '--font-realm-display'/);
   assert.match(layout, /variable: '--font-roboto-mono'/);
   assert.doesNotMatch(layout, /fonts\.googleapis\.com|fonts\.gstatic\.com/);
   assert.match(layout, /<html lang="vi"/);
@@ -23,7 +26,7 @@ test('ERP and Realm typography tokens use the bundled Vietnamese font families',
   const css = read('app', 'globals.css');
 
   assert.match(css, /--font:var\(--font-be-vietnam-pro\)/);
-  assert.match(css, /--font-display:var\(--font-be-vietnam-pro\)/);
+  assert.match(css, /--font-display:var\(--font-realm-display\)/);
   assert.match(css, /--font-mono:var\(--font-roboto-mono\)/);
   assert.match(css, /body\{font-family:var\(--font\)/);
 });

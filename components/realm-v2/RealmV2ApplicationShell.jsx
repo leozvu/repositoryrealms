@@ -14,9 +14,9 @@ import styles from './realm-v2.module.css';
 
 const PAGE_COPY = {
   home: {
-    eyebrow: 'Không gian điều hành cá nhân',
-    title: 'Không gian làm việc',
-    description: 'Mở đúng khu vực để tiếp tục công việc, xử lý ngoại lệ hoặc phối hợp với đội nhóm.',
+    eyebrow: 'Đại sảnh công việc',
+    title: 'Đại sảnh Realm',
+    description: 'Bắt đầu từ việc tiếp theo, Gold và người đang hiện diện. Bước vào thế giới khi cần gặp và voice.',
   },
   'my-work': {
     eyebrow: 'Task ERP · Góc nhìn Realm',
@@ -106,9 +106,9 @@ const PAGE_COPY = {
 };
 
 const PRIMARY_NAVIGATION = [
-  ['Làm việc', ['home', 'my-work', 'work-management', 'projects']],
+  ['Đại sảnh', ['home', 'my-work', 'work-management', 'projects']],
   ['Phối hợp', ['inbox', 'chronicle']],
-  ['Điều hành', ['action-center', 'ceo-terminal']],
+  ['Hội đồng', ['action-center', 'ceo-terminal']],
 ];
 
 function groups() {
@@ -126,6 +126,7 @@ function ProductShell({ user, company, slug, pilot, children }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationRevision, setNotificationRevision] = useState(0);
   const [unread, setUnread] = useState(0);
+  const [realmIdentity, setRealmIdentity] = useState(null);
   const headingRef = useRef(null);
   const navigationGroups = useMemo(groups, []);
   const page = PAGE_COPY[slug] || {
@@ -165,6 +166,15 @@ function ProductShell({ user, company, slug, pilot, children }) {
     return () => { alive = false; window.clearInterval(timer); };
   }, [notificationRevision]);
 
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/realm-v2/profile-recognition', { cache: 'no-store', credentials: 'same-origin' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload) => { if (alive && payload) setRealmIdentity(payload); })
+      .catch(() => null);
+    return () => { alive = false; };
+  }, []);
+
   const toggleRail = () => setCollapsed((current) => {
     const next = !current;
     window.localStorage.setItem('realm-v2-rail-collapsed', String(next));
@@ -178,8 +188,8 @@ function ProductShell({ user, company, slug, pilot, children }) {
       <div className={styles.shell} data-collapsed={collapsed}>
         <aside className={styles.rail} aria-label="Điều hướng chính Realm">
           <Link className={styles.brand} href="/realm-v2/home" aria-label="Trang chủ Realm">
-            <span className={styles.brandMark}>R</span>
-            <span className={styles.brandText}>RepositoryRealms<small>{company}</small></span>
+            <span className={styles.brandMark}><Icon name="shield" size={18}/></span>
+            <span className={styles.brandText}>Đại sảnh Realm<small>{company}</small></span>
           </Link>
           <nav className={styles.nav}>
             {navigationGroups.map(([group, areas]) => (
@@ -220,6 +230,13 @@ function ProductShell({ user, company, slug, pilot, children }) {
             <Icon name="search"/><span>Tìm bản ghi hoặc tác vụ ERP…</span><kbd>Ctrl K</kbd>
           </button>
           <div className={styles.topActions}>
+            <Link className={styles.realmPortal} href="/realm" aria-label="Bước vào thế giới Realm với nhân vật và voice theo khoảng cách">
+              <Icon name="map" size={17}/><span>Bước vào Realm</span>
+            </Link>
+            <Link className={styles.goldBalance} href="/realm-v2/recognition" aria-label="Mở Sổ Realm và Gold">
+              <span className={styles.goldCoin}>G</span>
+              <span><small>Gold</small><strong>{realmIdentity?.recognition?.summary?.balance == null ? 'Sổ Gold' : Number(realmIdentity.recognition.summary.balance).toLocaleString('vi-VN')}</strong></span>
+            </Link>
             <span className={styles.realmErpSwitch}><WorkspaceSurfaceSwitch realm pilot={pilot}/></span>
             <span className={styles.realmLanguage}><LanguageSwitch compact /></span>
             <button type="button" className={styles.iconButton} aria-label={`Thông báo${unread ? `, ${unread} chưa đọc` : ''}`} onClick={() => setNotificationsOpen(true)}>
@@ -248,7 +265,7 @@ function ProductShell({ user, company, slug, pilot, children }) {
         <nav className={styles.mobileNav} aria-label="Điều hướng chính trên di động">
           {mobileDestinations().map((item) => (
             <Link className={styles.mobileNavItem} data-active={slug === item.slug || undefined} aria-current={slug === item.slug ? 'page' : undefined} href={`/realm-v2/${item.slug}`} key={item.slug}>
-              <Icon name={item.icon} size={19}/><span>{{ home: 'Trang chủ', 'my-work': 'Việc tôi', 'action-center': 'Hành động', inbox: 'Hộp thư', mobile: 'Thêm' }[item.slug]}</span>
+              <Icon name={item.icon} size={19}/><span>{{ home: 'Trang chủ', 'my-work': 'Việc tôi', 'action-center': 'Hành động', inbox: 'Hộp thư', mobile: 'Xem thêm' }[item.slug]}</span>
             </Link>
           ))}
         </nav>
@@ -257,8 +274,9 @@ function ProductShell({ user, company, slug, pilot, children }) {
       {drawerOpen && (
         <div className={styles.overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDrawerOpen(false); }}>
           <section className={styles.drawer} role="dialog" aria-modal="true" aria-label="Tất cả điểm đến Realm">
-            <header className={styles.drawerHeader}><strong>Tất cả điểm đến</strong><button type="button" className={styles.iconButton} onClick={() => setDrawerOpen(false)} aria-label="Đóng"><Icon name="close"/></button></header>
+            <header className={styles.drawerHeader}><strong>Tất cả điểm đến</strong><span className={styles.drawerHeaderActions}><LanguageSwitch compact/><button type="button" className={styles.iconButton} onClick={() => setDrawerOpen(false)} aria-label="Đóng"><Icon name="close"/></button></span></header>
             <nav className={`${styles.drawerBody} ${styles.list}`}>
+              <Link href="/realm" className={`${styles.listItem} ${styles.drawerRealmEntry}`} onClick={() => setDrawerOpen(false)}><span className={styles.listIcon}><Icon name="map"/></span><span className={styles.listCopy}><strong>Bước vào thế giới Realm</strong><span>Nhân vật, hiện diện và voice theo khoảng cách</span></span><Icon name="chevron" size={14}/></Link>
               {REALM_V2_AREAS.map((item) => <Link href={`/realm-v2/${item.slug}`} key={item.slug} className={styles.listItem} onClick={() => setDrawerOpen(false)}><span className={styles.listIcon}><Icon name={item.icon}/></span><span className={styles.listCopy}><strong>{item.labelVi}</strong><span>{item.group}</span></span><Icon name="chevron" size={14}/></Link>)}
               <button type="button" className={styles.listItem} onClick={() => signOut({ callbackUrl: '/login' })} style={{ width: '100%', borderInline: 0, background: 'transparent', color: 'inherit', textAlign: 'left' }}><span className={styles.listIcon}><Icon name="lock"/></span><span className={styles.listCopy}><strong>Đăng xuất</strong><span>Kết thúc phiên hiện tại</span></span></button>
             </nav>

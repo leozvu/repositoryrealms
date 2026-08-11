@@ -548,6 +548,7 @@ export default function Shell({
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [notificationRevision, setNotificationRevision] = useState(0);
+  const [goldBalance, setGoldBalance] = useState(null);
   const [roleLabels, setRoleLabels] = useState(ROLE_LABEL);
   const [modules, setModules] = useState(null);
   const pathname = usePathname();
@@ -621,6 +622,19 @@ export default function Shell({
     const timer = setInterval(loadShellCounters, 15000);
     return () => clearInterval(timer);
   }, [pathname, loadShellCounters]);
+
+  useEffect(() => {
+    if (ceoPortal || freelancer || !realmPilot?.allowed) return undefined;
+    let alive = true;
+    fetch('/api/realm-v2/profile-recognition', { cache: 'no-store', credentials: 'same-origin' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload) => {
+        const balance = payload?.recognition?.summary?.balance;
+        if (alive && Number.isFinite(Number(balance))) setGoldBalance(Number(balance));
+      })
+      .catch(() => null);
+    return () => { alive = false; };
+  }, [ceoPortal, freelancer, realmPilot?.allowed]);
 
   useEffect(() => {
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -728,6 +742,11 @@ export default function Shell({
                   </div>
                   <div className="topbar-right">
                     {!ceoPortal && <WorkspaceSurfaceSwitch pilot={realmPilot} realmV2Available={realmV2Available} />}
+                    {!ceoPortal && realmPilot?.allowed && (
+                      <Link className="shell-gold-balance" href={realmV2Available ? '/realm-v2/recognition' : '/realm?view=ledger'} aria-label="Mở Kho bạc Gold">
+                        <span>G</span><strong>{goldBalance == null ? 'Gold' : goldBalance.toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN')}</strong>
+                      </Link>
+                    )}
                     <CreateMenu groups={groups} />
                     <button className="shell-command-trigger" onClick={() => { if (ceoPortal) router.push('/ceo-navigator'); else setShowSearch(true); }} aria-label={ceoPortal ? 'Mở điều hướng CEO' : 'Tìm kiếm toàn hệ thống'}>
                       <Icon name="search" size={17} /><span>Tìm kiếm</span><kbd>Ctrl K</kbd>

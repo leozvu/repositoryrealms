@@ -40,7 +40,9 @@ async function contactAction(id, action) {
 }
 
 export function WorkspaceSurfaceSwitch({ realm = false, pilot = null, realmV2Available = false }) {
-  const href = realm ? '/dashboard' : realmV2Available ? '/realm-v2/home' : '/realm';
+  // The spatial world is the canonical Realm entrance. Realm v2 remains the
+  // structured ledger/workspace reached from inside the Realm experience.
+  const href = realm ? '/dashboard' : '/realm';
   const surface = realm ? 'erp' : 'realm';
   const unavailable = !realm && pilot && !pilot.allowed;
   const label = realm ? 'ERP · CRM' : 'Mở Realm';
@@ -64,10 +66,10 @@ export function WorkspaceSurfaceSwitch({ realm = false, pilot = null, realmV2Ava
   };
   return (
     <Link
-      className={realm ? styles.realmToErp : 'btn btn-outline btn-sm'}
+      className={realm ? styles.realmToErp : `${styles.erpToRealm} btn btn-sm`}
       href={href}
       onClick={rememberPreference}
-      aria-label={realm ? 'Trở về workspace ERP CRM gốc' : 'Mở văn phòng Realm tùy chọn'}
+      aria-label={realm ? 'Trở về workspace ERP CRM gốc' : 'Bước vào Realm với nhân vật và voice theo khoảng cách'}
     >
       <Icon name={realm ? 'reports' : 'shield'} size={15} />
       <span>{label}</span>

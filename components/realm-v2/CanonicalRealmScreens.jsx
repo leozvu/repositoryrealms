@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useLanguage } from '@/components/LanguageProvider';
 import { useToast } from '@/components/ui';
 import Icon from './Icon';
 import { Badge, Banner, Button, Panel, Segmented, SourcePill, StateView, Status } from './Primitives';
@@ -133,6 +134,7 @@ function useTaskTransition(reload) {
 }
 
 function HomeScreen() {
+  const { t } = useLanguage();
   const data = useCanonicalWorkspace();
   const { busyId, transition } = useTaskTransition(data.reload);
   const openTasks = useMemo(() => OPEN_QUEUES.flatMap((key) => (data.myWork?.queues?.[key] || []).map((task) => ({ ...task, queue: key }))), [data.myWork]);
@@ -141,6 +143,7 @@ function HomeScreen() {
   const projectCount = useMemo(() => new Set(openTasks.map((task) => task.project?.id).filter(Boolean)).size, [openTasks]);
   const approvals = data.approvals?.toApprove || [];
   const notifications = data.notifications?.rows || [];
+  const metricLabel = (count, source) => t(`${count} ${source}`).replace(new RegExp(`^${count}\\s*`), '');
 
   if (data.loading && !data.myWork) return <Panel><StateView state="loading"/></Panel>;
   if (!data.myWork) return <Panel title="Không thể tải Realm Home"><div className={styles.canonicalState}><StateView state="error"/><Button variant="secondary" icon="refresh" onClick={data.reload}>Tải lại an toàn</Button></div></Panel>;
@@ -149,35 +152,40 @@ function HomeScreen() {
     <div className={styles.realmHome}>
       <PartialError errors={data.errors} onRetry={data.reload}/>
       <section className={styles.realmStatusStrip} aria-label="Tình trạng không gian làm việc">
-        <span><Icon name="checklist" size={16}/><strong>{data.myWork.metrics.open}</strong> việc đang mở</span>
-        <span data-alert={attention.length > 0 || undefined}><Icon name="warning" size={16}/><strong>{attention.length}</strong> cần chú ý</span>
-        <span data-alert={approvals.length > 0 || undefined}><Icon name="approval" size={16}/><strong>{approvals.length}</strong> chờ quyết định</span>
-        <span><Icon name="folder" size={16}/><strong>{projectCount}</strong> phòng dự án</span>
+        <span><Icon name="checklist" size={16}/><strong>{data.myWork.metrics.open}</strong> {metricLabel(data.myWork.metrics.open, 'việc đang mở')}</span>
+        <span data-alert={attention.length > 0 || undefined}><Icon name="warning" size={16}/><strong>{attention.length}</strong> {metricLabel(attention.length, 'cần chú ý')}</span>
+        <span data-alert={approvals.length > 0 || undefined}><Icon name="approval" size={16}/><strong>{approvals.length}</strong> {metricLabel(approvals.length, 'chờ quyết định')}</span>
+        <span><Icon name="folder" size={16}/><strong>{projectCount}</strong> {metricLabel(projectCount, 'phòng dự án')}</span>
         <SourcePill source="ERP" freshness={timeLabel(data.myWork.generatedAt)}/>
       </section>
 
       <div className={styles.realmHomeLayout}>
         <section className={styles.workplaceScene} aria-labelledby="realm-workplace-title">
           <header className={styles.sceneHeader}>
-            <div><span>Không gian chung</span><h2 id="realm-workplace-title">Văn phòng hôm nay</h2><p>Chọn một khu vực để mở đúng công việc và bản ghi chuẩn.</p></div>
+            <div><span>Realm đang sống</span><h2 id="realm-workplace-title">Bản đồ Đại sảnh</h2><p>Chọn khu vực nghiệp vụ, hoặc bước vào world để gặp đồng đội.</p></div>
             <span className={styles.presenceChip}><Icon name="people" size={15}/>Đang kết nối</span>
           </header>
           <div className={styles.roomFloor}>
             <div className={styles.floorPath} aria-hidden="true"/>
+            <Link className={styles.realmAvatarMarker} href="/realm" aria-label="Bước vào Realm, di chuyển nhân vật và mở voice theo khoảng cách">
+              <span className={styles.realmAvatarSprite} aria-hidden="true"/>
+              <strong>Bước vào Realm</strong>
+              <small>Di chuyển, gặp gỡ và voice</small>
+            </Link>
             <Link className={styles.spatialZone} data-zone="desk" href="/realm-v2/my-work">
-              <span><Icon name="checklist" size={22}/></span><strong>Bàn của tôi</strong><small>{data.myWork.metrics.open} việc đang mở</small>
+              <span><Icon name="checklist" size={22}/></span><strong>Bàn của tôi</strong><small>{t(`${data.myWork.metrics.open} việc đang mở`)}</small>
             </Link>
             <Link className={styles.spatialZone} data-zone="team" href="/realm-v2/work-management">
               <span><Icon name="people" size={22}/></span><strong>Phòng đội nhóm</strong><small>Phân bổ và trở ngại</small>
             </Link>
             <Link className={styles.spatialZone} data-zone="projects" href="/realm-v2/projects">
-              <span><Icon name="folder" size={22}/></span><strong>Phòng dự án</strong><small>{projectCount} dự án liên quan</small>
+              <span><Icon name="folder" size={22}/></span><strong>Phòng dự án</strong><small>{t(`${projectCount} dự án liên quan`)}</small>
             </Link>
             <Link className={styles.spatialZone} data-zone="operations" href="/realm-v2/approvals" data-alert={approvals.length > 0 || undefined}>
-              <span><Icon name="approval" size={22}/></span><strong>Bàn vận hành</strong><small>{approvals.length} quyết định chờ</small>
+              <span><Icon name="approval" size={22}/></span><strong>Bàn vận hành</strong><small>{t(`${approvals.length} quyết định chờ`)}</small>
             </Link>
             <Link className={styles.spatialZone} data-zone="inbox" href="/realm-v2/inbox" data-alert={notifications.some((item) => !item.readAt) || undefined}>
-              <span><Icon name="inbox" size={22}/></span><strong>Hộp thư</strong><small>{notifications.filter((item) => !item.readAt).length} chưa đọc</small>
+              <span><Icon name="inbox" size={22}/></span><strong>Hộp thư</strong><small>{t(`${notifications.filter((item) => !item.readAt).length} chưa đọc`)}</small>
             </Link>
             <Link className={styles.spatialZone} data-zone="chronicle" href="/realm-v2/chronicle">
               <span><Icon name="timeline" size={22}/></span><strong>Biên niên</strong><small>Thay đổi và quyết định</small>

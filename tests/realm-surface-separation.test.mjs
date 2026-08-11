@@ -29,16 +29,17 @@ test('only Sổ Realm can enter the gamified ledger mode', () => {
   assert.match(office, /Giao diện gamified, không thay thế ERP/);
 });
 
-test('the ERP shell retains business navigation and exposes Realm as an optional workplace', () => {
+test('the ERP shell retains business navigation and exposes the immersive Realm as its primary world', () => {
   const shell = read('components', 'Shell.jsx');
   const collaboration = read('components', 'collaboration', 'CollaborationBridge.jsx');
 
   assert.match(shell, /const NAV = ERP_NAV/);
   assert.match(shell, /workspaceNavigation\(visible/);
   assert.match(shell, /Business workspace/);
-  assert.match(collaboration, /const href = realm \? '\/dashboard' : realmV2Available \? '\/realm-v2\/home' : '\/realm'/);
+  assert.match(collaboration, /const href = realm \? '\/dashboard' : '\/realm'/);
+  assert.doesNotMatch(collaboration, /realmV2Available \? '\/realm-v2\/home'/);
   assert.match(collaboration, /const label = realm \? 'ERP · CRM' : 'Mở Realm'/);
-  assert.match(collaboration, /Mở văn phòng Realm tùy chọn/);
+  assert.match(collaboration, /Bước vào Realm với nhân vật và voice theo khoảng cách/);
   assert.match(collaboration, /pathname\.startsWith\('\/realm-v2'\)/);
 });
 

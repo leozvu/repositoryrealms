@@ -64,6 +64,19 @@ test('workplace rehab dynamic status preserves record names while translating UI
   assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
 });
 
+test('Realm great hall translates metric labels and mobile navigation completely', () => {
+  assert.equal(translateUiCopy('0 việc đang mở', 'en'), '0 open work items');
+  assert.equal(translateUiCopy('0 cần chú ý', 'en'), '0 need attention');
+  assert.equal(translateUiCopy('1 chờ quyết định', 'en'), '1 pending decision');
+  assert.equal(translateUiCopy('2 phòng dự án', 'en'), '2 project rooms');
+  assert.equal(translateUiCopy('3 dự án liên quan', 'en'), '3 related projects');
+  assert.equal(translateUiCopy('4 chưa đọc', 'en'), '4 unread');
+  assert.equal(translateUiCopy('Việc tôi', 'en'), 'My Work');
+  assert.equal(translateUiCopy('Xem thêm', 'en'), 'More');
+  assert.equal(translateUiCopy('Đã khôi phục khu vực Realm gần nhất.', 'en'), 'Restored your most recent Realm area.');
+  assert.equal(translateUiCopy('Đã khôi phục khu vực làm việc gần nhất trong Realm.', 'en'), 'Restored your most recent workspace area in Realm.');
+});
+
 test('mobile workspace keeps a reachable language switch in the navigation drawer', () => {
   const shell = fs.readFileSync(new URL('../components/Shell.jsx', import.meta.url), 'utf8');
   const css = fs.readFileSync(new URL('../app/globals.css', import.meta.url), 'utf8');

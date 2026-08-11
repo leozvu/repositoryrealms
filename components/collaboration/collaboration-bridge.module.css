@@ -71,6 +71,32 @@
   gap: 7px;
 }
 
+.erpToRealm {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #9b7835;
+  border-radius: 5px 5px 9px 9px;
+  color: #fff4cf;
+  background:
+    linear-gradient(180deg, rgba(255, 236, 173, .11), transparent 42%),
+    #244b37;
+  box-shadow: inset 0 0 0 1px rgba(255, 245, 209, .08), 0 4px 12px rgba(22, 42, 31, .16);
+  font-weight: 760;
+}
+
+.erpToRealm:hover {
+  border-color: #d1b365;
+  color: #fff9e9;
+  background:
+    linear-gradient(180deg, rgba(255, 236, 173, .15), transparent 42%),
+    #2d5a43;
+}
+
+.erpToRealm:active { transform: translateY(1px); }
+
 .unavailableSwitch {
   cursor: not-allowed;
   opacity: .62;

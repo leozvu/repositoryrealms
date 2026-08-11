@@ -5,7 +5,6 @@ import { prisma } from '@/lib/prisma';
 import { loadRealmCompanyModules } from '@/lib/realm-access';
 import { createRealmErpBridge } from '@/lib/realm-business-bridge';
 import { loadRealmPilotDecision } from '@/lib/realm-pilot';
-import { realmV2PreviewEnabled } from '@/lib/realm-v2-contracts';
 
 export const metadata = {
   title: 'Realm · RepositoryRealms',
@@ -22,7 +21,6 @@ export default async function RealmPage({ searchParams }) {
     loadRealmPilotDecision(prisma, user),
   ]);
   if (!pilot.allowed) redirect(`/dashboard?realm=${encodeURIComponent(pilot.code)}`);
-  if (realmV2PreviewEnabled()) redirect('/realm-v2/home');
   const query = await searchParams;
   const initialMode = query?.view === 'ledger' ? 'ledger' : 'world';
   const initialBridge = createRealmErpBridge({

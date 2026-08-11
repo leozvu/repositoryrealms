@@ -1,26 +1,26 @@
 .theme {
-  --r2-canvas: #0b0e14;
-  --r2-surface-1: #111722;
-  --r2-surface-2: #17202d;
-  --r2-surface-3: #202b39;
-  --r2-emerald: #5b8cff;
-  --r2-emerald-strong: #7ba2ff;
-  --r2-emerald-dark: #315fcc;
-  --r2-gold: #8eacff;
-  --r2-blue: #5b8cff;
+  --r2-canvas: #08110d;
+  --r2-surface-1: #101d16;
+  --r2-surface-2: #17281f;
+  --r2-surface-3: #203429;
+  --r2-emerald: #5f9a73;
+  --r2-emerald-strong: #82bd91;
+  --r2-emerald-dark: #2e6649;
+  --r2-gold: #d6b65f;
+  --r2-blue: #7b9bad;
   --r2-amber: #d69a4c;
   --r2-red: #cf5a5a;
-  --r2-text: #f3f5f7;
-  --r2-text-2: #aab4be;
-  --r2-muted: #7f8c98;
-  --r2-border: rgba(255, 255, 255, .09);
-  --r2-border-strong: rgba(91, 140, 255, .38);
-  --r2-focus: #8fc4f2;
-  --r2-shadow-1: 0 1px 2px rgba(0, 0, 0, .32);
-  --r2-shadow-2: 0 16px 48px rgba(0, 0, 0, .34);
-  --r2-radius-sm: 4px;
-  --r2-radius-md: 8px;
-  --r2-radius-lg: 12px;
+  --r2-text: #f5edd7;
+  --r2-text-2: #c5c6b6;
+  --r2-muted: #929b8e;
+  --r2-border: rgba(210, 183, 113, .17);
+  --r2-border-strong: rgba(214, 182, 95, .52);
+  --r2-focus: #f0d37a;
+  --r2-shadow-1: 0 2px 3px rgba(2, 9, 6, .38);
+  --r2-shadow-2: 0 20px 56px rgba(2, 9, 6, .48);
+  --r2-radius-sm: 3px;
+  --r2-radius-md: 6px;
+  --r2-radius-lg: 9px;
   --r2-space-1: 8px;
   --r2-space-2: 16px;
   --r2-space-3: 24px;
@@ -30,10 +30,9 @@
   min-height: 100dvh;
   color: var(--r2-text);
   background:
-    linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px),
-    var(--r2-canvas);
-  background-size: 32px 32px, 32px 32px, auto;
+    radial-gradient(circle at 76% 2%, rgba(125, 153, 103, .16), transparent 34rem),
+    linear-gradient(rgba(5, 14, 9, .92), rgba(8, 17, 13, .97)),
+    url('/realms/assets/generated/phase-22/maps/materials-webp/material-wall.webp') center/360px 480px repeat;
   font-family: var(--font-be-vietnam-pro), system-ui, sans-serif;
   line-height: 1.5;
 }
@@ -43,8 +42,9 @@
 .theme a { color: inherit; text-decoration: none; }
 .theme :focus-visible { outline: 3px solid var(--r2-focus); outline-offset: 2px; }
 .theme h1, .theme h2, .theme h3, .theme p { margin: 0; }
-.theme h1 { font-size: clamp(1.5rem, 2vw, 2rem); letter-spacing: -.03em; }
-.theme h2 { font-size: 1.08rem; letter-spacing: -.015em; }
+.theme h1, .theme h2 { font-family: var(--font-realm-display), Georgia, serif; }
+.theme h1 { font-size: clamp(1.8rem, 2.5vw, 2.45rem); line-height: 1.02; letter-spacing: .005em; }
+.theme h2 { font-size: 1.28rem; line-height: 1.12; letter-spacing: .005em; }
 .theme h3 { font-size: .95rem; }
 .theme button { color: inherit; }
 
@@ -1060,4 +1060,207 @@
 
 @media (prefers-reduced-motion: reduce) {
   .theme *, .theme *::before, .theme *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* Medieval fantasy product layer
+   Gold and the spatial Realm receive ceremonial framing. Dense operational
+   components keep restrained surfaces, readable typography and familiar flow. */
+.rail {
+  border-right-color: rgba(214, 182, 95, .28);
+  background:
+    linear-gradient(180deg, rgba(9, 24, 16, .88), rgba(5, 14, 9, .97)),
+    url('/realms/assets/generated/phase-22/maps/materials-webp/material-wall.webp') center/360px 480px repeat;
+  box-shadow: 8px 0 30px rgba(2, 9, 6, .25);
+}
+.brand { min-height: 64px; border-bottom-color: rgba(214, 182, 95, .24); }
+.brandMark {
+  border: 1px solid #b99543;
+  border-radius: 4px 4px 11px 11px;
+  color: #fff0b6;
+  background: linear-gradient(145deg, #315c43, #183425);
+  box-shadow: inset 0 0 0 2px rgba(255, 244, 207, .08), 0 6px 14px rgba(0, 0, 0, .25);
+}
+.brandText { font-family: var(--font-realm-display), Georgia, serif; font-size: 1rem; letter-spacing: .01em; }
+.brandText small { font-family: var(--font-be-vietnam-pro), system-ui, sans-serif; }
+.navLabel { color: #b9a879; }
+.navItem { border-radius: 4px; }
+.navItem:hover { color: #fff7de; background: rgba(214, 182, 95, .07); }
+.navItem[data-active="true"] {
+  color: #fff7de;
+  background: linear-gradient(90deg, rgba(214, 182, 95, .15), rgba(58, 96, 70, .18));
+  box-shadow: inset 3px 0 var(--r2-gold);
+}
+.railFooter { border-top-color: rgba(214, 182, 95, .2); }
+
+.topbar {
+  min-height: 64px;
+  border-bottom-color: rgba(214, 182, 95, .22);
+  background:
+    linear-gradient(90deg, rgba(8, 19, 13, .95), rgba(15, 31, 23, .92)),
+    url('/realms/assets/generated/phase-22/maps/materials-webp/material-wall.webp') center/360px 480px repeat;
+  box-shadow: 0 8px 24px rgba(2, 9, 6, .2);
+}
+.workspaceButton, .searchButton, .iconButton, .profileButton,
+.realmErpSwitch > a, .realmLanguage :global(.language-switch) {
+  border-radius: 5px;
+  background: rgba(17, 33, 24, .88);
+}
+.workspaceButton .brandMark { border-radius: 3px 3px 8px 8px !important; }
+.realmLanguage :global(.language-switch button[aria-pressed='true']) { color: #132319; background: var(--r2-gold); }
+
+.realmPortal, .goldBalance {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.realmPortal {
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid #b99543;
+  border-radius: 4px 4px 9px 9px;
+  color: #fff4c9;
+  background: linear-gradient(180deg, #39664c, #244633);
+  box-shadow: inset 0 1px rgba(255, 247, 217, .14), 0 5px 14px rgba(2, 9, 6, .28);
+  font-size: .74rem;
+  font-weight: 780;
+  white-space: nowrap;
+}
+.realmPortal:hover { border-color: #e3c875; color: #fffbea; background: linear-gradient(180deg, #427459, #2b523d); }
+.realmPortal:active { transform: translateY(1px); }
+.goldBalance {
+  gap: 8px;
+  padding: 0 10px 0 7px;
+  border: 1px solid rgba(214, 182, 95, .42);
+  border-radius: 5px;
+  color: #f8e5aa;
+  background: #211c10;
+}
+.goldBalance > span:last-child { display: grid; line-height: 1.05; }
+.goldBalance small { color: #a99d79; font-size: .56rem; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; }
+.goldBalance strong { margin-top: 2px; font-size: .7rem; font-variant-numeric: tabular-nums; }
+.goldCoin {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  border: 2px solid #f0d879;
+  border-radius: 50%;
+  color: #493712;
+  background: linear-gradient(145deg, #f2d36f, #b9862d);
+  box-shadow: inset 0 -3px rgba(106, 72, 17, .38), 0 2px 6px rgba(0, 0, 0, .28);
+  font-family: var(--font-roboto-mono), monospace;
+  font-size: .66rem;
+  font-weight: 900;
+}
+
+.pageHeader { min-height: 104px; border-bottom: 1px solid rgba(214, 182, 95, .12); }
+.breadcrumbs { color: #a89f86; }
+.subtitle { color: #bdc2b3; }
+.button { border-radius: 5px; background: #315f46; box-shadow: inset 0 1px rgba(255,255,255,.1); }
+.button:hover { background: #3b7354; }
+.button[data-variant="secondary"] { background: #17281f; }
+.panel {
+  border-color: rgba(210, 183, 113, .2);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 245, 209, .025), transparent 36%),
+    #101d16;
+  box-shadow: 0 2px 3px rgba(2, 9, 6, .3), inset 0 1px rgba(255,255,255,.025);
+}
+.panelHeader { border-bottom-color: rgba(210, 183, 113, .15); }
+.metricIcon, .listIcon { border-radius: 4px; color: #e0c46f; background: rgba(214, 182, 95, .07); }
+.metricValue { color: #fff1c3; }
+.drawerRealmEntry { color: #fff3c0; background: rgba(214, 182, 95, .08); }
+.drawerRealmEntry .listIcon { border-color: rgba(214, 182, 95, .4); }
+.drawerHeaderActions { display: inline-flex; align-items: center; gap: 8px; }
+.drawerHeaderActions :global(.language-switch) { border-color: rgba(214, 182, 95, .28); background: #17281f; box-shadow: none; }
+.drawerHeaderActions :global(.language-switch button[aria-pressed='true']) { color: #132319; background: var(--r2-gold); }
+
+.workplaceScene {
+  border-color: rgba(214, 182, 95, .42);
+  box-shadow: 0 18px 52px rgba(2, 9, 6, .34);
+}
+.sceneHeader {
+  border-bottom-color: rgba(214, 182, 95, .2);
+  background: linear-gradient(90deg, rgba(53, 82, 59, .24), rgba(17, 29, 22, .92));
+}
+.sceneHeader > div > span { color: var(--r2-gold); }
+.presenceChip { border-radius: 4px; }
+.roomFloor {
+  min-height: 520px;
+  grid-template-columns: minmax(150px, 1fr) 170px minmax(150px, 1fr);
+  gap: 16px;
+  padding: 24px;
+  background:
+    linear-gradient(rgba(5, 13, 9, .66), rgba(5, 13, 9, .78)),
+    url('/realms/assets/generated/phase-22/maps/realm-office-master-map-v1.png') center/cover no-repeat;
+}
+.floorPath {
+  border-inline: 1px solid rgba(214, 182, 95, .14);
+  background: linear-gradient(180deg, transparent, rgba(214, 182, 95, .06), transparent);
+}
+.floorPath::after { border-left: 1px solid rgba(214, 182, 95, .2); }
+.realmAvatarMarker {
+  grid-area: path;
+  place-self: center;
+  z-index: 3;
+  width: 154px;
+  min-height: 168px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 4px;
+  padding: 12px 9px;
+  border: 1px solid #c6a64f;
+  border-radius: 5px 5px 14px 14px;
+  color: #fff4c8;
+  background: rgba(10, 25, 16, .9);
+  box-shadow: inset 0 0 0 2px rgba(255, 242, 198, .06), 0 15px 34px rgba(0, 0, 0, .48);
+  text-align: center;
+}
+.realmAvatarMarker:hover { border-color: #efd57d; background: rgba(20, 48, 31, .94); transform: translateY(-2px); }
+.realmAvatarSprite {
+  width: 62px;
+  height: 78px;
+  display: block;
+  background: url('/realms/assets/generated/phase-22/characters-v2/directions/character-01-down.png') center bottom/contain no-repeat;
+  image-rendering: auto;
+  animation: realmIdle 2.8s ease-in-out infinite;
+}
+.realmAvatarMarker strong { font-family: var(--font-realm-display), Georgia, serif; font-size: 1.05rem; }
+.realmAvatarMarker small { color: #b6baa9; font-size: .62rem; }
+@keyframes realmIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.spatialZone {
+  border-color: rgba(214, 182, 95, .22);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(111, 76, 38, .08), transparent 52%),
+    rgba(16, 31, 22, .94);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .26), inset 0 1px rgba(255, 245, 215, .035);
+}
+.spatialZone:hover { border-color: #c4a758; background: rgba(28, 55, 38, .97); transform: translateY(-1px); }
+.spatialZone > span { border-radius: 3px; color: #e2c56b; background: rgba(214, 182, 95, .09); }
+.zoneList a:hover { color: #efd57d; }
+
+@media (max-width: 1320px) {
+  .realmPortal span { display: none; }
+  .realmPortal { width: 44px; padding: 0; justify-content: center; }
+  .goldBalance > span:last-child { display: none; }
+  .goldBalance { width: 44px; padding: 0; justify-content: center; }
+}
+
+@media (max-width: 900px) {
+  .brand { min-height: var(--r2-top); }
+  .realmPortal { width: 44px; }
+  .goldBalance { width: 44px; }
+}
+
+@media (max-width: 640px) {
+  .searchButton, .topActions > .realmErpSwitch, .topActions > .iconButton { display: none; }
+  .workspaceButton { max-width: 118px; }
+  .roomFloor { grid-template-areas: "portal" "desk" "team" "projects" "operations" "inbox" "chronicle"; grid-template-columns: 1fr; }
+  .realmAvatarMarker { grid-area: portal; width: 100%; min-height: 112px; grid-template-columns: 62px minmax(0, 1fr); justify-items: start; text-align: left; }
+  .realmAvatarSprite { grid-row: 1 / 3; }
 }
