@@ -74,6 +74,10 @@ test('Reforged Guildhall makes the spatial world primary without replacing busin
   assert.match(scene, /findRealmPath/);
   assert.match(scene, /phase: 'traveling'/);
   assert.match(scene, /phase: 'interacting'/);
+  assert.match(scene, /--scene-camera-x/);
+  assert.match(scene, /onPointerCancel/);
+  assert.match(scene, /visibilitychange/);
+  assert.match(scene, /t\(emote\.label\)/);
   assert.match(scene, /isInVoiceRange/);
   assert.match(scene, /realmGeneratedCharacterUrl/);
   assert.match(scene, /realmGeneratedCharacterArchetype/);
@@ -85,6 +89,8 @@ test('Reforged Guildhall makes the spatial world primary without replacing busin
   assert.match(css, /\.scenePlate/);
   assert.match(css, /\.sceneOcclusion/);
   assert.match(css, /\.actorContactShadow/);
+  assert.match(css, /aspect-ratio:\s*1915\s*\/\s*821/);
+  assert.match(css, /translate\(var\(--scene-camera-x/);
   assert.match(css, /\.actionDock/);
   assert.match(css, /\.surface/);
   assert.match(css, /prefers-reduced-motion: reduce/);
@@ -144,4 +150,12 @@ test('Living Guildhall and Workbench copy switches without translating business 
   assert.match(office, /<h3 data-no-i18n>\{quest\.title\}<\/h3>/);
   assert.match(office, /<span data-no-i18n>\{quest\.project\}<\/span>/);
   assert.match(office, /<span data-no-i18n>\{quest\.reviewer\}<\/span>/);
+  assert.match(office, /data-realm-next-quest/);
+  assert.match(office, /!person\.isRemote && \(!dataSource\.isErp \|\| person\.online\)/);
+  for (const [vietnamese, english] of Object.entries({
+    'Vẫy chào': 'Wave',
+    'Ăn mừng': 'Celebrate',
+    'Cảm ơn': 'Thank',
+    'Cần hỗ trợ': 'Request help',
+  })) assert.equal(translateUiCopy(vietnamese, 'en'), english);
 });

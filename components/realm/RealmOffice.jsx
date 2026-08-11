@@ -1045,7 +1045,7 @@ function RemoteVideoTile({ person, stream, connectionState, onSelect }) {
         ? <video ref={remoteVideoRef} autoPlay playsInline />
         : <span className={styles.videoAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span>}
       <span className={`${styles.connectionPip} ${connectionState === 'connected' ? styles.connectionLive : ''}`} aria-label={connectionLabel} />
-      <span className={styles.videoName}>{person.name}</span>
+      <span className={styles.videoName} data-no-i18n>{person.name}</span>
     </button>
   );
 }
@@ -1107,7 +1107,7 @@ function MediaDock({
         <div className={styles.videoTile}>
           {cameraOn ? <video ref={videoRef} autoPlay muted playsInline /> : <span className={styles.videoAvatar} style={{ '--avatar-color': profile.color }}>{initials(profile.name)}</span>}
           <span className={`${styles.connectionPip} ${styles.connectionLive}`} aria-label="Bạn đang online" />
-          <span className={styles.videoName}>{profile.name}</span>
+          <span className={styles.videoName} data-no-i18n>{profile.name}</span>
         </div>
         {nearby.slice(0, 5).map((person) => <RemoteVideoTile key={person.id} person={person} stream={remoteStreams[person.id]} connectionState={connectionStates[person.id]} onSelect={onPerson} />)}
       </div>
@@ -2030,7 +2030,10 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     () => mergeRealmPresencePeople({ staff: dataSource.isErp ? erpDirectoryPeople : STAFF, remotePlayers, selfProfile: profile }),
     [dataSource.isErp, erpDirectoryPeople, profile, remotePlayers],
   );
-  const worldStaff = useMemo(() => realmPeople.filter((person) => !person.isRemote), [realmPeople]);
+  const worldStaff = useMemo(
+    () => realmPeople.filter((person) => !person.isRemote && (!dataSource.isErp || person.online)),
+    [dataSource.isErp, realmPeople],
+  );
   const onlineCount = realmPeople.filter((person) => person.isRemote || person.online || !dataSource.isErp).length + 1;
   const guildDashboard = useMemo(
     () => realmLocalFixture(dataSource, createRealmGuildDemoDashboard({ members: realmPeople, quests, campaigns: CAMPAIGNS })),
@@ -2168,7 +2171,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                     <article className={styles.partyMember} key={member.id}>
                       <span className={styles.personAvatar} style={{ '--avatar-color': member.profile.color }}>{initials(member.profile.name)}</span>
                       <span>
-                        <strong>{member.profile.name}</strong>
+                        <strong data-no-i18n>{member.profile.name}</strong>
                         <small>{member.id === party.hostId ? 'Host' : 'Member'}{isSelf ? ' · Bạn' : ''}</small>
                       </span>
                       <span className={online ? styles.liveBadge : styles.quietBadge}>{online ? 'Online' : 'Đang nối lại'}</span>
@@ -2187,7 +2190,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                   {pendingInvites.map((inviteState) => (
                     <article className={styles.partyPendingCard} key={inviteState.targetId}>
                       <span className={styles.playerHeroAvatar} style={{ '--avatar-color': inviteState.targetProfile.color }}>{initials(inviteState.targetProfile.name)}</span>
-                      <div><strong>{inviteState.targetProfile.name}</strong><p>Đã gửi lời mời; chỗ được giữ đến khi họ phản hồi.</p></div>
+                      <div><strong data-no-i18n>{inviteState.targetProfile.name}</strong><p>Đã gửi lời mời; chỗ được giữ đến khi họ phản hồi.</p></div>
                       <button type="button" className={styles.secondaryButton} onClick={() => cancelInvite(inviteState.targetId)}>Thu hồi</button>
                     </article>
                   ))}
@@ -2200,7 +2203,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                     {candidates.map((person) => (
                       <button type="button" key={person.id} onClick={() => inviteToParty(person)}>
                         <Avatar className={styles.personAvatar} style={{ '--avatar-color': person.color }} userId={person.userId || null} name={person.name} />
-                        <span><strong>{person.name}</strong><small>{person.role}</small></span>
+                        <span><strong data-no-i18n>{person.name}</strong><small data-no-i18n>{person.role}</small></span>
                         <Icon name="plus" size={17} />
                       </button>
                     ))}
@@ -2245,7 +2248,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                   {remotePlayers.map((person) => (
                     <button type="button" key={person.id} onClick={() => inviteToParty(person)}>
                       <Avatar className={styles.personAvatar} style={{ '--avatar-color': person.color }} userId={person.userId || null} name={person.name} />
-                      <span><strong>{person.name}</strong><small>{person.role}</small></span>
+                      <span><strong data-no-i18n>{person.name}</strong><small data-no-i18n>{person.role}</small></span>
                       <Icon name="plus" size={17} />
                     </button>
                   ))}
@@ -2288,6 +2291,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
           <PanelHeading
             eyebrow="Player interaction"
             title={selectedPerson.name}
+            titleNoTranslate
             text={`${selectedPerson.role} · ${selectedPerson.isRemote ? 'Đang ở trong Realm' : selectedPerson.isErpDirectory ? selectedPerson.online ? `Đang online tại ${(selectedPerson.surfaces || []).map((surface) => surface === 'realm' ? 'Realm' : 'ERP').join(' + ')}` : 'Nhân sự ERP · hiện đang offline' : 'Người chơi Realm'}`}
           />
           <div className={styles.playerHero}>
@@ -2619,7 +2623,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
       {incomingInvite && (
         <section className={guild.invite} role="alertdialog" aria-labelledby="party-invite-title" aria-describedby="party-invite-copy">
           <span className={guild.inviteIcon}><Icon name="phone" size={20} /></span>
-          <div><strong id="party-invite-title">{incomingInvite.hostProfile.name} mời bạn vào Party Voice</strong><p id="party-invite-copy">{incomingInvite.memberCount}/{incomingInvite.maxMembers} người · cuộc thoại tiếp tục khi di chuyển giữa các phòng.</p></div>
+          <div><strong id="party-invite-title"><span data-no-i18n>{incomingInvite.hostProfile.name}</span> mời bạn vào Party Voice</strong><p id="party-invite-copy">{incomingInvite.memberCount}/{incomingInvite.maxMembers} người · cuộc thoại tiếp tục khi di chuyển giữa các phòng.</p></div>
           <div className={guild.inviteActions}><button type="button" onClick={declineInvite}>Từ chối</button><button type="button" onClick={acceptPartyInvite}>Tham gia</button></div>
         </section>
       )}
@@ -2677,7 +2681,10 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
           )}
 
           <nav className={guild.actionDock} aria-label="Hành động chính trong Guildhall" data-living-motion="action-dock">
-            <div className={guild.dockPrompt}><strong>{nextQuest ? nextQuest.title : 'Guildhall đã sẵn sàng'}</strong><small>{nextQuest ? <><span data-no-i18n>{nextQuest.project}</span><span> · {t(nextQuest.due)}</span></> : `${onlineCount} người đang có mặt · ${TRANSPORT[transportState]?.short || 'Solo mode'}`}</small></div>
+            <div className={guild.dockPrompt}>
+              {nextQuest ? <strong data-no-i18n data-realm-next-quest>{nextQuest.title}</strong> : <strong>{t('Guildhall đã sẵn sàng')}</strong>}
+              <small>{nextQuest ? <><span data-no-i18n>{nextQuest.project}</span><span> · {t(nextQuest.due)}</span></> : `${onlineCount} người đang có mặt · ${TRANSPORT[transportState]?.short || 'Solo mode'}`}</small>
+            </div>
             <div className={guild.dockActions}>
               <button type="button" className={`${guild.dockAction} ${voiceOpen ? guild.dockActionActive : ''}`} aria-pressed={voiceOpen} onClick={() => setVoiceOpen((open) => !open)}><Icon name="mic" size={21} /><span>Voice</span></button>
               <button type="button" className={guild.dockAction} onClick={() => moveToObject('quests')}><Icon name="work" size={21} /><span>Công việc</span></button>
@@ -2736,8 +2743,8 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   );
 }
 
-function PanelHeading({ eyebrow, title, text }) {
-  return <header className={styles.panelHeading}><span>{eyebrow}</span><h2>{title}</h2><p>{text}</p></header>;
+function PanelHeading({ eyebrow, title, text, titleNoTranslate = false }) {
+  return <header className={styles.panelHeading}><span>{eyebrow}</span><h2 data-no-i18n={titleNoTranslate || undefined}>{title}</h2><p>{text}</p></header>;
 }
 
 function Gold({ amount }) {
@@ -2748,7 +2755,7 @@ function LedgerList({ ledger }) {
   return (
     <div className={styles.ledgerList}>
       {ledger.map((entry) => (
-        <div key={entry.id}><span><strong>{entry.label}</strong><small>{entry.at}</small></span><b className={entry.amount > 0 ? styles.earn : entry.amount < 0 ? styles.spend : styles.neutral}>{entry.amount > 0 ? '+' : ''}{entry.amount} G</b></div>
+        <div key={entry.id}><span><strong data-no-i18n>{entry.label}</strong><small>{entry.at}</small></span><b className={entry.amount > 0 ? styles.earn : entry.amount < 0 ? styles.spend : styles.neutral}>{entry.amount > 0 ? '+' : ''}{entry.amount} G</b></div>
       ))}
     </div>
   );
@@ -2945,8 +2952,8 @@ function LedgerMode({
         <span className={styles.dossierCrest} style={{ '--avatar-color': profile.color }}><Icon name="shield" size={25} /></span>
         <div className={styles.identityCopy}>
           <span>ERP profile · Hồ sơ nhân sự / Character profile</span>
-          <h2>{profile.name}</h2>
-          <p>{profile.role} · Level {career.level} · <i style={{ '--status-color': status.color }} /> {status.label}</p>
+          <h2 data-no-i18n>{profile.name}</h2>
+          <p><span data-no-i18n>{profile.role}</span> · Level {career.level} · <i style={{ '--status-color': status.color }} /> {status.label}</p>
         </div>
         <div className={styles.ledgerKpis}>
           <span><small>Gold khả dụng</small><strong>{wallet} G</strong></span>
@@ -2990,8 +2997,8 @@ function LedgerMode({
             <thead><tr><th>Mã / phân hệ</th><th>Công việc</th><th>Tiến độ</th><th>Phê duyệt</th><th className={styles.num}>Gold</th><th>Thao tác</th></tr></thead>
             <tbody>{quests.map((quest) => (
               <tr key={quest.id}>
-                <td><strong>{quest.businessRef || quest.id}</strong><small>{quest.module || 'Tasks'}</small></td>
-                <td><strong>{quest.title}</strong><small>{quest.project} · {quest.due}</small></td>
+                <td><strong data-no-i18n>{quest.businessRef || quest.id}</strong><small data-no-i18n>{quest.module || 'Tasks'}</small></td>
+                <td><strong data-no-i18n>{quest.title}</strong><small><span data-no-i18n>{quest.project}</span> · {quest.due}</small></td>
                 <td><span className={styles.progressText}>{quest.progress}/{quest.total}</span><small>{quest.status === 'ready' ? 'Đủ điều kiện' : quest.status === 'claimed' ? 'Đã hoàn tất' : 'Đang thực hiện'}</small></td>
                 <td><span className={styles.tableStatus}>{quest.approval || `Duyệt bởi ${quest.reviewer}`}</span></td>
                 <td className={styles.num}><strong>+{quest.reward} G</strong><small>+{quest.renown} XP</small></td>
@@ -3011,7 +3018,7 @@ function LedgerMode({
         <section className={styles.ledgerSection} data-realm-ledger-section><div className={styles.sectionHead}><div><span>Reward accounting</span><h2>Gold journal</h2></div><p>Append-only demo</p></div><LedgerList ledger={ledger} /></section>
         <section className={styles.ledgerSection} data-realm-ledger-section><div className={styles.sectionHead}><div><span>Team availability</span><h2>Presence</h2></div><p>Trạng thái tự nguyện</p></div><div className={styles.roster}>{staff.map((person) => {
           const personStatus = STATUS[person.status] || STATUS.available;
-          return <article key={person.id} className={styles.personRow}><span className={styles.personAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span><span><strong>{person.name}</strong><small>{person.role}</small></span><span className={styles.presenceLabel}><i style={{ '--status-color': personStatus.color }} />{personStatus.label}</span></article>;
+          return <article key={person.id} className={styles.personRow}><span className={styles.personAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span><span><strong data-no-i18n>{person.name}</strong><small data-no-i18n>{person.role}</small></span><span className={styles.presenceLabel}><i style={{ '--status-color': personStatus.color }} />{personStatus.label}</span></article>;
         })}</div></section>
       </div>
       </>}
@@ -3027,7 +3034,7 @@ function CharacterDossier({ profile, playerStatus, career, wallet, operationsSou
       <span className={styles.eyebrow}>Live employee status</span>
       <div className={styles.dossierIdentity}>
         <span className={styles.dossierCrest} style={{ '--avatar-color': profile.color }}><Icon name="shield" size={27} /></span>
-        <div><h2 id="character-dossier-title">{profile.name}</h2><p>STAFF-001 · {profile.role}</p></div>
+        <div><h2 id="character-dossier-title" data-no-i18n>{profile.name}</h2><p>STAFF-001 · <span data-no-i18n>{profile.role}</span></p></div>
       </div>
       <div className={styles.levelRow}><span>Level {career.level}</span><strong>{career.renown.toLocaleString('vi-VN')} / {career.nextLevelRenown.toLocaleString('vi-VN')} XP</strong></div>
       <div className={styles.careerProgress} role="progressbar" aria-label="Tiến độ level nhân vật" aria-valuemin="0" aria-valuemax="100" aria-valuenow={career.levelProgress}><i style={{ width: `${career.levelProgress}%` }} /></div>

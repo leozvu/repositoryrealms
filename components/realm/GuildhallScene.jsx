@@ -54,7 +54,7 @@ const OBJECT_SCENE_POINTS = Object.freeze({
   'guild-roster': Object.freeze({ x: 85, y: 25 }),
   'war-table': Object.freeze({ x: 66, y: 37 }),
   'treasury-chest': Object.freeze({ x: 20, y: 50 }),
-  'tavern-board': Object.freeze({ x: 37, y: 22 }),
+  'tavern-board': Object.freeze({ x: 37, y: 31 }),
   'quest-board': Object.freeze({ x: 50, y: 44 }),
   'realm-gate': Object.freeze({ x: 27, y: 81 }),
   'arcane-forge': Object.freeze({ x: 78, y: 66 }),
@@ -150,6 +150,7 @@ function usePrefersReducedMotion() {
 }
 
 function RealmFigure({ person, player = false, moving = false, facing = 'down', action, actionPhase, emote, onSelect, interactionLabel, reducedMotion }) {
+  const { t } = useLanguage();
   const projected = projectPosition(person);
   const identity = person;
   const archetype = realmGeneratedCharacterArchetype(identity);
@@ -169,7 +170,7 @@ function RealmFigure({ person, player = false, moving = false, facing = 'down', 
       />
       <span className={scene.figureIdentity}>
         <span className={scene.figureStatus} style={{ '--figure-status': accent }} />
-        <strong>{player ? 'Bạn' : person.name}</strong>
+        <strong data-no-i18n={player ? undefined : true}>{player ? t('Bạn') : person.name}</strong>
         <small>{archetype.race} · {archetype.role}</small>
       </span>
       {emote && <span className={scene.figureEmote}>{emote.mark || emote.label}</span>}
@@ -182,8 +183,8 @@ function RealmFigure({ person, player = false, moving = false, facing = 'down', 
     zIndex: 20 + Math.round(projected.y),
   };
   const className = `${scene.figure} ${player ? scene.figurePlayer : ''} ${moving ? scene.figureMoving : ''}`;
-  if (!onSelect) return <span className={className} style={style} data-room={projected.room.id}>{content}</span>;
-  return <button type="button" className={className} style={style} data-room={projected.room.id} onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); onSelect(person); }} aria-label={interactionLabel || `Mở tương tác với ${person.name}`}>{content}</button>;
+  if (!onSelect) return <span className={className} style={style} data-room={projected.room.id} data-realm-player={player || undefined}>{content}</span>;
+  return <button type="button" className={className} style={style} data-room={projected.room.id} data-realm-player={player || undefined} onPointerDown={(event) => event.stopPropagation()} onClick={(event) => { event.stopPropagation(); onSelect(person); }} aria-label={interactionLabel || `Mở tương tác với ${person.name}`}>{content}</button>;
 }
 
 export default function GuildhallScene({
@@ -289,6 +290,23 @@ export default function GuildhallScene({
   useEffect(() => () => {
     if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
   }, []);
+
+  useEffect(() => {
+    const resetInput = () => {
+      keysRef.current.clear();
+      cancelJourney();
+      setMoving(false);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') resetInput();
+    };
+    window.addEventListener('blur', resetInput);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('blur', resetInput);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [cancelJourney]);
 
   useEffect(() => {
     const isTyping = (event) => ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target?.tagName);
@@ -439,9 +457,26 @@ export default function GuildhallScene({
     else keysRef.current.delete(key);
   };
 
+  const startDirection = (event, key) => {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    pressDirection(key, true);
+  };
+
+  const stopDirection = (event, key) => {
+    pressDirection(key, false);
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
+
   return (
     <section className={scene.sceneStage} aria-label={t('Không gian Guildhall tương tác')}>
-      <div ref={plateRef} className={scene.scenePlate} onPointerDown={moveOnPlate} data-room={projectedPlayer.room.id}>
+      <div
+        ref={plateRef}
+        className={scene.scenePlate}
+        style={{ '--scene-camera-x': `${-clamp(projectedPlayer.x, 12, 88)}%` }}
+        onPointerDown={moveOnPlate}
+        data-room={projectedPlayer.room.id}
+      >
         <GuildhallAtmosphere
           imageUrl="/realms/assets/guildhall-reforged/guildhall-environment.png"
           imageAlt={t('Đại sảnh Guildhall nhìn từ trên cao với bàn hội đồng, bàn dự án, kho bạc và khu nhân sự')}
@@ -475,6 +510,7 @@ export default function GuildhallScene({
             <button
               type="button"
               key={object.id}
+              data-realm-object-id={object.id}
               className={`${scene.hotspot} ${activePanel === object.panel ? scene.hotspotActive : ''} ${objectJourney ? scene.hotspotTarget : ''} ${objectJourney?.phase === 'interacting' ? scene.hotspotInteracting : ''}`}
               style={{ '--hotspot-x': `${projected.x}%`, '--hotspot-y': `${projected.y}%` }}
               onPointerDown={(event) => event.stopPropagation()}
@@ -521,7 +557,7 @@ export default function GuildhallScene({
       </div>
 
       {journey && journeyObject && journeyCopy && (
-        <div className={scene.journeyTracker} role="status" aria-live="polite" data-phase={journey.phase}>
+        <div className={scene.journeyTracker} role="status" aria-live="polite" data-phase={journey.phase} data-realm-journey>
           <span>{t(journey.phase === 'traveling' ? 'Đang di chuyển' : journey.phase === 'interacting' ? journey.verb : 'Bàn làm việc đã mở')}</span>
           <strong>{t(journeyCopy.title)}</strong>
           <small>{t(journey.phase === 'traveling' ? 'WASD để hủy hành trình' : journey.progress)}</small>
@@ -529,17 +565,17 @@ export default function GuildhallScene({
         </div>
       )}
 
-      {activeObject && (
+      {activeObject && !journey && (
         <button type="button" className={scene.nearbyPrompt} onClick={() => startObjectInteraction(activeObject)}>
           <kbd>E</kbd><span><strong>{t(OBJECT_INTERACTIONS[activeObject.id]?.verb || activeObject.name)}</strong><small>{t(activeObject.name)}</small></span>
         </button>
       )}
 
       <div className={scene.signalControl}>
-        <button type="button" aria-expanded={signalOpen} onClick={() => { setSignalOpen((open) => !open); setLocationOpen(false); }}><Icon name="bolt" size={17} /><span>{t('Ra hiệu')}</span></button>
+        <button type="button" aria-label={t('Ra hiệu')} aria-expanded={signalOpen} onClick={() => { setSignalOpen((open) => !open); setLocationOpen(false); }}><Icon name="bolt" size={17} /><span>{t('Ra hiệu')}</span></button>
         {signalOpen && (
           <div className={scene.signalMenu}>
-            {REALM_EMOTES.map((emote) => <button type="button" key={emote.id} onClick={() => { onEmote(emote.id); setSignalOpen(false); }}>{emote.label}</button>)}
+            {REALM_EMOTES.map((emote) => <button type="button" key={emote.id} onClick={() => { onEmote(emote.id); setSignalOpen(false); }}>{t(emote.label)}</button>)}
           </div>
         )}
       </div>
@@ -570,10 +606,24 @@ export default function GuildhallScene({
       </div>
 
       <div className={scene.mobileDpad} aria-label="Điều khiển di chuyển">
-        <button type="button" aria-label="Đi lên" onPointerDown={() => pressDirection('w', true)} onPointerUp={() => pressDirection('w', false)} onPointerLeave={() => pressDirection('w', false)}>W</button>
-        <button type="button" aria-label="Đi sang trái" onPointerDown={() => pressDirection('a', true)} onPointerUp={() => pressDirection('a', false)} onPointerLeave={() => pressDirection('a', false)}>A</button>
-        <button type="button" aria-label="Đi xuống" onPointerDown={() => pressDirection('s', true)} onPointerUp={() => pressDirection('s', false)} onPointerLeave={() => pressDirection('s', false)}>S</button>
-        <button type="button" aria-label="Đi sang phải" onPointerDown={() => pressDirection('d', true)} onPointerUp={() => pressDirection('d', false)} onPointerLeave={() => pressDirection('d', false)}>D</button>
+        {[
+          ['w', 'W', 'Đi lên'],
+          ['a', 'A', 'Đi sang trái'],
+          ['s', 'S', 'Đi xuống'],
+          ['d', 'D', 'Đi sang phải'],
+        ].map(([key, label, ariaLabel]) => (
+          <button
+            type="button"
+            key={key}
+            aria-label={t(ariaLabel)}
+            onPointerDown={(event) => startDirection(event, key)}
+            onPointerUp={(event) => stopDirection(event, key)}
+            onPointerCancel={(event) => stopDirection(event, key)}
+            onLostPointerCapture={(event) => pressDirection(key, false)}
+          >
+            {label}
+          </button>
+        ))}
       </div>
     </section>
   );
