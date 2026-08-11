@@ -162,15 +162,15 @@ function HomeScreen() {
       <div className={styles.realmHomeLayout}>
         <section className={styles.workplaceScene} aria-labelledby="realm-workplace-title">
           <header className={styles.sceneHeader}>
-            <div><span>Realm đang sống</span><h2 id="realm-workplace-title">Bản đồ Đại sảnh</h2><p>Chọn khu vực nghiệp vụ, hoặc bước vào world để gặp đồng đội.</p></div>
+            <div><span>Living Guildhall</span><h2 id="realm-workplace-title">Sơ đồ không gian làm việc</h2><p>Mở đúng bàn công việc, hoặc vào Đại sảnh sống để gặp đồng đội.</p></div>
             <span className={styles.presenceChip}><Icon name="people" size={15}/>Đang kết nối</span>
           </header>
           <div className={styles.roomFloor}>
             <div className={styles.floorPath} aria-hidden="true"/>
             <Link className={styles.realmAvatarMarker} href="/realm" aria-label="Bước vào Realm, di chuyển nhân vật và mở voice theo khoảng cách">
               <span className={styles.realmAvatarSprite} aria-hidden="true"/>
-              <strong>Bước vào Realm</strong>
-              <small>Di chuyển, gặp gỡ và voice</small>
+              <strong>Vào Đại sảnh sống</strong>
+              <small>Di chuyển, gặp gỡ và Council Voice</small>
             </Link>
             <Link className={styles.spatialZone} data-zone="desk" href="/realm-v2/my-work">
               <span><Icon name="checklist" size={22}/></span><strong>Bàn của tôi</strong><small>{t(`${data.myWork.metrics.open} việc đang mở`)}</small>

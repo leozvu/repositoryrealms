@@ -14,9 +14,9 @@ import styles from './realm-v2.module.css';
 
 const PAGE_COPY = {
   home: {
-    eyebrow: 'Đại sảnh công việc',
-    title: 'Đại sảnh Realm',
-    description: 'Bắt đầu từ việc tiếp theo, Gold và người đang hiện diện. Bước vào thế giới khi cần gặp và voice.',
+    eyebrow: 'Living Guildhall · Workbench',
+    title: 'Realm Workbench',
+    description: 'Bắt đầu từ việc tiếp theo, người đang hiện diện và Gold đã được ghi nhận. Vào Đại sảnh sống khi cần gặp và trò chuyện.',
   },
   'my-work': {
     eyebrow: 'Task ERP · Góc nhìn Realm',
@@ -189,7 +189,7 @@ function ProductShell({ user, company, slug, pilot, children }) {
         <aside className={styles.rail} aria-label="Điều hướng chính Realm">
           <Link className={styles.brand} href="/realm-v2/home" aria-label="Trang chủ Realm">
             <span className={styles.brandMark}><Icon name="shield" size={18}/></span>
-            <span className={styles.brandText}>Đại sảnh Realm<small>{company}</small></span>
+            <span className={styles.brandText}>Realm Workbench<small>{company}</small></span>
           </Link>
           <nav className={styles.nav}>
             {navigationGroups.map(([group, areas]) => (
@@ -224,14 +224,14 @@ function ProductShell({ user, company, slug, pilot, children }) {
           <button type="button" className={styles.mobileMenu} aria-label="Mở tất cả điểm đến" onClick={() => setDrawerOpen(true)}><Icon name="menu"/></button>
           <Link className={styles.workspaceButton} href="/realm-v2/home">
             <span className={styles.brandMark} style={{ width: 28, height: 28, flexBasis: 28, borderRadius: 8 }}>{(company || 'R')[0]}</span>
-            <span>{company} · Realm</span>
+            <span>{company} · Workbench</span>
           </Link>
           <button type="button" className={styles.searchButton} onClick={() => setSearchOpen(true)} aria-label="Tìm kiếm dữ liệu ERP">
             <Icon name="search"/><span>Tìm bản ghi hoặc tác vụ ERP…</span><kbd>Ctrl K</kbd>
           </button>
           <div className={styles.topActions}>
             <Link className={styles.realmPortal} href="/realm" aria-label="Bước vào thế giới Realm với nhân vật và voice theo khoảng cách">
-              <Icon name="map" size={17}/><span>Bước vào Realm</span>
+              <Icon name="map" size={17}/><span>Vào Living Guildhall</span>
             </Link>
             <Link className={styles.goldBalance} href="/realm-v2/recognition" aria-label="Mở Sổ Realm và Gold">
               <span className={styles.goldCoin}>G</span>

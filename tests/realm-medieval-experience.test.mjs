@@ -47,6 +47,30 @@ test('the medieval visual system uses repository assets and remains motion-acces
   assert.match(css, /prefers-reduced-motion/);
 });
 
+test('Living Guildhall makes the spatial world primary without replacing business capabilities', () => {
+  const office = source('components/realm/RealmOffice.jsx');
+  const motion = source('components/realm/LivingGuildhallMotion.jsx');
+  const css = source('components/realm/realm-office.module.css');
+  const manifest = JSON.parse(source('package.json'));
+
+  assert.match(office, /The Living Guildhall/);
+  assert.match(office, /Council Voice/);
+  assert.match(office, /Kho bạc Gold/);
+  assert.match(office, /data-realm-ledger-root/);
+  assert.match(office, /data-realm-ledger-tabs/);
+  assert.match(office, /data-realm-ledger-section/);
+  assert.match(office, /RoyalTreasuryExchange/);
+  assert.match(office, /RewardControlCenter/);
+  assert.match(office, /useProximityMedia/);
+  assert.match(motion, /prefers-reduced-motion: reduce/);
+  assert.match(motion, /ScrollTrigger/);
+  assert.match(css, /Living Guildhall: quiet medieval prestige/);
+  assert.match(css, /\.presenceRibbon/);
+  assert.match(css, /\.locationAccordion/);
+  assert.equal(manifest.dependencies.gsap, '^3.15.0');
+  assert.equal(manifest.dependencies['@gsap/react'], '^2.1.2');
+});
+
 test('new medieval Realm copy switches fully between Vietnamese and English', () => {
   const copy = {
     'Đại sảnh Realm': 'Realm Great Hall',
@@ -61,4 +85,26 @@ test('new medieval Realm copy switches fully between Vietnamese and English', ()
     assert.equal(translateUiCopy(vietnamese, 'en'), english, vietnamese);
     assert.equal(translateUiCopy(vietnamese, 'vi'), vietnamese, vietnamese);
   }
+});
+
+test('Living Guildhall and Workbench copy switches without translating business records', () => {
+  const copy = {
+    'Bàn công việc': 'Workbench',
+    'Phòng điều hành': 'Operations Room',
+    'Kho bạc Realm': 'Realm Treasury',
+    'Gold của bạn': 'Your Gold',
+    'Sơ đồ không gian làm việc': 'Workplace map',
+    'đang có mặt': 'present',
+    '· Duyệt bởi': '· Reviewed by',
+  };
+
+  for (const [vietnamese, english] of Object.entries(copy)) {
+    assert.equal(translateUiCopy(vietnamese, 'en'), english, vietnamese);
+    assert.equal(translateUiCopy(vietnamese, 'vi'), vietnamese, vietnamese);
+  }
+
+  const office = source('components/realm/RealmOffice.jsx');
+  assert.match(office, /<h3 data-no-i18n>\{quest\.title\}<\/h3>/);
+  assert.match(office, /<span data-no-i18n>\{quest\.project\}<\/span>/);
+  assert.match(office, /<span data-no-i18n>\{quest\.reviewer\}<\/span>/);
 });

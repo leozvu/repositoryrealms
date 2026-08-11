@@ -81,6 +81,7 @@ import { useRealmParty } from './useRealmParty';
 import { useRealmPresence } from './useRealmPresence';
 import { useRealmChangeFeed } from './useRealmChangeFeed';
 import RealmNotificationBell from './RealmNotificationBell';
+import LivingGuildhallMotion from './LivingGuildhallMotion';
 import { useCollaborationDirectory } from '@/components/collaboration/useCollaborationDirectory';
 import { LanguageSwitch } from '@/components/LanguageProvider';
 import {
@@ -170,14 +171,14 @@ const STATUS = {
 
 const NAV = [
   { id: 'briefing', label: 'Đại sảnh', icon: 'dashboard' },
-  { id: 'quests', label: 'Quest Board', icon: 'tasks' },
-  { id: 'command', label: 'Royal Command', icon: 'shield' },
-  { id: 'campaigns', label: 'Chiến dịch', icon: 'projects' },
-  { id: 'guild', label: 'Guild', icon: 'staff' },
-  { id: 'treasury', label: 'Royal Treasury', icon: 'wallet' },
-  { id: 'shop', label: 'Arcane Forge', icon: 'settings' },
-  { id: 'chat', label: 'Lantern Chat', icon: 'meeting' },
-  { id: 'party', label: 'Party Voice', icon: 'phone' },
+  { id: 'quests', label: 'Bàn công việc', icon: 'tasks' },
+  { id: 'command', label: 'Phòng điều hành', icon: 'shield' },
+  { id: 'campaigns', label: 'Phòng dự án', icon: 'projects' },
+  { id: 'guild', label: 'Thành viên', icon: 'staff' },
+  { id: 'treasury', label: 'Kho bạc Gold', icon: 'wallet' },
+  { id: 'shop', label: 'Xưởng phẩm', icon: 'settings' },
+  { id: 'chat', label: 'Lantern Mail', icon: 'meeting' },
+  { id: 'party', label: 'Council Voice', icon: 'phone' },
 ];
 
 const CAMPAIGNS = [
@@ -1079,11 +1080,11 @@ function MediaDock({
     : connectedPeers ? `${connectedPeers} P2P live` : remotePeers.length ? 'Đang kết nối' : 'Yên tĩnh';
 
   return (
-    <section className={styles.mediaDock} aria-label="Vùng trò chuyện theo khoảng cách">
+    <section className={styles.mediaDock} aria-label="Council Voice theo khoảng cách" data-living-motion="council-voice">
       <div className={styles.mediaHeader}>
         <div>
-          <span className={styles.eyebrow}>Spatial party</span>
-          <strong>{nearby.length ? `${nearby.length} người trong tầm thoại` : 'Chưa có ai trong tầm thoại'}</strong>
+          <span className={styles.eyebrow}>Council Voice</span>
+          <strong>{nearby.length ? `${nearby.length} người đang ở gần` : 'Không gian đang yên tĩnh'}</strong>
           <small>{transportLabel}</small>
         </div>
         <span className={connectedPeers || mediaTopology === 'sfu' ? styles.liveBadge : styles.quietBadge} aria-live="polite">{badgeLabel}</span>
@@ -1173,6 +1174,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const mediaRef = useRef(null);
   const screenRef = useRef(null);
   const videoRef = useRef(null);
+  const realmShellRef = useRef(null);
   const emoteTimersRef = useRef(new Map());
   const mainStageRef = useRef(null);
   const inspectorRef = useRef(null);
@@ -2128,7 +2130,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
         : null;
       return (
         <>
-          <PanelHeading eyebrow="Private meeting" title="Party Voice" text="Room nhiều thành viên giữ voice hoạt động ngoài bán kính spatial 5 ô; gateway quản lý host, roster và lời mời." />
+          <PanelHeading eyebrow="Phòng hội đồng" title="Council Voice" text="Không gian trao đổi riêng giữ cuộc thoại liên tục khi các thành viên di chuyển giữa các phòng." />
           {party ? (
             <>
               <div className={styles.partyStatusCard}>
@@ -2400,9 +2402,9 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                 <span className={styles.priority}>{quest.priority}</span>
                 <Gold amount={quest.reward} />
               </div>
-              <h3>{quest.title}</h3>
-              <p>{quest.project} · Duyệt bởi {quest.reviewer}</p>
-              <div className={styles.progressLabel}><span>{quest.progress}/{quest.total} tiêu chí</span><span>{quest.due}</span></div>
+              <h3 data-no-i18n>{quest.title}</h3>
+              <p><span data-no-i18n>{quest.project}</span> · Duyệt bởi <span data-no-i18n>{quest.reviewer}</span></p>
+              <div className={styles.progressLabel}><span>{quest.progress}/{quest.total} tiêu chí</span><span data-no-i18n>{quest.due}</span></div>
               <div className={styles.progress}><i style={{ width: `${quest.progress / quest.total * 100}%` }} /></div>
               {quest.status === 'ready' && <button type="button" className={styles.primaryButton} disabled={operationsSyncState === 'syncing'} onClick={() => claimQuest(quest)}>Nhận {quest.reward} Gold</button>}
               {quest.status === 'active' && (operationsSource === 'erp'
@@ -2466,8 +2468,12 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
 
     if (activePanel === 'treasury') return (
       <section className={styles.treasurySurface} data-realm-business-surface="treasury">
-        <PanelHeading eyebrow="Royal Treasury" title="Ví & sổ Gold" text="Wallet dùng để đổi vật phẩm; lịch sử Gold đã kiếm không bị giảm khi chi tiêu." />
-        <div className={styles.balanceCard}><span>Gold khả dụng</span><strong>{wallet}</strong><small>Renown mùa này: {career.renown.toLocaleString('vi-VN')} XP · Level {career.level}</small></div>
+        <PanelHeading eyebrow="Kho bạc Realm" title="Gold của bạn" text="Mỗi Gold đều có nguồn gốc từ một đóng góp được ghi nhận; chi tiêu không xóa lịch sử đã kiếm." />
+        <div className={styles.balanceCard}><span>Gold khả dụng</span><strong>{wallet}</strong><small>{career.renown.toLocaleString('vi-VN')} Renown · Level {career.level}</small></div>
+        <div className={styles.treasuryActions}>
+          <button type="button" className={styles.primaryButton} onClick={() => { setMode('ledger'); setLedgerView('rewards'); }}>Mở Hội đồng Gold</button>
+          <button type="button" className={styles.secondaryButton} onClick={() => { setMode('ledger'); setLedgerView('treasury'); }}>Vào Xưởng phẩm</button>
+        </div>
         <LedgerList ledger={ledger} />
       </section>
     );
@@ -2552,16 +2558,18 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
 
   return (
     <main
+      ref={realmShellRef}
       className={`${styles.realmShell} ${mode === 'ledger' ? styles.ledgerShell : ''}`}
       data-realm-ui-art={uiArtState}
       style={UI_ART_REQUESTED ? GENERATED_UI_ART_STYLE : undefined}
     >
+      <LivingGuildhallMotion scopeRef={realmShellRef} mode={mode} />
       <a className={styles.skipLink} href="#realm-main-content">Bỏ qua điều hướng, tới nội dung Realm</a>
       <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">{navigationAnnouncement}</span>
       <header className={styles.topbar}>
         <div className={styles.brandCompact}>
           <span className={styles.brandShield}><Icon name="shield" size={20} /></span>
-          <span><strong>CRMegoric Realms</strong><small>Virtual Medieval Office · {workspaceLabel}</small></span>
+          <span><strong>CRMegoric Realms</strong><small>Living Guildhall · {workspaceLabel}</small></span>
         </div>
         <div className={styles.topbarCenter}>
           <button type="button" className={mode === 'world' ? styles.activeMode : ''} onClick={() => setMode('world')} aria-pressed={mode === 'world'}><Icon name="dashboard" size={16} />Realm</button>
@@ -2658,9 +2666,9 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
 
         <section id="realm-main-content" ref={mainStageRef} tabIndex={-1} className={styles.mainStage}>
           {mode === 'world' ? (
-            <>
+            <section className={styles.worldExperience} data-living-motion="great-hall">
               <div className={styles.worldTopline}>
-                <div><span className={styles.eyebrow}>Bạn đang ở</span><h1>{currentRoom?.name || 'Hành lang lâu đài'}</h1></div>
+                <div><span className={styles.eyebrow}>The Living Guildhall</span><h1>{currentRoom?.name || 'Đại sảnh Realm'}</h1><p>Mọi người, công việc và cuộc trò chuyện trong cùng một không gian.</p></div>
                 <div className={styles.worldToplineActions}>
                   <label className={styles.mapStylePicker}>
                     <Icon name="settings" size={17} />
@@ -2686,6 +2694,25 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                 mapStyle={mapStyle}
                 position={position}
               />
+              <div className={styles.presenceRibbon} data-living-motion="presence" aria-label="Những người đang có mặt">
+                <span className={styles.presenceRibbonTitle}><i />{onlineCount} đang có mặt</span>
+                <div className={styles.presenceRibbonPeople}>
+                  {realmPeople.length ? realmPeople.slice(0, 8).map((person) => (
+                    <button type="button" key={person.id} onClick={() => selectPerson(person)} title={`Mở tương tác với ${person.name}`}>
+                      <Avatar className={styles.presenceRibbonAvatar} userId={person.userId || null} name={person.name} style={{ '--avatar-color': person.color }} />
+                      <span><strong>{person.name}</strong><small>{person.role}</small></span>
+                      <i style={{ '--status-color': (STATUS[person.status] || STATUS.available).color }} />
+                    </button>
+                  )) : <span className={styles.presenceEmpty}>Bạn là người đầu tiên trong sảnh.</span>}
+                </div>
+              </div>
+              <nav className={styles.locationAccordion} data-living-motion="locations" aria-label="Di chuyển nhanh trong Realm">
+                <button type="button" className={activePanel === 'briefing' ? styles.locationActive : ''} onClick={() => moveToObject('briefing')}><span>01</span><strong>Đại sảnh</strong><small>Hiện diện & nhịp làm việc</small></button>
+                <button type="button" className={activePanel === 'campaigns' ? styles.locationActive : ''} onClick={() => moveToObject('campaigns')}><span>02</span><strong>Phòng dự án</strong><small>Chiến dịch & bàn công việc</small></button>
+                <button type="button" className={activePanel === 'party' ? styles.locationActive : ''} onClick={() => moveToObject('party')}><span>03</span><strong>Council Voice</strong><small>Họp thoại không gian</small></button>
+                {tavernEnabled && <button type="button" className={activePanel === 'treasury' ? styles.locationActive : ''} onClick={() => moveToObject('treasury')}><span>04</span><strong>Kho bạc Gold</strong><small>Thưởng, sổ cái & đổi phẩm</small></button>}
+                <button type="button" onClick={() => { setMode('ledger'); setLedgerView('personal'); }}><span>05</span><strong>Chronicle</strong><small>Hồ sơ & dấu ấn đóng góp</small></button>
+              </nav>
               {activeObject && (
                 <button type="button" className={styles.interactPrompt} onClick={() => openObject(activeObject)}>
                   <kbd>E</kbd><span><strong>{activeObject.name}</strong><small>{activeObject.hint}</small></span>
@@ -2710,7 +2737,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                 onShare={toggleShare}
                 onPerson={selectPerson}
               />
-            </>
+            </section>
           ) : (
             <LedgerMode
               profile={profile}
@@ -2877,8 +2904,8 @@ function LedgerMode({
     }
   }, [accessManifest, ledgerView, onLedgerViewChange]);
   return (
-    <div className={styles.ledgerMode}>
-      <header className={styles.ledgerHero}>
+    <div className={styles.ledgerMode} data-realm-ledger-root>
+      <header className={styles.ledgerHero} data-realm-ledger-section>
         <div>
           <span className={styles.eyebrow}>Royal operations · ERP & CRM</span>
           <h1>Sổ điều hành CRMegoric</h1>
@@ -2887,7 +2914,7 @@ function LedgerMode({
         <span className={`${styles.syncBadge} ${styles[`syncBadge_${sync.tone}`] || ''}`} aria-live="polite"><Icon name={sync.icon} size={16} /> {sync.label}</span>
       </header>
 
-      <nav className={styles.ledgerViewTabs} aria-label="Chọn khu vực điều hành ERP">
+      <nav className={styles.ledgerViewTabs} aria-label="Chọn khu vực điều hành ERP" data-realm-ledger-tabs>
         {ledgerTabs.map((tab) => {
           const access = realmAccessForSurface(accessManifest, tab.key);
           return <button type="button" key={tab.key} disabled={!access.allowed} title={!access.allowed ? access.reason : undefined}
@@ -2901,7 +2928,7 @@ function LedgerMode({
       <SyncIntegrityCard source={operationsSource} state={operationsSyncState} meta={operationsSyncMeta} onRefresh={onOperationsRefresh} onCopySupportId={onCopySupportId} />
 
       {accessManifest && (
-        <section className={styles.accessManifest} aria-label="Quyền truy cập phiên ERP">
+        <section className={styles.accessManifest} aria-label="Quyền truy cập phiên ERP" data-realm-ledger-section>
           <span><Icon name="shield" size={17} /></span>
           <div><strong>Quyền phiên ERP đã đồng bộ</strong><small>{accessManifest.roles.join(' + ')} · {grantedSurfaces}/{totalSurfaces} khu vực khả dụng · {accessManifest.moduleMode === 'configured' ? 'module theo cấu hình công ty' : accessManifest.moduleMode === 'demo' ? 'quyền mô phỏng staging' : 'module theo mặc định tương thích'}</small></div>
         </section>
@@ -2960,7 +2987,7 @@ function LedgerMode({
           dataRevision={dataRevision}
         />
       ) : <>
-      <section className={styles.identityBridge} aria-label="Hồ sơ nhân sự kết nối nhân vật">
+      <section className={styles.identityBridge} aria-label="Hồ sơ nhân sự kết nối nhân vật" data-realm-ledger-section>
         <span className={styles.dossierCrest} style={{ '--avatar-color': profile.color }}><Icon name="shield" size={25} /></span>
         <div className={styles.identityCopy}>
           <span>ERP profile · Hồ sơ nhân sự / Character profile</span>
@@ -2982,7 +3009,7 @@ function LedgerMode({
         dataRevision={dataRevision}
       />
 
-      <section className={styles.ledgerSection} aria-labelledby="realm-erp-portals-title">
+      <section className={styles.ledgerSection} aria-labelledby="realm-erp-portals-title" data-realm-ledger-section>
         <div className={styles.sectionHead}><div><span>Business bridge</span><h2 id="realm-erp-portals-title">Cổng nghiệp vụ ERP/CRM</h2></div><p>Medieval label chỉ là lớp giao diện; route, dữ liệu và RBAC vẫn thuộc ERP gốc.</p></div>
         <div className={styles.bridgePortalGrid}>
           {(businessBridge?.portals || REALM_CORE_PORTALS).map((portal) => (
@@ -3002,7 +3029,7 @@ function LedgerMode({
         </div>
       </section>
 
-      <section className={styles.ledgerSection}>
+      <section className={styles.ledgerSection} data-realm-ledger-section>
         <div className={styles.sectionHead}><div><span>Work registry</span><h2>Quest ↔ công việc ERP/CRM</h2></div><p>Thao tác ở bảng này cập nhật ngay nhân vật trong Realm.</p></div>
         <div className={styles.tableWrap}>
           <table>
@@ -3027,8 +3054,8 @@ function LedgerMode({
         </div>
       </section>
       <div className={styles.ledgerColumns}>
-        <section className={styles.ledgerSection}><div className={styles.sectionHead}><div><span>Reward accounting</span><h2>Gold journal</h2></div><p>Append-only demo</p></div><LedgerList ledger={ledger} /></section>
-        <section className={styles.ledgerSection}><div className={styles.sectionHead}><div><span>Team availability</span><h2>Presence</h2></div><p>Trạng thái tự nguyện</p></div><div className={styles.roster}>{staff.map((person) => {
+        <section className={styles.ledgerSection} data-realm-ledger-section><div className={styles.sectionHead}><div><span>Reward accounting</span><h2>Gold journal</h2></div><p>Append-only demo</p></div><LedgerList ledger={ledger} /></section>
+        <section className={styles.ledgerSection} data-realm-ledger-section><div className={styles.sectionHead}><div><span>Team availability</span><h2>Presence</h2></div><p>Trạng thái tự nguyện</p></div><div className={styles.roster}>{staff.map((person) => {
           const personStatus = STATUS[person.status] || STATUS.available;
           return <article key={person.id} className={styles.personRow}><span className={styles.personAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span><span><strong>{person.name}</strong><small>{person.role}</small></span><span className={styles.presenceLabel}><i style={{ '--status-color': personStatus.color }} />{personStatus.label}</span></article>;
         })}</div></section>

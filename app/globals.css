@@ -1056,6 +1056,114 @@ kbd{padding:3px 5px;border:1px solid var(--border);border-radius:4px;background:
 @media(max-width:1060px){.home-layout{grid-template-columns:1fr}.home-context{grid-template-columns:1fr 1fr}.home-onboarding{grid-template-columns:1fr}}
 @media(max-width:680px){.home-context{grid-template-columns:1fr}.home-onboarding>div:nth-child(2){align-items:stretch;flex-direction:column}.home-onboarding a{justify-content:space-between}.home-layout{gap:24px}}
 
+/* Quiet medieval prestige for every entity workspace. The entity shell keeps
+   ERP density and semantics while sharing the Realm's material restraint. */
+#app.workspace-shell {
+  --bg:#F3F0E8;
+  --fg:#202922;
+  --muted:#667067;
+  --muted-bg:#EAE6DC;
+  --border:#D9D1C1;
+  --border-strong:#BCAF96;
+  --card:#FFFDF8;
+  --primary:#2E5A43;
+  --primary-dark:#234735;
+  background:#F3F0E8;
+}
+
+#app.workspace-shell #sidebar {
+  width:224px;
+  inset:12px auto 12px 12px;
+  border:1px solid rgba(230,218,190,.12);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 18% 2%,rgba(94,126,96,.16),transparent 19rem),
+    linear-gradient(180deg,#101B15,#0B130F);
+  box-shadow:0 24px 68px rgba(30,26,18,.22),inset 0 1px rgba(255,255,255,.025);
+  overflow:hidden;
+}
+#app.workspace-shell .brand{min-height:68px;margin:7px;padding:8px 10px;border:0;border-radius:12px}
+#app.workspace-shell .brand-logo{
+  width:38px;height:38px;border:1px solid rgba(211,180,105,.38);border-radius:10px 10px 13px 13px;
+  background:rgba(194,157,79,.09);box-shadow:inset 0 1px rgba(255,255,255,.05);color:#D8BA72;
+}
+#app.workspace-shell .brand-name{font-size:.98rem;font-weight:650}
+#app.workspace-shell .brand-sub{color:#92998F}
+#app.workspace-shell #nav{padding:5px 8px 12px}
+#app.workspace-shell .workspace-nav-group{border-radius:10px}
+#app.workspace-shell .workspace-nav-primary{border:1px solid transparent;border-radius:9px;color:#AFB9B0}
+#app.workspace-shell .workspace-nav-primary:hover{background:rgba(255,255,255,.035)}
+#app.workspace-shell .workspace-nav-primary[data-active]{
+  color:#F0E3C3;border-color:rgba(201,169,79,.15);background:rgba(201,169,79,.08);box-shadow:inset 2px 0 #A98A45;
+}
+#app.workspace-shell .workspace-nav-children{border-color:rgba(221,210,184,.11)}
+#app.workspace-shell .workspace-nav-child{border-radius:8px;color:#949E96}
+#app.workspace-shell .workspace-nav-child:hover,#app.workspace-shell .workspace-nav-child[data-active]{background:rgba(201,169,79,.06)}
+#app.workspace-shell .sidebar-footer{border-color:rgba(221,210,184,.1)}
+
+#app.workspace-shell #main{margin-left:236px;background:#F3F0E8}
+#app.workspace-shell #topbar{
+  min-height:62px;margin:12px 16px 0;padding:8px 14px;border:1px solid rgba(112,93,56,.14);border-radius:16px;
+  background:rgba(255,253,248,.86);box-shadow:0 18px 48px rgba(64,49,25,.1),inset 0 1px rgba(255,255,255,.72);
+  backdrop-filter:blur(20px);top:12px;
+}
+#app.workspace-shell #page-title{font-size:1.32rem;font-weight:650;color:#28372D}
+#app.workspace-shell .breadcrumbs{color:#758077}
+#app.workspace-shell .shell-command-trigger,
+#app.workspace-shell .shell-icon-button,
+#app.workspace-shell .shell-user-trigger,
+#app.workspace-shell .workspace-surface-switch,
+#app.workspace-shell .language-switch{
+  border-color:rgba(104,88,55,.14);border-radius:10px;background:rgba(255,255,255,.5);box-shadow:none;
+}
+#app.workspace-shell .shell-gold-balance{
+  border-color:rgba(169,134,62,.3);border-radius:10px;background:#FCF5DF;box-shadow:none;
+}
+#app.workspace-shell .shell-gold-balance>span{border-width:1px;background:#B99143;box-shadow:inset 0 1px rgba(255,246,210,.4)}
+
+#app.workspace-shell #view{max-width:1480px;padding:34px 34px 76px}
+#app.workspace-shell #view::before{display:none}
+#app.workspace-shell .work-page-header{min-height:104px;align-items:center;margin-bottom:28px;padding-bottom:22px;border-color:rgba(91,75,45,.13)}
+#app.workspace-shell .work-page-icon{width:42px;height:42px;border-color:#C9D7CD;border-radius:11px;background:#E9F0EA;color:#315F46}
+#app.workspace-shell .work-page-meta{color:#82714E}
+#app.workspace-shell .work-page-heading h2{font-family:var(--font-display);font-size:clamp(1.65rem,2.8vw,2.45rem);font-weight:620;letter-spacing:-.018em}
+#app.workspace-shell .work-page-heading p:not(.work-page-meta){max-width:78ch;font-size:.78rem;line-height:1.7}
+
+#app.workspace-shell .card,
+#app.workspace-shell .table-wrap,
+#app.workspace-shell .chat-wrap,
+#app.workspace-shell .data-table-shell,
+#app.workspace-shell .document-editor-body{
+  border-color:rgba(91,75,45,.13);border-radius:12px;background:#FFFDF8;box-shadow:0 16px 40px rgba(75,57,27,.055);
+}
+#app.workspace-shell .card-head{min-height:58px;padding:14px 17px;border-color:rgba(91,75,45,.1)}
+#app.workspace-shell .card-title{font-size:1.08rem;font-weight:650}
+#app.workspace-shell .kpi-grid{gap:10px;border:0;border-radius:0;overflow:visible;background:transparent}
+#app.workspace-shell .kpi{border:1px solid rgba(91,75,45,.12)!important;border-radius:11px!important;background:#FFFDF8;box-shadow:0 12px 30px rgba(75,57,27,.04)}
+#app.workspace-shell .kpi:last-child{border-right:1px solid rgba(91,75,45,.12)}
+#app.workspace-shell .kpi-icon{border-radius:9px}
+#app.workspace-shell .table-wrap{overflow:auto}
+#app.workspace-shell th{background:#F0ECE2;color:#606A62}
+#app.workspace-shell tbody tr:hover{background:#F6F2E9}
+#app.workspace-shell input,#app.workspace-shell select,#app.workspace-shell textarea{border-color:#CFC4AF;border-radius:9px;background:#FFFEFB}
+#app.workspace-shell .btn{min-height:38px;border-radius:9px}
+#app.workspace-shell .btn-primary{background:#315F46;border-color:#315F46}
+#app.workspace-shell .btn-outline{background:#FFFDF8}
+
+@media(max-width:900px){
+  #app.workspace-shell #sidebar{width:min(88vw,300px);inset:8px auto 8px 8px;border-radius:16px}
+  #app.workspace-shell #main{margin-left:0}
+  #app.workspace-shell #topbar{min-height:58px;margin:8px 8px 0;padding:7px 10px;top:8px;border-radius:14px}
+  #app.workspace-shell #view{padding:24px 14px 94px}
+  #app.workspace-shell .work-page-header{min-height:86px;margin-bottom:20px}
+}
+
+@media(max-width:620px){
+  #app.workspace-shell .work-page-heading h2{font-size:1.65rem}
+  #app.workspace-shell .work-page-icon{display:none}
+  #app.workspace-shell .work-page-actions{width:100%;justify-content:flex-start}
+}
+
 .record-index-page{display:grid;gap:16px}
 .index-filter-row{display:flex;align-items:flex-end;gap:8px}.index-filter-row label{display:grid;gap:4px;color:var(--muted);font-size:.66rem;font-weight:650}.index-filter-row select{min-width:180px;height:34px;font-size:.73rem}
 .record-link-button{color:var(--primary);font-weight:720;text-align:left}.record-link-button:hover{text-decoration:underline}
