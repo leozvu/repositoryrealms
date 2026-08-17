@@ -16,6 +16,8 @@
     "realm:v2:baseline:capture": "node scripts/capture-realm-v2-visual-baseline.mjs",
     "audit:realm:v2:baseline": "node scripts/audit-realm-v2-visual-baseline.mjs",
     "audit:realm:v2:baseline:check": "node scripts/audit-realm-v2-visual-baseline.mjs --check",
+    "audit:realm:visual-forge": "node scripts/audit-realm-visual-forge.mjs",
+    "audit:realm:visual-forge:check": "node scripts/audit-realm-visual-forge.mjs --check",
     "realm:v2:phase1:capture": "node scripts/capture-realm-v2-phase-1.mjs",
     "realm:v2:phase2:capture": "node scripts/capture-realm-v2-phase-2.mjs",
     "realm:v2:phase3:capture": "node scripts/capture-realm-v2-phase-3.mjs",
