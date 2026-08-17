@@ -19,6 +19,20 @@ import {
   stepRealmMotion,
 } from '@/lib/realm-world-v3';
 import {
+  REALM_CHARACTER_ATLAS_ROWS,
+  REALM_OCCLUDER_NODES,
+  REALM_OBJECT_VISUALS,
+  REALM_ROOM_MATERIAL_FRAMES,
+  REALM_RUNTIME_ASSET_URLS,
+  REALM_RUNTIME_CHARACTER_URLS,
+  REALM_WORLD_Y_SCALE,
+  projectRealmY,
+  realmAtlasFrame,
+  realmInteractionEnvelope,
+  realmObjectFacing,
+  unprojectRealmY,
+} from '@/lib/realm-visual-runtime';
+import {
   PRIVATE_ZONES,
   ROOMS,
   WALLS,
@@ -135,6 +149,125 @@ function roundRect(ctx, x, y, width, height, radius) {
   ctx.closePath();
 }
 
+function loadRealmImage(source) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.decoding = 'async';
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error(`Could not load Realm visual asset: ${source}`));
+    image.src = source;
+  });
+}
+
+async function loadRealmRuntimeArt() {
+  const entries = await Promise.all([
+    ...Object.entries(REALM_RUNTIME_ASSET_URLS),
+    ...Object.entries(REALM_RUNTIME_CHARACTER_URLS),
+  ].map(async ([key, source]) => {
+    const image = await loadRealmImage(source);
+    return [key, key.startsWith('character') ? removeWhiteMatte(image) : image];
+  }));
+  return Object.freeze(Object.fromEntries(entries));
+}
+
+function removeWhiteMatte(image) {
+  const canvas = document.createElement('canvas');
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  context.drawImage(image, 0, 0);
+  const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+  const width = canvas.width;
+  const height = canvas.height;
+  const visited = new Uint8Array(width * height);
+  const queue = new Int32Array(width * height);
+  let head = 0;
+  let tail = 0;
+  const enqueueMatte = (pixel) => {
+    if (pixel < 0 || pixel >= visited.length || visited[pixel]) return;
+    const index = pixel * 4;
+    const red = pixels.data[index];
+    const green = pixels.data[index + 1];
+    const blue = pixels.data[index + 2];
+    const minimum = Math.min(red, green, blue);
+    const spread = Math.max(red, green, blue) - minimum;
+    if (minimum <= 116 || spread >= 36) return;
+    visited[pixel] = 1;
+    queue[tail] = pixel;
+    tail += 1;
+  };
+  for (let x = 0; x < width; x += 1) {
+    enqueueMatte(x);
+    enqueueMatte((height - 1) * width + x);
+  }
+  for (let y = 1; y < height - 1; y += 1) {
+    enqueueMatte(y * width);
+    enqueueMatte(y * width + width - 1);
+  }
+  while (head < tail) {
+    const pixel = queue[head];
+    head += 1;
+    pixels.data[pixel * 4 + 3] = 0;
+    const x = pixel % width;
+    if (x > 0) enqueueMatte(pixel - 1);
+    if (x < width - 1) enqueueMatte(pixel + 1);
+    if (pixel >= width) enqueueMatte(pixel - width);
+    if (pixel < width * (height - 1)) enqueueMatte(pixel + width);
+  }
+  context.putImageData(pixels, 0, 0);
+  return canvas;
+}
+
+function drawAtlasFrame(ctx, image, index, columns, rows, x, y, width, height, alpha = 1) {
+  const imageWidth = image?.naturalWidth || image?.width;
+  const imageHeight = image?.naturalHeight || image?.height;
+  if (!imageWidth || !imageHeight) return false;
+  const frame = realmAtlasFrame(index, columns, rows);
+  const sourceWidth = imageWidth / frame.columns;
+  const sourceHeight = imageHeight / frame.rows;
+  ctx.save();
+  ctx.globalAlpha *= alpha;
+  ctx.drawImage(
+    image,
+    frame.column * sourceWidth,
+    frame.row * sourceHeight,
+    sourceWidth,
+    sourceHeight,
+    x,
+    y,
+    width,
+    height,
+  );
+  ctx.restore();
+  return true;
+}
+
+function buildMaterialPatterns(ctx, image, tile) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return null;
+  const patterns = [];
+  const sourceWidth = image.naturalWidth / 4;
+  const sourceHeight = image.naturalHeight / 4;
+  for (let index = 0; index < 16; index += 1) {
+    const frame = realmAtlasFrame(index, 4, 4);
+    const sample = document.createElement('canvas');
+    sample.width = Math.max(64, Math.ceil(tile * 3.2));
+    sample.height = Math.max(46, Math.ceil(tile * 3.2 * REALM_WORLD_Y_SCALE));
+    sample.getContext('2d').drawImage(
+      image,
+      frame.column * sourceWidth,
+      frame.row * sourceHeight,
+      sourceWidth,
+      sourceHeight,
+      0,
+      0,
+      sample.width,
+      sample.height,
+    );
+    patterns.push(ctx.createPattern(sample, 'repeat'));
+  }
+  return patterns;
+}
+
 function pathToObject(object) {
   const candidates = [
     { x: object.x, y: object.y + 1.45 },
@@ -149,14 +282,23 @@ function roomTheme(room) {
   return ROOM_THEME[room?.id] || ROOM_THEME.hall;
 }
 
-function drawStaticFloor(ctx, room, tile) {
+function drawStaticFloor(ctx, room, tile, materialPatterns) {
   const theme = roomTheme(room);
   const x = room.x * tile;
-  const y = room.y * tile;
+  const y = projectRealmY(room.y, tile);
   const width = room.w * tile;
-  const height = room.h * tile;
+  const height = room.h * tile * REALM_WORLD_Y_SCALE;
   ctx.fillStyle = theme.floor;
   ctx.fillRect(x, y, width, height);
+
+  const materialFrame = REALM_ROOM_MATERIAL_FRAMES[room.id] ?? 0;
+  if (materialPatterns?.[materialFrame]) {
+    ctx.save();
+    ctx.globalAlpha = room.id === 'tavern' || room.id === 'forge' ? .62 : .48;
+    ctx.fillStyle = materialPatterns[materialFrame];
+    ctx.fillRect(x, y, width, height);
+    ctx.restore();
+  }
 
   const gradient = ctx.createRadialGradient(x + width * .5, y + height * .45, 0, x + width * .5, y + height * .45, Math.max(width, height) * .72);
   gradient.addColorStop(0, 'rgba(232, 210, 158, .08)');
@@ -169,73 +311,110 @@ function drawStaticFloor(ctx, room, tile) {
   for (let tx = room.x; tx < room.x + room.w; tx += 1) {
     for (let ty = room.y; ty < room.y + room.h; ty += 1) {
       const px = tx * tile;
-      const py = ty * tile;
+      const py = projectRealmY(ty, tile);
       const grain = seededNoise(tx, ty);
       ctx.strokeStyle = `rgba(226, 211, 173, ${.018 + grain * .025})`;
       ctx.beginPath();
       if ((tx + ty) % 2) {
-        ctx.moveTo(px + tile * .12, py + tile * .18);
-        ctx.lineTo(px + tile * .88, py + tile * .82);
+        ctx.moveTo(px + tile * .12, py + tile * .18 * REALM_WORLD_Y_SCALE);
+        ctx.lineTo(px + tile * .88, py + tile * .82 * REALM_WORLD_Y_SCALE);
       } else {
-        ctx.moveTo(px + tile * .12, py + tile * .82);
-        ctx.lineTo(px + tile * .88, py + tile * .18);
+        ctx.moveTo(px + tile * .12, py + tile * .82 * REALM_WORLD_Y_SCALE);
+        ctx.lineTo(px + tile * .88, py + tile * .18 * REALM_WORLD_Y_SCALE);
       }
       ctx.stroke();
       if (grain > .83) {
         ctx.fillStyle = 'rgba(238, 220, 174, .05)';
-        ctx.fillRect(px + tile * grain * .7, py + tile * (1 - grain) * .7, 2, 2);
+        ctx.fillRect(px + tile * grain * .7, py + tile * (1 - grain) * .7 * REALM_WORLD_Y_SCALE, 2, 2);
       }
     }
   }
 
-  const rugW = Math.min(room.w * .48, 8.4) * tile;
-  const rugH = Math.min(room.h * .34, 5.2) * tile;
+  const rugW = Math.min(room.w * .36, 6.4) * tile;
+  const rugH = Math.min(room.h * .24, 3.8) * tile * REALM_WORLD_Y_SCALE;
   const rugX = x + width / 2 - rugW / 2;
   const rugY = y + height / 2 - rugH / 2;
-  ctx.fillStyle = theme.rug;
-  roundRect(ctx, rugX, rugY, rugW, rugH, tile * .18);
+  const inset = Math.min(tile * .34, rugW * .08);
+  ctx.save();
+  ctx.fillStyle = 'rgba(2, 5, 4, .34)';
+  ctx.beginPath();
+  ctx.moveTo(rugX + inset, rugY + tile * .13);
+  ctx.lineTo(rugX + rugW - inset, rugY + tile * .13);
+  ctx.lineTo(rugX + rugW + tile * .1, rugY + rugH + tile * .13);
+  ctx.lineTo(rugX - tile * .1, rugY + rugH + tile * .13);
+  ctx.closePath();
   ctx.fill();
+  ctx.globalAlpha = .82;
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.fillStyle = theme.rug;
+  ctx.beginPath();
+  ctx.moveTo(rugX + inset, rugY);
+  ctx.lineTo(rugX + rugW - inset, rugY);
+  ctx.lineTo(rugX + rugW, rugY + rugH);
+  ctx.lineTo(rugX, rugY + rugH);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = .4;
   ctx.strokeStyle = theme.metal;
   ctx.lineWidth = Math.max(1, tile * .035);
   ctx.stroke();
   ctx.strokeStyle = 'rgba(244, 225, 177, .2)';
   ctx.lineWidth = 1;
-  roundRect(ctx, rugX + tile * .18, rugY + tile * .18, rugW - tile * .36, rugH - tile * .36, tile * .1);
+  ctx.beginPath();
+  ctx.moveTo(rugX + inset + tile * .12, rugY + tile * .1);
+  ctx.lineTo(rugX + rugW - inset - tile * .12, rugY + tile * .1);
+  ctx.lineTo(rugX + rugW - tile * .16, rugY + rugH - tile * .1);
+  ctx.lineTo(rugX + tile * .16, rugY + rugH - tile * .1);
+  ctx.closePath();
   ctx.stroke();
-
-  ctx.fillStyle = 'rgba(4, 9, 7, .34)';
-  roundRect(ctx, x + tile * .6, y + tile * .52, Math.min(width - tile * 1.2, tile * 7.7), tile * .66, tile * .08);
-  ctx.fill();
-  ctx.fillStyle = 'rgba(237, 219, 174, .72)';
-  ctx.font = `700 ${Math.max(10, tile * .23)}px ui-monospace, monospace`;
-  ctx.textBaseline = 'middle';
-  ctx.fillText(ROOM_COPY[room.id].toLocaleUpperCase('vi-VN'), x + tile * .85, y + tile * .85);
+  ctx.globalAlpha = .12;
+  ctx.strokeStyle = theme.line;
+  for (let stripe = .18; stripe < 1; stripe += .18) {
+    const stripeY = rugY + rugH * stripe;
+    const sideInset = inset * (1 - stripe);
+    ctx.beginPath();
+    ctx.moveTo(rugX + sideInset, stripeY);
+    ctx.lineTo(rugX + rugW - sideInset, stripeY);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
-function drawStaticWall(ctx, x, y, tile) {
+function drawStaticWall(ctx, x, y, tile, wallPattern) {
   const px = x * tile;
-  const py = y * tile;
-  const top = seededNoise(x, y) > .5 ? '#526258' : '#48584f';
-  ctx.fillStyle = '#16231d';
-  ctx.fillRect(px, py, tile, tile);
-  ctx.fillStyle = top;
-  ctx.fillRect(px + 2, py + 2, tile - 4, tile - 6);
-  ctx.fillStyle = 'rgba(216, 202, 164, .14)';
-  ctx.fillRect(px + 3, py + 3, tile - 6, tile * .12);
-  ctx.strokeStyle = 'rgba(15, 27, 22, .62)';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(px + 1, py + 1, tile - 2, tile - 2);
+  const groundY = projectRealmY(y + 1, tile);
+  const faceHeight = tile * .72;
+  const topDepth = tile * .32;
+  const topY = groundY - faceHeight - topDepth * .5;
+  ctx.fillStyle = 'rgba(4, 8, 7, .55)';
+  ctx.fillRect(px + tile * .05, groundY - tile * .04, tile * .9, tile * .22);
+  ctx.fillStyle = wallPattern || (seededNoise(x, y) > .5 ? '#59625d' : '#4d5852');
+  ctx.fillRect(px + 1, topY + topDepth * .42, tile - 2, faceHeight);
+  ctx.fillStyle = 'rgba(224, 210, 174, .11)';
+  ctx.fillRect(px + 3, topY + topDepth * .42 + 2, tile - 6, tile * .1);
+  ctx.fillStyle = '#5b625d';
   ctx.beginPath();
-  ctx.moveTo(px + ((x + y) % 2 ? tile * .38 : tile * .62), py + 2);
-  ctx.lineTo(px + ((x + y) % 2 ? tile * .38 : tile * .62), py + tile - 4);
+  ctx.moveTo(px + 1, topY + topDepth * .42);
+  ctx.lineTo(px + tile * .18, topY);
+  ctx.lineTo(px + tile - 1, topY);
+  ctx.lineTo(px + tile - tile * .18, topY + topDepth * .42);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(14, 21, 18, .72)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(px + 1, topY + topDepth * .42, tile - 2, faceHeight);
+  ctx.beginPath();
+  ctx.moveTo(px + ((x + y) % 2 ? tile * .38 : tile * .62), topY + topDepth * .42 + 2);
+  ctx.lineTo(px + ((x + y) % 2 ? tile * .38 : tile * .62), groundY - 2);
   ctx.stroke();
   ctx.fillStyle = 'rgba(1, 4, 3, .26)';
-  ctx.fillRect(px + 2, py + tile * .72, tile - 4, tile * .2);
+  ctx.fillRect(px + 2, groundY - tile * .18, tile - 4, tile * .18);
 }
 
 function drawStaticFurniture(ctx, prop, tile) {
   const x = prop.x * tile;
-  const y = prop.y * tile;
+  const y = projectRealmY(prop.y, tile);
   const width = prop.w * tile;
   const wood = prop.type === 'vault' || prop.type === 'rack' ? '#464a45' : '#563d29';
   ctx.save();
@@ -304,22 +483,23 @@ function drawStaticFurniture(ctx, prop, tile) {
   ctx.restore();
 }
 
-function buildStaticWorld(tile) {
+function buildStaticWorld(tile, art) {
   const canvas = document.createElement('canvas');
   canvas.width = WORLD.cols * tile;
-  canvas.height = WORLD.rows * tile;
+  canvas.height = Math.ceil(WORLD.rows * tile * REALM_WORLD_Y_SCALE + tile * .5);
   const ctx = canvas.getContext('2d');
+  const materialPatterns = buildMaterialPatterns(ctx, art?.materials, tile);
   ctx.fillStyle = '#080e0c';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  for (const room of ROOMS) drawStaticFloor(ctx, room, tile);
+  for (const room of ROOMS) drawStaticFloor(ctx, room, tile, materialPatterns);
   for (let y = 0; y < WORLD.rows; y += 1) {
-    for (let x = 0; x < WORLD.cols; x += 1) if (WALLS.has(`${x},${y}`)) drawStaticWall(ctx, x, y, tile);
+    for (let x = 0; x < WORLD.cols; x += 1) if (WALLS.has(`${x},${y}`)) drawStaticWall(ctx, x, y, tile, materialPatterns?.[1]);
   }
   for (const zone of PRIVATE_ZONES) {
     ctx.strokeStyle = 'rgba(224, 188, 98, .24)';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([tile * .22, tile * .15]);
-    ctx.strokeRect(zone.x * tile, zone.y * tile, zone.w * tile, zone.h * tile);
+    ctx.strokeRect(zone.x * tile, projectRealmY(zone.y, tile), zone.w * tile, zone.h * tile * REALM_WORLD_Y_SCALE);
   }
   ctx.setLineDash([]);
   return canvas;
@@ -343,7 +523,7 @@ function buildTorchLight(tile) {
 function drawTorch(ctx, x, y, tile, time, quality, lightSprite) {
   const flicker = .88 + Math.sin(time * .012 + x * 1.7) * .1 + Math.sin(time * .027 + y) * .05;
   ctx.save();
-  ctx.translate(x * tile, y * tile);
+  ctx.translate(x * tile, projectRealmY(y, tile));
   ctx.fillStyle = '#60452b';
   ctx.fillRect(-tile * .045, -tile * .1, tile * .09, tile * .35);
   if (lightSprite) {
@@ -375,7 +555,7 @@ function drawTorch(ctx, x, y, tile, time, quality, lightSprite) {
 
 function drawAmbientProp(ctx, prop, tile, time, reducedMotion) {
   const x = prop.x * tile;
-  const y = prop.y * tile;
+  const y = projectRealmY(prop.y, tile);
   const phase = reducedMotion ? 0 : time * .001;
   ctx.save();
   ctx.translate(x, y);
@@ -477,7 +657,7 @@ function drawObjectBase(ctx, object, tile, time, state) {
   const phase = time * .001;
   const selected = state.selected || state.nearby || state.hovered;
   ctx.save();
-  ctx.translate(object.x * tile, object.y * tile);
+  ctx.translate(object.x * tile, projectRealmY(object.y, tile));
   ctx.fillStyle = 'rgba(2, 5, 4, .45)';
   ctx.beginPath();
   ctx.ellipse(0, tile * .36, tile * .7, tile * .23, 0, 0, Math.PI * 2);
@@ -603,6 +783,156 @@ function drawObjectBase(ctx, object, tile, time, state) {
   ctx.restore();
 }
 
+function drawLightOverlay(ctx, art, frame, x, y, width, height, alpha = 1) {
+  if (!art?.lighting) return false;
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  const drawn = drawAtlasFrame(ctx, art.lighting, frame, 4, 3, x, y, width, height, alpha);
+  ctx.restore();
+  return drawn;
+}
+
+function drawObjectReaction(ctx, visual, tile, time, strength) {
+  if (!strength) return;
+  const pulse = .72 + Math.sin(time * .009) * .28;
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, strength * .9);
+  ctx.lineWidth = Math.max(1.5, tile * .035);
+  if (visual.response === 'seal') {
+    ctx.strokeStyle = '#dfc276';
+    ctx.beginPath();
+    ctx.arc(0, -tile * .95, tile * (.2 + strength * .06), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(139, 52, 43, .72)';
+    ctx.beginPath();
+    ctx.arc(0, -tile * .95, tile * .1, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (visual.response === 'drawer') {
+    ctx.strokeStyle = '#d8c895';
+    for (let row = 0; row < 3; row += 1) {
+      const slide = (row % 2 ? -1 : 1) * strength * tile * .12;
+      ctx.strokeRect(-tile * .34 + slide, -tile * (1.24 - row * .18), tile * .68, tile * .12);
+    }
+  } else if (visual.response === 'map') {
+    ctx.strokeStyle = '#d8c783';
+    ctx.beginPath();
+    ctx.moveTo(-tile * .55, -tile * .72);
+    ctx.quadraticCurveTo(0, -tile * (.9 + strength * .1), tile * .55, -tile * .72);
+    ctx.stroke();
+    for (const offset of [-.34, 0, .34]) {
+      ctx.fillStyle = offset ? '#728a75' : '#b9a05c';
+      ctx.beginPath();
+      ctx.arc(offset * tile * (1 - strength * .18), -tile * .67, tile * .055, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (visual.response === 'vault') {
+    ctx.strokeStyle = `rgba(241, 202, 98, ${pulse})`;
+    ctx.beginPath();
+    ctx.arc(0, -tile * .82, tile * (.31 + strength * .06), -.7, Math.PI * 1.7);
+    ctx.stroke();
+    ctx.fillStyle = '#e5b64f';
+    for (let index = 0; index < 4; index += 1) {
+      const angle = time * .004 + index * Math.PI / 2;
+      ctx.fillRect(Math.cos(angle) * tile * .31 - 2, -tile * .82 + Math.sin(angle) * tile * .2 - 2, 4, 4);
+    }
+  } else if (visual.response === 'lantern') {
+    const glow = ctx.createRadialGradient(0, -tile * .78, 0, 0, -tile * .78, tile * 1.15);
+    glow.addColorStop(0, `rgba(246, 181, 77, ${.3 * strength * pulse})`);
+    glow.addColorStop(1, 'rgba(246, 181, 77, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(-tile * 1.2, -tile * 1.95, tile * 2.4, tile * 2.4);
+  } else if (visual.response === 'council') {
+    ctx.strokeStyle = `rgba(150, 187, 183, ${.78 * pulse})`;
+    for (let ring = 0; ring < 3; ring += 1) {
+      ctx.beginPath();
+      ctx.ellipse(0, -tile * .18, tile * (.42 + ring * .18 + strength * .08), tile * (.14 + ring * .06), 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  } else if (visual.response === 'gate') {
+    ctx.strokeStyle = `rgba(132, 205, 183, ${.82 * pulse})`;
+    ctx.beginPath();
+    ctx.moveTo(-tile * .4, -tile * .1);
+    ctx.quadraticCurveTo(0, -tile * (1.6 + strength * .12), tile * .4, -tile * .1);
+    ctx.stroke();
+  } else if (visual.response === 'forge') {
+    ctx.fillStyle = `rgba(255, 156, 64, ${.42 * pulse})`;
+    for (let ember = 0; ember < 6; ember += 1) {
+      const seed = (time * .0012 + ember * .173) % 1;
+      ctx.fillRect(Math.sin(seed * 17) * tile * .42, -tile * (.52 + seed * 1.05), 3, 3);
+    }
+  }
+  ctx.restore();
+}
+
+function drawObjectVisual(ctx, object, tile, time, state, art) {
+  const visual = REALM_OBJECT_VISUALS[object.id];
+  if (!visual || !art?.landmarks) {
+    drawObjectBase(ctx, object, tile, time, state);
+    return;
+  }
+  const copy = OBJECT_COPY[object.id] || { accent: '#c8ab68' };
+  const selected = state.selected || state.nearby || state.hovered;
+  const interactionStrength = state.interaction
+    ? realmInteractionEnvelope(state.interaction.startedAt, time, state.interaction.phase)
+    : 0;
+  const width = tile * visual.width;
+  const height = tile * visual.height;
+  ctx.save();
+  ctx.translate(object.x * tile, projectRealmY(object.y, tile));
+
+  ctx.fillStyle = 'rgba(1, 4, 3, .56)';
+  ctx.beginPath();
+  ctx.ellipse(0, tile * .2, width * .31, tile * .27, 0, 0, Math.PI * 2);
+  ctx.fill();
+  if (selected || interactionStrength) {
+    ctx.strokeStyle = copy.accent;
+    ctx.globalAlpha = .46 + interactionStrength * .38 + Math.sin(time * .004) * .08;
+    ctx.lineWidth = state.nearby ? 2.5 : 1.5;
+    ctx.beginPath();
+    ctx.ellipse(0, tile * .16, width * .34, tile * .3, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  const lightAlpha = selected ? .2 : .09;
+  drawLightOverlay(ctx, art, visual.lightFrame, -width * .56, -height * .52, width * 1.12, height * .72, lightAlpha + interactionStrength * .32);
+
+  ctx.save();
+  ctx.translate(0, -tile * .04 * interactionStrength);
+  const objectScale = 1 + interactionStrength * .024;
+  ctx.scale(objectScale, objectScale);
+  drawAtlasFrame(ctx, art.landmarks, visual.frame, 4, 2, -width / 2, -height * .87, width, height, 1);
+  drawObjectReaction(ctx, visual, tile, time, interactionStrength);
+  ctx.restore();
+
+  if (state.rewarded) {
+    ctx.strokeStyle = `rgba(245, 205, 99, ${.55 + Math.sin(time * .008) * .16})`;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.ellipse(0, tile * .1, width * .38, tile * .34, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawOccluder(ctx, node, tile, art) {
+  if (!art?.occluders) return;
+  const width = node.width * tile;
+  const height = node.height * tile;
+  drawAtlasFrame(
+    ctx,
+    art.occluders,
+    node.frame,
+    4,
+    3,
+    node.x * tile - width / 2,
+    projectRealmY(node.y, tile) - height * .9,
+    width,
+    height,
+    .98,
+  );
+}
+
 function facingVector(facing) {
   const map = {
     up: [0, -1], 'up-right': [.7, -.7], right: [1, 0], 'down-right': [.7, .7],
@@ -611,29 +941,77 @@ function facingVector(facing) {
   return map[facing] || map.down;
 }
 
+function actorFacingColumn(faceX, faceY) {
+  if (Math.abs(faceX) > Math.abs(faceY) * .72) return faceX >= 0 ? 3 : 1;
+  return faceY < 0 ? 2 : 0;
+}
+
+function drawForgedActorSkin(ctx, art, race, base, faceX, faceY, gait, bounce, interactionStrength, rewarded) {
+  const row = REALM_CHARACTER_ATLAS_ROWS[race.id];
+  if (!Number.isFinite(row) || !art?.characterTurnaround) return false;
+  const actionPose = interactionStrength > .08 || rewarded;
+  const sheet = actionPose && art.characterInteractions ? art.characterInteractions : art.characterTurnaround;
+  const column = actionPose ? (rewarded && interactionStrength <= .08 ? 3 : 2) : actorFacingColumn(faceX, faceY);
+  const frame = row * 4 + column;
+  const height = base * (race.id === 'dwarf' ? 2.18 : 2.42);
+  const width = height * 1.25;
+  ctx.save();
+  ctx.translate(gait * base * .018, base * .16 - bounce * .22 - interactionStrength * base * .035);
+  ctx.rotate(gait * .012 + faceX * interactionStrength * .018);
+  ctx.scale(1 - Math.abs(gait) * .012, 1 + Math.abs(gait) * .01);
+  if (actionPose && faceX < -.25) ctx.scale(-1, 1);
+  const drawn = drawAtlasFrame(ctx, sheet, frame, 4, 5, -width / 2, -height * .92, width, height, 1);
+  ctx.restore();
+  return drawn;
+}
+
 function drawActor(ctx, actor, tile, time, options = {}) {
   const archetype = actor.archetype || classifyRealmActor(actor);
   const race = archetype.race;
   const guildClass = archetype.guildClass;
   const motion = actor.motion || createRealmMotionState(actor);
-  const moving = motion.locomotion === 'walk' || motion.locomotion === 'start';
+  const interaction = options.interaction;
+  const interactionStrength = interaction
+    ? realmInteractionEnvelope(interaction.startedAt, time, interaction.phase)
+    : 0;
+  const moving = !interactionStrength && (motion.locomotion === 'walk' || motion.locomotion === 'start');
   const gait = moving ? Math.sin(motion.gaitTime * Math.PI * 2.25 * race.gait) : Math.sin(time * .0018 + actor.x) * .05;
   const bounce = options.reducedMotion ? 0 : moving ? Math.abs(gait) * tile * .045 : Math.sin(time * .0015 + actor.y) * tile * .015;
-  const [faceX, faceY] = facingVector(motion.facing);
+  const facing = interactionStrength ? realmObjectFacing(actor, interaction.object) : motion.facing;
+  const [faceX, faceY] = facingVector(facing);
   const side = Math.abs(faceX) > .4 ? Math.sign(faceX) : 1;
   const scale = race.scale * (options.player ? 1.07 : 1);
   const base = tile * scale;
   const x = actor.x * tile;
-  const y = actor.y * tile;
+  const y = projectRealmY(actor.y, tile);
   const status = STATUS_COLORS[actor.status] || STATUS_COLORS.available;
   const emote = options.emote;
   ctx.save();
-  ctx.translate(x, y - bounce);
+  ctx.translate(
+    x + faceX * base * .085 * interactionStrength,
+    y - bounce + faceY * base * .03 * interactionStrength,
+  );
 
-  ctx.fillStyle = 'rgba(1, 4, 3, .52)';
-  ctx.beginPath();
-  ctx.ellipse(0, tile * .16 + bounce, base * .32, base * .12, 0, 0, Math.PI * 2);
-  ctx.fill();
+  const contactShadowWidth = base * (race.id === 'dwarf' ? .82 : .94);
+  const contactShadowHeight = base * .36;
+  const drewContactShadow = drawAtlasFrame(
+    ctx,
+    options.art?.lighting,
+    race.id === 'dwarf' ? 8 : 9,
+    4,
+    3,
+    -contactShadowWidth / 2,
+    tile * .02,
+    contactShadowWidth,
+    contactShadowHeight,
+    .64,
+  );
+  if (!drewContactShadow) {
+    ctx.fillStyle = 'rgba(1, 4, 3, .52)';
+    ctx.beginPath();
+    ctx.ellipse(0, tile * .16 + bounce, base * .32, base * .12, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
   if (options.player) {
     ctx.strokeStyle = '#e5bd61';
     ctx.lineWidth = 2.2;
@@ -658,6 +1036,21 @@ function drawActor(ctx, actor, tile, time, options = {}) {
     ctx.stroke();
   }
 
+  const headY = -base * 1.13;
+  const headRadius = base * .24 * race.head;
+  const forgedActor = drawForgedActorSkin(
+    ctx,
+    options.art,
+    race,
+    base,
+    faceX,
+    faceY,
+    gait,
+    bounce,
+    interactionStrength,
+    options.rewarded,
+  );
+  if (!forgedActor) {
   if (race.id === 'tiefling') {
     ctx.strokeStyle = archetype.skin;
     ctx.lineWidth = base * .09;
@@ -745,6 +1138,18 @@ function drawActor(ctx, actor, tile, time, options = {}) {
   if (emote?.id === 'celebrate') { leftArm = 1.45; rightArm = -1.45; }
   if (emote?.id === 'thanks') { leftArm = -.28; rightArm = .28; }
   if (emote?.id === 'help') rightArm = -1.55;
+  if (interactionStrength) {
+    if (Math.abs(faceX) > .45) {
+      rightArm = faceX > 0 ? 1.32 : -.18;
+      leftArm = faceX < 0 ? -1.32 : .18;
+    } else if (faceY < 0) {
+      leftArm = 2.25;
+      rightArm = -2.25;
+    } else {
+      leftArm = -.68;
+      rightArm = .68;
+    }
+  }
   const armLength = base * .48;
   ctx.strokeStyle = guildClass.primary;
   ctx.lineWidth = base * .13;
@@ -755,8 +1160,6 @@ function drawActor(ctx, actor, tile, time, options = {}) {
   ctx.lineTo(shoulder * .82 + Math.sin(rightArm) * armLength * .45, torsoTop + base * .14 + Math.cos(rightArm) * armLength);
   ctx.stroke();
 
-  const headY = -base * 1.13;
-  const headRadius = base * .24 * race.head;
   if (race.id === 'elf' || race.id === 'half-orc' || race.id === 'tiefling') {
     ctx.fillStyle = archetype.skin;
     const ear = base * .21 * race.ears;
@@ -863,6 +1266,7 @@ function drawActor(ctx, actor, tile, time, options = {}) {
     ctx.lineTo(-shoulder * 1.18, footY);
     ctx.stroke();
   }
+  }
 
   const fullLabel = actor.name || 'Guild member';
   const labelParts = fullLabel.split(' · ');
@@ -873,7 +1277,9 @@ function drawActor(ctx, actor, tile, time, options = {}) {
       : fullLabel;
   ctx.font = `700 ${Math.max(10, tile * .22)}px "Be Vietnam Pro", system-ui, sans-serif`;
   const textWidth = ctx.measureText(label).width;
-  const labelY = headY - headRadius * (race.id === 'tiefling' ? 2.05 : 1.35);
+  const labelY = forgedActor
+    ? -base * (race.id === 'dwarf' ? 1.65 : race.id === 'tiefling' ? 1.95 : 1.82)
+    : headY - headRadius * (race.id === 'tiefling' ? 2.05 : 1.35);
   ctx.fillStyle = 'rgba(5, 10, 8, .86)';
   roundRect(ctx, -textWidth / 2 - 12, labelY - 10, textWidth + 24, 20, 5);
   ctx.fill();
@@ -910,8 +1316,8 @@ function drawRoute(ctx, route, tile, time) {
   ctx.setLineDash([tile * .14, tile * .2]);
   ctx.lineDashOffset = -(time * .015) % (tile * .34);
   ctx.beginPath();
-  ctx.moveTo(start.x * tile, start.y * tile);
-  for (let index = route.index; index < route.path.length; index += 1) ctx.lineTo(route.path[index].x * tile, route.path[index].y * tile);
+  ctx.moveTo(start.x * tile, projectRealmY(start.y, tile));
+  for (let index = route.index; index < route.path.length; index += 1) ctx.lineTo(route.path[index].x * tile, projectRealmY(route.path[index].y, tile));
   ctx.stroke();
   ctx.setLineDash([]);
   ctx.restore();
@@ -921,7 +1327,7 @@ function drawParticles(ctx, effects, tile) {
   for (const particle of effects) {
     ctx.save();
     ctx.globalAlpha = clamp(particle.life / particle.maxLife, 0, 1);
-    ctx.translate(particle.x * tile, particle.y * tile);
+    ctx.translate(particle.x * tile, projectRealmY(particle.y, tile));
     if (particle.kind === 'gold') {
       ctx.fillStyle = '#e7bd51';
       ctx.beginPath();
@@ -1031,7 +1437,8 @@ export default function RealmWorldV3({
   const reducedMotion = useReducedMotion();
   const stageRef = useRef(null);
   const canvasRef = useRef(null);
-  const staticLayerRef = useRef({ tile: 0, canvas: null });
+  const staticLayerRef = useRef({ tile: 0, canvas: null, artReady: false });
+  const artRef = useRef(null);
   const torchLightRef = useRef({ tile: 0, canvas: null });
   const screenLayerRef = useRef({ width: 0, height: 0, canvas: null });
   const keysRef = useRef(new Set());
@@ -1071,9 +1478,23 @@ export default function RealmWorldV3({
   const [rewardCallout, setRewardCallout] = useState(null);
   const [waygate, setWaygate] = useState(false);
   const [arrival, setArrival] = useState(!reducedMotion);
+  const [artReady, setArtReady] = useState(false);
   const [quality, setQuality] = useState(() => ({ id: 'medium', dpr: 1, particles: 28, lights: 10, ambientActors: 2 }));
   const [metrics, setMetrics] = useState({ fps: 0, p95: 0, renderP95: 0 });
   const [debug, setDebug] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    loadRealmRuntimeArt().then((art) => {
+      if (!active) return;
+      artRef.current = art;
+      staticLayerRef.current = { tile: 0, canvas: null, artReady: true };
+      setArtReady(true);
+    }).catch(() => {
+      if (active) setArtReady(false);
+    });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     const runtime = runtimeRef.current;
@@ -1161,6 +1582,8 @@ export default function RealmWorldV3({
     runtimeRef.current.route = null;
     runtimeRef.current.motion.vx = 0;
     runtimeRef.current.motion.vy = 0;
+    runtimeRef.current.motion.locomotion = 'idle';
+    runtimeRef.current.motion.facing = realmObjectFacing(runtimeRef.current.motion, object);
     runtimeRef.current.interaction = { object, phase: 'acting', startedAt: performance.now() };
     setJourney({ object, phase: 'acting', progress: copy?.verb || object.name });
     setSelectedObject(object);
@@ -1172,11 +1595,11 @@ export default function RealmWorldV3({
       interaction.phase = 'succeeded';
       setJourney({ object, phase: 'succeeded', progress: 'Bàn làm việc đã sẵn sàng' });
       callbacksRef.current.onObjectOpen(object);
-    }, reducedMotion ? 40 : 220);
+    }, reducedMotion ? 40 : 520);
     const restoreTimer = window.setTimeout(() => {
       if (runtimeRef.current.interaction?.object?.id === object.id) runtimeRef.current.interaction = null;
       setJourney((current) => current?.object?.id === object.id ? null : current);
-    }, reducedMotion ? 220 : 900);
+    }, reducedMotion ? 240 : 1500);
     timersRef.current.add(openTimer);
     timersRef.current.add(restoreTimer);
   }, [reducedMotion, spawnEffect]);
@@ -1251,7 +1674,9 @@ export default function RealmWorldV3({
       canvas.width = Math.max(1, Math.round(rect.width * tier.dpr));
       canvas.height = Math.max(1, Math.round(rect.height * tier.dpr));
       runtimeRef.current.viewport = { ...runtimeRef.current.viewport, width: rect.width, height: rect.height, dpr: tier.dpr, tile };
-      if (staticLayerRef.current.tile !== tile) staticLayerRef.current = { tile, canvas: buildStaticWorld(tile) };
+      if (staticLayerRef.current.tile !== tile || staticLayerRef.current.artReady !== artReady) {
+        staticLayerRef.current = { tile, canvas: buildStaticWorld(tile, artRef.current), artReady };
+      }
       if (torchLightRef.current.tile !== tile) torchLightRef.current = { tile, canvas: buildTorchLight(tile) };
       if (screenLayerRef.current.width !== Math.ceil(rect.width) || screenLayerRef.current.height !== Math.ceil(rect.height)) {
         screenLayerRef.current = { width: Math.ceil(rect.width), height: Math.ceil(rect.height), canvas: buildScreenTreatment(rect.width, rect.height) };
@@ -1262,7 +1687,7 @@ export default function RealmWorldV3({
     const observer = new ResizeObserver(resize);
     observer.observe(stage);
     return () => observer.disconnect();
-  }, [reducedMotion]);
+  }, [artReady, reducedMotion]);
 
   useEffect(() => {
     const isTyping = (event) => ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target?.tagName);
@@ -1272,6 +1697,7 @@ export default function RealmWorldV3({
       if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd'].includes(key)) {
         event.preventDefault();
         runtimeRef.current.route = null;
+        runtimeRef.current.interaction = null;
         setJourney(null);
         keysRef.current.add(key);
       }
@@ -1395,7 +1821,7 @@ export default function RealmWorldV3({
       } else if (runtime.motion.distanceTravelled < previousDistance) runtime.lastFootstep = runtime.motion.distanceTravelled;
       const viewport = runtime.viewport;
       const halfW = viewport.width / viewport.tile / 2;
-      const halfH = viewport.height / viewport.tile / 2;
+      const halfH = viewport.height / (viewport.tile * REALM_WORLD_Y_SCALE) / 2;
       const targetCamera = {
         x: clamp(runtime.motion.x, Math.min(WORLD.cols / 2, halfW), Math.max(WORLD.cols / 2, WORLD.cols - halfW)),
         y: clamp(runtime.motion.y, Math.min(WORLD.rows / 2, halfH), Math.max(WORLD.rows / 2, WORLD.rows - halfH)),
@@ -1451,8 +1877,9 @@ export default function RealmWorldV3({
           canvasRef.current.dataset.realmCameraX = runtime.camera.x.toFixed(3);
           canvasRef.current.dataset.realmCameraY = runtime.camera.y.toFixed(3);
           canvasRef.current.dataset.realmPlayerScreenX = (runtime.viewport.width / 2 + (actor.x - runtime.camera.x) * runtime.viewport.tile).toFixed(2);
-          canvasRef.current.dataset.realmPlayerScreenY = (runtime.viewport.height / 2 + (actor.y - runtime.camera.y) * runtime.viewport.tile * .72).toFixed(2);
+          canvasRef.current.dataset.realmPlayerScreenY = (runtime.viewport.height / 2 + (actor.y - runtime.camera.y) * runtime.viewport.tile * REALM_WORLD_Y_SCALE).toFixed(2);
           canvasRef.current.dataset.realmLocomotion = actor.locomotion;
+          canvasRef.current.dataset.realmInteraction = runtime.interaction?.phase || 'idle';
         }
       }
     };
@@ -1468,7 +1895,7 @@ export default function RealmWorldV3({
       ctx.fillStyle = '#070c0a';
       ctx.fillRect(0, 0, width, height);
       const offsetX = width / 2 - runtime.camera.x * tile;
-      const offsetY = height / 2 - runtime.camera.y * tile;
+      const offsetY = height / 2 - projectRealmY(runtime.camera.y, tile);
       viewport.offsetX = offsetX;
       viewport.offsetY = offsetY;
       ctx.save();
@@ -1497,18 +1924,26 @@ export default function RealmWorldV3({
         ...AMBIENT_PROPS.map((value) => ({ type: 'ambient', y: value.y, value })),
         ...WORLD_OBJECTS.map((value) => ({ type: 'object', y: value.y, value })),
         ...actors.map((value) => ({ type: 'actor', y: value.y, value })),
-      ].sort((a, b) => a.y - b.y || (a.type === 'actor' ? 1 : -1));
+        ...REALM_OCCLUDER_NODES
+          .filter((value) => quality.id !== 'low' || !value.highDetail)
+          .map((value) => ({ type: 'occluder', y: value.y, value })),
+      ].sort((a, b) => {
+        const priority = { ambient: 0, furniture: 1, object: 2, actor: 3, occluder: 4 };
+        return a.y - b.y || priority[a.type] - priority[b.type];
+      });
       for (const node of sceneNodes) {
         if (node.type === 'furniture') drawStaticFurniture(ctx, node.value, tile);
         else if (node.type === 'ambient') drawAmbientProp(ctx, node.value, tile, now, reducedMotion);
+        else if (node.type === 'occluder') drawOccluder(ctx, node.value, tile, artRef.current);
         else if (node.type === 'object') {
           const object = node.value;
-          drawObjectBase(ctx, object, tile, now, {
+          drawObjectVisual(ctx, object, tile, now, {
             nearby: nearbyObject?.id === object.id,
             selected: selectedObject?.id === object.id || activePanel === object.panel,
             hovered: runtime.hoveredObject?.id === object.id,
             rewarded: runtime.rewardObject?.id === object.id && runtime.rewardObject.until > now,
-          });
+            interaction: runtime.interaction?.object?.id === object.id ? runtime.interaction : null,
+          }, artRef.current);
         } else {
           const actor = node.value;
           const emote = activeEmotes[actor.id] || activeEmotes[actor.userId] || activeEmotes[actor.realmIdentity];
@@ -1519,6 +1954,8 @@ export default function RealmWorldV3({
             rewarded: actor.player && runtime.rewardedUntil > now,
             compactLabel: quality.id === 'low',
             reducedMotion,
+            interaction: actor.player ? runtime.interaction : null,
+            art: artRef.current,
           });
         }
       }
@@ -1574,7 +2011,7 @@ export default function RealmWorldV3({
     const viewport = runtimeRef.current.viewport;
     return {
       x: (event.clientX - rect.left - viewport.offsetX) / viewport.tile,
-      y: (event.clientY - rect.top - viewport.offsetY) / viewport.tile,
+      y: unprojectRealmY(event.clientY - rect.top - viewport.offsetY, viewport.tile),
     };
   };
 
@@ -1641,6 +2078,8 @@ export default function RealmWorldV3({
       aria-label={t('Không gian Guildhall tương tác')}
       data-realm-world-version="3"
       data-realm-quality={quality.id}
+      data-realm-depth="2.5d"
+      data-realm-art-ready={artReady ? 'true' : 'false'}
     >
       <canvas
         ref={canvasRef}

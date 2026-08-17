@@ -29,8 +29,11 @@ test.afterEach(async ({ page }) => {
 
 test('v3 is a live layered world with bounded locomotion and no static environment plate', async ({ page, isMobile }, testInfo) => {
   const canvas = page.locator('canvas[data-realm-runtime="canvas-2d-fixed-step"]');
+  const world = page.locator('[data-realm-world-version="3"]');
   await expect(canvas).toHaveAttribute('data-realm-renderer', 'canvas2d');
-  await expect(page.locator('[data-realm-world-version="3"]')).toHaveAttribute('data-realm-quality', isMobile ? 'low' : /medium|high/);
+  await expect(world).toHaveAttribute('data-realm-depth', '2.5d');
+  await expect(world).toHaveAttribute('data-realm-art-ready', 'true');
+  await expect(world).toHaveAttribute('data-realm-quality', isMobile ? 'low' : /medium|high/);
   await expect(page.locator('[data-realm-world-version="3"] img[src*="guildhall-environment"]')).toHaveCount(0);
   await expect.poll(async () => Number(await canvas.getAttribute('data-realm-x'))).toBeGreaterThan(0);
 
@@ -59,6 +62,20 @@ test('v3 is a live layered world with bounded locomotion and no static environme
   const screenshot = testInfo.outputPath(isMobile ? 'realm-world-v3-mobile.png' : 'realm-world-v3-desktop.png');
   await page.screenshot({ path: screenshot, fullPage: false });
   await testInfo.attach('Realm World v3', { path: screenshot, contentType: 'image/png' });
+});
+
+test('business interaction is embodied by the actor and acknowledged by the environment', async ({ page }, testInfo) => {
+  const canvas = page.locator('canvas[data-realm-runtime="canvas-2d-fixed-step"]');
+  await expect(canvas).toHaveAttribute('data-realm-interaction', 'idle');
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent('realm:move', {
+    detail: { objectId: 'war-table', direct: true },
+  })));
+  await expect.poll(async () => canvas.getAttribute('data-realm-interaction'), { timeout: 4_000 }).not.toBe('idle');
+  const screenshot = testInfo.outputPath('realm-world-v3-interaction.png');
+  await page.screenshot({ path: screenshot, fullPage: false });
+  await testInfo.attach('Embodied object interaction', { path: screenshot, contentType: 'image/png' });
+  await expect(page.getByRole('complementary', { name: 'Phòng dự án', exact: true })).toBeVisible({ timeout: 5_000 });
+  await expect.poll(async () => canvas.getAttribute('data-realm-interaction'), { timeout: 4_000 }).toBe('idle');
 });
 
 test('Waygate reaches every canonical business surface without removing the spatial context', async ({ page }) => {

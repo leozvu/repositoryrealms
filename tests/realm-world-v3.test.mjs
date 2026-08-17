@@ -102,6 +102,8 @@ test('quality tier and performance budget keep mobile rendering bounded', () => 
 test('v3 component owns continuous world rendering without Remotion or static scene projection', () => {
   const source = fs.readFileSync(new URL('../components/realm/RealmWorldV3.jsx', import.meta.url), 'utf8');
   assert.match(source, /data-realm-runtime="canvas-2d-fixed-step"/);
+  assert.match(source, /data-realm-depth="2\.5d"/);
+  assert.match(source, /data-realm-art-ready/);
   assert.match(source, /REALM_WORLD_FIXED_STEP/);
   assert.match(source, /stepRealmMotion/);
   assert.match(source, /stepRealmCamera/);
