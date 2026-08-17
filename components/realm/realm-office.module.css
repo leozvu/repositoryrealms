@@ -1212,6 +1212,26 @@
 .connectionNote strong { display: block; margin-bottom: 3px; font-size: .7rem; }
 .connectionNote p { margin: 0; color: var(--realm-muted); font-size: .64rem; line-height: 1.55; }
 
+.mobilePresenceControl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid var(--realm-border-soft);
+  border-radius: 6px;
+  color: #d4dbcf;
+  background: #14231b;
+}
+
+.mobilePresenceControl > span { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 8px; min-width: 0; }
+.mobilePresenceControl i { grid-row: 1 / 3; width: 9px; height: 9px; border-radius: 50%; background: var(--presence-color); box-shadow: 0 0 12px color-mix(in srgb, var(--presence-color) 64%, transparent); }
+.mobilePresenceControl strong { font-size: .7rem; }
+.mobilePresenceControl small { overflow: hidden; color: var(--realm-muted); font-size: .58rem; text-overflow: ellipsis; white-space: nowrap; }
+.mobilePresenceControl select { min-width: 112px; min-height: 44px; padding: 0 10px; border: 1px solid var(--realm-border-soft); border-radius: 5px; color: #f2ecdd; background: #0d1914; font-size: .65rem; }
+.mobilePresenceControl option { color: #18201c; background: #eee8da; }
+
 .playerHero {
   min-height: 96px;
   display: flex;

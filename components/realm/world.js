@@ -24,6 +24,7 @@ export const PRIVATE_ZONES = [
 ];
 
 export const WORLD_OBJECTS = [
+  { id: 'command-dais', panel: 'command', name: 'Phòng điều hành', hint: 'Mở ưu tiên và quyết định vận hành', kind: 'command', x: 29, y: 4.5 },
   { id: 'guild-roster', panel: 'guild', name: 'Sổ bộ Guild', hint: 'Mở hồ sơ nhân sự', kind: 'roster', x: 9, y: 8 },
   { id: 'war-table', panel: 'campaigns', name: 'Bàn chiến dịch', hint: 'Mở dự án và tiến độ', kind: 'table', x: 29, y: 8 },
   { id: 'treasury-chest', panel: 'treasury', name: 'Rương Hoàng gia', hint: 'Mở ví Gold và sổ cái', kind: 'chest', x: 48.5, y: 8 },

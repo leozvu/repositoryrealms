@@ -99,11 +99,12 @@ test('ERP and CRM ornament catalog exposes twelve optimized medieval-enterprise 
   assert.ok(assets.every((asset) => asset.url.includes('/erp-ui/elements-webp-v2/')));
 });
 
-test('business prop catalog exposes seven optimized deterministic bindings', () => {
+test('business prop catalog exposes eight optimized deterministic bindings', () => {
   const assets = realmGeneratedPropAssets();
-  assert.equal(assets.length, 7);
+  assert.equal(assets.length, 8);
   assert.deepEqual(new Set(assets.map((asset) => asset.objectId)), new Set(Object.keys(REALM_GENERATED_PROP_BINDINGS)));
   assert.equal(realmGeneratedPropBinding('guild-roster')?.asset, '011');
+  assert.equal(realmGeneratedPropBinding('command-dais')?.asset, '001');
   assert.equal(realmGeneratedPropBinding('realm-gate')?.proceduralUnderlay, true);
   assert.equal(realmGeneratedPropBinding('unknown'), null);
   assert.match(realmGeneratedPropUrl('4'), /prop-004\.webp$/);

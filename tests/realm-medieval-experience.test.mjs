@@ -49,6 +49,7 @@ test('the medieval visual system uses repository assets and remains motion-acces
 
 test('Reforged Guildhall makes the spatial world primary without replacing business capabilities', () => {
   const office = source('components/realm/RealmOffice.jsx');
+  const worldV3 = source('components/realm/RealmWorldV3.jsx');
   const scene = source('components/realm/GuildhallScene.jsx');
   const motion = source('components/realm/LivingGuildhallMotion.jsx');
   const remotion = source('components/realm/GuildhallRemotion.jsx');
@@ -56,7 +57,8 @@ test('Reforged Guildhall makes the spatial world primary without replacing busin
   const manifest = JSON.parse(source('package.json'));
 
   assert.match(office, /<GuildhallScene/);
-  assert.match(office, /Guildhall của đội ngũ/);
+  assert.match(office, /<RealmWorldV3/);
+  assert.match(office, /Realm World v3/);
   assert.match(office, /<MediaDock/);
   assert.match(office, /<LedgerMode/);
   assert.match(office, /setLedgerView\('personal'\)/);
@@ -66,6 +68,10 @@ test('Reforged Guildhall makes the spatial world primary without replacing busin
   assert.match(office, /RoyalTreasuryExchange/);
   assert.match(office, /RewardControlCenter/);
   assert.match(office, /useProximityMedia/);
+  assert.match(worldV3, /canvas-2d-fixed-step/);
+  assert.match(worldV3, /normalizeRealmWorldPeople/);
+  assert.match(worldV3, /stepRealmCamera/);
+  assert.doesNotMatch(worldV3, /guildhall-environment\.png/);
   assert.match(scene, /guildhall-environment\.png/);
   assert.match(scene, /GuildhallAtmosphere/);
   assert.match(scene, /RealmActorMotion/);

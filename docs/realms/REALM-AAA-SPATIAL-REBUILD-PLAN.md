@@ -1,12 +1,12 @@
 # Realm AAA Spatial Coworking Rebuild Plan
 
-Status: `READY_TO_EXECUTE`
+Status: `IMPLEMENTED_CANDIDATE__RELEASE_GATE_FAILED`
 
 Working branch: `ux-ui-rehab`
 
-Last updated: 2026-08-11
+Last updated: 2026-08-17
 
-Next executable milestone: `Phase 0 - contract freeze and vertical-slice baseline`
+Next executable milestone: `Phase 10 remediation - authored character/environment production and real multi-user soak`
 
 ## 1. Source-of-truth contract
 
@@ -291,17 +291,30 @@ Every Player must declare mute behavior, reduced-motion behavior, lazy mounting 
 
 | Phase | Status | Outcome | Hard dependency | Exit gate |
 | --- | --- | --- | --- | --- |
-| 0. Contract freeze and baseline | Planned | Locked invariants, ADRs and measurable harness | This plan | Baseline reproducible and feature flag ready |
-| 1. Renderer and scene kernel | Planned | Layered world running behind flag | Phase 0 | Stable layered scene at target frame budget |
-| 2. Locomotion vertical slice | Planned | Movement no longer slides | Phase 1 | Locomotion gate passes desktop and mobile |
-| 3. Character classes | Planned | Diverse, coherent actors | Phase 2 | Five readable archetypes and full core state set |
-| 4. Living Guildhall | Planned | Environment reads as alive | Phase 1 and 3 | Human review and motion-state gate pass |
-| 5. Object interaction slice | Planned | Project table works in-world | Phase 2 and 4 | One end-to-end business action retains context |
-| 6. Spatial social and voice | Planned | Coworker encounter is truthful | Phase 0, 2 and 3 | Presence consistency and proximity tests pass |
-| 7. Gold recognition loop | Planned | Receipt changes avatar and world | Phase 5 | No reward before receipt, replay is idempotent |
-| 8. Mobile and adaptive HUD | Planned | Mobile is a first-class game surface | Phases 2, 5 and 6 | Control, camera, coverage and focus gates pass |
-| 9. Full object and entity rollout | Planned | Existing Realm capability mapped to v3 | Phases 5-8 | Capability parity matrix is complete |
-| 10. Optimization and release | Planned | Flagship pilot candidate | All prior phases | Full release dossier reaches GO |
+| 0. Contract freeze and baseline | Gate passed | Locked invariants, ADRs and measurable harness | This plan | ADRs, rollback and baseline harness verified |
+| 1. Renderer and scene kernel | Gate passed | Layered Canvas2D world behind v3 flag | Phase 0 | Desktop/mobile frame and render budgets pass |
+| 2. Locomotion vertical slice | Gate passed | Fixed-step movement replaces CSS sliding | Phase 1 | Keyboard, tap, collision and camera checks pass |
+| 3. Character classes | Gate failed | Five procedural race/class silhouettes implemented | Phase 2 | External review still rates characters prototype-level |
+| 4. Living Guildhall | Gate failed | Layered animated world and prop cycles implemented | Phase 1 and 3 | External visual benchmark remains below 7/10 |
+| 5. Object interaction slice | Gate failed | Contextual ribbon and retained world context implemented | Phase 2 and 4 | Project-table quick action and context-perfect deep return need stronger proof |
+| 6. Spatial social and voice | Gate failed | Identity normalization, roster, presence and existing voice adapters integrated | Phase 0, 2 and 3 | Zero-remote audit cannot prove two-user proximity/media soak |
+| 7. Gold recognition loop | Gate passed | Receipt-bound lazy Remotion reward implemented | Phase 5 | Eligible mutation and no-pre-receipt checks pass |
+| 8. Mobile and adaptive HUD | Gate passed | Tap movement, optional D-pad and adaptive HUD implemented | Phases 2, 5 and 6 | 360/393 focus, target, overflow and HUD gates pass |
+| 9. Full object and entity rollout | Gate failed | All eight canonical surfaces mapped to one v3 runtime | Phases 5-8 | Success paths pass; per-object adverse-state matrix remains incomplete |
+| 10. Optimization and release | Gate failed | Release candidate, metrics and rollback evidence produced | All prior phases | Independent score is 7.3/10; real-user soak absent |
+
+### 7.1 Implementation evidence — 2026-08-17
+
+- Runtime: native Canvas2D scene graph with fixed-step locomotion, camera spring, painter sorting, collision, adaptive quality, visibility pause and no React render per world frame.
+- Characters: Elf, Dwarf, Human, Half-Orc and Tiefling silhouettes with race/class-specific procedural equipment, movement and labels.
+- World: eight business objects, animated room props, truthful labeled demo actors, contextual action ribbons and direct Waygate travel.
+- Social: normalized presence identity drives the world and roster; mobile presence status remains operable from the Members surface; existing proximity/party/media adapters remain connected.
+- Gold: one eligible canonical wallet mutation triggers the lazy Remotion reward sequence and updates the wallet/Chronicle from the same operation.
+- Mobile: default HUD coverage at or below 22 percent, 44 x 44 minimum visible controls, no horizontal overflow at 360 x 800, hidden D-pad removed from focus order, and duplicate offscreen object proxies removed.
+- Rollback: `?world=v2` restores the prior scene and is labeled `Realm World v2 · rollback`.
+- Automated evidence: `886/886` Node tests passed; the v3 desktop/mobile Playwright suite passed with one intentional desktop skip for the mobile-only gate; the final optimized production build passed after accessibility remediation.
+- Measured live evidence: click/tap acknowledgement below 100 ms; desktop/mobile frame p95 approximately 16.8-17.0 ms; render p95 approximately 0.5-1.9 ms; console clean during the audited journeys.
+- Independent strict audit: `7.3/10`, `NO-GO` for flagship release. There are no open P0 findings. Art direction `6.2`, world cohesion `6.8`, character quality `5.8`, motion `6.9` and spatial/social presence `6.4` remain below the release minimum; authored visual quality and real multi-user soak are the P1 blockers.
 
 ## 8. Phase work breakdown and gates
 
@@ -775,6 +788,18 @@ Accepted. Identity deduplication and count consistency must pass before adding r
 ### D-005: Business capability over visual cleanliness
 
 Accepted. No current business capability may be silently removed. A capability may receive a new interaction pattern only when the parity matrix shows its safe path.
+
+### D-006: Native Canvas2D is the v3 renderer
+
+Accepted. The Phase 1 spike meets the measured desktop and mobile frame budgets without a new WebGL dependency. The scene graph and simulation contracts remain renderer-independent so a later WebGL renderer can replace drawing without moving canonical business logic into the world runtime.
+
+### D-007: Procedural art is an implementation bridge, not the flagship bar
+
+Accepted. Procedural actors and props prove locomotion, scene ownership, capability parity and performance. The independent 7.3/10 review still leaves character quality at 5.8 and art direction at 6.2, so they do not satisfy the release target; authored atlases, state transitions and environment layers remain mandatory before flagship release.
+
+### D-008: Preserve mobile controls through visible contextual placement
+
+Accepted. CSS-hidden focusable controls are prohibited. Sound remains a visible world control; presence status moves to the visible Members surface on compact viewports; the hidden D-pad is disabled and removed from tab order until expanded.
 
 ## 16. Execution order
 

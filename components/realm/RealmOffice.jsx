@@ -83,6 +83,7 @@ import { useRealmChangeFeed } from './useRealmChangeFeed';
 import RealmNotificationBell from './RealmNotificationBell';
 import LivingGuildhallMotion from './LivingGuildhallMotion';
 import GuildhallScene from './GuildhallScene';
+import RealmWorldV3 from './RealmWorldV3';
 import { useCollaborationDirectory } from '@/components/collaboration/useCollaborationDirectory';
 import { LanguageSwitch, useLanguage } from '@/components/LanguageProvider';
 import {
@@ -96,6 +97,7 @@ import {
   parseRealmExperienceContext,
   realmJourneyForContext,
 } from '@/lib/realm-experience';
+import { realmWorldV3Enabled } from '@/lib/realm-world-v3';
 import styles from './realm-office.module.css';
 import guild from './guildhall-shell.module.css';
 
@@ -119,6 +121,7 @@ const GENERATED_ART_REQUESTED = realmGeneratedArtEnabled();
 const ENVIRONMENT_ART_REQUESTED = realmGeneratedEnvironmentEnabled();
 const PROP_ART_REQUESTED = realmGeneratedPropEnabled();
 const UI_ART_REQUESTED = realmGeneratedUiEnabled();
+const WORLD_V3_REQUESTED = realmWorldV3Enabled();
 const GENERATED_UI_ART_ASSETS = Object.freeze([
   ...realmGeneratedUiAssets(),
   ...realmGeneratedErpUiAssets(),
@@ -1120,9 +1123,23 @@ function MediaDock({
   );
 }
 
-function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world' }) {
+function useCompactRealmViewport() {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 760px)');
+    const sync = () => setCompact(media.matches);
+    sync();
+    media.addEventListener?.('change', sync);
+    return () => media.removeEventListener?.('change', sync);
+  }, []);
+  return compact;
+}
+
+function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world', worldVersion = 'v3' }) {
   const toast = useToast();
   const { t } = useLanguage();
+  const compactViewport = useCompactRealmViewport();
+  const usesWorldV3 = WORLD_V3_REQUESTED && worldVersion !== 'v2';
   const tavernEnabled = pilotFeatures?.tavern !== false;
   const realmNav = useMemo(() => tavernEnabled ? NAV : NAV.filter((item) => !['treasury', 'shop'].includes(item.id)), [tavernEnabled]);
   const dataSource = useMemo(
@@ -1146,6 +1163,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const [mapStyle, setMapStyle] = useState(REALM_MAP_STYLE_DEFAULT);
   const [position, setPosition] = useState({ ...DEFAULT_WORLD_POSITION, zoneId: null });
   const positionRef = useRef(position);
+  const positionStateSyncRef = useRef(0);
   const [activeObject, setActiveObject] = useState(null);
   const [nearby, setNearby] = useState([]);
   const [privateZone, setPrivateZone] = useState(null);
@@ -1675,7 +1693,12 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   }, [broadcastEmote, sessionId, showEmote, toast]);
 
   const handlePosition = useCallback((next, object) => {
-    setPosition((current) => (Math.abs(current.x - next.x) + Math.abs(current.y - next.y) > 0.03 ? { ...next } : current));
+    positionRef.current = { ...next };
+    const now = typeof performance === 'undefined' ? Date.now() : performance.now();
+    if (now - positionStateSyncRef.current >= 750) {
+      positionStateSyncRef.current = now;
+      setPosition((current) => (Math.abs(current.x - next.x) + Math.abs(current.y - next.y) > 0.03 ? { ...next } : current));
+    }
     setActiveObject((current) => (current?.id === object?.id ? current : object));
   }, []);
 
@@ -1685,8 +1708,6 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
       person.name,
       person.role,
       person.status,
-      Number(person.x).toFixed(2),
-      Number(person.y).toFixed(2),
     ].join(':')).join('|');
     setNearby((current) => signature(current) === signature(people) ? current : people);
     setPrivateZone((current) => current?.id === zone?.id ? current : zone);
@@ -1715,9 +1736,23 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   }, [openAuthorizedPanel]);
 
   const moveToObject = (panel) => {
-    if (!openAuthorizedPanel(panel)) return;
+    if (!tavernEnabled && ['treasury', 'shop'].includes(panel)) {
+      toast('Tavern đang tạm tắt theo release policy.', 'error');
+      return;
+    }
+    const access = realmAccessForPanel(businessBridge?.access, panel);
+    if (!access.allowed) {
+      toast(access.reason || 'Session ERP không có quyền mở khu vực này.', 'error');
+      return;
+    }
     const object = WORLD_OBJECTS.find((item) => item.panel === panel);
-    if (object) window.dispatchEvent(new CustomEvent('realm:move', { detail: { x: object.x, y: object.y + 1.1 } }));
+    if (object) {
+      setMode('world');
+      setSurfaceOpen(false);
+      window.dispatchEvent(new CustomEvent('realm:move', { detail: { x: object.x, y: object.y, objectId: object.id, direct: true } }));
+      return;
+    }
+    openAuthorizedPanel(panel);
   };
 
   useEffect(() => {
@@ -2030,18 +2065,28 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     () => mergeRealmPresencePeople({ staff: dataSource.isErp ? erpDirectoryPeople : STAFF, remotePlayers, selfProfile: profile }),
     [dataSource.isErp, erpDirectoryPeople, profile, remotePlayers],
   );
+  const realmRosterPeople = useMemo(() => [{
+    ...profile,
+    id: viewerRealUserId || `self:${profile.name}`,
+    userId: viewerRealUserId || undefined,
+    status: playerStatus,
+    presence: playerStatus,
+    online: true,
+    isSelf: true,
+    statusText: 'Bạn đang hiện diện trong Realm',
+  }, ...realmPeople], [playerStatus, profile, realmPeople, viewerRealUserId]);
   const worldStaff = useMemo(
     () => realmPeople.filter((person) => !person.isRemote && (!dataSource.isErp || person.online)),
     [dataSource.isErp, realmPeople],
   );
   const onlineCount = realmPeople.filter((person) => person.isRemote || person.online || !dataSource.isErp).length + 1;
   const guildDashboard = useMemo(
-    () => realmLocalFixture(dataSource, createRealmGuildDemoDashboard({ members: realmPeople, quests, campaigns: CAMPAIGNS })),
-    [dataSource, quests, realmPeople],
+    () => realmLocalFixture(dataSource, createRealmGuildDemoDashboard({ members: realmRosterPeople, quests, campaigns: CAMPAIGNS })),
+    [dataSource, quests, realmRosterPeople],
   );
   const commandDashboard = useMemo(
-    () => realmLocalFixture(dataSource, createRealmCommandCenterDemoDashboard({ members: realmPeople, quests })),
-    [dataSource, quests, realmPeople],
+    () => realmLocalFixture(dataSource, createRealmCommandCenterDemoDashboard({ members: realmRosterPeople, quests })),
+    [dataSource, quests, realmRosterPeople],
   );
   const chronicleDashboard = useMemo(
     () => realmLocalFixture(dataSource, createRealmChronicleDemoDashboard({ profile, career, quests, ledger, wallet })),
@@ -2454,12 +2499,24 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
 
     if (activePanel === 'guild') return (
       <>
+        {compactViewport && (
+          <section className={styles.mobilePresenceControl} aria-label="Trạng thái hiện diện của bạn">
+            <span style={{ '--presence-color': STATUS[playerStatus].color }}><i /><strong>Hiện diện</strong><small>Chia sẻ trạng thái tự nguyện với Guild</small></span>
+            <select value={playerStatus} onChange={(event) => setPlayerStatus(rememberCollaborationAvailability(event.target.value))} aria-label="Trạng thái hiện diện">
+              {Object.entries(STATUS).map(([value, item]) => <option value={value} key={value}>{item.label}</option>)}
+            </select>
+          </section>
+        )}
         <GuildHall
           compact
           operationsSource={operationsSource}
           localDashboard={guildDashboard}
-          presence={realmPeople}
+          presence={realmRosterPeople}
           onSelectMember={(member) => {
+            if (member.id === (viewerRealUserId || `self:${profile.name}`) || member.name === profile.name) {
+              openAuthorizedPanel('profile');
+              return;
+            }
             const person = realmPeople.find((item) => item.id === member.id || item.name === member.name);
             if (person) selectPerson(person);
             else if (operationsSource === 'erp') window.location.assign(realmRecordHref('staff', member.id));
@@ -2576,7 +2633,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
         </div>
       </>
     );
-  }, [activePanel, businessBridge, cancelInvite, career.level, career.renown, chatText, commandDashboard, confirmPartyAction, contactReceipt, contactSending, currentRoom?.name, dataSource.isErp, embassyDashboard, guildDashboard, handleLocalTreasuryChange, incomingInvite, inviteToParty, ledger, localWarRoom, mediaTopology, messages, moveToSelectedPerson, nearby.length, networkInfo, onlineCount, openAuthorizedPanel, operationsSource, operationsSyncState, outgoingInvite, party, partyConfirm, position, profile.color, profile.name, profileDraft, quests, realmDataRevision, realmPeople, refreshRealmOperations, remotePlayers, selectPerson, selectedCampaign, selectedPerson, sendContactToSelected, sendWhisperToSelected, sessionId, sfuMedia.status, transportState, treasuryDashboard, triggerEmote, wallet, whisperText]);
+  }, [activePanel, businessBridge, cancelInvite, career.level, career.renown, chatText, commandDashboard, compactViewport, confirmPartyAction, contactReceipt, contactSending, currentRoom?.name, dataSource.isErp, embassyDashboard, guildDashboard, handleLocalTreasuryChange, incomingInvite, inviteToParty, ledger, localWarRoom, mediaTopology, messages, moveToSelectedPerson, nearby.length, networkInfo, onlineCount, openAuthorizedPanel, operationsSource, operationsSyncState, outgoingInvite, party, partyConfirm, playerStatus, position, profile.color, profile.name, profileDraft, quests, realmDataRevision, realmPeople, realmRosterPeople, refreshRealmOperations, remotePlayers, selectPerson, selectedCampaign, selectedPerson, sendContactToSelected, sendWhisperToSelected, sessionId, sfuMedia.status, transportState, treasuryDashboard, triggerEmote, viewerRealUserId, wallet, whisperText]);
 
   const surfaceTitle = activePanel === 'profile'
     ? 'Hồ sơ nhân vật'
@@ -2608,14 +2665,14 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
         </nav>
         <div className={guild.commandActions}>
           <LanguageSwitch compact />
-          {dataSource.isErp && <RealmNotificationBell dataRevision={realmDataRevision} />}
-          <label className={guild.presenceSelect} style={{ '--presence-color': STATUS[playerStatus].color }}>
+          {dataSource.isErp && !compactViewport && <RealmNotificationBell dataRevision={realmDataRevision} />}
+          {!compactViewport && <label className={guild.presenceSelect} style={{ '--presence-color': STATUS[playerStatus].color }}>
             <i />
             <select value={playerStatus} onChange={(event) => setPlayerStatus(rememberCollaborationAvailability(event.target.value))} aria-label="Trạng thái hiện diện">
               {Object.entries(STATUS).map(([value, item]) => <option value={value} key={value}>{item.label}</option>)}
             </select>
-          </label>
-          <button type="button" className={guild.goldButton} onClick={() => { setMode('ledger'); setLedgerView('personal'); setSurfaceOpen(false); setVoiceOpen(false); }} aria-label={`${t('Mở Chronicle')}, ${t('số dư')} ${wallet} Gold`}><span className={guild.goldCoin}>G</span><strong>{wallet.toLocaleString('vi-VN')} Gold</strong></button>
+          </label>}
+          {!compactViewport && <button type="button" className={guild.goldButton} onClick={() => { setMode('ledger'); setLedgerView('personal'); setSurfaceOpen(false); setVoiceOpen(false); }} aria-label={`${t('Mở Chronicle')}, ${t('số dư')} ${wallet} Gold`}><span className={guild.goldCoin}>G</span><strong>{wallet.toLocaleString('vi-VN')} Gold</strong></button>}
           <button type="button" className={guild.profileButton} onClick={() => openAuthorizedPanel('profile')} aria-label="Mở hồ sơ nhân vật"><span style={{ '--avatar-color': profile.color }}>{initials(profile.name)}</span></button>
         </div>
       </header>
@@ -2631,26 +2688,46 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
       {mode === 'world' ? (
         <section id="realm-main-content" ref={mainStageRef} tabIndex={-1} className={guild.worldViewport}>
           <div className={guild.worldTitle} data-living-motion="great-hall">
-            <span>Không gian cộng tác sống</span>
-            <h1>Guildhall của đội ngũ</h1>
-            <p>Đi tới đúng bàn để làm việc, trò chuyện hoặc ghi nhận đóng góp. Không có dashboard trung gian.</p>
+            <span>{usesWorldV3 ? 'Realm World v3' : 'Realm World v2 · rollback'}</span>
+            <h1>Guildhall</h1>
+            <p>Người, công việc, voice và Gold cùng tồn tại trong một thế giới.</p>
           </div>
 
-          <GuildhallScene
-            activePanel={activePanel}
-            playerStatus={playerStatus}
-            playerProfile={profile}
-            position={position}
-            staff={worldStaff}
-            remotePlayers={remotePlayers}
-            activeEmotes={activeEmotes}
-            sessionId={sessionId}
-            onPosition={handlePosition}
-            onNearby={handleNearby}
-            onObjectOpen={openObject}
-            onPerson={selectPerson}
-            onEmote={triggerEmote}
-          />
+          {usesWorldV3 ? (
+            <RealmWorldV3
+              activePanel={activePanel}
+              playerStatus={playerStatus}
+              playerProfile={profile}
+              position={position}
+              staff={worldStaff}
+              remotePlayers={remotePlayers}
+              activeEmotes={activeEmotes}
+              sessionId={sessionId}
+              onPosition={handlePosition}
+              onNearby={handleNearby}
+              onObjectOpen={openObject}
+              onPerson={selectPerson}
+              onEmote={triggerEmote}
+              wallet={wallet}
+              demoMode={demoMode}
+            />
+          ) : (
+            <GuildhallScene
+              activePanel={activePanel}
+              playerStatus={playerStatus}
+              playerProfile={profile}
+              position={position}
+              staff={worldStaff}
+              remotePlayers={remotePlayers}
+              activeEmotes={activeEmotes}
+              sessionId={sessionId}
+              onPosition={handlePosition}
+              onNearby={handleNearby}
+              onObjectOpen={openObject}
+              onPerson={selectPerson}
+              onEmote={triggerEmote}
+            />
+          )}
 
           {voiceOpen && (
             <div className={guild.voiceTray}>
@@ -2697,7 +2774,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
             <>
               <button type="button" className={guild.surfaceBackdrop} onClick={() => setSurfaceOpen(false)} aria-label="Đóng bàn làm việc" />
               <aside ref={inspectorRef} className={guild.surface} aria-label={surfaceTitle}>
-                <header className={guild.surfaceHeader}><div><span>Guildhall workspace</span><strong>{surfaceTitle}</strong></div><button type="button" onClick={() => setSurfaceOpen(false)} aria-label="Đóng"><Icon name="x" size={18} /></button></header>
+                <header className={guild.surfaceHeader}><div><span>Bàn làm việc Guildhall</span><strong>{surfaceTitle}</strong></div><button type="button" onClick={() => setSurfaceOpen(false)} aria-label="Đóng"><Icon name="x" size={18} /></button></header>
                 <div className={guild.surfaceBody}>{panel}</div>
               </aside>
             </>
@@ -2712,7 +2789,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
               career={career}
               quests={quests}
               ledger={ledger}
-              staff={realmPeople}
+              staff={realmRosterPeople}
               wallet={wallet}
               onAdvanceQuest={advanceQuest}
               onClaimQuest={claimQuest}
@@ -2729,7 +2806,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
               guildDashboard={guildDashboard}
               commandDashboard={commandDashboard}
               chronicleDashboard={chronicleDashboard}
-              guildPresence={realmPeople}
+              guildPresence={realmRosterPeople}
               embassyDashboard={embassyDashboard}
               businessBridge={businessBridge}
               dataRevision={realmDataRevision}
@@ -3070,6 +3147,6 @@ function CharacterDossier({ profile, playerStatus, career, wallet, operationsSou
   );
 }
 
-export default function RealmOffice({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world' }) {
-  return <ToastProvider><RealmOfficeInner erpHref={erpHref} demoMode={demoMode} workspaceLabel={workspaceLabel} initialBridge={initialBridge} pilotFeatures={pilotFeatures} initialMode={initialMode} /></ToastProvider>;
+export default function RealmOffice({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world', worldVersion = 'v3' }) {
+  return <ToastProvider><RealmOfficeInner erpHref={erpHref} demoMode={demoMode} workspaceLabel={workspaceLabel} initialBridge={initialBridge} pilotFeatures={pilotFeatures} initialMode={initialMode} worldVersion={worldVersion} /></ToastProvider>;
 }

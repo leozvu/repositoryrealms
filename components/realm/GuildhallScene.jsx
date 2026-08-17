@@ -60,16 +60,7 @@ const OBJECT_SCENE_POINTS = Object.freeze({
   'arcane-forge': Object.freeze({ x: 78, y: 66 }),
 });
 
-const COMMAND_OBJECT = Object.freeze({
-  id: 'command-dais',
-  panel: 'command',
-  name: 'Phòng điều hành',
-  hint: 'Mở ưu tiên và quyết định vận hành',
-  x: 29,
-  y: 4.5,
-});
-
-const SCENE_OBJECTS = Object.freeze([COMMAND_OBJECT, ...WORLD_OBJECTS]);
+const SCENE_OBJECTS = WORLD_OBJECTS;
 
 export const OBJECT_INTERACTIONS = Object.freeze({
   'command-dais': Object.freeze({ action: 'salute', verb: 'Trình diện', progress: 'Đang báo cáo ưu tiên', accent: '#d7b465' }),

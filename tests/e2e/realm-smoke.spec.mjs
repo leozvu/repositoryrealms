@@ -410,13 +410,15 @@ test('contextual Guildhall surfaces contain their content on desktop and mobile'
   }
 });
 
-test('the cinematic environment stays presentation-only and keeps business actions in the DOM', async ({ page }) => {
+test('the v3 environment stays presentation-only and keeps business actions in accessible DOM controls', async ({ page }) => {
   await page.goto('/realm-demo');
   const scene = page.getByRole('region', { name: 'Không gian Guildhall tương tác' });
-  const environment = scene.getByRole('img', { name: 'Đại sảnh Guildhall nhìn từ trên cao với bàn hội đồng, bàn dự án, kho bạc và khu nhân sự' });
+  const environment = scene.locator('canvas[data-realm-runtime="canvas-2d-fixed-step"]');
   await expect(environment).toBeVisible();
-  expect(await environment.evaluate((image) => ({ width: image.naturalWidth, height: image.naturalHeight }))).toEqual({ width: 1915, height: 821 });
-  expect(await scene.getByRole('button').count()).toBeGreaterThanOrEqual(10);
+  await expect(environment).toHaveAttribute('data-realm-renderer', 'canvas2d');
+  await expect(scene.locator('img[src*="guildhall-environment"]')).toHaveCount(0);
+  await scene.getByRole('button', { name: 'Mở danh sách địa điểm', exact: true }).click();
+  await expect(scene.locator('[class*="locationMenu"] > button')).toHaveCount(8);
   expect(await page.evaluate(() => Object.keys(localStorage).filter((key) => key.includes('map-style')))).toEqual([]);
 });
 
@@ -534,33 +536,44 @@ test('opening another tab for the same profile does not inflate online headcount
 test('RPG travel keeps its target clear and follows the player on mobile', async ({ page, isMobile }) => {
   await page.goto('/realm-demo');
   const scene = page.getByRole('region', { name: 'Không gian Guildhall tương tác' });
+  const canvas = scene.locator('canvas[data-realm-runtime="canvas-2d-fixed-step"]');
+  const before = await canvas.evaluate((element) => ({ x: Number(element.dataset.realmX), y: Number(element.dataset.realmY) }));
   await page.getByRole('button', { name: 'Mở danh sách địa điểm', exact: true }).click();
   await page.getByRole('button', { name: 'Mở Sổ bộ Guild', exact: true }).click();
 
   const tracker = scene.locator('[data-realm-journey]');
-  const target = scene.locator('[data-realm-object-id="guild-roster"]');
   await expect(tracker).toBeVisible();
-  const [trackerBox, targetBox] = await Promise.all([tracker.boundingBox(), target.boundingBox()]);
+  await expect(tracker).toHaveAttribute('data-realm-target', 'guild-roster');
+  const trackerBox = await tracker.boundingBox();
   expect(trackerBox).not.toBeNull();
-  expect(targetBox).not.toBeNull();
-  const overlapWidth = Math.min(trackerBox.x + trackerBox.width, targetBox.x + targetBox.width) - Math.max(trackerBox.x, targetBox.x);
-  const overlapHeight = Math.min(trackerBox.y + trackerBox.height, targetBox.y + targetBox.height) - Math.max(trackerBox.y, targetBox.y);
-  expect(overlapWidth > 0 && overlapHeight > 0).toBe(false);
+  const viewport = page.viewportSize();
+  expect(trackerBox.x).toBeGreaterThanOrEqual(0);
+  expect(trackerBox.x + trackerBox.width).toBeLessThanOrEqual(viewport.width);
 
   const surface = page.getByRole('complementary', { name: 'Thành viên', exact: true });
   await expect(surface).toBeVisible({ timeout: 7_000 });
+  const tracking = await canvas.evaluate((element) => ({
+    x: Number(element.dataset.realmX),
+    y: Number(element.dataset.realmY),
+    screenX: Number(element.dataset.realmPlayerScreenX),
+    screenY: Number(element.dataset.realmPlayerScreenY),
+  }));
+  expect(Math.hypot(tracking.x - before.x, tracking.y - before.y)).toBeGreaterThan(1);
+  expect(tracking.screenX).toBeGreaterThan(0);
+  expect(tracking.screenX).toBeLessThan(viewport.width);
+  expect(tracking.screenY).toBeGreaterThan(0);
+  expect(tracking.screenY).toBeLessThan(viewport.height);
   await closeGuildhallSurface(surface);
 
   if (isMobile) {
-    const player = scene.locator('[data-realm-player="true"]');
-    const playerBox = await player.boundingBox();
-    const viewport = page.viewportSize();
-    expect(playerBox).not.toBeNull();
-    expect(viewport).not.toBeNull();
-    expect(playerBox.x + playerBox.width / 2).toBeGreaterThan(0);
-    expect(playerBox.x + playerBox.width / 2).toBeLessThan(viewport.width);
-
-    for (const name of ['Mở danh sách địa điểm', 'Ra hiệu', 'Đi lên', 'Đi sang trái', 'Đi xuống', 'Đi sang phải']) {
+    for (const name of ['Bật âm thanh Realm', 'Mở danh sách địa điểm', 'Ra hiệu', 'Mở điều khiển di chuyển']) {
+      const box = await page.getByRole('button', { name, exact: true }).boundingBox();
+      expect(box, name).not.toBeNull();
+      expect(box.width, name).toBeGreaterThanOrEqual(44);
+      expect(box.height, name).toBeGreaterThanOrEqual(44);
+    }
+    await page.getByRole('button', { name: 'Mở điều khiển di chuyển', exact: true }).click();
+    for (const name of ['Đi lên', 'Đi sang trái', 'Đi xuống', 'Đi sang phải']) {
       const box = await page.getByRole('button', { name, exact: true }).boundingBox();
       expect(box, name).not.toBeNull();
       expect(box.width, name).toBeGreaterThanOrEqual(44);
@@ -591,19 +604,20 @@ test('English Realm copy never translates business records and localizes every s
 test('retargeting and WASD cancellation never open a stale workspace', async ({ page, isMobile }) => {
   test.skip(isMobile, 'Touch cancellation and camera follow are covered in the mobile RPG travel test.');
   await page.goto('/realm-demo');
-  const command = page.locator('[data-realm-object-id="command-dais"]');
-  const forge = page.locator('[data-realm-object-id="arcane-forge"]');
-  await command.click();
-  await forge.click();
-  await expect(page.locator('[data-realm-journey]')).toContainText('Xưởng Guild');
+  await page.locator('canvas[data-realm-runtime="canvas-2d-fixed-step"]').waitFor();
+  await page.evaluate(() => {
+    window.dispatchEvent(new CustomEvent('realm:move', { detail: { objectId: 'command-dais' } }));
+    window.dispatchEvent(new CustomEvent('realm:move', { detail: { objectId: 'arcane-forge', direct: true } }));
+  });
+  await expect(page.locator('[data-realm-journey]')).toHaveAttribute('data-realm-target', 'arcane-forge');
   const forgeSurface = page.getByRole('complementary', { name: 'Xưởng phẩm', exact: true });
   await expect(forgeSurface).toBeVisible({ timeout: 7_000 });
   await expect(page.getByRole('complementary', { name: 'Phòng điều hành', exact: true })).toHaveCount(0);
   await closeGuildhallSurface(forgeSurface);
 
-  const treasury = page.locator('[data-realm-object-id="treasury-chest"]');
-  await treasury.click();
-  await treasury.press('w');
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent('realm:move', { detail: { objectId: 'treasury-chest' } })));
+  await expect(page.locator('[data-realm-journey]')).toHaveAttribute('data-realm-target', 'treasury-chest');
+  await page.keyboard.press('w');
   await expect(page.locator('[data-realm-journey]')).toHaveCount(0);
   await page.waitForTimeout(1_500);
   await expect(page.getByRole('complementary', { name: 'Kho bạc Gold', exact: true })).toHaveCount(0);

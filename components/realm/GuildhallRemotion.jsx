@@ -188,7 +188,9 @@ export function GuildhallAtmosphere({ imageUrl, imageAlt, reducedMotion }) {
       autoPlay={!reducedMotion}
       loop
       controls={false}
+      initiallyMuted
       numberOfSharedAudioTags={0}
+      acknowledgeRemotionLicense
       inputProps={{ imageUrl, imageAlt, reducedMotion }}
       style={{ width: '100%', height: '100%', backgroundColor: '#070b0a' }}
     />
@@ -207,7 +209,9 @@ export function RealmActorMotion({ spriteUrl, moving, facing, player, accent, ac
       autoPlay={!reducedMotion}
       loop
       controls={false}
+      initiallyMuted
       numberOfSharedAudioTags={0}
+      acknowledgeRemotionLicense
       inputProps={{ spriteUrl, moving, facing, player, accent, action, actionPhase, reducedMotion }}
       style={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}
     />
@@ -226,7 +230,9 @@ export function RealmObjectInteractionMotion({ accent, action, phase, reducedMot
       autoPlay={!reducedMotion}
       loop
       controls={false}
+      initiallyMuted
       numberOfSharedAudioTags={0}
+      acknowledgeRemotionLicense
       inputProps={{ accent, action, phase, reducedMotion }}
       style={{ width: '100%', height: '100%', backgroundColor: 'transparent' }}
     />

@@ -333,16 +333,18 @@
 .worldTitle {
   position: fixed;
   z-index: 12;
-  top: 94px;
-  left: clamp(24px, 4vw, 64px);
-  max-width: min(560px, calc(100vw - 48px));
+  top: 98px;
+  left: clamp(20px, 3vw, 44px);
+  max-width: min(320px, calc(100vw - 40px));
+  padding-left: 11px;
+  border-left: 1px solid rgba(207, 176, 105, .44);
   pointer-events: none;
   text-shadow: 0 2px 20px rgba(0, 0, 0, .72);
 }
 
-.worldTitle span { display: block; margin-bottom: 8px; color: #cfb069; font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.worldTitle h1 { max-width: 80rem; margin: 0; color: #f4eee1; font-family: "Cabinet Grotesk", var(--font-display), serif; font-size: clamp(2rem, 4.4vw, 4.4rem); font-weight: 550; letter-spacing: -.045em; line-height: .96; text-wrap: balance; }
-.worldTitle p { max-width: 46ch; margin: 10px 0 0; color: rgba(238, 232, 218, .64); font-size: clamp(.72rem, 1vw, .84rem); line-height: 1.55; }
+.worldTitle span { display: block; margin-bottom: 3px; color: #cfb069; font-size: .5rem; font-weight: 740; letter-spacing: .11em; text-transform: uppercase; }
+.worldTitle h1 { margin: 0; color: #f4eee1; font-family: "Cabinet Grotesk", var(--font-display), serif; font-size: clamp(1.05rem, 2vw, 1.35rem); font-weight: 640; letter-spacing: -.025em; line-height: 1; }
+.worldTitle p { max-width: 42ch; margin: 5px 0 0; color: rgba(238, 232, 218, .5); font-size: .55rem; line-height: 1.4; }
 
 .sceneHint {
   position: fixed;
@@ -592,21 +594,21 @@
 .voiceTrayHeader button:hover { color: #f3ead8; border-color: rgba(225,189,104,.3); background: rgba(255,255,255,.07); }
 .voiceTray > section { position: relative; z-index: 1; margin: 0; border: 1px solid rgba(222,205,162,.16); border-radius: 13px; background: rgba(10,16,14,.95); box-shadow: 0 22px 70px rgba(0,0,0,.46); backdrop-filter: blur(20px); }
 
-.surfaceBackdrop { position: fixed; z-index: 74; inset: 0; border: 0; background: rgba(2,5,4,.48); backdrop-filter: blur(2px); animation: fadeIn .2s ease both; }
+.surfaceBackdrop { position: fixed; z-index: 74; inset: 0; border: 0; background: rgba(2,5,4,.08); animation: fadeIn .2s ease both; }
 .surface {
   position: fixed;
   z-index: 75;
   top: 86px;
   right: 16px;
-  bottom: 16px;
+  bottom: 112px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  width: min(660px, calc(100vw - 32px));
+  width: min(580px, calc(100vw - 32px));
   overflow: hidden;
   border: 1px solid rgba(222,205,162,.17);
   border-radius: 14px;
   color: var(--realm-text, #ece8dc);
-  background: linear-gradient(180deg, #111c17, #0c1511);
+  background: linear-gradient(180deg, rgba(17, 28, 23, .98), rgba(10, 18, 14, .97));
   box-shadow: -30px 30px 90px rgba(0,0,0,.5), inset 0 1px rgba(255,255,255,.035);
   animation: surfaceIn .46s cubic-bezier(.22,1,.36,1) both;
 }
@@ -638,7 +640,7 @@
 @media (max-width: 1080px) {
   .commandBar { grid-template-columns: 1fr auto; }
   .modeRail { display: none; }
-  .worldTitle h1 { font-size: clamp(2rem, 6vw, 3.8rem); }
+  .worldTitle h1 { font-size: clamp(1.05rem, 2vw, 1.3rem); }
   .actionDock { grid-template-columns: 1fr auto; }
   .dockPrompt { display: none; }
   .actionDock { width: auto; padding-left: 14px; }
@@ -656,16 +658,13 @@
   .presenceSelect, .commandActions > :global([class*="notification"]) { display: none; }
   .commandActions { gap: 3px; }
   .commandActions :global(.language-switch) { display: flex; }
-  .commandActions :global(.language-switch button) { min-width: 40px; min-height: 44px; padding: 0 7px; }
+  .commandActions :global(.language-switch button) { min-width: 44px; min-height: 44px; padding: 0 7px; }
   .commandIcon { width: 44px; height: 44px; }
   .goldButton { min-height: 44px; padding: 0 8px; }
   .goldButton strong { display: none; }
   .commandActions > .goldButton { display: none; }
   .profileButton { width: 44px; height: 44px; }
-  .worldTitle { top: 76px; left: 18px; max-width: calc(100vw - 36px); pointer-events: none; }
-  .worldTitle span { margin-bottom: 5px; font-size: .53rem; }
-  .worldTitle h1 { max-width: 16ch; font-size: clamp(1.65rem, 8vw, 2.15rem); }
-  .worldTitle p { display: none; }
+  .worldTitle { display: none; }
   .sceneHint { top: 145px; right: 18px; }
   .sceneHint small { display: none; }
   .journeyTracker { top: auto; right: auto; bottom: 206px; left: 50%; width: min(300px, calc(100vw - 24px)); padding: 8px 10px; }
@@ -687,14 +686,14 @@
   .locationControl > button span { display: none; }
   .locationMenu { right: -48px; width: min(300px, calc(100vw - 24px)); max-height: calc(100dvh - 220px); }
   .nearbyPrompt { bottom: 206px; max-width: calc(100vw - 24px); }
-  .actionDock { bottom: 8px; width: calc(100vw - 16px); min-height: 84px; padding: 8px; border-radius: 12px; }
+  .actionDock { bottom: 8px; width: calc(100vw - 16px); min-height: 70px; padding: 4px 8px; border-radius: 12px; }
   .dockActions { width: 100%; }
-  .dockAction { min-width: 0; flex: 1; min-height: 62px; }
+  .dockAction { min-width: 0; flex: 1; min-height: 54px; }
   .dockAction span { font-size: .54rem; }
   .voiceTray { bottom: 98px; width: calc(100vw - 16px); }
   .voiceTrayHeader { padding-left: 10px; }
   .voiceTrayHeader strong { display: none; }
-  .surface { top: 64px; right: 8px; bottom: 8px; width: calc(100vw - 16px); border-radius: 12px; }
+  .surface { top: auto; right: 8px; bottom: 98px; width: calc(100vw - 16px); height: min(60dvh, 620px); border-radius: 12px; }
   .surfaceHeader { min-height: 60px; padding-left: 15px; }
   .surfaceBody { padding: 16px 13px 22px; }
   .ledgerViewport { padding: 72px 8px 18px; }
@@ -703,7 +702,7 @@
   .inviteActions button { flex: 1; }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 390px) {
   .commandBar { grid-template-columns: 1fr auto; }
   .brand { display: none; }
   .modeRail { justify-self: start; }
