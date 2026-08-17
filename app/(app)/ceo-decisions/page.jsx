@@ -11,7 +11,7 @@ import styles from './page.module.css';
 const COPY = {
   vi: {
     eyebrow: 'CEO-13 · UNIFIED DECISION QUEUE', title: 'Hàng đợi quyết định toàn group',
-    intro: 'Nhìn thấy quyết định đang chờ ở bốn công ty, rồi mở đúng workflow của công ty sở hữu để xử lý.',
+    intro: 'Nhìn thấy quyết định đang chờ ở ba công ty, rồi mở đúng workflow của công ty sở hữu để xử lý.',
     back: 'Về Tổng quan', refresh: 'Làm mới', all: 'Tất cả', critical: 'Quá SLA nghiêm trọng', warning: 'Đến SLA', normal: 'Trong SLA',
     total: 'Đang chờ', sources: 'Nguồn phản hồi', amount: 'Giá trị đang chờ', empty: 'Không có quyết định phù hợp bộ lọc.',
     open: 'Mở tại công ty', requester: 'Người yêu cầu', step: 'Bước hiện tại', age: 'Tuổi yêu cầu', hours: 'giờ',
@@ -20,7 +20,7 @@ const COPY = {
   },
   en: {
     eyebrow: 'CEO-13 · UNIFIED DECISION QUEUE', title: 'Group decision queue',
-    intro: 'See pending decisions across four companies, then open the canonical workflow owned by the relevant company.',
+    intro: 'See pending decisions across three companies, then open the canonical workflow owned by the relevant company.',
     back: 'Back to Overview', refresh: 'Refresh', all: 'All', critical: 'Severely over SLA', warning: 'At SLA', normal: 'Within SLA',
     total: 'Pending', sources: 'Sources responding', amount: 'Pending value', empty: 'No decision matches this filter.',
     open: 'Open in company', requester: 'Requester', step: 'Current step', age: 'Request age', hours: 'hours',

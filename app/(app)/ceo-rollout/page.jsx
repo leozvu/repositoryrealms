@@ -17,7 +17,7 @@ const EVIDENCE_LABELS = {
 
 const COPY = {
   vi: {
-    eyebrow: 'CEO-9 · PILOT & ROLLOUT', title: 'Trung tâm phát hành bốn công ty',
+    eyebrow: 'CEO-9 · PILOT & ROLLOUT', title: 'Trung tâm phát hành ba công ty',
     intro: 'Điều khiển rollout theo từng ring và từng entity. Chỉ trạng thái ủy quyền của CEO Portal thay đổi; màn hình này không deploy và không ghi database nghiệp vụ.',
     refresh: 'Tải lại', loading: 'Đang kiểm tra rollout…', loadError: 'Không thể tải trạng thái rollout.', forbidden: 'Chỉ Director được truy cập trung tâm rollout.',
     hold: 'CEO-0 HOLD', go: 'Đã có phê duyệt', maxRing: 'Ring tối đa', approval: 'Mã phê duyệt', expires: 'Hết hạn', noApproval: 'Chưa có production approval hợp lệ',
@@ -33,7 +33,7 @@ const COPY = {
     saved: 'Đã ghi evidence.', transitioned: 'Đã ghi rollout receipt.',
   },
   en: {
-    eyebrow: 'CEO-9 · PILOT & ROLLOUT', title: 'Four-company release control center',
+    eyebrow: 'CEO-9 · PILOT & ROLLOUT', title: 'Three-company release control center',
     intro: 'Control rollout per ring and per entity. Only CEO Portal authorization state changes; this screen does not deploy or write an entity business database.',
     refresh: 'Refresh', loading: 'Checking rollout posture…', loadError: 'Unable to load rollout posture.', forbidden: 'Only Directors may access rollout control.',
     hold: 'CEO-0 HOLD', go: 'Approved', maxRing: 'Maximum ring', approval: 'Approval ID', expires: 'Expires', noApproval: 'No valid production approval',

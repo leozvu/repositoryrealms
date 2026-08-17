@@ -3,7 +3,7 @@
    - Tạo tài khoản Giám đốc nếu chưa có người dùng nào
    - Tạo Kênh chung nếu chưa có
    Chạy: COMPANY="Tên Cty" DIR_EMAIL=a@b.c DIR_PASS=xxx DIR_NAME="Tên GĐ" MODULES=export node prisma/bootstrap.js
-   MODULES: 'agency' | 'export' | 'livestream' (tên preset) — bỏ trống = để mặc định (agency). */
+   MODULES: 'agency' | 'egoric' | 'export' | 'livestream' (tên preset) — bỏ trống = để mặc định (agency). */
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
@@ -11,6 +11,7 @@ const prisma = new PrismaClient();
 // Giữ đồng bộ với lib/modules.js MODULE_PRESETS (bootstrap chạy CommonJS nên khai lại ở đây).
 const PRESETS = {
   agency: ['sales', 'services', 'support', 'tasks', 'delivery', 'commissions', 'procurement', 'freelancers', 'recruitment', 'reviews', 'analytics'],
+  egoric: ['sales', 'services', 'support', 'tasks', 'delivery', 'commissions', 'procurement', 'freelancers', 'recruitment', 'reviews', 'analytics', 'livestream'],
   export: ['sales', 'tasks', 'procurement', 'recruitment', 'export', 'inventory'],
   livestream: ['tasks', 'commissions', 'freelancers', 'reviews', 'livestream'],
 };
@@ -20,7 +21,7 @@ async function main() {
   const email = (process.env.DIR_EMAIL || 'giamdoc@congty.vn').toLowerCase();
   const pass = process.env.DIR_PASS || 'doimatkhau';
   const name = process.env.DIR_NAME || 'Giám đốc';
-  const modulesPreset = process.env.MODULES; // 'export' | 'livestream' | 'agency' | undefined
+  const modulesPreset = process.env.MODULES; // 'egoric' | 'export' | 'livestream' | 'agency' | undefined
 
   const row = await prisma.setting.findUnique({ where: { id: 1 } });
   const base = row ? JSON.parse(row.json) : {};

@@ -66,13 +66,13 @@ const PAGE_COPY = {
   },
   'world-map': {
     eyebrow: 'Federation · Presence · Source freshness',
-    title: 'Bản đồ bốn công ty',
+    title: 'Bản đồ ba công ty',
     description: 'Một góc nhìn không gian trên federation thật; mọi trạng thái đều có bản bảng tương đương và không biến presence thành điểm năng suất.',
   },
   'ceo-terminal': {
     eyebrow: 'Portfolio truth · Executive decisions · Provenance',
     title: 'CEO Terminal',
-    description: 'Tổng hợp điều hành bốn công ty với tiền tệ, nguồn, as-of và giới hạn dữ liệu được công khai rõ ràng.',
+    description: 'Tổng hợp điều hành ba công ty với tiền tệ, nguồn, as-of và giới hạn dữ liệu được công khai rõ ràng.',
   },
   'employee-profile': {
     eyebrow: 'Identity · Work context · Explicit privacy',

@@ -9,6 +9,8 @@
     "start": "next start -p 3300",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.js",
+    "egolive:department:plan": "node scripts/enable-egolive-department.mjs",
+    "egolive:department:apply": "node scripts/enable-egolive-department.mjs --apply",
     "migration:ci": "prisma migrate deploy && prisma migrate diff --from-schema-datasource prisma/schema.prisma --to-schema-datamodel prisma/schema.prisma --exit-code",
     "test": "node --test --test-concurrency=1 \"tests/**/*.test.mjs\"",
     "test:coverage": "node --test --test-concurrency=1 --experimental-test-coverage --test-coverage-lines=90 --test-coverage-functions=85 --test-coverage-branches=75 \"tests/**/*.test.mjs\"",

@@ -10,7 +10,7 @@ import styles from './registry.module.css';
 const COPY = {
   vi: {
     eyebrow: 'CEO CONTROL PLANE · ENTITY REGISTRY',
-    title: 'Danh bạ bốn công ty',
+    title: 'Danh bạ ba công ty',
     intro: 'Một nơi kiểm soát kết nối tới AIm, Egoric, Vnecom và Egolive. SSO trust secret và service key dùng hai tham chiếu riêng; giá trị thật không nằm trong database hoặc trình duyệt.',
     refresh: 'Tải lại trạng thái',
     loading: 'Đang tải danh bạ công ty…',
@@ -51,7 +51,7 @@ const COPY = {
   },
   en: {
     eyebrow: 'CEO CONTROL PLANE · ENTITY REGISTRY',
-    title: 'Four-company registry',
+    title: 'Three-company registry',
     intro: 'A single control point for AIm, Egoric, Vnecom, and Egolive. SSO trust and service keys use separate references; raw values never enter the database or browser.',
     refresh: 'Refresh status',
     loading: 'Loading company registry…',

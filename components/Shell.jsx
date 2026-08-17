@@ -390,7 +390,7 @@ export default function Shell({ user, company, realmPilot, realmV2Theme = false,
             <div className="brand-logo">{ceoPortal ? 'L' : (company || 'A')[0].toUpperCase()}</div>
             <div className="brand-text">
               <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">{ceoPortal ? 'CEO Terminal · 4 công ty' : 'ERP · CRM · 7 vai trò nghiệp vụ'}</span>
+              <span className="brand-sub">{ceoPortal ? 'CEO Terminal · 3 công ty' : 'ERP · CRM · 7 vai trò nghiệp vụ'}</span>
             </div>
           </div>
           <nav id="nav">

@@ -52,7 +52,7 @@ test('CEO-11 gives the portal a dedicated login, shell and v2 presentation', () 
   const login = text('app/login/LoginForm.jsx');
   assert.match(appLayout, /const v2Enabled = ceoPortal \|\| realmV2PreviewEnabled\(\)/);
   assert.match(appLayout, /ceoPortal=\{ceoPortal\}/);
-  assert.match(shell, /CEO Terminal · 4 công ty/);
+  assert.match(shell, /CEO Terminal · 3 công ty/);
   assert.match(shell, /!ceoPortal && <WorkspaceSurfaceSwitch/);
   assert.match(login, /LEOZ GROUP · CONTROL PLANE/);
   assert.match(login, /ceoPortal \? '\/ceo-overview' : '\/dashboard'/);

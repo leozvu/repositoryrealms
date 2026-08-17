@@ -25,9 +25,9 @@ const entities = () => [
     consecutiveErrors: 0, lastErrorCode: null, circuitState: 'closed', circuitRetryAt: null,
   },
   {
-    id: 'egolive', displayName: 'Egolive', baseUrl: 'https://erp-egolive.vercel.app', businessProfile: 'livestream',
-    capabilities: '["finance","delivery","people","livestream"]', environment: 'staging', enabled: true,
-    status: 'ready', credentialRef: 'CEO_ENTITY_EGOLIVE_API_KEY', contractVersion: '1.0.0', schemaVersion: 1,
+    id: 'egoric', displayName: 'Egoric Agency', baseUrl: 'https://erp-egoric.vercel.app', businessProfile: 'agency',
+    capabilities: '["finance","crm","delivery","support","people","livestream"]', environment: 'staging', enabled: true,
+    status: 'ready', credentialRef: 'CEO_ENTITY_EGORIC_API_KEY', contractVersion: '1.0.0', schemaVersion: 1,
     consecutiveErrors: 0, lastErrorCode: null, circuitState: 'closed', circuitRetryAt: null,
   },
   {
@@ -154,7 +154,7 @@ test('refresh fetches each enabled entity with its server credential and persist
   const fetchImpl = async (url, options) => {
     const entity = state.entities.find((row) => new URL(row.baseUrl).host === url.host);
     seen.push({ entityId: entity.id, authorization: options.headers.Authorization, redirect: options.redirect });
-    return new Response(JSON.stringify(snapshot(entity, { gmv: entity.id === 'egolive' ? 5_000 : 0 })), { status: 200 });
+    return new Response(JSON.stringify(snapshot(entity, { gmv: entity.id === 'egoric' ? 5_000 : 0 })), { status: 200 });
   };
   const result = await refreshCeoUnifiedDashboard(db, DIRECTOR, { entityId: 'all' }, {
     now: NOW, fetchImpl, secretResolver: (name) => `secret-for-${name}`, timeoutMs: 1_000,

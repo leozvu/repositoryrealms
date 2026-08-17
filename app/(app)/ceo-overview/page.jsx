@@ -13,13 +13,12 @@ const DEFAULT_ENTITIES = [
   { id: 'aim', displayName: 'AIm Agency' },
   { id: 'egoric', displayName: 'Egoric Agency' },
   { id: 'vnecom', displayName: 'Vnecom LLC' },
-  { id: 'egolive', displayName: 'Egolive' },
 ];
 
 const COPY = {
   vi: {
     eyebrow: 'CEO-12 · LEOZ GROUP CONTROL PLANE', title: 'CEO Terminal · Leoz Group',
-    intro: 'Điều hành AIm, Egoric, Vnecom và Egolive từ một điểm vào; mỗi hành động vẫn chạy trong workflow và quyền của công ty sở hữu.',
+    intro: 'Điều hành AIm, Egoric (gồm phòng Egolive) và Vnecom từ một điểm vào; mỗi hành động vẫn chạy trong workflow và quyền của công ty sở hữu.',
     all: 'Tất cả công ty', refresh: 'Làm mới dữ liệu', refreshing: 'Đang gọi các entity…',
     loading: 'Đang tải snapshot đã lưu…', retry: 'Thử lại', loadError: 'Không thể tải CEO Dashboard.',
     readOnly: 'Control plane chỉ đọc', policy: 'Portal chỉ nhận aggregate đã whitelist. Không truy vấn trực tiếp database công ty và không ghi business record.',
@@ -33,12 +32,12 @@ const COPY = {
     openDetail: 'Mở chi tiết tại entity', activatingRequired: 'Cần CEO session + TOTP để mở deep link đã ký.', manageIdentity: 'Mở Identity & Registry',
     staleNotice: 'Một số nguồn đang dùng snapshot cũ vì entity chưa phản hồi. Các số hết hạn đã bị loại khỏi tổng.',
     partialRefresh: 'Làm mới một phần: một số entity không phản hồi; snapshot gần nhất vẫn được giữ.', refreshSuccess: 'Đã cập nhật snapshot của các entity khả dụng.',
-    cachePolicy: 'Cache 5 phút · stale-if-error 24 giờ', noEntities: 'Chưa có entity hoặc migration CEO-4 chưa được áp dụng.', commandCenter: 'Điều phối liên công ty', groupWorkforce: 'Nhân sự trong group', worldMap: 'Bản đồ bốn vương quốc',
+    cachePolicy: 'Cache 5 phút · stale-if-error 24 giờ', noEntities: 'Chưa có entity hoặc migration CEO-4 chưa được áp dụng.', commandCenter: 'Điều phối liên công ty', groupWorkforce: 'Nhân sự trong group', worldMap: 'Bản đồ ba vương quốc',
     cashBasis: 'Cash-ledger, không phải lợi nhuận kế toán', gmvWarning: 'GMV không được cộng vào revenue',
   },
   en: {
     eyebrow: 'CEO-12 · LEOZ GROUP CONTROL PLANE', title: 'CEO Terminal · Leoz Group',
-    intro: 'Operate AIm, Egoric, Vnecom, and Egolive from one entry point while every action remains inside the owning company’s workflow and authorization.',
+    intro: 'Operate AIm, Egoric (including its Egolive department), and Vnecom from one entry point while every action remains inside the owning company’s workflow and authorization.',
     all: 'All companies', refresh: 'Refresh data', refreshing: 'Contacting entities…',
     loading: 'Loading saved snapshots…', retry: 'Try again', loadError: 'CEO Dashboard could not be loaded.',
     readOnly: 'Read-only control plane', policy: 'The Portal accepts whitelisted aggregates only. It never queries company databases directly or writes business records.',
@@ -52,7 +51,7 @@ const COPY = {
     openDetail: 'Open detail in entity', activatingRequired: 'A CEO session with TOTP step-up is required for a signed deep link.', manageIdentity: 'Open Identity & Registry',
     staleNotice: 'Some sources use stale snapshots because an entity did not respond. Expired numbers are excluded from totals.',
     partialRefresh: 'Partial refresh: some entities did not respond; their latest usable snapshots were retained.', refreshSuccess: 'Available entity snapshots were updated.',
-    cachePolicy: '5-minute cache · stale-if-error for 24 hours', noEntities: 'No entity exists or the CEO-4 migration has not been applied.', commandCenter: 'Cross-company commands', groupWorkforce: 'Group workforce', worldMap: 'Four-kingdom map',
+    cachePolicy: '5-minute cache · stale-if-error for 24 hours', noEntities: 'No entity exists or the CEO-4 migration has not been applied.', commandCenter: 'Cross-company commands', groupWorkforce: 'Group workforce', worldMap: 'Three-kingdom map',
     cashBasis: 'Cash-ledger view, not accounting profit', gmvWarning: 'GMV is never added to revenue',
   },
 };

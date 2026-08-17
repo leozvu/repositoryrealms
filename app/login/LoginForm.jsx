@@ -89,7 +89,7 @@ export default function LoginForm({ brand, ceoPortal = false }) {
         <h1 className="login-title" id="login-title">{ceoPortal ? `${brand.company} — ${brand.product}` : 'Agency ERP'}</h1>
         <p className="login-sub">{ceoPortal ? brand.subtitle : 'Đăng nhập vào hệ thống quản trị'}</p>
         {ceoPortal && <div className="ceo-login-scope" aria-label="Phạm vi CEO Terminal">
-          <span>AIm Agency</span><span>Egoric Agency</span><span>Vnecom LLC</span><span>Egolive</span>
+          <span>AIm Agency</span><span>Egoric Agency · Egolive</span><span>Vnecom LLC</span>
         </div>}
         {err && <div className="login-err" role="alert" aria-live="polite">{err}</div>}
         <form method="post" action="/login" onSubmit={submit}>

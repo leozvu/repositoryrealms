@@ -11,20 +11,20 @@ import styles from './world.module.css';
 
 const COPY = {
   vi: {
-    eyebrow: 'CEO-7 · REALM FEDERATION', title: 'Bản đồ bốn vương quốc', intro: 'Mỗi công ty vẫn là một Realm độc lập. Gateway chỉ tạo phiên SSO tại entity đích; dữ liệu, quyền và business record không rời khỏi vương quốc sở hữu.',
+    eyebrow: 'CEO-7 · REALM FEDERATION', title: 'Bản đồ ba vương quốc', intro: 'Mỗi công ty vẫn là một Realm độc lập; Egolive là phòng ban của Egoric. Gateway chỉ tạo phiên SSO tại entity đích; dữ liệu, quyền và business record không rời khỏi vương quốc sở hữu.',
     back: 'Tổng quan CEO', inbox: 'Hộp thư liên công ty', refresh: 'Làm mới presence', refreshing: 'Đang liên lạc…', opening: 'Đang mở cổng…', open: 'Đi qua gateway', message: 'Gửi tân thư', retry: 'Thử lại kingdom này', identity: 'Mở Identity & Registry',
     available: 'Presence khả dụng', policy_disabled: 'Công ty chưa cho phép presence', degraded: 'Presence tạm mất kết nối', disabled: 'Gateway đã tắt', online: 'đang online', optedIn: 'đã tự nguyện chia sẻ', noneOnline: 'Không có thành viên opt-in đang online.',
     policy: 'Presence là tín hiệu phiên ngắn hạn, không phải năng suất. Cross-entity chat không tự mở quyền xem task, lead, tài chính, HR hoặc Gold.',
-    stepup: 'Cần CEO session với TOTP step-up để đi qua gateway.', loadError: 'Không thể tải Realm federation.', separate: '4 data boundary độc lập', gateways: 'gateway khả dụng', presenceSources: 'nguồn presence', onlineNow: 'người online đã opt-in',
-    realm: 'Realm', erp: 'ERP', focus: 'Tập trung', busy: 'Bận', dnd: 'Không làm phiền', away: 'Vắng', availableStatus: 'Sẵn sàng', source: 'Nguồn', privacy: 'Không cấp quyền record', mapLabel: 'Bản đồ minh họa bốn kingdom của RepositoryRealms với các gateway tương tác.',
+    stepup: 'Cần CEO session với TOTP step-up để đi qua gateway.', loadError: 'Không thể tải Realm federation.', separate: '3 data boundary độc lập', gateways: 'gateway khả dụng', presenceSources: 'nguồn presence', onlineNow: 'người online đã opt-in',
+    realm: 'Realm', erp: 'ERP', focus: 'Tập trung', busy: 'Bận', dnd: 'Không làm phiền', away: 'Vắng', availableStatus: 'Sẵn sàng', source: 'Nguồn', privacy: 'Không cấp quyền record', mapLabel: 'Bản đồ minh họa ba kingdom của RepositoryRealms với các gateway tương tác.',
   },
   en: {
-    eyebrow: 'CEO-7 · REALM FEDERATION', title: 'Map of four kingdoms', intro: 'Each company remains an independent Realm. A gateway only creates an SSO session at the target entity; data, authorization, and business records remain with their owning kingdom.',
+    eyebrow: 'CEO-7 · REALM FEDERATION', title: 'Map of three kingdoms', intro: 'Each company remains an independent Realm; Egolive is a department of Egoric. A gateway only creates an SSO session at the target entity; data, authorization, and business records remain with their owning kingdom.',
     back: 'CEO overview', inbox: 'Cross-company inbox', refresh: 'Refresh presence', refreshing: 'Contacting kingdoms…', opening: 'Opening gateway…', open: 'Enter gateway', message: 'Send message', retry: 'Retry this kingdom', identity: 'Open Identity & Registry',
     available: 'Presence available', policy_disabled: 'Company presence policy is off', degraded: 'Presence connection degraded', disabled: 'Gateway disabled', online: 'online', optedIn: 'explicitly opted in', noneOnline: 'No opted-in members are online.',
     policy: 'Presence is short-lived session context, not productivity. Cross-entity chat never grants task, lead, finance, HR, or Gold record access.',
     stepup: 'A CEO session with recent TOTP step-up is required to enter a gateway.', loadError: 'Realm federation could not be loaded.', separate: 'independent data boundaries', gateways: 'available gateways', presenceSources: 'presence sources', onlineNow: 'opted-in people online',
-    realm: 'Realm', erp: 'ERP', focus: 'Focus', busy: 'Busy', dnd: 'Do not disturb', away: 'Away', availableStatus: 'Available', source: 'Source', privacy: 'No record access granted', mapLabel: 'Illustrated map of four RepositoryRealms kingdoms with interactive gateways.',
+    realm: 'Realm', erp: 'ERP', focus: 'Focus', busy: 'Busy', dnd: 'Do not disturb', away: 'Away', availableStatus: 'Available', source: 'Source', privacy: 'No record access granted', mapLabel: 'Illustrated map of three RepositoryRealms kingdoms with interactive gateways.',
   },
 };
 

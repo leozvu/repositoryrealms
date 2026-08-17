@@ -29,7 +29,7 @@ const COPY = {
     attentionHint: 'Sắp theo ảnh hưởng và khả năng cần hành động; không tự sửa record thay CEO.',
     clear: 'Không có cảnh báo cần xử lý từ các nguồn đang khả dụng.',
     open: 'Mở nơi xử lý',
-    companyPulse: 'Nhịp vận hành bốn công ty',
+    companyPulse: 'Nhịp vận hành ba công ty',
     source: 'Dữ liệu',
     ring: 'Quyền kết nối',
     openReceipts: 'receipt mở',
@@ -66,7 +66,7 @@ const COPY = {
     attentionHint: 'Ordered by impact and actionability; the cockpit never changes a record on the CEO’s behalf.',
     clear: 'No actionable warning was found in the currently available sources.',
     open: 'Open resolution workflow',
-    companyPulse: 'Four-company operating pulse',
+    companyPulse: 'Three-company operating pulse',
     source: 'Data',
     ring: 'Connection scope',
     openReceipts: 'open receipts',
@@ -282,7 +282,7 @@ export default function CeoOperationsCockpit({ dashboard, identityReady, locale 
       </section>
 
       <section className={styles.pulse} aria-labelledby="ceo-company-pulse-title">
-        <div className={styles.sectionHead}><div><h3 id="ceo-company-pulse-title">{c.companyPulse}</h3><p>{entityId === 'all' ? 'AIm · Egoric · Vnecom · Egolive' : entityId}</p></div></div>
+        <div className={styles.sectionHead}><div><h3 id="ceo-company-pulse-title">{c.companyPulse}</h3><p>{entityId === 'all' ? 'AIm · Egoric (Egolive) · Vnecom' : entityId}</p></div></div>
         <div className={styles.companyList}>
           {model.companies.map((company) => <article key={company.id}>
             <header><span>{company.id.slice(0, 2).toUpperCase()}</span><div><strong>{company.displayName}</strong><small>{company.id}</small></div></header>
