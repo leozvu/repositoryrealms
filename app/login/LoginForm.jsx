@@ -45,8 +45,28 @@ export default function LoginForm({ brand, ceoPortal = false }) {
     }
 
     const result = await signIn('credentials', { email, password, otp, redirect: false });
+    if (result?.error) { setBusy(false); setErr('Email, mật khẩu hoặc mã 2FA không đúng'); return; }
+
+    // The local NextAuth session and the cross-company CEO control-plane session
+    // are deliberately separate. A fresh CEO login must bootstrap both in one
+    // atomic user journey; otherwise the overview opens but every signed entity
+    // deep link fails with ceo_sso_session_invalid until a stale cookie happens
+    // to exist in that browser.
+    if (ceoPortal) {
+      const identityResponse = await fetch('/api/ceo/v1/identity/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otp, deviceLabel: 'CEO Terminal browser' }),
+      }).catch(() => null);
+      const identity = identityResponse ? await identityResponse.json().catch(() => ({})) : {};
+      if (!identityResponse?.ok || identity.session?.stepUp !== true) {
+        setBusy(false);
+        setErr(identity.error || 'Không thể kích hoạt phiên điều hành đa công ty');
+        return;
+      }
+    }
+
     setBusy(false);
-    if (result?.error) { setErr('Email, mật khẩu hoặc mã 2FA không đúng'); return; }
 
     let destination = ceoPortal ? '/ceo-overview' : '/dashboard';
     if (!ceoPortal) {
@@ -69,7 +89,7 @@ export default function LoginForm({ brand, ceoPortal = false }) {
         <h1 className="login-title" id="login-title">{ceoPortal ? `${brand.company} — ${brand.product}` : brand.company}</h1>
         <p className="login-sub">{brand.subtitle}</p>
         {ceoPortal && <div className="ceo-login-scope" aria-label="Phạm vi CEO Terminal">
-          <span>AIm Agency</span><span>Egoric Agency</span><span>Vnecom LLC</span><span>Egolive</span>
+          <span>AIm Agency</span><span>Egoric Agency · Egolive</span><span>Vnecom LLC</span>
         </div>}
         {err && <div className="login-err" role="alert" aria-live="polite">{err}</div>}
         <form method="post" action="/login" onSubmit={submit}>

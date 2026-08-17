@@ -212,6 +212,22 @@ test('CEO-6 routes, policy, schema and UI preserve local ERP/Realm adapters', ()
   assert.match(docs, /CEO-6 — Unified inbox and messaging/);
 });
 
+test('CEO-15 background collaboration sync is bounded, fail-soft and creates metadata-only notifications', () => {
+  const portal = fs.readFileSync(path.join(root, 'lib/ceo-messaging-admin.js'), 'utf8');
+  const route = fs.readFileSync(path.join(root, 'app/api/ceo/v1/messaging/sync/route.js'), 'utf8');
+  const bridge = fs.readFileSync(path.join(root, 'components/ceo/CeoRealtimeBridge.jsx'), 'utf8');
+  const layout = fs.readFileSync(path.join(root, 'app/(app)/layout.jsx'), 'utf8');
+  assert.match(portal, /export async function syncCeoInbox/);
+  assert.match(portal, /Math\.min\(Number\(limit\) \|\| 12, 20\)/);
+  assert.match(portal, /Phản hồi từ \$\{item\.senderName\} · \$\{entity\.displayName\}/);
+  assert.match(portal, /route: `\/ceo-inbox\?conversation=/);
+  assert.doesNotMatch(portal, /notification\.create[\s\S]{0,240}item\.content/);
+  assert.match(route, /ceoRequestIsSameOrigin/);
+  assert.match(bridge, /SYNC_INTERVAL_MS = 30_000/);
+  assert.match(bridge, /document\.visibilityState !== 'visible'/);
+  assert.match(layout, /ceoPortal && <CeoRealtimeBridge/);
+});
+
 test('receipt sanitizer requires RepositoryRealms invariant evidence', () => {
   const message = normalizeCeoMessageEnvelope(envelope());
   assert.throws(() => sanitizeCeoMessageReceipt({ ...receiptFor(message), repository: { name: 'Unknown' } }, message), (error) => error.code === 'ceo_messaging_repository_evidence_missing');

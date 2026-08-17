@@ -29,7 +29,10 @@ export async function PUT(req, { params }) {
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
-  if (cfg.canWriteRow && !cfg.canWriteRow(row, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  const rowWritable = cfg.canWriteRowAsync
+    ? await cfg.canWriteRowAsync(row, user, prisma)
+    : !cfg.canWriteRow || cfg.canWriteRow(row, user);
+  if (!rowWritable) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   let data = await req.json();
   delete data.id;
   if (cfg.filterUpdate) data = cfg.filterUpdate(data, user);
@@ -58,6 +61,10 @@ export async function DELETE(req, { params }) {
   if (!cfg || !canDelete(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
+  const rowDeletable = cfg.canWriteRowAsync
+    ? await cfg.canWriteRowAsync(row, user, prisma)
+    : !cfg.canWriteRow || cfg.canWriteRow(row, user);
+  if (!rowDeletable) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   try {
     await prisma[cfg.model].delete({ where: { id: params.id } });
     await audit(user, 'delete', params.resource, params.id, row.name || row.title || row.code || null);

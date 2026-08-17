@@ -3,14 +3,16 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
 import { money, fmtDate, todayISO, daysFromNow, initials } from '@/lib/format';
-import { hasAny } from '@/lib/perm';
+import { hasAny, isDirector } from '@/lib/perm';
 
 const CATEGORIES = ['Thiết bị quay chụp', 'Laptop / máy tính', 'License phần mềm', 'Nội thất văn phòng', 'Khác'];
 const STATUS_LABEL = { in_use: ['Đang dùng', 'b-green'], storage: ['Trong kho', 'b-gray'], broken: ['Hỏng / sửa chữa', 'b-red'], sold: ['Đã thanh lý', 'b-gray'] };
 
 export default function AssetsPage() {
   const { data: session } = useSession();
-  const isMgmt = hasAny(session?.user, ['HR', 'ACCOUNTANT']); // quản trị tài sản + xem giá trị
+  const canManageAssets = hasAny(session?.user, ['HR']);
+  const canSeeAssetValue = hasAny(session?.user, ['HR', 'ACCOUNTANT']);
+  const canDeleteAssets = isDirector(session?.user);
   const { rows, create, update, remove } = useResource('assets');
   const users = useResource('users');
   const [modal, setModal] = useState(null);
@@ -43,14 +45,14 @@ export default function AssetsPage() {
       )}
       <div className="toolbar">
         <span style={{ fontSize: '.85rem', color: 'var(--muted)' }}>
-          {rows.length} tài sản{isMgmt ? <> · Tổng giá trị: <b style={{ color: 'var(--fg)' }}>{money(totalValue)}</b></> : ''}
+          {rows.length} tài sản{canSeeAssetValue ? <> · Tổng giá trị: <b style={{ color: 'var(--fg)' }}>{money(totalValue)}</b></> : ''}
         </span>
         <div className="spacer"></div>
-        {isMgmt && <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm tài sản</span></button>}
+        {canManageAssets && <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm tài sản</span></button>}
       </div>
       <div className="table-wrap">
         <table>
-          <thead><tr><th>Tài sản</th><th>Nhóm</th><th>Người giữ</th>{isMgmt && <th className="num">Giá trị</th>}<th>Gia hạn</th><th>Tình trạng</th>{isMgmt && <th></th>}</tr></thead>
+          <thead><tr><th>Tài sản</th><th>Nhóm</th><th>Người giữ</th>{canSeeAssetValue && <th className="num">Giá trị</th>}<th>Gia hạn</th><th>Tình trạng</th>{(canManageAssets || canDeleteAssets) && <th></th>}</tr></thead>
           <tbody>
             {rows.map(a => {
               const [sl, sc] = STATUS_LABEL[a.status] || [a.status, 'b-gray'];
@@ -59,12 +61,12 @@ export default function AssetsPage() {
                   <td><span className="cell-main">{a.name}</span><span className="cell-sub">{a.serial || ''}</span></td>
                   <td>{a.category ? <span className="badge b-blue">{a.category}</span> : '—'}</td>
                   <td>{holder(a.holderId) ? <span className="cell-person"><span className="avatar">{initials(holder(a.holderId))}</span>{holder(a.holderId)}</span> : <span style={{ color: 'var(--muted)' }}>Trong kho</span>}</td>
-                  {isMgmt && <td className="num" style={{ fontWeight: 700 }}>{money(a.price)}</td>}
+                  {canSeeAssetValue && <td className="num" style={{ fontWeight: 700 }}>{money(a.price)}</td>}
                   <td>{a.renewAt ? fmtDate(a.renewAt) : '—'}</td>
                   <td><span className={`badge ${sc}`}><span className="dot"></span>{sl}</span></td>
-                  {isMgmt && <td><div className="row-actions">
-                    <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: a })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
-                    <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: a })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
+                  {(canManageAssets || canDeleteAssets) && <td><div className="row-actions">
+                    {canManageAssets && <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: a })} aria-label="Sửa"><Icon name="edit" size={16} /></button>}
+                    {canDeleteAssets && <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: a })} aria-label="Xóa"><Icon name="trash" size={16} /></button>}
                   </div></td>}
                 </tr>
               );
@@ -73,11 +75,11 @@ export default function AssetsPage() {
           </tbody>
         </table>
       </div>
-      {modal?.mode === 'add' && <FormModal title="Thêm tài sản" fields={FIELDS} data={{ status: 'in_use', category: CATEGORIES[0], buyDate: todayISO() }}
+      {canManageAssets && modal?.mode === 'add' && <FormModal title="Thêm tài sản" fields={FIELDS} data={{ status: 'in_use', category: CATEGORIES[0], buyDate: todayISO() }}
         onClose={() => setModal(null)} onSave={async d => { await create({ ...d, price: +d.price || 0, holderId: d.holderId || null }); toast('Đã thêm tài sản'); }} />}
-      {modal?.mode === 'edit' && <FormModal title="Sửa tài sản" fields={FIELDS} data={{ ...modal.row, holderId: modal.row.holderId || '' }}
+      {canManageAssets && modal?.mode === 'edit' && <FormModal title="Sửa tài sản" fields={FIELDS} data={{ ...modal.row, holderId: modal.row.holderId || '' }}
         onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, { ...d, price: +d.price || 0, holderId: d.holderId || null }); toast('Đã cập nhật'); }} />}
-      {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa tài sản "${modal.row.name}"?`}
+      {canDeleteAssets && modal?.mode === 'del' && <ConfirmDialog msg={`Xóa tài sản "${modal.row.name}"?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
     </>
   );

@@ -216,3 +216,20 @@ test('Read models giới hạn dữ liệu theo self và manager scope', async (
   assert.equal(team.members[0].queue.version, 2);
   assert.equal(team.policy.employeeRanking, false);
 });
+
+test('Trưởng nhóm chỉ đứng tên lead của Team vẫn tải được workspace quản lý', async () => {
+  const leadWithoutTeamId = { id: 'lead-owner', name: 'Lead owner', roles: ['LEAD'], userType: 'employee' };
+  let memberWhere;
+  const teamDb = {
+    team: { findMany: async () => [{ id: 'delivery' }] },
+    user: { findMany: async ({ where }) => { memberWhere = where; return [{ id: 'staff-1', name: 'An', teamId: 'delivery' }]; } },
+    task: { findMany: async () => [BASE] },
+    workQueueState: { findMany: async () => [] },
+    workEstimateRevision: { findMany: async () => [] },
+    timeLog: { groupBy: async () => [] },
+  };
+  const team = await loadTeamWork(teamDb, leadWithoutTeamId, new Date('2026-07-20T12:00:00.000Z'));
+  assert.deepEqual(memberWhere.teamId.in, ['delivery']);
+  assert.equal(team.scope, 'team');
+  assert.equal(team.members[0].member.id, 'staff-1');
+});

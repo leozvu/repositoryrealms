@@ -1,5 +1,5 @@
 // Đợt 1+2 tối ưu CEO Terminal: cron định kỳ (Vercel Cron) — không cần CEO mở trang.
-// 1. Force-refresh snapshot 4 công ty → số liệu không bao giờ "chết" quá hạn 24h.
+// 1. Force-refresh snapshot 3 công ty → số liệu không bao giờ "chết" quá hạn 24h.
 // 2. Cảnh báo chuông khi công ty mất kết nối (circuit open / lỗi liên tiếp).
 // 3. Thứ Hai: digest tuần vào chuông thông báo.
 // 4. Nhắc xoay service key trước hạn (env CEO_SERVICE_KEY_EXPIRES_AT, nhắc trước 14 ngày).

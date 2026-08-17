@@ -81,8 +81,8 @@ function database(initial = entity()) {
   };
 }
 
-test('CEO-2 seeds exactly four stable entities with server-secret references only', () => {
-  assert.deepEqual(CEO_ENTITY_REGISTRY_SEED.map((item) => item.id), ['aim', 'egoric', 'vnecom', 'egolive']);
+test('CEO-2 seeds three companies after Egolive becomes an Egoric department', () => {
+  assert.deepEqual(CEO_ENTITY_REGISTRY_SEED.map((item) => item.id), ['aim', 'egoric', 'vnecom']);
   for (const item of CEO_ENTITY_REGISTRY_SEED) {
     assert.equal(item.baseUrl.startsWith('https://'), true);
     assert.match(item.credentialRef, /^CEO_ENTITY_[A-Z0-9_]+_API_KEY$/);
@@ -90,7 +90,7 @@ test('CEO-2 seeds exactly four stable entities with server-secret references onl
     assert.equal(JSON.stringify(item).includes('ak_'), false);
     assert.equal(item.capabilities.includes('finance'), true);
   }
-  assert.equal(CEO_ENTITY_REGISTRY_SEED.find((item) => item.id === 'egolive').capabilities.includes('livestream'), true);
+  assert.equal(CEO_ENTITY_REGISTRY_SEED.find((item) => item.id === 'egoric').capabilities.includes('livestream'), true);
 });
 
 test('Registry validation rejects raw keys, unsafe URLs, unknown fields and unknown capabilities', () => {

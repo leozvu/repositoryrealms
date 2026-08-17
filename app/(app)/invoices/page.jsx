@@ -1,11 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Badge, Forbidden, ExportCsv, AsyncButton, useToast } from '@/components/ui';
 import { printDoc, nextCode } from '@/components/DocEditor';
 import { SendEmailModal } from '@/components/SendEmail';
 import { money, fmtDate, todayISO, docGrand, paidOf, remainOf } from '@/lib/format';
 import PageHeader from '@/components/system/PageHeader';
+import { hasAny, isDirector } from '@/lib/perm';
 
 function PayModal({ inv, onDone, onClose }) {
   const remain = remainOf(inv);
@@ -111,6 +113,9 @@ function FromHoursModal({ projects, onClose, onDone }) {
 }
 
 export default function InvoicesPage() {
+  const { data: session } = useSession();
+  const canWriteInvoice = hasAny(session?.user, ['ACCOUNTANT']);
+  const canDeleteInvoice = isDirector(session?.user);
   const { rows, forbidden, create, update, remove, refresh } = useResource('invoices');
   const clients = useResource('clients');
   const projects = useResource('projects');
@@ -154,7 +159,7 @@ export default function InvoicesPage() {
         meta="Tài chính · Phải thu"
         title="Hóa đơn và thu tiền"
         description="Theo dõi số đã thu, số còn lại, hạn thanh toán và lịch sử xử lý."
-        actions={<button className="btn btn-primary" onClick={() => {
+        actions={canWriteInvoice && <button className="btn btn-primary" onClick={() => {
           if (!clients.rows.length) return toast('Hãy thêm khách hàng trước', 'error');
           router.push('/invoices/new');
         }}><Icon name="plus" size={16} />Tạo hóa đơn</button>}
@@ -178,14 +183,14 @@ export default function InvoicesPage() {
           { label: 'Còn lại', value: v => remainOf(v) }, { key: 'status', label: 'Trạng thái' },
         ]} />
         {/* v3.13: nối giờ công vào hóa đơn — trước đây phải gõ tay lại */}
-        <button className="btn btn-outline" onClick={() => {
+        {canWriteInvoice && <button className="btn btn-outline" onClick={() => {
           if (!projects.rows.length) return toast('Chưa có dự án nào', 'error');
           setModal({ mode: 'fromHours' });
-        }}><Icon name="clock" size={16} /><span>Xuất từ giờ công</span></button>
-        <button className="btn btn-primary" onClick={() => {
+        }}><Icon name="clock" size={16} /><span>Xuất từ giờ công</span></button>}
+        {canWriteInvoice && <button className="btn btn-primary" onClick={() => {
           if (!clients.rows.length) return toast('Hãy thêm khách hàng trước', 'error');
           router.push('/invoices/new');
-        }}><Icon name="plus" size={16} /><span>Tạo hóa đơn</span></button>
+        }}><Icon name="plus" size={16} /><span>Tạo hóa đơn</span></button>}
       </div>
       <div className="table-wrap">
         <table>
@@ -202,16 +207,16 @@ export default function InvoicesPage() {
                 <td className="num" style={{ fontWeight: 600, color: remainOf(v) > 0 ? 'var(--warn)' : 'var(--accent)' }}>{remainOf(v) > 0 ? money(remainOf(v)) : '✓ đủ'}</td>
                 <td><Badge map="invoice" k={v.status} /></td>
                 <td><div className="row-actions">
-                  {v.status !== 'paid' && <button className="icon-btn" style={{ color: 'var(--accent)' }} title="Ghi nhận thanh toán"
+                  {canWriteInvoice && v.status !== 'paid' && <button className="icon-btn" style={{ color: 'var(--accent)' }} title="Ghi nhận thanh toán"
                     onClick={() => setModal({ mode: 'pay', row: v })}><Icon name="wallet" size={16} /></button>}
                   {/* v3.13: nhân bản retainer sang kỳ tới, cùng recGroup để MRR không cộng dồn */}
-                  {v.recurring && <AsyncButton className="icon-btn" pendingLabel="…" style={{ color: 'var(--primary)' }} title="Sinh hóa đơn kỳ tới (tháng sau)"
+                  {canWriteInvoice && v.recurring && <AsyncButton className="icon-btn" pendingLabel="…" style={{ color: 'var(--primary)' }} title="Sinh hóa đơn kỳ tới (tháng sau)"
                     onClick={() => nextPeriod(v)}><Icon name="repeat" size={16} /></AsyncButton>}
                   <button className="icon-btn" title="Gửi email cho khách" aria-label={`Gửi email hóa đơn ${v.code}`}
                     onClick={() => setModal({ mode: 'email', row: v })}><Icon name="mail" size={16} /></button>
                   <button className="icon-btn" title="In / xuất PDF" onClick={() => printDoc(v, 'invoice', client(v.clientId)?.name || '', client(v.clientId) || {})}><Icon name="print" size={16} /></button>
-                  <button className="icon-btn" onClick={() => router.push(`/invoices/${v.id}`)} aria-label="Mở trình soạn hóa đơn"><Icon name="edit" size={16} /></button>
-                  <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: v })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
+                  {canWriteInvoice && <button className="icon-btn" onClick={() => router.push(`/invoices/${v.id}`)} aria-label="Mở trình soạn hóa đơn"><Icon name="edit" size={16} /></button>}
+                  {canDeleteInvoice && <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: v })} aria-label="Xóa"><Icon name="trash" size={16} /></button>}
                 </div></td>
               </tr>
             ))}
@@ -219,11 +224,11 @@ export default function InvoicesPage() {
           </tbody>
         </table>
       </div>
-      {modal?.mode === 'pay' && <PayModal inv={modal.row} onDone={refresh} onClose={() => setModal(null)} />}
-      {modal?.mode === 'fromHours' && <FromHoursModal projects={projects.rows.filter(p => p.status !== 'done')}
+      {canWriteInvoice && modal?.mode === 'pay' && <PayModal inv={modal.row} onDone={refresh} onClose={() => setModal(null)} />}
+      {canWriteInvoice && modal?.mode === 'fromHours' && <FromHoursModal projects={projects.rows.filter(p => p.status !== 'done')}
         onDone={refresh} onClose={() => setModal(null)} />}
       {modal?.mode === 'email' && <SendEmailModal type="invoice" doc={modal.row} defaultTo={client(modal.row.clientId)?.email || ''} onClose={() => setModal(null)} />}
-      {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa hóa đơn ${modal.row.code}?`}
+      {canDeleteInvoice && modal?.mode === 'del' && <ConfirmDialog msg={`Xóa hóa đơn ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
     </div>
   );

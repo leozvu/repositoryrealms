@@ -693,7 +693,7 @@ export default function Shell({
                   <div className="brand-logo"><Icon name={ceoPortal ? 'company' : 'command'} size={21} /></div>
                   <div className="brand-text">
                     <span className="brand-name">{company || 'RepositoryRealms'}</span>
-                    <span className="brand-sub">{ceoPortal ? 'CEO Terminal · 4 công ty' : 'Business workspace'}</span>
+                    <span className="brand-sub">{ceoPortal ? 'CEO Terminal · 3 công ty' : 'Business workspace'}</span>
                   </div>
                 </div>
                 {!ceoPortal && roles.includes('DIRECTOR') && ceoPortalOrigin && (

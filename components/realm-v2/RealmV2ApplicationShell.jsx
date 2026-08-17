@@ -71,7 +71,7 @@ const PAGE_COPY = {
   'ceo-terminal': {
     eyebrow: 'Portfolio truth · Executive decisions · Provenance',
     title: 'CEO Terminal',
-    description: 'Tổng hợp điều hành bốn công ty với tiền tệ, nguồn, as-of và giới hạn dữ liệu được công khai rõ ràng.',
+    description: 'Tổng hợp điều hành ba công ty với tiền tệ, nguồn, as-of và giới hạn dữ liệu được công khai rõ ràng.',
   },
   'employee-profile': {
     eyebrow: 'Identity · Work context · Explicit privacy',

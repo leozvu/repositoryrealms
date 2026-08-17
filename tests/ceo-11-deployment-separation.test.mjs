@@ -25,6 +25,7 @@ test('CEO-11 exposes control-plane paths only on the CEO deployment', () => {
     '/ceo-overview', '/ceo-navigator', '/ceo-briefing', '/ceo-decisions', '/ceo-world', '/ceo-commands', '/ceo-workforce', '/ceo-inbox', '/ceo-registry', '/ceo-security', '/ceo-rollout',
     '/realm-v2/command-center', '/realm-v2/world-map', '/realm-v2/ceo-terminal',
     '/api/ceo/v1/dashboard', '/api/ceo/v1/decision-queue', '/api/ceo/v1/registry/aim', '/api/ceo/v1/identity/session', '/api/ceo/v1/staff/sso',
+    '/api/ceo/v2/executive-workspace',
   ]) assert.equal(isCeoPortalOnlyPath(path), true, path);
 
   // Entity-side contract endpoints must stay reachable for federation and receipts.
@@ -32,6 +33,7 @@ test('CEO-11 exposes control-plane paths only on the CEO deployment', () => {
     '/api/ceo/v1/capabilities', '/api/ceo/v1/health', '/api/ceo/v1/snapshot', '/api/ceo/v1/decisions', '/api/ceo/v1/commands',
     '/api/ceo/v1/commands/receipts', '/api/ceo/v1/directory/profile', '/api/ceo/v1/federation/presence',
     '/api/ceo/v1/messaging/deliver', '/api/ceo/v1/messaging/feed', '/api/ceo/v1/sso/callback',
+    '/api/ceo/v2/executive-snapshot',
   ]) assert.equal(isCeoPortalOnlyPath(path), false, path);
 
   const middleware = text('middleware.js');
@@ -51,11 +53,14 @@ test('CEO-11 gives the portal a dedicated login, shell and v2 presentation', () 
   const login = text('app/login/LoginForm.jsx');
   assert.match(appLayout, /const v2Enabled = ceoPortal \|\| realmV2PreviewEnabled\(\)/);
   assert.match(appLayout, /ceoPortal=\{ceoPortal\}/);
-  assert.match(shell, /CEO Terminal · 4 công ty/);
+  assert.match(shell, /CEO Terminal · 3 công ty/);
   assert.match(shell, /!ceoPortal && <WorkspaceSurfaceSwitch/);
   assert.match(login, /LEOZ GROUP · CONTROL PLANE/);
   assert.match(login, /ceoPortal \? '\/ceo-overview' : '\/dashboard'/);
   assert.match(login, /ceoPortal && <button[^>]+login-recovery-toggle/);
+  assert.match(login, /fetch\('\/api\/ceo\/v1\/identity\/session'/);
+  assert.match(login, /identity\.session\?\.stepUp !== true/);
+  assert.match(login, /body: JSON\.stringify\(\{ otp, deviceLabel:/);
 });
 
 test('each entity deployment exposes its own pre-authentication workspace identity', () => {

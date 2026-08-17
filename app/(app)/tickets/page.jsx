@@ -1,7 +1,9 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Modal, AsyncButton, useToast } from '@/components/ui';
 import { initials, todayISO } from '@/lib/format';
+import { hasAny } from '@/lib/perm';
 
 /* v3.3: modal chấm CSAT 1-5 sao sau khi xử lý xong ticket */
 function CsatModal({ ticket, onSave, onClose }) {
@@ -35,6 +37,8 @@ const slaLeft = t => {
 };
 
 export default function TicketsPage() {
+  const { data: session } = useSession();
+  const canDeleteTicket = hasAny(session?.user, ['AM', 'PM']);
   const { rows, loading, create, update, remove, mutating } = useResource('tickets');
   const clients = useResource('clients');
   const users = useResource('users');
@@ -138,7 +142,7 @@ export default function TicketsPage() {
                       : <button className="icon-btn" title="Ghi đánh giá CSAT của khách" style={{ color: 'var(--warn, #D97706)' }}
                           onClick={() => setModal({ mode: 'csat', row: t })}>⭐</button>)}
                     <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: t })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
-                    <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: t })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
+                    {canDeleteTicket && <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: t })} aria-label="Xóa"><Icon name="trash" size={16} /></button>}
                   </div></td>
                 </tr>
               );
@@ -151,7 +155,7 @@ export default function TicketsPage() {
         onClose={() => setModal(null)} onSave={async d => { await create(payload(d, true)); toast('Đã tạo ticket — SLA bắt đầu tính'); }} />}
       {modal?.mode === 'edit' && <FormModal title={`Ticket ${modal.row.code}`} fields={FIELDS} data={{ ...modal.row, clientId: modal.row.clientId || '' }}
         onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, payload(d, false, modal.row)); toast('Đã cập nhật'); }} />}
-      {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa ticket ${modal.row.code}?`}
+      {canDeleteTicket && modal?.mode === 'del' && <ConfirmDialog msg={`Xóa ticket ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
       {modal?.mode === 'csat' && <CsatModal ticket={modal.row} onClose={() => setModal(null)}
         onSave={async (score, comment) => {

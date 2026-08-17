@@ -102,13 +102,16 @@ test('CEO-12 UI remains a read-only cockpit over existing CEO workflows', () => 
     '/api/ceo/v1/staff/links',
     '/api/ceo/v1/command-gateway?limit=100',
     '/api/ceo/v1/messaging/conversations',
+    '/api/ceo/v1/decision-queue',
   ]) assert.match(component, new RegExp(endpoint.replace(/[/?]/g, '\\$&')));
-  for (const href of ['/ceo-commands?compose=task.create', '/ceo-inbox', '/ceo-workforce', '/ceo-world']) {
+  for (const href of ['/ceo-commands?compose=task.create', '/ceo-inbox', '/ceo-workforce', '/ceo-world', '/ceo-briefing', '/ceo-decisions']) {
     assert.match(component, new RegExp(href.replace(/[/?]/g, '\\$&')));
   }
   assert.doesNotMatch(component, /method:\s*['"](?:POST|PUT|PATCH|DELETE)/);
   assert.match(component, /aria-labelledby="ceo-operations-cockpit-title"/);
   assert.match(component, /aria-busy/);
+  assert.match(component, /ceo-executive-focus-title/);
+  assert.match(component, /buildCeoDailyBriefing/);
   assert.match(css, /min-height:\s*44px/);
   assert.match(css, /max-width:\s*520px/);
   assert.match(css, /prefers-reduced-motion/);

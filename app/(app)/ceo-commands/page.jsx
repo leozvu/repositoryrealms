@@ -8,7 +8,8 @@ import { useLanguage } from '@/components/LanguageProvider';
 import { rolesOf } from '@/lib/perm';
 import styles from './commands.module.css';
 
-const ACTIONS = ['task.create', 'status.request', 'announcement.send', 'approval.request'];
+const ACTIONS = ['task.create', 'task.adjust', 'status.request', 'project.status.request', 'announcement.send', 'approval.request', 'incident.acknowledge'];
+const LEGACY_ACTIONS = ['task.create', 'status.request', 'announcement.send', 'approval.request'];
 const ROLE_OPTIONS = ['PM', 'AM', 'ACCOUNTANT', 'HR', 'LEAD', 'DIRECTOR'];
 
 const COPY = {
@@ -19,7 +20,7 @@ const COPY = {
     policy: 'Portal chỉ giữ trạng thái giao nhận và mã receipt. Nội dung công việc, thông báo và yêu cầu phê duyệt chỉ tồn tại trong entity đích.',
     noFinance: 'CEO-5 không cho phép ghi Finance hoặc Payroll.',
     compose: 'Tạo lệnh mới', entity: 'Công ty đích', action: 'Hành động',
-    taskCreate: 'Tạo công việc', statusRequest: 'Yêu cầu cập nhật trạng thái', announcement: 'Gửi thông báo', approval: 'Gửi yêu cầu phê duyệt',
+    taskCreate: 'Tạo công việc', taskAdjust: 'Điều chỉnh phân công', statusRequest: 'Yêu cầu cập nhật trạng thái', projectStatusRequest: 'Yêu cầu cập nhật dự án', announcement: 'Gửi thông báo', approval: 'Gửi yêu cầu phê duyệt', incidentAcknowledge: 'Xác nhận tiếp nhận sự cố',
     recordTitle: 'Tiêu đề', note: 'Mô tả', assigneeEmail: 'Email người phụ trách (không bắt buộc)', projectId: 'Mã dự án (không bắt buộc)',
     dueDate: 'Hạn xử lý', priority: 'Mức ưu tiên', estHours: 'Giờ dự kiến', topic: 'Nội dung cần cập nhật', message: 'Lời nhắn',
     targetEmail: 'Email người cần phản hồi', audience: 'Người nhận', allEmployees: 'Toàn bộ nhân sự', byRole: 'Theo vai trò', role: 'Vai trò', approverRole: 'Vai trò phê duyệt',
@@ -36,6 +37,8 @@ const COPY = {
     taskTitlePlaceholder: 'Ví dụ: Hoàn thiện báo cáo chiến dịch', statusTopicPlaceholder: 'Ví dụ: Tiến độ bàn giao landing page',
     notePlaceholder: 'Bối cảnh và kết quả cần đạt', messagePlaceholder: 'Nêu rõ nội dung cần phản hồi',
     attempts: 'lần kiểm tra', noReceipt: 'Chưa có', correlation: 'Correlation',
+    taskId: 'Mã công việc', projectStatusId: 'Mã dự án', incidentId: 'Mã sự cố', expectedUpdatedAt: 'Thời điểm record được kiểm tra',
+    capabilitiesChecking: 'Đang kiểm tra action mà entity hỗ trợ…', capabilitiesFallback: 'Không đọc được capability mới; chỉ hiện các action tương thích an toàn.',
   },
   en: {
     eyebrow: 'CEO-5 · CROSS-ENTITY COMMAND GATEWAY', title: 'Cross-company operations',
@@ -44,7 +47,7 @@ const COPY = {
     policy: 'The Portal stores delivery state and a receipt reference only. Task, announcement, and approval content exists only in the target entity.',
     noFinance: 'CEO-5 does not allow Finance or Payroll writes.',
     compose: 'Compose command', entity: 'Target company', action: 'Action',
-    taskCreate: 'Create task', statusRequest: 'Request status update', announcement: 'Send announcement', approval: 'Submit approval request',
+    taskCreate: 'Create task', taskAdjust: 'Adjust task assignment', statusRequest: 'Request status update', projectStatusRequest: 'Request project update', announcement: 'Send announcement', approval: 'Submit approval request', incidentAcknowledge: 'Acknowledge incident',
     recordTitle: 'Title', note: 'Description', assigneeEmail: 'Assignee email (optional)', projectId: 'Project ID (optional)',
     dueDate: 'Due date', priority: 'Priority', estHours: 'Estimated hours', topic: 'Status topic', message: 'Message',
     targetEmail: 'Employee email', audience: 'Audience', allEmployees: 'All employees', byRole: 'By role', role: 'Role', approverRole: 'Approver role',
@@ -61,14 +64,19 @@ const COPY = {
     taskTitlePlaceholder: 'Example: Complete campaign report', statusTopicPlaceholder: 'Example: Landing-page delivery progress',
     notePlaceholder: 'Context and expected outcome', messagePlaceholder: 'Describe the update or response required',
     attempts: 'checks', noReceipt: 'Not available', correlation: 'Correlation',
+    taskId: 'Task ID', projectStatusId: 'Project ID', incidentId: 'Incident ID', expectedUpdatedAt: 'Record timestamp reviewed',
+    capabilitiesChecking: 'Checking actions supported by this entity…', capabilitiesFallback: 'New capabilities could not be read; only safe compatible actions are shown.',
   },
 };
 
 const actionLabel = (action, c) => ({
   'task.create': c.taskCreate,
+  'task.adjust': c.taskAdjust,
   'status.request': c.statusRequest,
+  'project.status.request': c.projectStatusRequest,
   'announcement.send': c.announcement,
   'approval.request': c.approval,
+  'incident.acknowledge': c.incidentAcknowledge,
 }[action] || action);
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -83,12 +91,27 @@ function payloadFromForm(action, form) {
     title: data.get('title'), note: data.get('note'), assigneeEmail: data.get('assigneeEmail'),
     projectId: data.get('projectId'), dueDate: data.get('dueDate'), priority: data.get('priority'), estHours: data.get('estHours'),
   };
+  if (action === 'task.adjust') {
+    const payload = { taskId: data.get('taskId'), expectedUpdatedAt: new Date(data.get('expectedUpdatedAt')).toISOString() };
+    for (const field of ['assigneeEmail', 'dueDate', 'priority', 'estHours']) {
+      const value = String(data.get(field) ?? '').trim();
+      if (value) payload[field] = value;
+    }
+    return payload;
+  }
   if (action === 'status.request') return {
     topic: data.get('topic'), message: data.get('message'), targetEmail: data.get('targetEmail'),
     dueDate: data.get('dueDate'), priority: data.get('priority'),
   };
+  if (action === 'project.status.request') return {
+    projectId: data.get('projectId'), message: data.get('message'), targetEmail: data.get('targetEmail'),
+    dueDate: data.get('dueDate'), priority: data.get('priority'),
+  };
   if (action === 'announcement.send') return {
     title: data.get('title'), message: data.get('message'), audience: data.get('audience'), role: data.get('audience') === 'role' ? data.get('role') : null,
+  };
+  if (action === 'incident.acknowledge') return {
+    incidentId: data.get('incidentId'), expectedUpdatedAt: new Date(data.get('expectedUpdatedAt')).toISOString(),
   };
   return { title: data.get('title'), note: data.get('note'), approverRole: data.get('approverRole') };
 }
@@ -104,6 +127,9 @@ export default function CeoCommandsPage() {
   const [identity, setIdentity] = useState(null);
   const [deliveries, setDeliveries] = useState([]);
   const [action, setAction] = useState(ACTIONS[0]);
+  const [targetEntityId, setTargetEntityId] = useState('');
+  const [supportedActions, setSupportedActions] = useState(LEGACY_ACTIONS);
+  const [capabilitiesState, setCapabilitiesState] = useState('idle');
   const [audience, setAudience] = useState('all');
   const [confirmed, setConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -133,6 +159,30 @@ export default function CeoCommandsPage() {
 
   const entities = useMemo(() => (registry?.entities || []).filter((entity) => entity.enabled), [registry]);
   const identityReady = identity?.active && identity?.stepUp;
+
+  useEffect(() => {
+    if (!targetEntityId || !identityReady) {
+      setSupportedActions(LEGACY_ACTIONS); setCapabilitiesState('idle'); return;
+    }
+    let active = true;
+    setCapabilitiesState('loading');
+    fetch(`/api/ceo/v1/command-gateway/capabilities?entityId=${encodeURIComponent(targetEntityId)}`, { cache: 'no-store' })
+      .then(async (response) => ({ ok: response.ok, body: await response.json().catch(() => ({})) }))
+      .then(({ ok, body }) => {
+        if (!active) return;
+        const negotiated = ok ? ACTIONS.filter((item) => body.actions?.includes(item)) : [];
+        const next = negotiated.length ? negotiated : LEGACY_ACTIONS;
+        setSupportedActions(next);
+        setAction((current) => next.includes(current) ? current : next[0]);
+        setCapabilitiesState(ok ? 'ready' : 'fallback');
+      })
+      .catch(() => {
+        if (!active) return;
+        setSupportedActions(LEGACY_ACTIONS); setAction((current) => LEGACY_ACTIONS.includes(current) ? current : LEGACY_ACTIONS[0]);
+        setCapabilitiesState('fallback');
+      });
+    return () => { active = false; };
+  }, [identityReady, targetEntityId]);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -208,8 +258,8 @@ export default function CeoCommandsPage() {
       <form ref={formRef} className={`card ${styles.composer}`} onSubmit={submit} aria-labelledby="ceo-command-compose-title" aria-busy={submitting || undefined}>
         <header><p className={styles.eyebrow}>COMMAND</p><h2 id="ceo-command-compose-title">{c.compose}</h2></header>
         <div className={styles.formGrid}>
-          <div className="field"><label htmlFor="ceo-command-entity">{c.entity}<span className="req"> *</span></label><select id="ceo-command-entity" name="targetEntityId" required defaultValue=""><option value="" disabled>—</option>{entities.map((entity) => <option key={entity.id} value={entity.id}>{entity.displayName}</option>)}</select></div>
-          <div className="field"><label htmlFor="ceo-command-action">{c.action}<span className="req"> *</span></label><select id="ceo-command-action" name="action" value={action} onChange={(event) => setAction(event.target.value)}>{ACTIONS.map((value) => <option key={value} value={value}>{actionLabel(value, c)}</option>)}</select></div>
+          <div className="field"><label htmlFor="ceo-command-entity">{c.entity}<span className="req"> *</span></label><select id="ceo-command-entity" name="targetEntityId" required value={targetEntityId} onChange={(event) => setTargetEntityId(event.target.value)}><option value="" disabled>—</option>{entities.map((entity) => <option key={entity.id} value={entity.id}>{entity.displayName}</option>)}</select></div>
+          <div className="field"><label htmlFor="ceo-command-action">{c.action}<span className="req"> *</span></label><select id="ceo-command-action" name="action" value={action} onChange={(event) => setAction(event.target.value)} disabled={capabilitiesState === 'loading'}>{supportedActions.map((value) => <option key={value} value={value}>{actionLabel(value, c)}</option>)}</select><small>{capabilitiesState === 'loading' ? c.capabilitiesChecking : capabilitiesState === 'fallback' ? c.capabilitiesFallback : ''}</small></div>
 
           {action === 'task.create' && <>
             <div className={`field ${styles.full}`}><label htmlFor="command-title">{c.recordTitle}<span className="req"> *</span></label><input id="command-title" name="title" required minLength={3} maxLength={160} placeholder={c.taskTitlePlaceholder} /></div>
@@ -221,12 +271,29 @@ export default function CeoCommandsPage() {
             <div className="field"><label htmlFor="command-hours">{c.estHours}</label><input id="command-hours" name="estHours" type="number" min="0" max="1000" step="0.25" defaultValue="0" /></div>
           </>}
 
+          {action === 'task.adjust' && <>
+            <div className="field"><label htmlFor="adjust-task-id">{c.taskId}<span className="req"> *</span></label><input id="adjust-task-id" name="taskId" required autoComplete="off" /></div>
+            <div className="field"><label htmlFor="adjust-updated-at">{c.expectedUpdatedAt}<span className="req"> *</span></label><input id="adjust-updated-at" name="expectedUpdatedAt" type="datetime-local" required /></div>
+            <div className="field"><label htmlFor="adjust-assignee">{c.assigneeEmail}</label><input id="adjust-assignee" name="assigneeEmail" type="email" autoComplete="off" /></div>
+            <div className="field"><label htmlFor="adjust-due">{c.dueDate}</label><input id="adjust-due" name="dueDate" type="date" /></div>
+            <div className="field"><label htmlFor="adjust-priority">{c.priority}</label><select id="adjust-priority" name="priority" defaultValue=""><option value="">—</option><option value="low">{c.low}</option><option value="medium">{c.medium}</option><option value="high">{c.high}</option><option value="urgent">{c.urgent}</option></select></div>
+            <div className="field"><label htmlFor="adjust-hours">{c.estHours}</label><input id="adjust-hours" name="estHours" type="number" min="0" max="1000" step="0.25" /></div>
+          </>}
+
           {action === 'status.request' && <>
             <div className={`field ${styles.full}`}><label htmlFor="command-topic">{c.topic}<span className="req"> *</span></label><input id="command-topic" name="topic" required minLength={3} maxLength={160} placeholder={c.statusTopicPlaceholder} /></div>
             <div className={`field ${styles.full}`}><label htmlFor="command-message">{c.message}<span className="req"> *</span></label><textarea id="command-message" name="message" required minLength={1} maxLength={800} placeholder={c.messagePlaceholder} /></div>
             <div className="field"><label htmlFor="command-target-email">{c.targetEmail}<span className="req"> *</span></label><input id="command-target-email" name="targetEmail" type="email" required autoComplete="off" /></div>
             <div className="field"><label htmlFor="status-due">{c.dueDate}</label><input id="status-due" name="dueDate" type="date" min={today()} /></div>
             <div className="field"><label htmlFor="status-priority">{c.priority}</label><select id="status-priority" name="priority" defaultValue="medium"><option value="medium">{c.medium}</option><option value="high">{c.high}</option><option value="urgent">{c.urgent}</option></select></div>
+          </>}
+
+          {action === 'project.status.request' && <>
+            <div className="field"><label htmlFor="project-status-id">{c.projectStatusId}<span className="req"> *</span></label><input id="project-status-id" name="projectId" required autoComplete="off" /></div>
+            <div className="field"><label htmlFor="project-status-target">{c.targetEmail}<span className="req"> *</span></label><input id="project-status-target" name="targetEmail" type="email" required autoComplete="off" /></div>
+            <div className={`field ${styles.full}`}><label htmlFor="project-status-message">{c.message}<span className="req"> *</span></label><textarea id="project-status-message" name="message" required minLength={1} maxLength={800} placeholder={c.messagePlaceholder} /></div>
+            <div className="field"><label htmlFor="project-status-due">{c.dueDate}</label><input id="project-status-due" name="dueDate" type="date" min={today()} /></div>
+            <div className="field"><label htmlFor="project-status-priority">{c.priority}</label><select id="project-status-priority" name="priority" defaultValue="medium"><option value="medium">{c.medium}</option><option value="high">{c.high}</option><option value="urgent">{c.urgent}</option></select></div>
           </>}
 
           {action === 'announcement.send' && <>
@@ -240,6 +307,11 @@ export default function CeoCommandsPage() {
             <div className={`field ${styles.full}`}><label htmlFor="approval-title">{c.recordTitle}<span className="req"> *</span></label><input id="approval-title" name="title" required minLength={3} maxLength={160} /></div>
             <div className={`field ${styles.full}`}><label htmlFor="approval-note">{c.note}<span className="req"> *</span></label><textarea id="approval-note" name="note" required minLength={1} maxLength={1000} /></div>
             <div className="field"><label htmlFor="approval-role">{c.approverRole}</label><select id="approval-role" name="approverRole">{ROLE_OPTIONS.map((role) => <option key={role}>{role}</option>)}</select></div>
+          </>}
+
+          {action === 'incident.acknowledge' && <>
+            <div className="field"><label htmlFor="incident-id">{c.incidentId}<span className="req"> *</span></label><input id="incident-id" name="incidentId" required autoComplete="off" /></div>
+            <div className="field"><label htmlFor="incident-updated-at">{c.expectedUpdatedAt}<span className="req"> *</span></label><input id="incident-updated-at" name="expectedUpdatedAt" type="datetime-local" required /></div>
           </>}
         </div>
         <label className={styles.confirm} htmlFor="ceo-command-confirm"><input id="ceo-command-confirm" type="checkbox" aria-label={c.confirm} checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>{c.confirm}</span></label>

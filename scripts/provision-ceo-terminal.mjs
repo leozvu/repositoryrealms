@@ -7,7 +7,8 @@
    ENV: DATABASE_URL (ceoportal) · PORTAL_CEO_EMAIL/PASS/NAME · PORTAL_CHECKER_EMAIL/PASS
         BACKUP_DIR (thư mục backups/<timestamp> để lấy checksum)
         RINGS=<entityId>:<ring>:<status>,... (vd crmtest:commands:active)
-        MEMBERSHIPS=<entityId>:<localDirectorEmail>,...  */
+       MEMBERSHIPS=<entityId>:<localDirectorEmail>,...
+       EGOLIVE_MERGE_COMPLETE=1 chỉ dùng sau khi đã backup, đối soát và chuyển dữ liệu Egolive vào Egoric. */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,11 +20,10 @@ const now = new Date();
 const plus29d = new Date(now.getTime() + 29 * 86400000);
 
 const ENTITIES = [
-  { id: 'crmtest', displayName: 'Sandbox Test', baseUrl: 'https://erp-crm-test.vercel.app', businessProfile: 'agency', environment: 'staging', backupFile: 'crmtest.json' },
-  { id: 'aim', displayName: 'AIm Agency', baseUrl: 'https://agency-erp-mu.vercel.app', businessProfile: 'agency', environment: 'production', backupFile: 'public.json' },
-  { id: 'egoric', displayName: 'Egoric Agency', baseUrl: 'https://erp-egoric.vercel.app', businessProfile: 'agency', environment: 'production', backupFile: 'egoric.json' },
-  { id: 'vnecom', displayName: 'Vnecom LLC', baseUrl: 'https://erp-vnecom.vercel.app', businessProfile: 'agency', environment: 'production', backupFile: 'vnecom.json' },
-  { id: 'egolive', displayName: 'Egolive (livestream)', baseUrl: 'https://erp-egolive.vercel.app', businessProfile: 'livestream', environment: 'production', backupFile: 'egolive.json' },
+  { id: 'crmtest', displayName: 'Sandbox Test', baseUrl: 'https://erp-crm-test.vercel.app', businessProfile: 'agency', capabilities: ['finance', 'crm', 'delivery', 'support', 'people'], environment: 'staging', backupFile: 'crmtest.json' },
+  { id: 'aim', displayName: 'AIm Agency', baseUrl: 'https://agency-erp-mu.vercel.app', businessProfile: 'agency', capabilities: ['finance', 'crm', 'delivery', 'support', 'people'], environment: 'production', backupFile: 'public.json' },
+  { id: 'egoric', displayName: 'Egoric Agency', baseUrl: 'https://erp-egoric.vercel.app', businessProfile: 'agency', capabilities: ['finance', 'crm', 'delivery', 'support', 'people', 'livestream'], environment: 'production', backupFile: 'egoric.json' },
+  { id: 'vnecom', displayName: 'Vnecom LLC', baseUrl: 'https://erp-vnecom.vercel.app', businessProfile: 'agency', capabilities: ['finance', 'crm', 'delivery', 'support', 'people'], environment: 'production', backupFile: 'vnecom.json' },
   // Fretas thuộc đơn vị khác (chỉ đạo 23/7/2026) — KHÔNG nối vào terminal. Registry row cũ
   // (nếu có) bị vô hiệu bởi bước disable trong lần provision kế tiếp, không xuất hiện ở đây.
 ];
@@ -61,10 +61,10 @@ for (const e of ENTITIES) {
   const up = String(e.id).toUpperCase();
   await prisma.ceoEntityRegistry.upsert({
     where: { id: e.id },
-    update: { displayName: e.displayName, baseUrl: e.baseUrl, businessProfile: e.businessProfile, environment: e.environment },
+    update: { displayName: e.displayName, baseUrl: e.baseUrl, businessProfile: e.businessProfile, capabilities: JSON.stringify(e.capabilities), environment: e.environment },
     create: {
       id: e.id, displayName: e.displayName, baseUrl: e.baseUrl, businessProfile: e.businessProfile,
-      environment: e.environment, enabled: false, status: 'unverified',
+      capabilities: JSON.stringify(e.capabilities), environment: e.environment, enabled: false, status: 'unverified',
       credentialRef: `CEO_ENTITY_${up}_API_KEY`, serviceCredentialRef: `CEO_ENTITY_${up}_SERVICE_KEY`,
     },
   });
@@ -87,7 +87,7 @@ for (const e of ENTITIES) {
       const checksum = sha256File(file);
       const upTo = RING_ORDER.indexOf(spec.ring);
       for (const ring of RING_ORDER.slice(1, upTo + 1)) {
-        for (const kind of [...BASE_KINDS, ...(RING_EXTRA[ring] || []), ...(e.id === 'egolive' && ring === 'commands' ? ['finance_review'] : [])]) {
+        for (const kind of [...BASE_KINDS, ...(RING_EXTRA[ring] || []), ...(e.id === 'egoric' && ring === 'commands' ? ['finance_review'] : [])]) {
           const recorder = kind === 'maker_checker' || kind === 'finance_review' ? checker : ceo;
           await prisma.ceoRolloutEvidence.upsert({
             where: { entityId_ring_kind_checksum: { entityId: e.id, ring, kind, checksum } },
@@ -114,7 +114,8 @@ const identity = await prisma.ceoGlobalIdentity.upsert({
   create: { subject: 'ceo_' + crypto.createHash('sha256').update(ceo.email).digest('hex').slice(0, 16), userId: ceo.id, email: ceo.email, displayName: ceo.name, status: 'active' },
 });
 for (const pair of env('MEMBERSHIPS', '').split(',').filter(Boolean)) {
-  const [entityId, localEmail] = pair.split(':');
+  const [rawEntityId, localEmail] = pair.split(':');
+  const entityId = rawEntityId === 'egolive' ? 'egoric' : rawEntityId;
   await prisma.ceoEntityMembership.upsert({
     where: { identityId_entityId: { identityId: identity.id, entityId } },
     update: { localUserEmail: localEmail, localRole: 'DIRECTOR', status: 'active' },
@@ -123,10 +124,17 @@ for (const pair of env('MEMBERSHIPS', '').split(',').filter(Boolean)) {
 }
 
 // ---- 5. Bật entity có đủ ring > local_staging ----
+const provisionedIds = new Set(ENTITIES.map((item) => item.id));
 for (const [id, spec] of Object.entries(ringSpec)) {
-  if (spec.ring !== 'local_staging') {
+  if (provisionedIds.has(id) && spec.ring !== 'local_staging') {
     await prisma.ceoEntityRegistry.update({ where: { id }, data: { enabled: true, status: 'ready' } });
   }
+}
+
+// Không tự động tắt nguồn Egolive cũ trước khi data migration được backup và đối soát.
+// Sau cutover đã duyệt, cờ này chỉ vô hiệu registry cũ; không xóa dữ liệu hay lịch sử rollout.
+if (env('EGOLIVE_MERGE_COMPLETE', '0') === '1') {
+  await prisma.ceoEntityRegistry.updateMany({ where: { id: 'egolive' }, data: { enabled: false, status: 'disabled' } });
 }
 
 const states = await prisma.ceoRolloutState.findMany();

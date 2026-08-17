@@ -1,29 +1,18 @@
 # Deployment Manifest — RepositoryRealms
 
-Cập nhật: 2026-08-09. Entity UX/UI release: `ux-ui-rehab`; CEO control-plane giữ nguyên.
+Cập nhật: 2026-08-17. Nhánh tích hợp `codex/livestream-room-integration` kết hợp entity UX/UI với control-plane và Phòng Livestream Egolive; chưa promote production nếu chưa qua canary.
 
 ## Production domains đang phục vụ
 
 | Entity | Vercel project | Domain | Schema | Stable deployment | Trạng thái |
 |---|---|---|---|---|---|
-| AIm Agency | `agency-erp` | `agency-erp-mu.vercel.app` | `public` | `dpl_FA7hhE9SZZZs38jSX5W7U11qyvQR` | READY; i18n hotfix smoke PASS |
-| Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_5c5Wdqa55SA52RVn7s7UzJRAmSL4` | READY; i18n hotfix smoke PASS |
-| VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_5ShmwXjuVAyVXbV547ChURCLzN6e` | READY; i18n hotfix smoke PASS |
-| Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_FFn1c5yzrYi4vbfmgCxtg7ttiz9D` | READY; i18n hotfix smoke PASS |
-| CEO Terminal | `ceo-terminal-leoz` | `ceo-terminal-leoz.vercel.app` | `ceoportal` | `dpl_6ARCEAAYKhkAxK8oUg9gibCDY8ou` | READY; `/login` 200 |
+| AIm Agency | `agency-erp` | `agency-erp-mu.vercel.app` | `public` | `dpl_5SyEfVuneLtCf5wpsBXBpgaeotbW` | READY; pool bounded; authenticated CEO SSO PASS |
+| Egoric Agency | `erp-egoric` | `erp-egoric.vercel.app` | `egoric` | `dpl_FjAfMgTg1uCmFySrXrd7xPo5wejJ` | READY; pool bounded; authenticated CEO SSO PASS |
+| VNECOM LLC | `erp-vnecom` | `erp-vnecom.vercel.app` | `vnecom` | `dpl_69L7bXo8puX94UAjLww3pAGi9ePc` | READY; pool bounded; authenticated CEO SSO PASS |
+| Egolive | `erp-egolive` | `erp-egolive.vercel.app` | `egolive` | `dpl_B39QEDvdpiATRYYryxEBvBmTvXFX` | READY; pool bounded; authenticated CEO SSO PASS |
+| CEO Terminal | `ceo-terminal-leoz` | `ceo-terminal-leoz.vercel.app` | `ceoportal` | `dpl_CCpgYtuUe9uMJqrdGTDbzPHtQvCC` | READY; CEO-18 stable; authenticated SSO PASS 4/4 |
 
-UX/UI rehab được build thành bốn canary production-env với `--skip-domain`, smoke test trước cutover rồi mới promote. Kiểm tra hậu promote trên cả bốn domain: `/login` 200 và đúng entity brand; `/dashboard` 307 khi chưa đăng nhập; `/api/settings` 401; credentials provider sẵn sàng. Release không có thay đổi Prisma schema hoặc migration và không promote CEO Terminal.
-
-Hotfix i18n `eeddc85` cũng đi qua canary → `/login` 200 → promote. Kiểm tra Playwright hậu promote trên cả bốn domain đã thao tác VI → EN → VI, xác nhận `html lang`, locale lưu trong trình duyệt và copy đăng nhập cùng chuyển đúng ngôn ngữ. Hotfix không thay đổi schema hoặc dữ liệu nghiệp vụ.
-
-### Rollback evidence cho UX/UI rehab
-
-| Entity | Canary đã promote | Previous stable deployment |
-|---|---|---|
-| AIm Agency | `agency-pmx9jrpbe-leozs-projects-64a5f0c8.vercel.app` | `dpl_6czBa3jbvLmK2mSBKzbnv5jyiqvT` |
-| Egoric Agency | `erp-egoric-mt5u63hk8-leozs-projects-64a5f0c8.vercel.app` | `dpl_DQgU5EBtPwihNL1DuJuXk9T3QYbS` |
-| VNECOM LLC | `erp-vnecom-nonp3duku-leozs-projects-64a5f0c8.vercel.app` | `dpl_A148KFQ5w9d8BGionGuUNDyQbqBc` |
-| Egolive | `erp-egolive-9j3d1qxe6-leozs-projects-64a5f0c8.vercel.app` | `dpl_42MbiE38n8Ug3iZJSha5MEhgyJ84` |
+CEO Terminal được promote sau protected-canary gate ngày 2026-08-09. Sau khi stable drill phát hiện shared Postgres `EMAXCONN`, cả bốn entity được build canary bằng immutable commit `b0af34b`, không đổi schema/data, rồi promote theo ring. `origin/main` và nhánh LeozOps không bị sửa hoặc merge trong release này.
 
 Ngoài phạm vi: Fretas, `erp-master-leoz`, LeozOps và contract `lead-snapshot v1`.
 
@@ -41,11 +30,11 @@ Chi tiết evidence: `docs/realms/CEO-12-PRODUCTION-TRUTH-EVIDENCE.md`.
 
 ## Schema gate hiện tại
 
-Snapshot cho thấy cả năm schema có 95 bảng Prisma. CEO Portal production từng trả `P2022` khi đọc bằng model Prisma hiện tại, nghĩa là có column drift so với release candidate; công cụ backup đã đọc các cột thực tế và chứng minh dữ liệu có thể restore vào schema hiện tại. Không được promote CEO Terminal trước khi chạy migration diff, backup gate và additive migration plan.
+Snapshot cho thấy cả năm schema có 95 bảng Prisma. CEO Portal đã được additive reconciliation; Prisma diff bằng 0 và 324 row được giữ nguyên. Pre-change và post-schema encrypted backups đều được giữ ngoài repository.
 
 ## Rollback
 
-1. Code: promote `Previous stable deployment` trong bảng rollback evidence; không rollback bằng cách viết lại Git history.
+1. Code: dùng stable deployment ID ở bảng trên; rollback CEO về `dpl_ByF5RCHvBxYcY5VmES6a12WHAHRm`, AIm về `dpl_2wdKb7RzMMtukGytCgufCnzhtJjA`, Egoric về `dpl_BLw3joRx3EUPM5LDcR48xwXYtT1Q`, VNECOM về `dpl_3WTArswEcqM3zdUvP7wKCxx9Jnmh`, Egolive về `dpl_wHrAprGqtDLMo6VnjQPr7qM8UZd4`; không rollback bằng cách viết lại Git history.
 2. Dữ liệu: chỉ restore từ bộ `20260809T040418Z` sau quyết định founder và rehearsal mới.
 3. CEO feature: hạ rollout ring/kill switch của Portal; local ERP login phải tiếp tục hoạt động.
 4. Không xóa hoặc ghi đè schema production để sửa drift.

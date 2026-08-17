@@ -90,10 +90,45 @@ test('CEO-7 world degrades one kingdom without disabling other SSO gateways', ()
   assert.equal(world.invariants.separateEntityRealms, true);
 });
 
+test('CEO-7 product world excludes staging and unknown registry memberships', async () => {
+  const entity = (id, environment = 'production') => ({
+    id, displayName: id, enabled: true, environment, businessProfile: 'agency',
+    capabilities: '["people"]', credentialRef: `CEO_ENTITY_${id.toUpperCase()}_API_KEY`,
+    circuitState: 'closed', consecutiveErrors: 0,
+  });
+  const identity = { id: 'identity-1', userId: DIRECTOR.id, subject: 'ceo_global_subject_001', status: 'active' };
+  const session = {
+    id: 'session-1', identityId: identity.id, identity,
+    tokenHash: hashCeoIdentitySecret(RAW_SESSION, HASH_SECRET), revokedAt: null,
+    stepUpAt: NOW, lastSeenAt: NOW, idleExpiresAt: new Date(NOW.getTime() + 30 * 60_000),
+    expiresAt: new Date(NOW.getTime() + 8 * 60 * 60_000),
+  };
+  const memberships = [
+    { identityId: identity.id, entityId: 'aim', localRole: 'DIRECTOR', status: 'active', scopes: JSON.stringify([CEO_FEDERATION_SCOPE]), entity: entity('aim') },
+    { identityId: identity.id, entityId: 'crmtest', localRole: 'DIRECTOR', status: 'active', scopes: JSON.stringify([CEO_FEDERATION_SCOPE]), entity: entity('crmtest', 'staging') },
+    { identityId: identity.id, entityId: 'legacy-company', localRole: 'DIRECTOR', status: 'active', scopes: JSON.stringify([CEO_FEDERATION_SCOPE]), entity: entity('legacy-company') },
+  ];
+  const db = {
+    ceoPortalSession: { findUnique: async () => session, updateMany: async () => ({ count: 1 }) },
+    ceoEntityMembership: { findMany: async () => memberships },
+    ceoEntityRegistry: { findUnique: async () => memberships[0].entity, update: async ({ data }) => ({ ...memberships[0].entity, ...data }) },
+    ceoRolloutState: { findUnique: async () => ({ currentRing: 'ceo_sso', status: 'active', recordVersion: 1 }) },
+    auditLog: { create: async ({ data }) => data },
+  };
+  const presence = buildCeoFederationPresenceEnvelope({ entity: memberships[0].entity, policy: { presenceEnabled: true }, asOf: NOW });
+  const world = await loadCeoFederationWorld(db, DIRECTOR, RAW_SESSION, {}, {
+    now: NOW, hashSecret: HASH_SECRET, secretResolver: () => 'entity-secret',
+    allowedOriginResolver: () => ['https://aim.example.test'], timeoutMs: 1_000,
+    fetchImpl: async () => new Response(JSON.stringify(presence), { status: 200 }),
+  });
+  assert.deepEqual(world.kingdoms.map((kingdom) => kingdom.id), ['aim']);
+  assert.equal(world.summary.registered, 1);
+});
+
 test('CEO-7 portal reads a target with audience-bound headers and stores no remote roster', async () => {
   const entity = {
     id: 'aim', displayName: 'AIm Agency', baseUrl: 'https://aim.example.test', enabled: true,
-    environment: 'staging', businessProfile: 'agency', capabilities: '["people"]',
+    environment: 'production', businessProfile: 'agency', capabilities: '["people"]',
     credentialRef: 'CEO_ENTITY_AIM_API_KEY', circuitState: 'closed', consecutiveErrors: 0,
   };
   const identity = { id: 'identity-1', userId: DIRECTOR.id, subject: 'ceo_global_subject_001', status: 'active' };

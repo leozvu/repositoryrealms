@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { currentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Shell from '@/components/Shell';
+import CeoRealtimeBridge from '@/components/ceo/CeoRealtimeBridge';
 import { parseRealmPilotConfig, realmPilotDecision } from '@/lib/realm-pilot';
 import { realmV2PreviewEnabled } from '@/lib/realm-v2-contracts';
 import { ceoPortalOrigin, deploymentBranding, isCeoPortalDeployment } from '@/lib/deployment-profile';
@@ -38,6 +39,7 @@ export default async function AppLayout({ children }) {
       ceoPortal={ceoPortal}
       ceoPortalOrigin={ceoPortalOrigin()}
     >
+      {ceoPortal && <CeoRealtimeBridge />}
       {children}
     </Shell>
   );

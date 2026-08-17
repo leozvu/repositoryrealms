@@ -31,5 +31,6 @@ export const config = {
     '/ceo-navigator/:path*',
     '/realm-v2/:path*',
     '/api/ceo/v1/:path*',
+    '/api/ceo/v2/:path*',
   ],
 };

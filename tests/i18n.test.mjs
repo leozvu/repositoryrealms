@@ -104,7 +104,7 @@ test('Phase 5 Project Realm and Chronicle copy is available in English without t
 });
 
 test('Phase 6 World Map and CEO Terminal copy preserves executive accounting meanings', () => {
-  assert.equal(translateUiCopy('Bản đồ bốn công ty', 'en'), 'Four-company Map');
+  assert.equal(translateUiCopy('Bản đồ ba công ty', 'en'), 'Three-company Map');
   assert.equal(translateUiCopy('Danh sách công ty tương đương', 'en'), 'Equivalent company list');
   assert.equal(translateUiCopy('Không phải recognized revenue', 'en'), 'Not recognized revenue');
   assert.equal(translateUiCopy('GMV không phải revenue', 'en'), 'GMV is not revenue');

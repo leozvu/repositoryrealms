@@ -204,11 +204,11 @@ model Client {
   serviceLine String? // v3.37: mảng dịch vụ khách đang dùng (Seeding, Digital Ads…) — lọc danh sách khách
   address     String?
   note        String?
-  createdAt String? // ISO date
-  projects  Project[]
-  invoices  Invoice[]
-  quotes    Quote[]
-  contacts  Contact[]
+  createdAt   String? // ISO date
+  projects    Project[]
+  invoices    Invoice[]
+  quotes      Quote[]
+  contacts    Contact[]
 }
 
 // ===== v3.4: một khách nhiều người liên hệ =====
@@ -225,24 +225,24 @@ model Contact {
 }
 
 model Lead {
-  id            String  @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String
   company       String?
   email         String?
   phone         String?
   source        String?
-  value         Int     @default(0)
-  stage         String  @default("new")
+  value         Int       @default(0)
+  stage         String    @default("new")
   ownerId       String?
   note          String?
   createdAt     String?
   expectedClose String? // v3.4: tháng/ngày dự kiến chốt (YYYY-MM-DD) — cho forecast
   // v3.42 (cụm Lead): lead tự chảy về từ Facebook/TikTok/landing thay vì nhập tay
-  campaign    String? // nhãn chiến dịch marketing, VD "4_MKT_Landing_ThaoVietAn"
-  region      String? // khu vực khách — dùng để chia sale theo vùng
-  serviceLine String? // mảng dịch vụ khách quan tâm — chia sale theo chuyên môn
-  intakeKey   String? @unique // khóa chống trùng: liên hệ + chiến dịch
-  intakeAt    DateTime? // thời điểm hệ thống nhận, tách khỏi createdAt (chuỗi) cũ
+  campaign      String? // nhãn chiến dịch marketing, VD "4_MKT_Landing_ThaoVietAn"
+  region        String? // khu vực khách — dùng để chia sale theo vùng
+  serviceLine   String? // mảng dịch vụ khách quan tâm — chia sale theo chuyên môn
+  intakeKey     String?   @unique // khóa chống trùng: liên hệ + chiến dịch
+  intakeAt      DateTime? // thời điểm hệ thống nhận, tách khỏi createdAt (chuỗi) cũ
 
   @@index([campaign])
   @@index([ownerId, stage])
@@ -980,11 +980,11 @@ model CsatResponse {
 // deployment khác nếu bật VAPID). Push gửi RỖNG, service worker tự lấy nội dung từ
 // /api/notifications nên bảng này không chứa dữ liệu nghiệp vụ.
 model PushSubscription {
-  id        String   @id @default(cuid())
-  userId    String
-  endpoint  String   @unique
-  device    String? // nhãn thiết bị do trình duyệt gợi ý (userAgent rút gọn)
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  userId     String
+  endpoint   String    @unique
+  device     String? // nhãn thiết bị do trình duyệt gợi ý (userAgent rút gọn)
+  createdAt  DateTime  @default(now())
   lastSentAt DateTime?
 
   @@index([userId])
@@ -1319,16 +1319,16 @@ model CeoStaffLink {
 }
 
 model CeoStaffSsoCode {
-  id           String    @id @default(cuid())
-  codeHash     String    @unique
-  personKey    String
-  sourceEntity String
-  targetEntity String
+  id             String    @id @default(cuid())
+  codeHash       String    @unique
+  personKey      String
+  sourceEntity   String
+  targetEntity   String
   localUserEmail String // email tại công ty ĐÍCH
-  redirectPath String    @default("/dashboard")
-  expiresAt    DateTime
-  consumedAt   DateTime?
-  createdAt    DateTime  @default(now())
+  redirectPath   String    @default("/dashboard")
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  createdAt      DateTime  @default(now())
 
   @@index([targetEntity, expiresAt, consumedAt])
 }
@@ -1670,40 +1670,56 @@ model StockMove {
 // ===== v3.20: LIVESTREAM BÁN HÀNG (phân hệ 'livestream' — Egolive) =====
 // Một ca live. GMV ≠ doanh thu: gmv là chốt trên sóng, netGmv là sau đối soát (trừ hủy/hoàn/phí/thuế).
 model LiveSession {
-  id            String   @id @default(cuid())
-  platform      String   @default("tiktok") // tiktok | shopee
-  shop          String? // kênh/shop
-  clientId      String? // nhãn hàng (nếu live thuê)
-  date          String // YYYY-MM-DD
-  startAt       String? // HH:MM
-  durationMin   Int      @default(0)
-  hostId        String? // host chính (thường là freelancer)
-  assistantId   String? // trợ live
-  contractType  String   @default("affiliate") // affiliate | booking | revshare | kpi
+  id             String   @id @default(cuid())
+  department     String   @default("egolive") // phòng ban sở hữu trong Egoric
+  title          String? // tên chương trình / event
+  platform       String   @default("tiktok") // tiktok | shopee
+  shop           String? // kênh/shop
+  clientId       String? // nhãn hàng (nếu live thuê)
+  date           String // YYYY-MM-DD
+  startAt        String? // HH:MM
+  durationMin    Int      @default(0)
+  scheduleStatus String   @default("draft") // draft | confirmed
+  timezone       String   @default("Asia/Ho_Chi_Minh")
+  callTime       String? // HH:MM — giờ ekip có mặt
+  studio         String?
+  campaign       String?
+  hostId         String? // host chính (thường là freelancer)
+  assistantId    String? // trợ live
+  operatorId     String? // vận hành kỹ thuật / sản phẩm
+  moderatorId    String? // quản trị chat / pin sản phẩm
+  productCount   Int      @default(0)
+  targetGmv      Int      @default(0)
+  briefUrl       String? // brief / script / rundown
+  rehearsalAt    String? // YYYY-MM-DDTHH:MM local
+  streamUrl      String? // URL event trên nền tảng
+  contractType   String   @default("affiliate") // affiliate | booking | revshare | kpi
   // chỉ số phiên (chốt trên sóng)
-  gmv           Int      @default(0) // GMV chốt trên sóng (VND)
-  orders        Int      @default(0)
-  uniqueViewers Int      @default(0)
-  peakViewers   Int      @default(0)
-  ctr           Float    @default(0) // % click vào SP
-  ctor          Float    @default(0) // % click -> đơn
+  gmv            Int      @default(0) // GMV chốt trên sóng (VND)
+  orders         Int      @default(0)
+  uniqueViewers  Int      @default(0)
+  peakViewers    Int      @default(0)
+  ctr            Float    @default(0) // % click vào SP
+  ctor           Float    @default(0) // % click -> đơn
   // đối soát (sau khi sàn quyết toán)
-  netGmv        Int      @default(0) // GMV ròng sau hủy/hoàn
-  platformFee   Int      @default(0) // phí sàn + thanh toán
-  taxWithheld   Int      @default(0) // thuế sàn khấu trừ (NĐ 117/2025)
-  netReceived   Int      @default(0) // tiền thực nhận
-  status        String   @default("scheduled") // scheduled | live | done | reconciled
+  netGmv         Int      @default(0) // GMV ròng sau hủy/hoàn
+  platformFee    Int      @default(0) // phí sàn + thanh toán
+  taxWithheld    Int      @default(0) // thuế sàn khấu trừ (NĐ 117/2025)
+  netReceived    Int      @default(0) // tiền thực nhận
+  status         String   @default("scheduled") // scheduled | live | done | reconciled
   // công host
-  hostPayBase   Int      @default(0) // lương cứng ca
-  hostPayRate   Float    @default(0) // % hoa hồng trên GMV
-  hostAdvance   Int      @default(0) // tạm ứng theo GMV sóng
-  hostSettled   Int      @default(0) // quyết toán theo GMV ròng (GỘP, trước khấu trừ TNCN)
-  hostPit       Int      @default(0) // v3.27: TNCN khấu trừ tại nguồn từ công host (freelancer)
-  settledDate   String? // v3.33: ngày tiền sàn THỰC VỀ ví (Shopee ~ngày 4, có hoàn tới ngày 15) — ghi phiếu thu
-  note          String?
-  createdAt     DateTime @default(now())
+  hostPayBase    Int      @default(0) // lương cứng ca
+  hostPayRate    Float    @default(0) // % hoa hồng trên GMV
+  hostAdvance    Int      @default(0) // tạm ứng theo GMV sóng
+  hostSettled    Int      @default(0) // quyết toán theo GMV ròng (GỘP, trước khấu trừ TNCN)
+  hostPit        Int      @default(0) // v3.27: TNCN khấu trừ tại nguồn từ công host (freelancer)
+  settledDate    String? // v3.33: ngày tiền sàn THỰC VỀ ví (Shopee ~ngày 4, có hoàn tới ngày 15) — ghi phiếu thu
+  note           String?
+  createdAt      DateTime @default(now())
 
   @@index([date])
+  @@index([date, scheduleStatus])
+  @@index([date, studio])
   @@index([status])
   @@index([hostId])
 }

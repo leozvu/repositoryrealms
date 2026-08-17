@@ -5,14 +5,15 @@ import { useSession } from 'next-auth/react';
 import { useResource, useServiceLines, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
 import { DocLinksModal } from '@/components/DocLinks';
 import { moneyShort, fmtDate, todayISO, BADGE } from '@/lib/format';
-import { hasAny } from '@/lib/perm';
+import { hasAny, isDirector } from '@/lib/perm';
 import styles from './projects-execution-list.module.css';
 
 const HEALTH = { green: ['Ổn định', 'green'], amber: ['Cần chú ý', 'amber'], red: ['Rủi ro', 'red'] };
 
 export default function ProjectsPage() {
   const { data: session } = useSession();
-  const isMgmt = hasAny(session?.user, ['PM']); // Dự án: PM + Giám đốc
+  const isMgmt = hasAny(session?.user, ['PM', 'LEAD']); // Dự án: PM, Trưởng nhóm + Giám đốc
+  const canDeleteProject = isDirector(session?.user);
   const { rows, create, update, remove } = useResource('projects');
   const clients = useResource('clients');
   const templates = useResource('projecttemplates');
@@ -108,7 +109,7 @@ export default function ProjectsPage() {
                     <td><div className="row-actions">
                       <button className={`icon-btn ${styles.projectAction}`} title="Tài liệu (Drive/Notion…)" onClick={() => setModal({ mode: 'docs', row: p })} aria-label={`Mở tài liệu của ${p.name}`}><Icon name="link" size={16} /></button>
                       <button className={`icon-btn ${styles.projectAction}`} onClick={() => setModal({ mode: 'edit', row: p })} aria-label={`Sửa ${p.name}`}><Icon name="edit" size={16} /></button>
-                      <button className={`icon-btn danger ${styles.projectAction}`} onClick={() => setModal({ mode: 'del', row: p })} aria-label={`Xóa ${p.name}`}><Icon name="trash" size={16} /></button>
+                      {canDeleteProject && <button className={`icon-btn danger ${styles.projectAction}`} onClick={() => setModal({ mode: 'del', row: p })} aria-label={`Xóa ${p.name}`}><Icon name="trash" size={16} /></button>}
                     </div></td>
                   )}
                 </tr>
@@ -132,7 +133,7 @@ export default function ProjectsPage() {
       {modal?.mode === 'edit' && <FormModal title="Sửa dự án" fields={FIELDS} data={{ ...modal.row, autoProgress: modal.row.autoProgress ? '1' : '' }}
         onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, norm(d)); toast('Đã cập nhật'); loadStats(); }} />}
       {modal?.mode === 'docs' && <DocLinksModal refType="project" refId={modal.row.id} name={modal.row.name} onClose={() => setModal(null)} />}
-      {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa dự án "${modal.row.name}"? Công việc thuộc dự án cần được xóa/chuyển trước.`}
+      {canDeleteProject && modal?.mode === 'del' && <ConfirmDialog msg={`Xóa dự án "${modal.row.name}"? Công việc thuộc dự án cần được xóa/chuyển trước.`}
         onClose={() => setModal(null)} onYes={async () => { const r = await remove(modal.row.id); if (r) toast('Đã xóa'); }} />}
     </>
   );

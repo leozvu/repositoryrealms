@@ -11,7 +11,7 @@ const COPY = {
   vi: {
     eyebrow: 'CEO-8 · SECURITY, CHAOS & RECOVERY',
     title: 'Hầm an toàn CEO Portal',
-    intro: 'Kiểm soát quyền tối thiểu, circuit breaker và khôi phục riêng cho Portal. Mọi thao tác tại đây không thay đổi dữ liệu nghiệp vụ của bốn công ty.',
+    intro: 'Kiểm soát quyền tối thiểu, circuit breaker và khôi phục riêng cho Portal. Mọi thao tác tại đây không thay đổi dữ liệu nghiệp vụ của ba công ty.',
     refresh: 'Tải lại posture', loading: 'Đang kiểm tra posture bảo mật…', loadError: 'Không thể tải trạng thái CEO Security.',
     control: 'Control plane', local: 'Đăng nhập ERP cục bộ', credentials: 'Service credentials', recovery: 'Khôi phục',
     active: 'Đang hoạt động', suspended: 'Đã tạm khóa', preserved: 'Được giữ nguyên', unavailable: 'Chưa sẵn sàng',
@@ -33,7 +33,7 @@ const COPY = {
   en: {
     eyebrow: 'CEO-8 · SECURITY, CHAOS & RECOVERY',
     title: 'CEO Portal security vault',
-    intro: 'Least-privilege access, circuit breakers, and Portal-only recovery. Nothing here changes business data owned by the four companies.',
+    intro: 'Least-privilege access, circuit breakers, and Portal-only recovery. Nothing here changes business data owned by the three companies.',
     refresh: 'Refresh posture', loading: 'Checking security posture…', loadError: 'Unable to load CEO Security posture.',
     control: 'Control plane', local: 'Local ERP login', credentials: 'Service credentials', recovery: 'Recovery',
     active: 'Active', suspended: 'Suspended', preserved: 'Preserved', unavailable: 'Unavailable',

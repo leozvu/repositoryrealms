@@ -15,10 +15,9 @@ const generatedAt = '2026-07-29T15:00:00.000Z';
 
 const registry = {
   entities: [
-    { id: 'egoric-agency', displayName: 'Egoric Agency', enabled: true },
+    { id: 'egoric', displayName: 'Egoric Agency · Egolive', enabled: true },
     { id: 'aim-agency', displayName: 'AIM Agency', enabled: true },
     { id: 'vnecom-llc', displayName: 'VNECOM LLC', enabled: true },
-    { id: 'egolive', displayName: 'Egolive', enabled: true },
   ],
 };
 
