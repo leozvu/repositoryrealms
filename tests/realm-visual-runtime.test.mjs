@@ -31,6 +31,8 @@ test('runtime art pack is a bounded WebP bundle rather than loading preproductio
     totalBytes += bytes.length;
   }
   assert.ok(totalBytes < 1_500_000, `runtime art pack is ${totalBytes} bytes`);
+  assert.match(REALM_RUNTIME_ASSET_URLS.scenePlate, /guildhall-unified-plate\.webp$/);
+  assert.equal('materials' in REALM_RUNTIME_ASSET_URLS, false);
 });
 
 test('runtime character sheets are isolated copies and stay within the mobile transfer budget', () => {
@@ -66,10 +68,9 @@ test('all eight canonical business objects own a distinct visual and environment
   }
 });
 
-test('foreground scene nodes provide doorway and prop occlusion without duplicate identities', () => {
-  assert.ok(REALM_OCCLUDER_NODES.length >= 12);
+test('local foreground nodes stay sparse because large occlusion comes from the unified plate', () => {
+  assert.ok(REALM_OCCLUDER_NODES.length > 0 && REALM_OCCLUDER_NODES.length <= 4);
   assert.equal(new Set(REALM_OCCLUDER_NODES.map((node) => node.id)).size, REALM_OCCLUDER_NODES.length);
-  assert.ok(REALM_OCCLUDER_NODES.filter((node) => node.id.startsWith('arch-')).length >= 7);
   assert.ok(REALM_OCCLUDER_NODES.some((node) => node.highDetail));
 });
 
@@ -91,7 +92,8 @@ test('live component consumes the runtime scene graph without replacing fixed-st
   assert.match(source, /data-realm-depth="2\.5d"/);
   assert.match(source, /data-realm-art-ready/);
   assert.match(source, /drawObjectVisual/);
-  assert.match(source, /drawOccluder/);
+  assert.match(source, /drawArchitectureOcclusion/);
+  assert.match(source, /art\.scenePlate/);
   assert.match(source, /realmObjectFacing/);
   assert.match(source, /drawForgedActorSkin/);
   assert.match(source, /removeWhiteMatte/);

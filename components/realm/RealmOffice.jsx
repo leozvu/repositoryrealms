@@ -1155,6 +1155,12 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const [activePanel, setActivePanel] = useState('briefing');
   const [surfaceOpen, setSurfaceOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
+
+  useEffect(() => {
+    if (surfaceOpen && mode === 'world') document.documentElement.dataset.realmWorkspaceOpen = 'true';
+    else delete document.documentElement.dataset.realmWorkspaceOpen;
+    return () => { delete document.documentElement.dataset.realmWorkspaceOpen; };
+  }, [mode, surfaceOpen]);
   const [ledgerView, setLedgerView] = useState('personal');
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [profile, setProfile] = useState(initialProfile);
@@ -1732,7 +1738,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   }, [businessBridge, tavernEnabled, toast]);
 
   const openObject = useCallback((object) => {
-    openAuthorizedPanel(object.panel, { announce: `Đã mở ${object.name}` });
+    openAuthorizedPanel(object.panel);
   }, [openAuthorizedPanel]);
 
   const moveToObject = (panel) => {
@@ -2647,6 +2653,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
       ref={realmShellRef}
       className={`${styles.realmShell} ${guild.shell} ${mode === 'ledger' ? styles.ledgerShell : ''}`}
       data-realm-ui-art={uiArtState}
+      data-realm-ui-mode={mode === 'ledger' ? 'ledger' : surfaceOpen ? 'workspace' : voiceOpen ? 'voice' : 'explore'}
       style={UI_ART_REQUESTED ? GENERATED_UI_ART_STYLE : undefined}
     >
       <LivingGuildhallMotion scopeRef={realmShellRef} mode={mode} />
@@ -2696,6 +2703,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
           {usesWorldV3 ? (
             <RealmWorldV3
               activePanel={activePanel}
+              workspaceOpen={surfaceOpen}
               playerStatus={playerStatus}
               playerProfile={profile}
               position={position}
@@ -2729,7 +2737,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
             />
           )}
 
-          {voiceOpen && (
+          {voiceOpen && !surfaceOpen && (
             <div className={guild.voiceTray}>
               <div className={guild.voiceTrayHeader}>
                 <div><span>Council Voice</span><strong>Cuộc gọi theo không gian</strong></div>
@@ -2757,7 +2765,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
             </div>
           )}
 
-          <nav className={guild.actionDock} aria-label="Hành động chính trong Guildhall" data-living-motion="action-dock">
+          {!surfaceOpen && <nav className={guild.actionDock} aria-label="Hành động chính trong Guildhall" data-living-motion="action-dock">
             <div className={guild.dockPrompt}>
               {nextQuest ? <strong data-no-i18n data-realm-next-quest>{nextQuest.title}</strong> : <strong>{t('Guildhall đã sẵn sàng')}</strong>}
               <small>{nextQuest ? <><span data-no-i18n>{nextQuest.project}</span><span> · {t(nextQuest.due)}</span></> : `${onlineCount} người đang có mặt · ${TRANSPORT[transportState]?.short || 'Solo mode'}`}</small>
@@ -2768,7 +2776,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
               <button type="button" className={guild.dockAction} onClick={() => { setMode('ledger'); setLedgerView('personal'); setSurfaceOpen(false); setVoiceOpen(false); }}><Icon name="wallet" size={21} /><span>Gold</span></button>
               <button type="button" className={guild.dockAction} onClick={() => moveToObject('guild')} aria-label={`${t('Mọi người')}, ${onlineCount} online`}><Icon name="people" size={21} /><span>Mọi người</span></button>
             </div>
-          </nav>
+          </nav>}
 
           {surfaceOpen && (
             <>

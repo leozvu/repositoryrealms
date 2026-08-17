@@ -35,9 +35,10 @@
 
 .locationReadout {
   position: fixed;
-  z-index: 14;
+  z-index: 10;
   top: 94px;
-  right: clamp(20px, 3vw, 44px);
+  right: auto;
+  left: clamp(20px, 3vw, 44px);
   display: flex;
   max-width: min(330px, calc(100vw - 40px));
   align-items: center;
@@ -66,9 +67,10 @@
 
 .worldControls {
   position: fixed;
-  z-index: 28;
+  z-index: 12;
   right: clamp(18px, 2.5vw, 38px);
-  bottom: 116px;
+  top: 94px;
+  bottom: auto;
   display: flex;
   gap: 5px;
   padding: 4px;
@@ -102,11 +104,12 @@
 .locationMenu,
 .signalMenu {
   position: fixed;
-  z-index: 62;
+  z-index: 20;
   right: clamp(18px, 2.5vw, 38px);
-  bottom: 172px;
+  top: 152px;
+  bottom: auto;
   width: min(340px, calc(100vw - 32px));
-  max-height: min(560px, calc(100dvh - 250px));
+  max-height: min(560px, calc(100dvh - 170px));
   padding: 7px;
   overflow: auto;
   border: 1px solid rgba(226, 208, 162, .17);
@@ -179,7 +182,7 @@
 .actionRibbon,
 .personRibbon {
   position: fixed;
-  z-index: 32;
+  z-index: 14;
   bottom: 118px;
   left: 50%;
   display: grid;
@@ -218,7 +221,8 @@
 .actionRibbon small { color: #c0a35d; font-size: .48rem; font-style: normal; font-weight: 760; letter-spacing: .08em; text-transform: uppercase; }
 .actionRibbon strong { margin-top: 2px; overflow: hidden; color: #f1eadb; font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
 .actionRibbon em { margin-top: 2px; overflow: hidden; color: rgba(239, 232, 215, .45); font-size: .54rem; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
-.actionRibbon > button {
+.actionActions { display: flex; align-items: stretch; gap: 5px; }
+.actionActions > button {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -232,8 +236,12 @@
   font-weight: 760;
   transition: background .2s ease, transform .18s ease;
 }
-.actionRibbon > button:hover { background: #e4c77e; }
-.actionRibbon > button:active { transform: translateY(1px) scale(.985); }
+.actionActions > button:first-child { color: #201a0f; background: #d5b363; box-shadow: inset 0 1px rgba(255, 255, 255, .28); }
+.actionActions > button:not(:first-child) { width: 44px; justify-content: center; padding: 0; color: #d9bf7d; background: rgba(255,255,255,.055); }
+.actionActions > button:first-child:hover { background: #e4c77e; }
+.actionActions > button:not(:first-child):hover { background: rgba(255,255,255,.1); }
+.actionTouch { display: none !important; }
+.actionActions > button:active { transform: translateY(1px) scale(.985); }
 .actionRibbon kbd { display: grid; width: 23px; height: 23px; place-items: center; border: 1px solid rgba(35, 27, 14, .26); border-radius: 5px; background: rgba(255, 255, 255, .2); font-family: var(--font-mono), monospace; font-size: .58rem; }
 
 .personRibbon { border: 1px solid rgba(226, 208, 162, .17); text-align: left; }
@@ -246,7 +254,7 @@
 
 .journey {
   position: fixed;
-  z-index: 35;
+  z-index: 13;
   top: 92px;
   left: 50%;
   display: grid;
@@ -270,7 +278,7 @@
 
 .reward {
   position: fixed;
-  z-index: 72;
+  z-index: 44;
   top: 50%;
   left: 50%;
   display: grid;
@@ -308,7 +316,7 @@
 
 .touchControls {
   position: fixed;
-  z-index: 30;
+  z-index: 12;
   bottom: 113px;
   left: 14px;
   display: none;
@@ -358,7 +366,7 @@
 
 .waygateTransition {
   position: fixed;
-  z-index: 90;
+  z-index: 40;
   inset: 0;
   pointer-events: none;
   opacity: 0;
@@ -383,18 +391,19 @@
 @media (max-width: 760px) {
   .locationReadout { top: 76px; right: 12px; left: 12px; width: fit-content; max-width: calc(100vw - 24px); padding: 6px 8px; }
   .locationReadout small { display: none; }
-  .worldControls { right: 10px; bottom: 105px; }
+  .worldControls { top: auto; right: 8px; bottom: 88px; }
   .locationMenu,
-  .signalMenu { right: 8px; bottom: 158px; max-height: calc(100dvh - 230px); }
+  .signalMenu { top: auto; right: 8px; bottom: 142px; max-height: min(52dvh, 520px); }
   .actionRibbon,
-  .personRibbon { bottom: 202px; width: calc(100vw - 20px); min-height: 66px; padding: 7px 8px; }
+  .personRibbon { bottom: 88px; width: calc(100vw - 20px); min-height: 66px; padding: 7px 8px; }
   .actionRibbon em { display: none; }
-  .actionRibbon > button { min-width: 96px; padding: 0 9px; }
+  .actionActions > button:first-child { min-width: 96px; padding: 0 9px; }
   .journey { top: 132px; min-width: min(310px, calc(100vw - 24px)); }
   .journey em { max-width: 82px; }
   .touchToggle { display: flex !important; }
+  .actionTouch { display: inline-flex !important; }
   .touchToggle span:first-child { display: inline !important; font-size: 1rem; line-height: 1; }
-  .touchControls[data-open='true'] { display: grid; bottom: 103px; }
+  .touchControls[data-open='true'] { display: grid; bottom: 88px; }
   .reward { padding: 13px 14px; }
   .reward > span { width: 46px; height: 46px; }
   .skipArrival { right: 10px; bottom: 98px; }
@@ -404,15 +413,24 @@
   .locationReadout { display: none; }
   .journey { top: 76px; }
   .actionRibbon,
-  .personRibbon { grid-template-columns: auto 1fr; bottom: 198px; }
-  .actionRibbon > button,
+  .personRibbon { grid-template-columns: auto 1fr; bottom: 86px; }
+  .actionActions,
   .personRibbon > svg { grid-column: 1 / -1; width: 100%; justify-content: center; }
+  .actionActions > button:first-child { flex: 1; }
   .actionRibbon { min-height: 112px; }
   .personRibbon { min-height: 74px; }
-  .worldControls { bottom: 101px; }
+  .worldControls { bottom: 86px; }
   .locationMenu,
-  .signalMenu { bottom: 154px; }
+  .signalMenu { right: 6px; bottom: 138px; width: calc(100vw - 12px); }
 }
+
+.stage[data-realm-ui-mode='workspace'] .canvas {
+  filter: brightness(.46) saturate(.72) blur(1.5px);
+  transition: filter .24s ease;
+}
+
+.stage[data-realm-ui-mode='waygate'] .canvas,
+.stage[data-realm-ui-mode='signal'] .canvas { filter: brightness(.72) saturate(.84); }
 
 @media (prefers-reduced-motion: reduce) {
   .stage *,

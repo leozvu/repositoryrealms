@@ -325,6 +325,7 @@ td .cell-sub{font-size:.75rem;color:var(--muted);display:block}
 
 /* ============ Toast ============ */
 #toast-root{position:fixed;bottom:22px;right:22px;z-index:200;display:flex;flex-direction:column;gap:9px}
+:root[data-realm-workspace-open='true'] #toast-root{top:auto;right:auto;bottom:24px;left:72px;width:min(420px,calc(100vw - 96px))}
 .toast{background:#0F172A;color:#fff;padding:11px 17px;border-radius:10px;font-size:.85rem;font-weight:500;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:9px;animation:slideUp .2s ease}
 .toast svg{width:17px;height:17px}
 .toast.success svg{color:#34D399}
@@ -946,6 +947,7 @@ kbd{padding:3px 5px;border:1px solid var(--border);border-radius:4px;background:
   .mobile-workspace-nav a[data-active]{color:var(--primary)}
   .mobile-workspace-nav a span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #toast-root{bottom:84px;right:12px;left:12px}.toast{width:100%}
+  :root[data-realm-workspace-open='true'] #toast-root{top:auto;right:10px;bottom:12px;left:10px;width:auto}
 }
 
 @media screen and (max-width:768px){

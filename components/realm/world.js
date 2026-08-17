@@ -1,37 +1,40 @@
 import { REALM_TREASURY_CATALOG } from '@/lib/realm-treasury';
 
-// The Realm is deliberately larger than the viewport. Camera follow and the
-// minimap keep navigation legible while each business room gets enough space
-// for people, functional objects and generated environment props.
-export const WORLD = { cols: 58, rows: 36, tile: 32 };
+// One continuous Guildhall replaces the former six-room tile collage. The
+// aspect ratio intentionally matches the graduated 1536x1024 environment plate
+// after the 2.5D Y projection, so actors, landmarks and architecture share one
+// camera and one perspective.
+export const WORLD = { cols: 48, rows: 44, tile: 32 };
 
-export const DEFAULT_WORLD_POSITION = Object.freeze({ x: 29, y: 30.5 });
+export const DEFAULT_WORLD_POSITION = Object.freeze({ x: 24, y: 36.5 });
 
+// These are semantic work zones, not separately rendered rooms. They preserve
+// room/presence semantics while the presentation remains one coherent hall.
 export const ROOMS = [
-  { id: 'guild', name: 'Guild Hall', subtitle: 'Nhân sự & đội nhóm', x: 1, y: 1, w: 17, h: 15, floor: '#2d4a3d' },
-  { id: 'war', name: 'War Room', subtitle: 'Dự án & chiến dịch', x: 19, y: 1, w: 20, h: 15, floor: '#3d3a48' },
-  { id: 'treasury', name: 'Royal Treasury', subtitle: 'Gold & tài chính', x: 40, y: 1, w: 17, h: 15, floor: '#4b3c2a' },
-  { id: 'tavern', name: 'The Lantern Tavern', subtitle: 'Chat & gặp gỡ', x: 1, y: 17, w: 17, h: 18, floor: '#49362f' },
-  { id: 'hall', name: 'Great Hall', subtitle: 'Quest Board', x: 19, y: 17, w: 20, h: 18, floor: '#33443d' },
-  { id: 'forge', name: 'Arcane Forge', subtitle: 'Shop & tự động hóa', x: 40, y: 17, w: 17, h: 18, floor: '#44333b' },
+  { id: 'guild', name: 'Guild Registry', subtitle: 'Nhân sự & đội nhóm', x: 3, y: 5, w: 14, h: 12, floor: '#26362f' },
+  { id: 'war', name: 'Command Gallery', subtitle: 'Dự án & chiến dịch', x: 17, y: 2, w: 14, h: 13, floor: '#302d35' },
+  { id: 'treasury', name: 'Royal Treasury', subtitle: 'Gold & tài chính', x: 31, y: 5, w: 14, h: 12, floor: '#3b3124' },
+  { id: 'tavern', name: 'The Lantern Commons', subtitle: 'Chat & gặp gỡ', x: 3, y: 18, w: 14, h: 16, floor: '#3a2e29' },
+  { id: 'hall', name: 'Great Hall', subtitle: 'Điều phối công việc', x: 17, y: 14, w: 14, h: 29, floor: '#293832' },
+  { id: 'forge', name: 'Guild Forge', subtitle: 'Shop & tự động hóa', x: 31, y: 18, w: 14, h: 16, floor: '#382d30' },
 ];
 
 export const PRIVATE_ZONES = [
-  { id: 'guild-pod', name: 'Bàn Guild', x: 4, y: 4, w: 10, h: 6 },
-  { id: 'war-council', name: 'Hội đồng Chiến dịch', x: 23, y: 4, w: 12, h: 6 },
-  { id: 'treasury-audit', name: 'Phòng Đối soát', x: 43, y: 4, w: 10, h: 6 },
-  { id: 'tavern-booth', name: 'Bàn riêng Tavern', x: 4, y: 22, w: 10, h: 8 },
+  { id: 'guild-pod', name: 'Bàn Guild', x: 6, y: 8, w: 9, h: 6 },
+  { id: 'war-council', name: 'Hội đồng Chiến dịch', x: 19, y: 16, w: 10, h: 8 },
+  { id: 'treasury-audit', name: 'Phòng Đối soát', x: 34, y: 8, w: 8, h: 6 },
+  { id: 'tavern-booth', name: 'Bàn riêng Tavern', x: 33, y: 25, w: 9, h: 7 },
 ];
 
 export const WORLD_OBJECTS = [
-  { id: 'command-dais', panel: 'command', name: 'Phòng điều hành', hint: 'Mở ưu tiên và quyết định vận hành', kind: 'command', x: 29, y: 4.5 },
-  { id: 'guild-roster', panel: 'guild', name: 'Sổ bộ Guild', hint: 'Mở hồ sơ nhân sự', kind: 'roster', x: 9, y: 8 },
-  { id: 'war-table', panel: 'campaigns', name: 'Bàn chiến dịch', hint: 'Mở dự án và tiến độ', kind: 'table', x: 29, y: 8 },
-  { id: 'treasury-chest', panel: 'treasury', name: 'Rương Hoàng gia', hint: 'Mở ví Gold và sổ cái', kind: 'chest', x: 48.5, y: 8 },
-  { id: 'tavern-board', panel: 'chat', name: 'Bảng Tavern', hint: 'Mở chat khu vực', kind: 'tavern', x: 9, y: 26 },
-  { id: 'quest-board', panel: 'quests', name: 'Quest Board', hint: 'Xem nhiệm vụ hôm nay', kind: 'board', x: 29, y: 23 },
-  { id: 'realm-gate', panel: 'briefing', name: 'Cổng Realm', hint: 'Mở tổng quan ngày làm việc', kind: 'portal', x: 29, y: 32.5 },
-  { id: 'arcane-forge', panel: 'shop', name: 'Arcane Forge', hint: 'Đổi Gold lấy vật phẩm', kind: 'forge', x: 48.5, y: 26 },
+  { id: 'command-dais', panel: 'command', name: 'Phòng điều hành', hint: 'Mở ưu tiên và quyết định vận hành', kind: 'command', x: 24, y: 8 },
+  { id: 'guild-roster', panel: 'guild', name: 'Sổ bộ Guild', hint: 'Mở hồ sơ nhân sự', kind: 'roster', x: 10, y: 11.5 },
+  { id: 'war-table', panel: 'campaigns', name: 'Bàn chiến dịch', hint: 'Mở dự án và tiến độ', kind: 'table', x: 24, y: 20.5 },
+  { id: 'treasury-chest', panel: 'treasury', name: 'Rương Hoàng gia', hint: 'Mở ví Gold và sổ cái', kind: 'chest', x: 38, y: 11.5 },
+  { id: 'tavern-board', panel: 'chat', name: 'Bảng Tavern', hint: 'Mở chat khu vực', kind: 'tavern', x: 38, y: 29 },
+  { id: 'quest-board', panel: 'quests', name: 'Quest Board', hint: 'Xem nhiệm vụ hôm nay', kind: 'board', x: 38, y: 21.5 },
+  { id: 'realm-gate', panel: 'briefing', name: 'Cổng Realm', hint: 'Mở tổng quan ngày làm việc', kind: 'portal', x: 24, y: 33.6 },
+  { id: 'arcane-forge', panel: 'shop', name: 'Arcane Forge', hint: 'Đổi Gold lấy vật phẩm', kind: 'forge', x: 10, y: 29 },
 ];
 
 // Không dựng NPC giả. Bản đồ chỉ hiển thị nhân sự thật từ ERP directory
@@ -80,14 +83,18 @@ export function makeWallSet() {
     add(WORLD.cols - 1, y);
   }
 
-  for (const x of [18, 39]) {
-    for (let y = 1; y < WORLD.rows - 1; y += 1) {
-      if (![7, 8, 25, 26].includes(y)) add(x, y);
+  // Match the octagonal shell and the narrow southern gate of the art plate.
+  // Internal business zones stay connected; architecture never creates six
+  // isolated boxes again.
+  for (let y = 1; y < WORLD.rows - 1; y += 1) {
+    let minX = 2;
+    let maxX = WORLD.cols - 3;
+    if (y < 5) { minX = 11 - y; maxX = WORLD.cols - minX - 1; }
+    else if (y < 9) { minX = 6 - Math.floor((y - 5) / 2); maxX = WORLD.cols - minX - 1; }
+    else if (y >= 37) { minX = 20; maxX = 27; }
+    for (let x = 1; x < WORLD.cols - 1; x += 1) {
+      if (x < minX || x > maxX) add(x, y);
     }
-  }
-
-  for (let x = 1; x < WORLD.cols - 1; x += 1) {
-    if (![8, 9, 28, 29, 48, 49].includes(x)) add(x, 16);
   }
 
   return walls;

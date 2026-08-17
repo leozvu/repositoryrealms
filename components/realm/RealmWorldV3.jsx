@@ -20,9 +20,7 @@ import {
 } from '@/lib/realm-world-v3';
 import {
   REALM_CHARACTER_ATLAS_ROWS,
-  REALM_OCCLUDER_NODES,
   REALM_OBJECT_VISUALS,
-  REALM_ROOM_MATERIAL_FRAMES,
   REALM_RUNTIME_ASSET_URLS,
   REALM_RUNTIME_CHARACTER_URLS,
   REALM_WORLD_Y_SCALE,
@@ -106,17 +104,12 @@ const STATIC_FURNITURE = Object.freeze([
 ]);
 
 const TORCHES = Object.freeze([
-  [2.2, 16.45], [15.8, 16.45], [20.2, 16.45], [37.8, 16.45], [41.2, 16.45], [55.8, 16.45],
-  [18.48, 2.5], [18.48, 14.3], [18.48, 18.7], [18.48, 33.3],
-  [39.48, 2.5], [39.48, 14.3], [39.48, 18.7], [39.48, 33.3],
+  [24, 7.2], [10, 10.8], [38, 10.8], [24, 20], [10, 28.6], [38, 28.6], [24, 36.2],
 ]);
 
 const DEMO_ACTORS = Object.freeze([
-  Object.freeze({ id: 'demo-elf', name: 'Lyra · Elf Steward · demo', role: 'Elf · Guild Steward', status: 'available', x: 26.5, y: 26.5, waypoints: [[26.5, 26.5], [32.5, 26.5], [32.5, 30.5], [26.5, 30.5]] }),
-  Object.freeze({ id: 'demo-dwarf', name: 'Brom · Dwarf Engineer · demo', role: 'Dwarf · Forge Engineer', status: 'busy', x: 45.5, y: 27.5, waypoints: [[45.5, 27.5], [51.5, 27.5], [51.5, 31.2], [45.5, 31.2]] }),
-  Object.freeze({ id: 'demo-orc', name: 'Kael · Half-Orc Warden · demo', role: 'Half-Orc · Project Warden', status: 'focus', x: 25.5, y: 9.5, waypoints: [[25.5, 9.5], [32.5, 9.5], [32.5, 12.5], [25.5, 12.5]] }),
-  Object.freeze({ id: 'demo-tiefling', name: 'Vexa · Tiefling Archivist · demo', role: 'Tiefling · Archivist', status: 'away', x: 6.5, y: 8.5, waypoints: [[6.5, 8.5], [13.5, 8.5], [13.5, 12.5], [6.5, 12.5]] }),
-  Object.freeze({ id: 'demo-human', name: 'Eira · Human Goldkeeper · demo', role: 'Human · Goldkeeper', status: 'available', x: 47.5, y: 8.5, waypoints: [[47.5, 8.5], [52.5, 8.5], [52.5, 12.3], [47.5, 12.3]] }),
+  Object.freeze({ id: 'demo-elf', name: 'Lyra · Elf Steward · demo', role: 'Elf · Guild Steward', status: 'available', x: 12.5, y: 17.5, waypoints: [[12.5, 17.5], [18, 18.5], [16.5, 23.5], [11.5, 22]] }),
+  Object.freeze({ id: 'demo-dwarf', name: 'Brom · Dwarf Engineer · demo', role: 'Dwarf · Forge Engineer', status: 'busy', x: 9, y: 25, waypoints: [[9, 25], [14, 25.5], [14, 31.5], [9, 31]] }),
 ]);
 
 const STATUS_COLORS = Object.freeze({ available: '#7cc39b', busy: '#d6a455', focus: '#aa9bd6', dnd: '#cf7278', away: '#87948d' });
@@ -291,7 +284,7 @@ function drawStaticFloor(ctx, room, tile, materialPatterns) {
   ctx.fillStyle = theme.floor;
   ctx.fillRect(x, y, width, height);
 
-  const materialFrame = REALM_ROOM_MATERIAL_FRAMES[room.id] ?? 0;
+  const materialFrame = 0;
   if (materialPatterns?.[materialFrame]) {
     ctx.save();
     ctx.globalAlpha = room.id === 'tavern' || room.id === 'forge' ? .62 : .48;
@@ -488,21 +481,53 @@ function buildStaticWorld(tile, art) {
   canvas.width = WORLD.cols * tile;
   canvas.height = Math.ceil(WORLD.rows * tile * REALM_WORLD_Y_SCALE + tile * .5);
   const ctx = canvas.getContext('2d');
-  const materialPatterns = buildMaterialPatterns(ctx, art?.materials, tile);
   ctx.fillStyle = '#080e0c';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  for (const room of ROOMS) drawStaticFloor(ctx, room, tile, materialPatterns);
-  for (let y = 0; y < WORLD.rows; y += 1) {
-    for (let x = 0; x < WORLD.cols; x += 1) if (WALLS.has(`${x},${y}`)) drawStaticWall(ctx, x, y, tile, materialPatterns?.[1]);
+  if (art?.scenePlate) {
+    ctx.drawImage(art.scenePlate, 0, 0, canvas.width, WORLD.rows * tile * REALM_WORLD_Y_SCALE);
+    const depth = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    depth.addColorStop(0, 'rgba(4, 8, 10, .08)');
+    depth.addColorStop(.55, 'rgba(8, 12, 10, 0)');
+    depth.addColorStop(1, 'rgba(2, 5, 4, .22)');
+    ctx.fillStyle = depth;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else {
+    for (const room of ROOMS) drawStaticFloor(ctx, room, tile, null);
   }
-  for (const zone of PRIVATE_ZONES) {
-    ctx.strokeStyle = 'rgba(224, 188, 98, .24)';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([tile * .22, tile * .15]);
-    ctx.strokeRect(zone.x * tile, projectRealmY(zone.y, tile), zone.w * tile, zone.h * tile * REALM_WORLD_Y_SCALE);
-  }
-  ctx.setLineDash([]);
   return canvas;
+}
+
+function drawPlateSlice(ctx, image, tile, x, y, width, height, alpha = 1) {
+  const imageWidth = image?.naturalWidth || image?.width;
+  const imageHeight = image?.naturalHeight || image?.height;
+  if (!imageWidth || !imageHeight) return;
+  const sourceX = x / WORLD.cols * imageWidth;
+  const sourceY = y / WORLD.rows * imageHeight;
+  const sourceWidth = width / WORLD.cols * imageWidth;
+  const sourceHeight = height / WORLD.rows * imageHeight;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(
+    image,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    x * tile,
+    projectRealmY(y, tile),
+    width * tile,
+    height * tile * REALM_WORLD_Y_SCALE,
+  );
+  ctx.restore();
+}
+
+function drawArchitectureOcclusion(ctx, art, tile) {
+  if (!art?.scenePlate) return;
+  // Re-sampling the same plate keeps material, light and perspective exact.
+  // These slices sit in front of actors to create real architectural depth.
+  drawPlateSlice(ctx, art.scenePlate, tile, 13.2, 12.4, 21.6, 5.8, .99);
+  drawPlateSlice(ctx, art.scenePlate, tile, 0, 33.8, 20.2, 10.2, 1);
+  drawPlateSlice(ctx, art.scenePlate, tile, 27.8, 33.8, 20.2, 10.2, 1);
 }
 
 function buildTorchLight(tile) {
@@ -524,10 +549,8 @@ function drawTorch(ctx, x, y, tile, time, quality, lightSprite) {
   const flicker = .88 + Math.sin(time * .012 + x * 1.7) * .1 + Math.sin(time * .027 + y) * .05;
   ctx.save();
   ctx.translate(x * tile, projectRealmY(y, tile));
-  ctx.fillStyle = '#60452b';
-  ctx.fillRect(-tile * .045, -tile * .1, tile * .09, tile * .35);
   if (lightSprite) {
-    ctx.globalAlpha = flicker;
+    ctx.globalAlpha = flicker * .68;
     ctx.globalCompositeOperation = 'screen';
     ctx.drawImage(lightSprite, -lightSprite.width / 2, -lightSprite.height / 2 - tile * .15);
     ctx.globalCompositeOperation = 'source-over';
@@ -980,7 +1003,7 @@ function drawActor(ctx, actor, tile, time, options = {}) {
   const facing = interactionStrength ? realmObjectFacing(actor, interaction.object) : motion.facing;
   const [faceX, faceY] = facingVector(facing);
   const side = Math.abs(faceX) > .4 ? Math.sign(faceX) : 1;
-  const scale = race.scale * (options.player ? 1.07 : 1);
+  const scale = race.scale * (options.player ? .96 : .88);
   const base = tile * scale;
   const x = actor.x * tile;
   const y = projectRealmY(actor.y, tile);
@@ -1280,20 +1303,23 @@ function drawActor(ctx, actor, tile, time, options = {}) {
   const labelY = forgedActor
     ? -base * (race.id === 'dwarf' ? 1.65 : race.id === 'tiefling' ? 1.95 : 1.82)
     : headY - headRadius * (race.id === 'tiefling' ? 2.05 : 1.35);
-  ctx.fillStyle = 'rgba(5, 10, 8, .86)';
-  roundRect(ctx, -textWidth / 2 - 12, labelY - 10, textWidth + 24, 20, 5);
-  ctx.fill();
-  ctx.strokeStyle = options.player ? 'rgba(225, 189, 104, .5)' : 'rgba(224, 213, 183, .16)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.fillStyle = '#f4eee0';
+  const showLabel = options.player || options.voice || Boolean(emote);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(label, 0, labelY);
-  ctx.fillStyle = status;
-  ctx.beginPath();
-  ctx.arc(textWidth / 2 + 7, labelY, 3.2, 0, Math.PI * 2);
-  ctx.fill();
+  if (showLabel) {
+    ctx.fillStyle = 'rgba(5, 10, 8, .8)';
+    roundRect(ctx, -textWidth / 2 - 10, labelY - 9, textWidth + 20, 18, 5);
+    ctx.fill();
+    ctx.strokeStyle = options.player ? 'rgba(225, 189, 104, .44)' : 'rgba(224, 213, 183, .14)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#f4eee0';
+    ctx.fillText(label, 0, labelY);
+    ctx.fillStyle = status;
+    ctx.beginPath();
+    ctx.arc(textWidth / 2 + 6, labelY, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   if (emote) {
     const bubbleY = labelY - 24 - Math.sin(time * .008) * 2;
@@ -1418,6 +1444,7 @@ function createAudioEngine() {
 
 export default function RealmWorldV3({
   activePanel,
+  workspaceOpen = false,
   playerStatus,
   playerProfile,
   position,
@@ -1482,6 +1509,15 @@ export default function RealmWorldV3({
   const [quality, setQuality] = useState(() => ({ id: 'medium', dpr: 1, particles: 28, lights: 10, ambientActors: 2 }));
   const [metrics, setMetrics] = useState({ fps: 0, p95: 0, renderP95: 0 });
   const [debug, setDebug] = useState(false);
+
+  useEffect(() => {
+    if (!workspaceOpen) return;
+    setLocationOpen(false);
+    setSignalOpen(false);
+    setTouchOpen(false);
+    setJourney(null);
+    keysRef.current.clear();
+  }, [workspaceOpen]);
 
   useEffect(() => {
     let active = true;
@@ -1920,22 +1956,21 @@ export default function RealmWorldV3({
         player: true,
       }];
       const sceneNodes = [
-        ...STATIC_FURNITURE.map((value) => ({ type: 'furniture', y: value.y, value })),
-        ...AMBIENT_PROPS.map((value) => ({ type: 'ambient', y: value.y, value })),
         ...WORLD_OBJECTS.map((value) => ({ type: 'object', y: value.y, value })),
         ...actors.map((value) => ({ type: 'actor', y: value.y, value })),
-        ...REALM_OCCLUDER_NODES
-          .filter((value) => quality.id !== 'low' || !value.highDetail)
-          .map((value) => ({ type: 'occluder', y: value.y, value })),
       ].sort((a, b) => {
-        const priority = { ambient: 0, furniture: 1, object: 2, actor: 3, occluder: 4 };
+        const priority = { object: 1, actor: 2 };
         return a.y - b.y || priority[a.type] - priority[b.type];
       });
       for (const node of sceneNodes) {
-        if (node.type === 'furniture') drawStaticFurniture(ctx, node.value, tile);
-        else if (node.type === 'ambient') drawAmbientProp(ctx, node.value, tile, now, reducedMotion);
-        else if (node.type === 'occluder') drawOccluder(ctx, node.value, tile, artRef.current);
-        else if (node.type === 'object') {
+        const screenX = offsetX + node.value.x * tile;
+        const screenY = offsetY + projectRealmY(node.value.y, tile);
+        const edgeDistance = Math.min(screenX, width - screenX, screenY, height - screenY);
+        const edgeAlpha = clamp((edgeDistance + 28) / 96, 0, 1);
+        if (edgeAlpha <= .02) continue;
+        ctx.save();
+        ctx.globalAlpha *= edgeAlpha;
+        if (node.type === 'object') {
           const object = node.value;
           drawObjectVisual(ctx, object, tile, now, {
             nearby: nearbyObject?.id === object.id,
@@ -1950,7 +1985,7 @@ export default function RealmWorldV3({
           drawActor(ctx, actor, tile, now, {
             player: actor.player,
             emote,
-            voice: !actor.player && nearbyPerson?.realmIdentity === actor.realmIdentity,
+            voice: Boolean(!actor.player && actor.realmIdentity && nearbyPerson?.realmIdentity === actor.realmIdentity),
             rewarded: actor.player && runtime.rewardedUntil > now,
             compactLabel: quality.id === 'low',
             reducedMotion,
@@ -1958,8 +1993,10 @@ export default function RealmWorldV3({
             art: artRef.current,
           });
         }
+        ctx.restore();
       }
       drawParticles(ctx, runtime.effects, tile);
+      drawArchitectureOcclusion(ctx, artRef.current, tile);
       ctx.restore();
       if (screenLayerRef.current.canvas) ctx.drawImage(screenLayerRef.current.canvas, 0, 0, width, height);
     };
@@ -2080,12 +2117,14 @@ export default function RealmWorldV3({
       data-realm-quality={quality.id}
       data-realm-depth="2.5d"
       data-realm-art-ready={artReady ? 'true' : 'false'}
+      data-realm-ui-mode={workspaceOpen ? 'workspace' : locationOpen ? 'waygate' : signalOpen ? 'signal' : touchOpen ? 'controls' : 'explore'}
     >
       <canvas
         ref={canvasRef}
         className={worldStyles.canvas}
         role="img"
-        tabIndex={0}
+        tabIndex={workspaceOpen ? -1 : 0}
+        aria-hidden={workspaceOpen || undefined}
         aria-label={t('Guildhall nhiều lớp. Dùng WASD, phím mũi tên hoặc nhấp để di chuyển; đến gần đồ vật và nhấn E để tương tác.')}
         onPointerMove={onPointerMove}
         onPointerLeave={() => { runtimeRef.current.hoveredObject = null; }}
@@ -2094,19 +2133,19 @@ export default function RealmWorldV3({
         data-realm-renderer="canvas2d"
       />
 
-      <div className={worldStyles.locationReadout} aria-live="polite">
+      {!workspaceOpen && <div className={worldStyles.locationReadout} aria-live="polite">
         <i />
         <span><strong>{t(ROOM_COPY[currentRoom.id] || currentRoom.name)}</strong><small>{t('Thế giới trực tiếp · không gian và công việc cùng một ngữ cảnh')}</small></span>
-      </div>
+      </div>}
 
-      <div className={worldStyles.worldControls}>
+      {!workspaceOpen && !focusedObject && <div className={worldStyles.worldControls}>
         <button type="button" className={worldStyles.soundControl} aria-label={t(soundOn ? 'Tắt âm thanh Realm' : 'Bật âm thanh Realm')} aria-pressed={soundOn} onClick={toggleSound}><Icon name={soundOn ? 'bolt' : 'mic'} size={17} /><span>{t(soundOn ? 'Âm thanh bật' : 'Âm thanh')}</span></button>
         <button type="button" aria-label={t('Mở danh sách địa điểm')} aria-expanded={locationOpen} onClick={() => { setLocationOpen((open) => !open); setSignalOpen(false); setTouchOpen(false); }}><Icon name="map" size={17} /><span>{t('Waygate')}</span></button>
         <button type="button" aria-label={t('Ra hiệu')} aria-expanded={signalOpen} onClick={() => { setSignalOpen((open) => !open); setLocationOpen(false); setTouchOpen(false); }}><Icon name="bolt" size={17} /><span>{t('Ra hiệu')}</span></button>
         <button type="button" className={worldStyles.touchToggle} aria-label={t(touchOpen ? 'Đóng điều khiển di chuyển' : 'Mở điều khiển di chuyển')} aria-expanded={touchOpen} onClick={() => { setTouchOpen((open) => !open); setLocationOpen(false); setSignalOpen(false); }}><span aria-hidden="true">✥</span><span>{t('Điều khiển')}</span></button>
-      </div>
+      </div>}
 
-      {locationOpen && (
+      {!workspaceOpen && locationOpen && (
         <div className={worldStyles.locationMenu}>
           <header><span>{t('Mạng Waygate')}</span><strong>{t('Đi thẳng tới nơi làm việc')}</strong><small>{t('Chuyển cảnh ngắn giúp bỏ qua quãng đường mà không mất ngữ cảnh.')}</small></header>
           {WORLD_OBJECTS.map((object) => {
@@ -2116,24 +2155,28 @@ export default function RealmWorldV3({
         </div>
       )}
 
-      {signalOpen && (
+      {!workspaceOpen && signalOpen && (
         <div className={worldStyles.signalMenu}>
           <header><span>{t('Ra hiệu bằng nhân vật')}</span><small>{t('Cử chỉ xuất hiện trên cơ thể, không chỉ là thông báo.')}</small></header>
           {REALM_EMOTES.map((emote) => <button type="button" key={emote.id} aria-label={t(emote.label)} onClick={() => { onEmote(emote.id); setSignalOpen(false); }}><span aria-hidden="true">{emote.mark}</span>{t(emote.label)}</button>)}
         </div>
       )}
 
-      {focusedObject && focusedCopy && (
+      {!workspaceOpen && !locationOpen && !signalOpen && !touchOpen && focusedObject && focusedCopy && (
         <div className={worldStyles.actionRibbon} data-nearby={Boolean(nearbyObject)} role="group" aria-label={`${t(focusedCopy.title)} · ${t(focusedCopy.detail)}`}>
           <span className={worldStyles.actionGlyph} style={{ '--object-accent': focusedCopy.accent }}><Icon name={focusedCopy.icon} size={20} /></span>
           <span><small>{t(nearbyObject ? 'Trong tầm tương tác' : 'Đã chọn')}</small><strong>{t(focusedCopy.title)}</strong><em>{t(focusedCopy.detail)}</em></span>
-          {nearbyObject
-            ? <button type="button" onClick={() => beginInteraction(focusedObject)}><kbd>E</kbd>{t(focusedCopy.verb)}</button>
-            : <button type="button" onClick={() => routeTo(pathToObject(focusedObject), focusedObject)}><Icon name="map" size={16} />{t('Đi tới')}</button>}
+          <span className={worldStyles.actionActions}>
+            {nearbyObject
+              ? <button type="button" onClick={() => beginInteraction(focusedObject)}><kbd>E</kbd>{t(focusedCopy.verb)}</button>
+              : <button type="button" onClick={() => routeTo(pathToObject(focusedObject), focusedObject)}><Icon name="map" size={16} />{t('Đi tới')}</button>}
+            <button type="button" aria-label={t('Mở danh sách địa điểm')} onClick={() => { setLocationOpen(true); setSignalOpen(false); setTouchOpen(false); }}><Icon name="map" size={16} /></button>
+            <button type="button" className={worldStyles.actionTouch} aria-label={t('Mở điều khiển di chuyển')} onClick={() => { setTouchOpen(true); setLocationOpen(false); setSignalOpen(false); }}><span aria-hidden="true">✥</span></button>
+          </span>
         </div>
       )}
 
-      {nearbyPerson && !focusedObject && (
+      {!workspaceOpen && !locationOpen && !signalOpen && !touchOpen && nearbyPerson && !focusedObject && (
         <button type="button" className={worldStyles.personRibbon} onClick={() => onPerson(nearbyPerson)}>
           <span style={{ '--person-status': STATUS_COLORS[nearbyPerson.status] || STATUS_COLORS.available }}>{String(nearbyPerson.name || '?').slice(0, 1)}</span>
           <span><small>{t('Đồng đội trong tầm thoại')}</small><strong data-no-i18n>{nearbyPerson.name}</strong></span>
@@ -2141,7 +2184,7 @@ export default function RealmWorldV3({
         </button>
       )}
 
-      {journey && (
+      {!workspaceOpen && journey && (
         <div className={worldStyles.journey} role="status" aria-live="polite" data-realm-journey data-realm-target={journey.object.id} data-phase={journey.phase}>
           <i style={{ '--journey-accent': OBJECT_COPY[journey.object.id]?.accent }} />
           <span><small>{t(journey.phase === 'traveling' ? 'Đang di chuyển' : journey.phase === 'waygate' ? 'Waygate' : journey.phase === 'succeeded' ? 'Đã kết nối' : 'Đang tương tác')}</small><strong>{t(OBJECT_COPY[journey.object.id]?.title || journey.object.name)}</strong></span>
@@ -2156,7 +2199,7 @@ export default function RealmWorldV3({
         </div>
       )}
 
-      <div className={worldStyles.touchControls} data-open={touchOpen || undefined} aria-label={t('Điều khiển di chuyển')} aria-hidden={!touchOpen}>
+      {!workspaceOpen && <div className={worldStyles.touchControls} data-open={touchOpen || undefined} aria-label={t('Điều khiển di chuyển')} aria-hidden={!touchOpen}>
         {[
           ['w', 'up', 'Đi lên'], ['a', 'left', 'Đi sang trái'], ['s', 'down', 'Đi xuống'], ['d', 'right', 'Đi sang phải'],
         ].map(([key, direction, label]) => (
@@ -2175,7 +2218,7 @@ export default function RealmWorldV3({
           ><span aria-hidden="true">{direction === 'up' ? '↑' : direction === 'down' ? '↓' : direction === 'left' ? '←' : '→'}</span></button>
         ))}
         <span aria-hidden="true" />
-      </div>
+      </div>}
 
       {debug && <output className={worldStyles.debug}>V3 · {quality.id} · {metrics.fps.toFixed(0)} fps · frame {metrics.p95.toFixed(1)} ms · render {metrics.renderP95.toFixed(1)} ms · {people.length} remote</output>}
       {arrival && <button type="button" className={worldStyles.skipArrival} onClick={() => setArrival(false)}>{t('Bỏ qua chuyển cảnh')}</button>}

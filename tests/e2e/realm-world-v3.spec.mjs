@@ -27,7 +27,7 @@ test.afterEach(async ({ page }) => {
   expect(page.__realmIssues || []).toEqual([]);
 });
 
-test('v3 is a live layered world with bounded locomotion and no static environment plate', async ({ page, isMobile }, testInfo) => {
+test('v3 is a live layered world with bounded locomotion over one unified scene plate', async ({ page, isMobile }, testInfo) => {
   const canvas = page.locator('canvas[data-realm-runtime="canvas-2d-fixed-step"]');
   const world = page.locator('[data-realm-world-version="3"]');
   await expect(canvas).toHaveAttribute('data-realm-renderer', 'canvas2d');

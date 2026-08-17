@@ -15,7 +15,7 @@ async function loadWorldModule() {
   return import(`data:text/javascript;base64,${Buffer.from(runnable).toString('base64')}`);
 }
 
-test('expanded Realm is at least twice the former world area and keeps six business rooms', async () => {
+test('unified Realm keeps a large continuous hall with six semantic business zones', async () => {
   const { ROOMS, WORLD } = await loadWorldModule();
   assert.ok(WORLD.cols * WORLD.rows >= 38 * 24 * 2);
   assert.equal(ROOMS.length, 6);
@@ -43,6 +43,6 @@ test('spawn, business objects and staff remain inside walkable rooms', async () 
 test('saved positions are clamped and wall collisions migrate to the safe spawn', async () => {
   const { DEFAULT_WORLD_POSITION, normalizeWorldPosition } = await loadWorldModule();
   assert.deepEqual(normalizeWorldPosition({ x: -10, y: 999 }), DEFAULT_WORLD_POSITION);
-  assert.deepEqual(normalizeWorldPosition({ x: 18, y: 12 }), DEFAULT_WORLD_POSITION);
-  assert.deepEqual(normalizeWorldPosition({ x: 29, y: 23 }), { x: 29, y: 23 });
+  assert.deepEqual(normalizeWorldPosition({ x: 2, y: 2 }), DEFAULT_WORLD_POSITION);
+  assert.deepEqual(normalizeWorldPosition({ x: 24, y: 20.5 }), { x: 24, y: 20.5 });
 });

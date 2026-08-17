@@ -99,7 +99,7 @@ test('quality tier and performance budget keep mobile rendering bounded', () => 
   assert.deepEqual(realmFrameBudget([16, 17, 15, 18]), { average: 16.5, p95: 18, fps: 1000 / 16.5 });
 });
 
-test('v3 component owns continuous world rendering without Remotion or static scene projection', () => {
+test('v3 component owns continuous motion over one unified 2.5D scene plate', () => {
   const source = fs.readFileSync(new URL('../components/realm/RealmWorldV3.jsx', import.meta.url), 'utf8');
   assert.match(source, /data-realm-runtime="canvas-2d-fixed-step"/);
   assert.match(source, /data-realm-depth="2\.5d"/);
@@ -109,7 +109,10 @@ test('v3 component owns continuous world rendering without Remotion or static sc
   assert.match(source, /stepRealmCamera/);
   assert.match(source, /normalizeRealmWorldPeople/);
   assert.match(source, /Canonical receipt đã xác nhận/);
-  for (const race of ['Elf', 'Dwarf', 'Human', 'Half-Orc', 'Tiefling']) assert.match(source, new RegExp(`· ${race} `));
+  assert.match(source, /REALM_CHARACTER_ATLAS_ROWS/);
+  assert.match(source, /drawArchitectureOcclusion/);
+  assert.match(source, /demo-elf/);
+  assert.match(source, /demo-dwarf/);
   assert.doesNotMatch(source, /@remotion\/player/);
   assert.doesNotMatch(source, /guildhall-environment\.png/);
   assert.doesNotMatch(source, /style=\{\{\s*top:/);
