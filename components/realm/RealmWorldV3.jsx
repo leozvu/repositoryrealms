@@ -1609,6 +1609,54 @@ function drawRoute(ctx, route, tile, time) {
   ctx.restore();
 }
 
+function drawCooperationBeacon(ctx, session, tile, time) {
+  if (!session?.anchor) return;
+  const pulse = .5 + Math.sin(time * .0045) * .5;
+  const x = session.anchor.x * tile;
+  const y = projectRealmY(session.anchor.y, tile);
+  ctx.save();
+  ctx.translate(x, y);
+
+  const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, tile * 1.15);
+  glow.addColorStop(0, 'rgba(235, 199, 112, .28)');
+  glow.addColorStop(.45, `rgba(206, 163, 76, ${.12 + pulse * .06})`);
+  glow.addColorStop(1, 'rgba(178, 132, 56, 0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, tile * 1.15, tile * .55, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = `rgba(239, 204, 123, ${.48 + pulse * .28})`;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, tile * (.52 + pulse * .1), tile * (.22 + pulse * .04), 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  const mastHeight = tile * 1.35;
+  ctx.strokeStyle = '#b99150';
+  ctx.lineWidth = Math.max(2, tile * .045);
+  ctx.beginPath();
+  ctx.moveTo(0, -tile * .08);
+  ctx.lineTo(0, -mastHeight);
+  ctx.stroke();
+  ctx.fillStyle = '#c39a4e';
+  ctx.beginPath();
+  ctx.moveTo(0, -mastHeight);
+  ctx.lineTo(tile * .52, -mastHeight + tile * .16);
+  ctx.lineTo(tile * .08, -mastHeight + tile * .46);
+  ctx.lineTo(0, -mastHeight + tile * .4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 231, 169, .58)';
+  ctx.stroke();
+  ctx.fillStyle = '#251c0f';
+  ctx.font = `900 ${Math.max(9, tile * .2)}px "Be Vietnam Pro", system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(String(session.members?.length || 1), tile * .18, -mastHeight + tile * .23);
+  ctx.restore();
+}
+
 function drawMovementDebug(ctx, runtime, actors, tile) {
   ctx.save();
   ctx.lineWidth = 1.25;
@@ -1769,6 +1817,7 @@ export default function RealmWorldV3({
   onEmote,
   wallet = 0,
   demoMode = false,
+  cooperationSession = null,
 }) {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
@@ -2430,6 +2479,7 @@ export default function RealmWorldV3({
           canvasRef.current.dataset.realmRemoteCorrection = runtime.movementMetrics.remoteCorrection.toFixed(3);
           canvasRef.current.dataset.realmNpcMoving = String(runtime.movementMetrics.npcMoving);
           canvasRef.current.dataset.realmPortalWaits = String(runtime.movementMetrics.portalWaits + spatialActors.reduce((sum, item) => sum + (item.portalWaits || 0), 0));
+          canvasRef.current.dataset.realmCooperationSession = cooperationSession?.id || 'none';
           canvasRef.current.dataset.realmActorState = JSON.stringify(spatialActors.map((item) => ({
             id: item.id || item.realmIdentity,
             x: Number(item.x).toFixed(2),
@@ -2482,11 +2532,12 @@ export default function RealmWorldV3({
       }];
       const sceneNodes = [
         ...WORLD_OBJECTS.map((value) => ({ type: 'object', y: value.y, value })),
+        ...(cooperationSession?.anchor ? [{ type: 'beacon', y: cooperationSession.anchor.y, value: { ...cooperationSession.anchor, session: cooperationSession } }] : []),
         ...actors.map((value) => ({ type: 'actor', y: value.y, value })),
         ...runtime.effects.map((value) => ({ type: 'particle', y: value.y, value })),
         ...REALM_ARCHITECTURE_OCCLUDERS.map((value) => ({ type: 'architecture', y: value.depthY, value })),
       ].sort((a, b) => {
-        const priority = { object: 1, actor: 2, particle: 3, architecture: 4 };
+        const priority = { object: 1, beacon: 2, actor: 3, particle: 4, architecture: 5 };
         return a.y - b.y || priority[a.type] - priority[b.type];
       });
       let playerRendered = false;
@@ -2517,6 +2568,8 @@ export default function RealmWorldV3({
             rewarded: runtime.rewardObject?.id === object.id && runtime.rewardObject.until > now,
             interaction: runtime.interaction?.object?.id === object.id ? runtime.interaction : null,
           }, artRef.current);
+        } else if (node.type === 'beacon') {
+          drawCooperationBeacon(ctx, node.value.session, tile, now);
         } else if (node.type === 'actor') {
           const actor = node.value;
           const emote = activeEmotes[actor.id] || activeEmotes[actor.userId] || activeEmotes[actor.realmIdentity];
@@ -2678,6 +2731,7 @@ export default function RealmWorldV3({
       data-realm-depth="2.5d"
       data-realm-art-ready={artReady ? 'true' : 'false'}
       data-realm-ui-mode={workspaceOpen ? 'workspace' : locationOpen ? 'waygate' : signalOpen ? 'signal' : touchOpen ? 'controls' : 'explore'}
+      data-realm-cooperation={cooperationSession?.id || 'none'}
     >
       <canvas
         ref={canvasRef}

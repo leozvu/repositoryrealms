@@ -21,6 +21,7 @@ import {
   roomAt,
 } from './world';
 import { createRealmDemoGuestProfile, DEFAULT_PROFILE, isInVoiceRange, mergeRealmPresencePeople, normalizeProfile } from '@/lib/realm-protocol';
+import { realmWorkSessionTaskComment } from '@/lib/realm-cooperation';
 import {
   REALM_OPERATIONS_STORAGE_KEY,
   advanceRealmQuest,
@@ -78,12 +79,14 @@ import AdventurerChronicle from './AdventurerChronicle';
 import { useProximityMedia } from './useProximityMedia';
 import { usePartySfuMedia } from './usePartySfuMedia';
 import { useRealmParty } from './useRealmParty';
+import { useRealmCooperation } from './useRealmCooperation';
 import { useRealmPresence } from './useRealmPresence';
 import { useRealmChangeFeed } from './useRealmChangeFeed';
 import RealmNotificationBell from './RealmNotificationBell';
 import LivingGuildhallMotion from './LivingGuildhallMotion';
 import GuildhallScene from './GuildhallScene';
 import RealmWorldV3 from './RealmWorldV3';
+import { RealmCooperationHud, RealmCooperationPanel } from './RealmCooperation';
 import { useCollaborationDirectory } from '@/components/collaboration/useCollaborationDirectory';
 import { LanguageSwitch, useLanguage } from '@/components/LanguageProvider';
 import {
@@ -203,6 +206,30 @@ const CAMPAIGNS = [
   { id: 'campaign-2', name: 'Website Nhà Giả Kim', owner: 'Đỗ Quốc Anh', progress: 46, health: 'Cần chú ý', color: '#e7ad58' },
   { id: 'campaign-3', name: 'Hội chợ phương Bắc', owner: 'Trần Khánh Linh', progress: 63, health: 'Ổn định', color: '#64c48d' },
 ];
+
+function workSessionCandidateForQuest(quest) {
+  if (!quest) return null;
+  const questBoard = WORLD_OBJECTS.find((object) => object.id === 'quest-board');
+  return {
+    work: {
+      kind: 'task',
+      id: quest.businessRef || quest.id,
+      title: quest.title,
+      context: quest.project,
+      status: quest.status,
+    },
+    anchor: {
+      objectId: questBoard?.id || 'quest-board',
+      x: questBoard?.x || 38,
+      y: (questBoard?.y || 21.5) + 1.35,
+    },
+    agenda: [
+      { id: 'outcome', label: 'Chốt kết quả cần bàn giao' },
+      { id: 'execution', label: `Xử lý ${Math.max(0, quest.total - quest.progress)} tiêu chí còn lại` },
+      { id: 'review', label: `Review với ${quest.reviewer || 'người duyệt ERP'}` },
+    ],
+  };
+}
 
 const ERP_DESK_POSITIONS = [
   ...STAFF.map(({ x, y }) => ({ x, y })),
@@ -1480,8 +1507,10 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     sendEmote: broadcastEmote,
     sendSignal,
     sendParty,
+    sendCooperation,
     subscribeSignal,
     subscribeParty,
+    subscribeCooperation,
   } = useRealmPresence({ positionRef, profile, status: playerStatus, onChat: receiveChat, onEmote: showEmote });
   const {
     party,
@@ -1500,6 +1529,22 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     partyAuthority: networkInfo.partyAuthority === true,
     sendParty,
     subscribeParty,
+  });
+  const {
+    workSession,
+    notice: cooperationNotice,
+    startSession: startCooperationSession,
+    setReady: setCooperationReady,
+    setPhase: setCooperationPhase,
+    toggleAgenda: toggleCooperationAgenda,
+    addNote: addCooperationNote,
+    finishSession: finishCooperationSession,
+  } = useRealmCooperation({
+    sessionId,
+    profile,
+    party,
+    sendCooperation,
+    subscribeCooperation,
   });
   const partyMemberIds = useMemo(
     () => new Set((party?.members || []).filter((member) => member.id !== sessionId).map((member) => member.id)),
@@ -1558,6 +1603,10 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   useEffect(() => {
     if (partyNotice) toast(partyNotice.text, partyNotice.tone);
   }, [partyNotice, toast]);
+
+  useEffect(() => {
+    if (cooperationNotice) toast(cooperationNotice.text, cooperationNotice.tone);
+  }, [cooperationNotice, toast]);
 
   useEffect(() => { positionRef.current = position; }, [position]);
   useEffect(() => {
@@ -2186,6 +2235,97 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
 
   useEffect(() => { setPartyConfirm(null); }, [party?.id]);
 
+  const nextWorkQuest = useMemo(
+    () => quests.find((quest) => quest.status === 'active')
+      || quests.find((quest) => quest.status === 'ready')
+      || quests.find((quest) => quest.status !== 'claimed')
+      || null,
+    [quests],
+  );
+  const workSessionCandidate = useMemo(() => workSessionCandidateForQuest(nextWorkQuest), [nextWorkQuest]);
+
+  const openCooperationPanel = useCallback(() => {
+    setMode('world');
+    setActivePanel('party');
+    setSurfaceOpen(true);
+    setVoiceOpen(false);
+  }, []);
+
+  const startWorkSession = useCallback((candidate = workSessionCandidate) => {
+    if (!party) {
+      openCooperationPanel();
+      toast('Mời một đồng đội vào Party trước khi mở phiên phối hợp.', 'error');
+      return false;
+    }
+    if (party.hostId !== sessionId) {
+      openCooperationPanel();
+      toast('Host của Party sẽ mở phiên phối hợp cho cả nhóm.', 'error');
+      return false;
+    }
+    if (!candidate) {
+      toast('Chưa có Task phù hợp để mở phiên phối hợp.', 'error');
+      return false;
+    }
+    const started = startCooperationSession(candidate);
+    if (started) openCooperationPanel();
+    return started;
+  }, [openCooperationPanel, party, sessionId, startCooperationSession, toast, workSessionCandidate]);
+
+  const startWorkSessionForQuest = useCallback((quest) => {
+    const candidate = workSessionCandidateForQuest(quest);
+    if (workSession && workSession.work.id !== candidate?.work.id) {
+      openCooperationPanel();
+      toast('Hãy khép phiên hiện tại trước khi chuyển sang Task khác.', 'error');
+      return false;
+    }
+    if (workSession) {
+      openCooperationPanel();
+      return true;
+    }
+    return startWorkSession(candidate);
+  }, [openCooperationPanel, startWorkSession, toast, workSession]);
+
+  const rallyToWorkSession = useCallback(() => {
+    if (!workSession?.anchor) return;
+    setSurfaceOpen(false);
+    setMode('world');
+    window.dispatchEvent(new CustomEvent('realm:move', { detail: { ...workSession.anchor } }));
+    toast(`Đang tới điểm hẹn của “${workSession.work.title}”.`);
+  }, [toast, workSession]);
+
+  const openWorkSessionTask = useCallback(() => {
+    if (!workSession) return;
+    setMode('world');
+    setActivePanel(workSession.work.kind === 'project' ? 'campaigns' : 'quests');
+    setSurfaceOpen(true);
+    setVoiceOpen(false);
+  }, [workSession]);
+
+  const publishWorkSessionNote = useCallback(async (note) => {
+    if (operationsSource !== 'erp' || !workSession || workSession.work.kind !== 'task') return false;
+    try {
+      const command = realmWorkSessionTaskComment(workSession, note);
+      const response = await fetch('/api/execution/actions', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': command.idempotencyKey,
+        },
+        body: JSON.stringify(command.body),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || 'ERP từ chối ghi chú này.');
+      setRealmDataRevision((current) => current + 1);
+      toast(payload.idempotent ? 'Ghi chú này đã có trong Task ERP.' : 'Đã ghi shared log vào Task ERP với biên nhận.');
+      return true;
+    } catch (error) {
+      toast(error.message || 'Không thể ghi shared log vào Task ERP.', 'error');
+      return false;
+    }
+  }, [operationsSource, toast, workSession]);
+
   const panel = useMemo(() => {
     if (activePanel === 'party') {
       const pendingInvites = party?.pendingInvites || (outgoingInvite ? [{
@@ -2203,6 +2343,21 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
       return (
         <>
           <PanelHeading eyebrow="Phòng hội đồng" title="Council Voice" text="Không gian trao đổi riêng giữ cuộc thoại liên tục khi các thành viên di chuyển giữa các phòng." />
+          <RealmCooperationPanel
+            party={party}
+            session={workSession}
+            selfId={sessionId}
+            candidate={workSessionCandidate}
+            onStart={startWorkSession}
+            onReady={setCooperationReady}
+            onPhase={setCooperationPhase}
+            onAgenda={toggleCooperationAgenda}
+            onNote={addCooperationNote}
+            onRally={rallyToWorkSession}
+            onOpenWork={openWorkSessionTask}
+            onPublishNote={operationsSource === 'erp' ? publishWorkSessionNote : undefined}
+            onFinish={finishCooperationSession}
+          />
           {party ? (
             <>
               <div className={styles.partyStatusCard}>
@@ -2479,6 +2634,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
               <p><span data-no-i18n>{quest.project}</span> · Duyệt bởi <span data-no-i18n>{quest.reviewer}</span></p>
               <div className={styles.progressLabel}><span>{quest.progress}/{quest.total} tiêu chí</span><span data-no-i18n>{quest.due}</span></div>
               <div className={styles.progress}><i style={{ width: `${quest.progress / quest.total * 100}%` }} /></div>
+              {quest.status !== 'claimed' && <button type="button" className={styles.secondaryButton} onClick={() => startWorkSessionForQuest(quest)}><Icon name="people" size={15} />{workSession?.work.id === (quest.businessRef || quest.id) ? 'Mở phiên phối hợp' : 'Phối hợp cùng Party'}</button>}
               {quest.status === 'ready' && <button type="button" className={styles.primaryButton} disabled={operationsSyncState === 'syncing'} onClick={() => claimQuest(quest)}>Nhận {quest.reward} Gold</button>}
               {quest.status === 'active' && (operationsSource === 'erp'
                 ? <Link className={styles.secondaryButton} href={quest.links?.task || realmRecordHref('task', quest.businessRef)}>Mở Task ERP</Link>
@@ -2639,7 +2795,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
         </div>
       </>
     );
-  }, [activePanel, businessBridge, cancelInvite, career.level, career.renown, chatText, commandDashboard, compactViewport, confirmPartyAction, contactReceipt, contactSending, currentRoom?.name, dataSource.isErp, embassyDashboard, guildDashboard, handleLocalTreasuryChange, incomingInvite, inviteToParty, ledger, localWarRoom, mediaTopology, messages, moveToSelectedPerson, nearby.length, networkInfo, onlineCount, openAuthorizedPanel, operationsSource, operationsSyncState, outgoingInvite, party, partyConfirm, playerStatus, position, profile.color, profile.name, profileDraft, quests, realmDataRevision, realmPeople, realmRosterPeople, refreshRealmOperations, remotePlayers, selectPerson, selectedCampaign, selectedPerson, sendContactToSelected, sendWhisperToSelected, sessionId, sfuMedia.status, transportState, treasuryDashboard, triggerEmote, viewerRealUserId, wallet, whisperText]);
+  }, [activePanel, addCooperationNote, businessBridge, cancelInvite, career.level, career.renown, chatText, commandDashboard, compactViewport, confirmPartyAction, contactReceipt, contactSending, currentRoom?.name, dataSource.isErp, embassyDashboard, finishCooperationSession, guildDashboard, handleLocalTreasuryChange, incomingInvite, inviteToParty, ledger, localWarRoom, mediaTopology, messages, moveToSelectedPerson, nearby.length, networkInfo, onlineCount, openAuthorizedPanel, openWorkSessionTask, operationsSource, operationsSyncState, outgoingInvite, party, partyConfirm, playerStatus, position, profile.color, profile.name, profileDraft, publishWorkSessionNote, quests, rallyToWorkSession, realmDataRevision, realmPeople, realmRosterPeople, refreshRealmOperations, remotePlayers, selectPerson, selectedCampaign, selectedPerson, sendContactToSelected, sendWhisperToSelected, sessionId, setCooperationPhase, setCooperationReady, sfuMedia.status, startWorkSession, startWorkSessionForQuest, toggleCooperationAgenda, transportState, treasuryDashboard, triggerEmote, viewerRealUserId, wallet, whisperText, workSession, workSessionCandidate]);
 
   const surfaceTitle = activePanel === 'profile'
     ? 'Hồ sơ nhân vật'
@@ -2718,6 +2874,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
               onEmote={triggerEmote}
               wallet={wallet}
               demoMode={demoMode}
+              cooperationSession={workSession}
             />
           ) : (
             <GuildhallScene
@@ -2734,6 +2891,17 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
               onObjectOpen={openObject}
               onPerson={selectPerson}
               onEmote={triggerEmote}
+            />
+          )}
+
+          {!surfaceOpen && workSession && (
+            <RealmCooperationHud
+              session={workSession}
+              selfId={sessionId}
+              onReady={setCooperationReady}
+              onRally={rallyToWorkSession}
+              onOpen={openCooperationPanel}
+              onOpenWork={openWorkSessionTask}
             />
           )}
 

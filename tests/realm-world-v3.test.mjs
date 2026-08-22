@@ -113,6 +113,8 @@ test('v3 component owns continuous motion over one unified 2.5D scene plate', ()
   assert.match(source, /sampleRemoteSnapshot/);
   assert.match(source, /advanceActivityState/);
   assert.match(source, /cameraTargetWithDeadZone/);
+  assert.match(source, /drawCooperationBeacon/);
+  assert.match(source, /data-realm-cooperation/);
   assert.match(source, /stepRealmCamera/);
   assert.match(source, /normalizeRealmWorldPeople/);
   assert.match(source, /Canonical receipt đã xác nhận/);
@@ -141,5 +143,6 @@ test('Realm World v3 UI copy switches between Vietnamese and English without cha
   assert.equal(translateUiCopy('Phòng điều hành', 'en'), 'Operations Room');
   assert.equal(translateUiCopy('Canonical receipt đã xác nhận', 'en'), 'Canonical receipt confirmed');
   assert.equal(translateUiCopy('Cử chỉ xuất hiện trên cơ thể, không chỉ là thông báo.', 'en'), 'The gesture appears on the character, not only as a notification.');
+  assert.equal(translateUiCopy('Tới điểm hẹn', 'en'), 'Go to rally point');
   assert.equal(translateUiCopy('Khánh Linh', 'en'), 'Khánh Linh');
 });

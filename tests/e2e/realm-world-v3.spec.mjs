@@ -33,6 +33,7 @@ test('v3 is a live layered world with bounded locomotion over one unified scene 
   await expect(canvas).toHaveAttribute('data-realm-renderer', 'canvas2d');
   await expect(world).toHaveAttribute('data-realm-depth', '2.5d');
   await expect(world).toHaveAttribute('data-realm-movement-version', '4');
+  await expect(world).toHaveAttribute('data-realm-cooperation', 'none');
   await expect(world).toHaveAttribute('data-realm-art-ready', 'true');
   await expect(world).toHaveAttribute('data-realm-quality', isMobile ? 'low' : /medium|high/);
   await expect(page.locator('[data-realm-world-version="3"] img[src*="guildhall-environment"]')).toHaveCount(0);
@@ -42,6 +43,7 @@ test('v3 is a live layered world with bounded locomotion over one unified scene 
   await expect(canvas).toHaveAttribute('data-realm-player-occluded', /clear|silhouette/);
   await expect(canvas).toHaveAttribute('data-realm-collision', 'none');
   await expect(canvas).toHaveAttribute('data-realm-movement-version', '4');
+  await expect(canvas).toHaveAttribute('data-realm-cooperation-session', 'none');
   await expect(canvas).toHaveAttribute('data-realm-movement-intent', /idle|manual|interact|waygate/);
   await expect.poll(async () => Number(await canvas.getAttribute('data-realm-actor-overlaps'))).toBeGreaterThanOrEqual(0);
   await expect.poll(async () => Number(await canvas.getAttribute('data-realm-npc-moving'))).toBeLessThanOrEqual(isMobile ? 1 : 2);
