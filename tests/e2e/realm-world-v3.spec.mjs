@@ -32,6 +32,7 @@ test('v3 is a live layered world with bounded locomotion over one unified scene 
   const world = page.locator('[data-realm-world-version="3"]');
   await expect(canvas).toHaveAttribute('data-realm-renderer', 'canvas2d');
   await expect(world).toHaveAttribute('data-realm-depth', '2.5d');
+  await expect(world).toHaveAttribute('data-realm-movement-version', '4');
   await expect(world).toHaveAttribute('data-realm-art-ready', 'true');
   await expect(world).toHaveAttribute('data-realm-quality', isMobile ? 'low' : /medium|high/);
   await expect(page.locator('[data-realm-world-version="3"] img[src*="guildhall-environment"]')).toHaveCount(0);
@@ -40,6 +41,10 @@ test('v3 is a live layered world with bounded locomotion over one unified scene 
   await expect(canvas).toHaveAttribute('data-realm-player-alpha', '1.00');
   await expect(canvas).toHaveAttribute('data-realm-player-occluded', /clear|silhouette/);
   await expect(canvas).toHaveAttribute('data-realm-collision', 'none');
+  await expect(canvas).toHaveAttribute('data-realm-movement-version', '4');
+  await expect(canvas).toHaveAttribute('data-realm-movement-intent', /idle|manual|interact|waygate/);
+  await expect.poll(async () => Number(await canvas.getAttribute('data-realm-actor-overlaps'))).toBeGreaterThanOrEqual(0);
+  await expect.poll(async () => Number(await canvas.getAttribute('data-realm-npc-moving'))).toBeLessThanOrEqual(isMobile ? 1 : 2);
 
   const before = await canvas.evaluate((element) => ({ x: Number(element.dataset.realmX), y: Number(element.dataset.realmY) }));
   if (isMobile) {
@@ -103,7 +108,7 @@ test('actor remains visible and collision-free while routing around authored arc
     return window.__realmSpatialSamples;
   });
   expect(samples.length).toBeGreaterThan(8);
-  expect(samples.some((sample) => sample.locomotion === 'walk' || sample.locomotion === 'start')).toBe(true);
+  expect(samples.some((sample) => ['walk', 'start', 'arrive', 'yield', 'turn'].includes(sample.locomotion))).toBe(true);
   expect(samples.every((sample) => sample.collision === 'none')).toBe(true);
   expect(samples.every((sample) => sample.visible === 'true' && sample.alpha === '1.00')).toBe(true);
   expect(samples.some((sample) => sample.x >= 18.15 && sample.x <= 29.85 && sample.y >= 12.05 && sample.y <= 14.75)).toBe(false);

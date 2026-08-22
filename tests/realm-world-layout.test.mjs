@@ -64,7 +64,9 @@ test('saved positions are clamped and wall collisions migrate to the safe spawn'
 });
 
 test('unified scene geometry blocks the walls visible in the plate and preserves intentional portals', async () => {
-  const { isWorldPositionWalkable, worldCollisionAt } = await loadWorldModule();
+  const { REALM_NAV_PORTALS, isWorldPositionWalkable, worldCollisionAt } = await loadWorldModule();
+  assert.deepEqual(REALM_NAV_PORTALS.map((portal) => portal.id), ['council-stair', 'eastern-stair', 'south-gate']);
+  assert.ok(REALM_NAV_PORTALS.every((portal) => portal.capacity >= 1));
   assert.equal(worldCollisionAt({ x: 21.5, y: 13.1 })?.id, 'command-balustrade');
   assert.equal(worldCollisionAt({ x: 10, y: 15.5 })?.id, 'western-gallery-wall');
   assert.equal(worldCollisionAt({ x: 18, y: 19.35 })?.id, 'council-ring');

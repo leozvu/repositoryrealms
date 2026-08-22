@@ -105,7 +105,14 @@ test('v3 component owns continuous motion over one unified 2.5D scene plate', ()
   assert.match(source, /data-realm-depth="2\.5d"/);
   assert.match(source, /data-realm-art-ready/);
   assert.match(source, /REALM_WORLD_FIXED_STEP/);
-  assert.match(source, /stepRealmMotion/);
+  assert.match(source, /stepSteeredMotion/);
+  assert.match(source, /REALM_MOVEMENT_VERSION/);
+  assert.match(source, /createMovementIntent/);
+  assert.match(source, /reserveInteractionSlot/);
+  assert.match(source, /reservePortalPassage/);
+  assert.match(source, /sampleRemoteSnapshot/);
+  assert.match(source, /advanceActivityState/);
+  assert.match(source, /cameraTargetWithDeadZone/);
   assert.match(source, /stepRealmCamera/);
   assert.match(source, /normalizeRealmWorldPeople/);
   assert.match(source, /Canonical receipt đã xác nhận/);

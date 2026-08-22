@@ -8,6 +8,23 @@ import { isInVoiceRange } from '@/lib/realm-protocol';
 import { findRealmPath } from '@/lib/realm-navigation';
 import { REALM_EMOTES } from '@/lib/realm-social';
 import {
+  REALM_MOVEMENT_VERSION,
+  advanceActivityState,
+  cameraTargetWithDeadZone,
+  createActivityState,
+  createMovementIntent,
+  createRemoteSnapshotBuffer,
+  movementProfile,
+  personalSpaceOverlap,
+  portalForSegment,
+  pushRemoteSnapshot,
+  reconcileRemoteTarget,
+  releasePortalPassage,
+  reservePortalPassage,
+  sampleRemoteSnapshot,
+  stepSteeredMotion,
+} from '@/lib/realm-movement-v4';
+import {
   REALM_WORLD_FIXED_STEP,
   classifyRealmActor,
   createRealmCameraState,
@@ -16,7 +33,6 @@ import {
   realmFrameBudget,
   realmQualityTier,
   stepRealmCamera,
-  stepRealmMotion,
 } from '@/lib/realm-world-v3';
 import {
   REALM_CHARACTER_ATLAS_ROWS,
@@ -33,6 +49,7 @@ import {
 import {
   PRIVATE_ZONES,
   REALM_ARCHITECTURE_OCCLUDERS,
+  REALM_NAV_PORTALS,
   ROOMS,
   WORLD,
   WORLD_OBJECTS,
@@ -111,14 +128,29 @@ const TORCHES = Object.freeze([
 ]);
 
 const DEMO_ACTORS = Object.freeze([
-  Object.freeze({ id: 'demo-elf', name: 'Lyra · Elf Steward · demo', role: 'Elf · Guild Steward', status: 'available', x: 12.5, y: 17.5, waypoints: [[12.5, 17.5], [18, 18.5], [16.5, 23.5], [11.5, 22]] }),
-  Object.freeze({ id: 'demo-dwarf', name: 'Brom · Dwarf Engineer · demo', role: 'Dwarf · Forge Engineer', status: 'busy', x: 9, y: 25, waypoints: [[9, 25], [14, 25.5], [14, 31.5], [9, 31]] }),
+  Object.freeze({
+    id: 'demo-elf', name: 'Lyra · Elf Steward · demo', role: 'Elf · Guild Steward', status: 'available', x: 12.5, y: 17.5,
+    routine: Object.freeze([
+      Object.freeze({ objectId: 'guild-roster', dwellMs: 8200 }),
+      Object.freeze({ objectId: 'war-table', dwellMs: 6800 }),
+      Object.freeze({ objectId: 'quest-board', dwellMs: 7600 }),
+    ]),
+  }),
+  Object.freeze({
+    id: 'demo-dwarf', name: 'Brom · Dwarf Engineer · demo', role: 'Dwarf · Forge Engineer', status: 'busy', x: 9, y: 25,
+    routine: Object.freeze([
+      Object.freeze({ objectId: 'arcane-forge', dwellMs: 9200 }),
+      Object.freeze({ objectId: 'tavern-board', dwellMs: 6200 }),
+      Object.freeze({ objectId: 'treasury-chest', dwellMs: 7400 }),
+    ]),
+  }),
 ]);
 
 const STATUS_COLORS = Object.freeze({ available: '#7cc39b', busy: '#d6a455', focus: '#aa9bd6', dnd: '#cf7278', away: '#87948d' });
 const INTERACTION_RADIUS = 1.85;
-const WALK_SPEED = 4.65;
 const ROUTE_ARRIVAL = .2;
+const ROUTE_LOOK_AHEAD = .58;
+const INTERACTION_SLOT_TTL = 18000;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -265,6 +297,31 @@ function pathToObject(object, origin = null) {
   return candidates[0] || nearestWalkableWorldPosition(object);
 }
 
+function reserveInteractionSlot(reservations, actorId, object, origin, now = 0) {
+  if (!object) return null;
+  for (const [key, reservation] of reservations) {
+    if (reservation.expiresAt <= now || reservation.actorId === actorId) reservations.delete(key);
+  }
+  const candidates = objectInteractionPoints(object)
+    .map((point, index) => ({ ...point, index }))
+    .sort((left, right) => distance(left, origin) - distance(right, origin));
+  const available = candidates.find((point) => !reservations.has(`${object.id}:${point.index}`)) || candidates[0];
+  if (!available) return pathToObject(object, origin);
+  reservations.set(`${object.id}:${available.index}`, {
+    actorId,
+    objectId: object.id,
+    point: available,
+    expiresAt: now + INTERACTION_SLOT_TTL,
+  });
+  return { x: available.x, y: available.y };
+}
+
+function releaseInteractionSlot(reservations, actorId) {
+  for (const [key, reservation] of reservations) {
+    if (reservation.actorId === actorId) reservations.delete(key);
+  }
+}
+
 function objectAtWorldPoint(point) {
   return [...WORLD_OBJECTS].reverse().find((object) => {
     const visual = REALM_OBJECT_VISUALS[object.id];
@@ -279,16 +336,6 @@ function objectAtWorldPoint(point) {
 
 function spatialTargetKey(point) {
   return `${Math.round(point.x * 2)},${Math.round(point.y * 2)}`;
-}
-
-function settleMotionForRouteTurn(motion, input) {
-  const speed = Math.hypot(motion.vx, motion.vy);
-  const inputLength = Math.hypot(input.x, input.y);
-  if (speed < .08 || inputLength < .01) return motion;
-  const alignment = (motion.vx * input.x + motion.vy * input.y) / (speed * inputLength);
-  if (alignment >= .72) return motion;
-  const retention = alignment < .15 ? .08 : .32;
-  return { ...motion, vx: motion.vx * retention, vy: motion.vy * retention };
 }
 
 function stepSpatialActor(actor, target, delta, options = {}) {
@@ -311,21 +358,54 @@ function stepSpatialActor(actor, target, delta, options = {}) {
   }
 
   let waypoint = actor.spatialRoute.path[actor.spatialRoute.index];
-  while (waypoint && distance(actor.motion, waypoint) <= ROUTE_ARRIVAL) {
+  while (waypoint && distance(actor.motion, waypoint) <= (
+    actor.spatialRoute.index === actor.spatialRoute.path.length - 1 ? ROUTE_ARRIVAL : ROUTE_LOOK_AHEAD
+  )) {
     actor.spatialRoute.index += 1;
     waypoint = actor.spatialRoute.path[actor.spatialRoute.index];
   }
-  const remaining = waypoint ? distance(actor.motion, waypoint) || 1 : 0;
-  const input = waypoint ? {
-    x: (waypoint.x - actor.motion.x) / remaining,
-    y: (waypoint.y - actor.motion.y) / remaining,
-  } : {};
-  actor.motion = stepRealmMotion(settleMotionForRouteTurn(actor.motion, input), input, delta, {
-    maxSpeed: options.maxSpeed,
-    acceleration: options.acceleration,
-    deceleration: options.deceleration,
+  const portal = waypoint ? portalForSegment(actor.motion, waypoint, REALM_NAV_PORTALS) : null;
+  if (portal && options.portalReservations) {
+    const passage = reservePortalPassage(options.portalReservations, {
+      id: actor.id || actor.realmIdentity,
+      priority: actor.priority || options.profile?.priority || 25,
+    }, portal, options.now);
+    if (!passage.granted) {
+      actor.motion = stepSteeredMotion(actor.motion, null, delta, {
+        id: actor.id || actor.realmIdentity,
+        kind: options.kind || 'npc',
+        profile: options.profile,
+        neighbors: options.neighbors || [],
+        isWalkable: isWorldPositionWalkable,
+      });
+      actor.motion.locomotion = 'yield';
+      actor.portalWaits = (actor.portalWaits || 0) + 1;
+      actor.x = actor.motion.x;
+      actor.y = actor.motion.y;
+      return distance(actor.motion, safeTarget);
+    }
+  } else if (options.portalReservations) {
+    releasePortalPassage(options.portalReservations, actor.id || actor.realmIdentity);
+  }
+  const before = { x: actor.motion.x, y: actor.motion.y };
+  actor.motion = stepSteeredMotion(actor.motion, waypoint || null, delta, {
+    id: actor.id || actor.realmIdentity,
+    kind: options.kind || 'npc',
+    profile: options.profile || {
+      maxSpeed: options.maxSpeed,
+      acceleration: options.acceleration,
+      deceleration: options.deceleration,
+    },
+    neighbors: options.neighbors || [],
     isWalkable: isWorldPositionWalkable,
   });
+  const moved = distance(before, actor.motion);
+  actor.stuckFor = waypoint && moved < .0015 ? (actor.stuckFor || 0) + delta : 0;
+  if (actor.stuckFor > .48) {
+    actor.spatialRoute = null;
+    actor.stuckFor = 0;
+    actor.repathCount = (actor.repathCount || 0) + 1;
+  }
   actor.x = actor.motion.x;
   actor.y = actor.motion.y;
   return distance(actor.motion, safeTarget);
@@ -693,7 +773,7 @@ function drawActorOcclusionSilhouette(ctx, actor, tile, time, art, reducedMotion
   const archetype = actor.archetype || classifyRealmActor(actor);
   const race = archetype.race;
   const motion = actor.motion || createRealmMotionState(actor);
-  const moving = motion.locomotion === 'walk' || motion.locomotion === 'start';
+  const moving = ['walk', 'start', 'arrive', 'yield'].includes(motion.locomotion);
   const gait = moving ? Math.sin(motion.gaitTime * Math.PI * 2.25 * race.gait) : Math.sin(time * .0018 + actor.x) * .05;
   const bounce = reducedMotion ? 0 : moving ? Math.abs(gait) * tile * .045 : Math.sin(time * .0015 + actor.y) * tile * .015;
   const [faceX, faceY] = facingVector(motion.facing);
@@ -1177,7 +1257,7 @@ function drawActor(ctx, actor, tile, time, options = {}) {
   const interactionStrength = interaction
     ? realmInteractionEnvelope(interaction.startedAt, time, interaction.phase)
     : 0;
-  const moving = !interactionStrength && (motion.locomotion === 'walk' || motion.locomotion === 'start');
+  const moving = !interactionStrength && ['walk', 'start', 'arrive', 'yield'].includes(motion.locomotion);
   const gait = moving ? Math.sin(motion.gaitTime * Math.PI * 2.25 * race.gait) : Math.sin(time * .0018 + actor.x) * .05;
   const bounce = options.reducedMotion ? 0 : moving ? Math.abs(gait) * tile * .045 : Math.sin(time * .0015 + actor.y) * tile * .015;
   const facing = interactionStrength ? realmObjectFacing(actor, interaction.object) : motion.facing;
@@ -1529,6 +1609,58 @@ function drawRoute(ctx, route, tile, time) {
   ctx.restore();
 }
 
+function drawMovementDebug(ctx, runtime, actors, tile) {
+  ctx.save();
+  ctx.lineWidth = 1.25;
+  ctx.font = `700 ${Math.max(9, tile * .18)}px ui-monospace, monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+
+  for (const portal of REALM_NAV_PORTALS) {
+    const x = portal.minX * tile;
+    const y = projectRealmY(portal.minY, tile);
+    const width = (portal.maxX - portal.minX) * tile;
+    const height = (portal.maxY - portal.minY) * tile * REALM_WORLD_Y_SCALE;
+    const active = runtime.portalReservations.get(portal.id) || [];
+    ctx.fillStyle = active.length ? 'rgba(238, 169, 67, .12)' : 'rgba(80, 190, 156, .07)';
+    ctx.strokeStyle = active.length ? 'rgba(238, 169, 67, .78)' : 'rgba(80, 190, 156, .48)';
+    ctx.fillRect(x, y, width, height);
+    ctx.strokeRect(x, y, width, height);
+    ctx.fillStyle = '#f5ddb0';
+    ctx.fillText(`${portal.id} ${active.length}/${portal.capacity}`, x + width / 2, y - 3);
+  }
+
+  for (const actor of actors) {
+    const x = actor.x * tile;
+    const y = projectRealmY(actor.y, tile);
+    const radius = (actor.radius || .3) * tile;
+    const locomotion = actor.motion?.locomotion || actor.locomotion || 'idle';
+    ctx.strokeStyle = actor.player
+      ? 'rgba(247, 212, 112, .95)'
+      : locomotion === 'yield'
+        ? 'rgba(238, 120, 84, .9)'
+        : 'rgba(103, 208, 188, .72)';
+    ctx.beginPath();
+    ctx.ellipse(x, y, radius, radius * REALM_WORLD_Y_SCALE, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.fillText(locomotion, x, y - radius - 3);
+  }
+
+  if (runtime.intent?.target) {
+    const x = runtime.intent.target.x * tile;
+    const y = projectRealmY(runtime.intent.target.y, tile);
+    ctx.strokeStyle = 'rgba(245, 213, 119, .9)';
+    ctx.beginPath();
+    ctx.moveTo(x - 7, y);
+    ctx.lineTo(x + 7, y);
+    ctx.moveTo(x, y - 7);
+    ctx.lineTo(x, y + 7);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function drawParticle(ctx, particle, tile) {
   ctx.save();
   ctx.globalAlpha = clamp(particle.life / particle.maxLife, 0, 1);
@@ -1654,12 +1786,16 @@ export default function RealmWorldV3({
   const runtimeRef = useRef({
     motion: createRealmMotionState(normalizeWorldPosition(position)),
     camera: createRealmCameraState(normalizeWorldPosition(position)),
+    intent: createMovementIntent('idle'),
     route: null,
     selectedObject: null,
     hoveredObject: null,
     interaction: null,
     remotes: new Map(),
     demoActors: new Map(),
+    interactionReservations: new Map(),
+    portalReservations: new Map(),
+    movementMetrics: { overlaps: 0, repaths: 0, remoteCorrection: 0, npcMoving: 0, portalWaits: 0 },
     effects: [],
     frameSamples: [],
     renderSamples: [],
@@ -1716,9 +1852,16 @@ export default function RealmWorldV3({
     if (!demoMode) return;
     for (const actor of DEMO_ACTORS) runtime.demoActors.set(actor.id, {
       ...actor,
-      waypointIndex: 1,
       archetype: classifyRealmActor(actor),
       motion: createRealmMotionState(actor),
+      profile: movementProfile('npc', {
+        maxSpeed: 1.28 * classifyRealmActor(actor).race.gait,
+      }),
+      activity: createActivityState(actor, performance.now()),
+      activityTarget: null,
+      activityInteraction: null,
+      priority: 25,
+      radius: .3,
     });
   }, [demoMode]);
 
@@ -1730,6 +1873,7 @@ export default function RealmWorldV3({
     if (distance(current, next) > 1.5) {
       runtimeRef.current.motion = createRealmMotionState(next);
       runtimeRef.current.camera = createRealmCameraState(next);
+      runtimeRef.current.intent = createMovementIntent('idle');
       runtimeRef.current.route = null;
     }
   }, [position]);
@@ -1794,6 +1938,7 @@ export default function RealmWorldV3({
     if (!object || runtimeRef.current.interaction?.object?.id === object.id) return;
     const copy = OBJECT_COPY[object.id];
     runtimeRef.current.route = null;
+    runtimeRef.current.intent = createMovementIntent('interact', runtimeRef.current.motion, { objectId: object.id, issuedAt: performance.now() });
     runtimeRef.current.motion.vx = 0;
     runtimeRef.current.motion.vy = 0;
     runtimeRef.current.motion.locomotion = 'idle';
@@ -1812,15 +1957,21 @@ export default function RealmWorldV3({
     }, reducedMotion ? 40 : 520);
     const restoreTimer = window.setTimeout(() => {
       if (runtimeRef.current.interaction?.object?.id === object.id) runtimeRef.current.interaction = null;
+      releaseInteractionSlot(runtimeRef.current.interactionReservations, sessionId);
+      runtimeRef.current.intent = createMovementIntent('idle', null, { issuedAt: performance.now() });
       setJourney((current) => current?.object?.id === object.id ? null : current);
     }, reducedMotion ? 240 : 1500);
     timersRef.current.add(openTimer);
     timersRef.current.add(restoreTimer);
-  }, [reducedMotion, spawnEffect]);
+  }, [reducedMotion, sessionId, spawnEffect]);
 
   const routeTo = useCallback((target, object = null) => {
     const runtime = runtimeRef.current;
-    const safeTarget = nearestWalkableWorldPosition(target, runtime.motion);
+    releaseInteractionSlot(runtime.interactionReservations, sessionId);
+    const reservedTarget = object
+      ? reserveInteractionSlot(runtime.interactionReservations, sessionId, object, runtime.motion, performance.now())
+      : target;
+    const safeTarget = nearestWalkableWorldPosition(reservedTarget, runtime.motion);
     const path = findRealmPath({
       start: runtime.motion,
       target: safeTarget,
@@ -1837,20 +1988,33 @@ export default function RealmWorldV3({
       origin: { x: runtime.motion.x, y: runtime.motion.y },
       stuckFor: 0,
     };
+    runtime.intent = createMovementIntent(object ? 'interact' : 'manual', safeTarget, {
+      objectId: object?.id,
+      issuedAt: performance.now(),
+      source: object ? 'business-object' : 'click-to-walk',
+    });
     runtime.selectedObject = object;
     setSelectedObject(object);
     setJourney(object ? { object, phase: 'traveling', progress: 'Đang tìm đường' } : null);
     return true;
-  }, []);
+  }, [sessionId]);
 
   const waygateTo = useCallback((object) => {
     if (!object || waygate) return;
     setLocationOpen(false);
     setSelectedObject(object);
     setWaygate(true);
+    runtimeRef.current.intent = createMovementIntent('waygate', object, { objectId: object.id, issuedAt: performance.now() });
     setJourney({ object, phase: 'waygate', progress: 'Đang đi qua Waygate' });
     const moveTimer = window.setTimeout(() => {
-      const target = pathToObject(object, runtimeRef.current.motion);
+      releaseInteractionSlot(runtimeRef.current.interactionReservations, sessionId);
+      const target = reserveInteractionSlot(
+        runtimeRef.current.interactionReservations,
+        sessionId,
+        object,
+        runtimeRef.current.motion,
+        performance.now(),
+      );
       runtimeRef.current.motion = createRealmMotionState(target);
       runtimeRef.current.camera = createRealmCameraState(target);
       runtimeRef.current.route = null;
@@ -1862,7 +2026,7 @@ export default function RealmWorldV3({
     }, reducedMotion ? 50 : 430);
     timersRef.current.add(moveTimer);
     timersRef.current.add(openTimer);
-  }, [beginInteraction, reducedMotion, waygate]);
+  }, [beginInteraction, reducedMotion, sessionId, waygate]);
 
   useEffect(() => {
     const handler = (event) => {
@@ -1919,6 +2083,8 @@ export default function RealmWorldV3({
         event.preventDefault();
         runtimeRef.current.route = null;
         runtimeRef.current.interaction = null;
+        releaseInteractionSlot(runtimeRef.current.interactionReservations, sessionId);
+        runtimeRef.current.intent = createMovementIntent('manual', null, { source: 'keyboard', issuedAt: performance.now() });
         setJourney(null);
         keysRef.current.add(key);
       }
@@ -1931,6 +2097,7 @@ export default function RealmWorldV3({
         setSignalOpen(false);
         setTouchOpen(false);
         runtimeRef.current.route = null;
+        runtimeRef.current.intent = createMovementIntent('idle', null, { issuedAt: performance.now() });
         setJourney(null);
       }
     };
@@ -1938,6 +2105,7 @@ export default function RealmWorldV3({
     const reset = () => {
       keysRef.current.clear();
       runtimeRef.current.route = null;
+      runtimeRef.current.intent = createMovementIntent('idle', null, { issuedAt: performance.now() });
     };
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
@@ -1947,7 +2115,7 @@ export default function RealmWorldV3({
       window.removeEventListener('keyup', up);
       window.removeEventListener('blur', reset);
     };
-  }, [beginInteraction, nearbyObject, selectedObject]);
+  }, [beginInteraction, nearbyObject, selectedObject, sessionId]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1959,7 +2127,21 @@ export default function RealmWorldV3({
     let lastUiSync = 0;
     let lastMetricsSync = 0;
 
-    const updateRemoteActors = (delta) => {
+    const actorNeighbors = (runtime, actorId) => {
+      const player = {
+        ...runtime.motion,
+        id: sessionId,
+        priority: 100,
+        radius: .3,
+      };
+      return [
+        player,
+        ...runtime.remotes.values(),
+        ...runtime.demoActors.values(),
+      ].filter((actor) => actor.id !== actorId && actor.realmIdentity !== actorId);
+    };
+
+    const updateRemoteActors = (delta, now) => {
       const runtime = runtimeRef.current;
       const eligible = new Set();
       for (const person of peopleRef.current) {
@@ -1971,21 +2153,120 @@ export default function RealmWorldV3({
         let actor = runtime.remotes.get(key);
         if (!actor) {
           const initial = nearestWalkableWorldPosition({ x: targetX, y: targetY });
-          actor = { ...person, ...initial, targetX, targetY, motion: createRealmMotionState(initial), spatialRoute: null };
+          actor = {
+            ...person,
+            ...initial,
+            targetX,
+            targetY,
+            motion: createRealmMotionState(initial),
+            spatialRoute: null,
+            snapshots: createRemoteSnapshotBuffer({ x: targetX, y: targetY, at: now - 140 }),
+            snapshotKey: null,
+            priority: 70,
+            radius: .3,
+            correctionMode: 'hold',
+          };
           runtime.remotes.set(key, actor);
         }
-        actor.targetX = targetX;
-        actor.targetY = targetY;
+        const snapshotKey = `${person.seenAt || ''}:${targetX.toFixed(3)}:${targetY.toFixed(3)}`;
+        if (actor.snapshotKey !== snapshotKey) {
+          actor.snapshotKey = snapshotKey;
+          pushRemoteSnapshot(actor.snapshots, { x: targetX, y: targetY, at: now });
+        }
         actor.name = person.name;
         actor.status = person.status;
         actor.archetype = person.archetype;
-        stepSpatialActor(actor, { x: actor.targetX, y: actor.targetY }, delta, {
-          maxSpeed: 5.8,
-          acceleration: 26,
-          deceleration: 36,
-        });
+        const sampled = sampleRemoteSnapshot(actor.snapshots, now);
+        const correction = reconcileRemoteTarget(actor.motion, sampled, delta);
+        actor.correctionMode = correction.mode;
+        actor.correction = correction.correction;
+        runtime.movementMetrics.remoteCorrection = Math.max(runtime.movementMetrics.remoteCorrection * .92, correction.correction);
+        if (correction.mode === 'waygate') {
+          const destination = nearestWalkableWorldPosition(correction.target, actor.motion);
+          actor.motion = createRealmMotionState(destination);
+          actor.spatialRoute = null;
+          actor.x = destination.x;
+          actor.y = destination.y;
+          actor.waygateUntil = now + 360;
+        } else {
+          actor.targetX = correction.target.x;
+          actor.targetY = correction.target.y;
+          stepSpatialActor(actor, correction.target, delta, {
+            kind: 'remote',
+            maxSpeed: 4.5,
+            acceleration: 18,
+            deceleration: 24,
+            neighbors: actorNeighbors(runtime, key),
+            portalReservations: runtime.portalReservations,
+            now,
+          });
+        }
       }
       for (const key of runtime.remotes.keys()) if (!eligible.has(key)) runtime.remotes.delete(key);
+    };
+
+    const updateDemoActors = (delta, now) => {
+      const runtime = runtimeRef.current;
+      const demoActors = [...runtime.demoActors.values()].slice(0, quality.ambientActors);
+      const movementBudget = runtime.viewport.width < 520 ? 1 : 2;
+      let movingActors = demoActors.filter((actor) => actor.activity?.phase === 'commute').length;
+
+      for (const actor of demoActors) {
+        if (actor.activity?.phase !== 'commute' && now >= actor.activity?.nextDecisionAt) {
+          if (movingActors >= movementBudget) {
+            actor.activity = { ...actor.activity, nextDecisionAt: now + 900 };
+          } else {
+            releaseInteractionSlot(runtime.interactionReservations, actor.id);
+            actor.activity = advanceActivityState(actor.activity, now, { routineLength: actor.routine.length });
+            const entry = actor.routine[actor.activity.activityIndex] || actor.routine[0];
+            const object = WORLD_OBJECTS.find((item) => item.id === entry.objectId) || null;
+            actor.activityTarget = object
+              ? reserveInteractionSlot(runtime.interactionReservations, actor.id, object, actor.motion, now)
+              : nearestWalkableWorldPosition(entry.point, actor.motion);
+            actor.activityObject = object;
+            actor.activityInteraction = null;
+            actor.spatialRoute = null;
+            movingActors += 1;
+          }
+        }
+
+        if (actor.activity?.phase === 'commute' && actor.activityTarget) {
+          const remaining = stepSpatialActor(actor, actor.activityTarget, delta, {
+            kind: 'npc',
+            profile: actor.profile,
+            neighbors: actorNeighbors(runtime, actor.id),
+            portalReservations: runtime.portalReservations,
+            now,
+          });
+          if (remaining < .22) {
+            const entry = actor.routine[actor.activity.activityIndex] || actor.routine[0];
+            actor.activity = advanceActivityState(
+              { ...actor.activity, nextDecisionAt: now },
+              now,
+              { routineLength: actor.routine.length, dwellMs: entry.dwellMs },
+            );
+            actor.spatialRoute = null;
+            actor.motion = { ...actor.motion, vx: 0, vy: 0, locomotion: 'idle' };
+            actor.activityInteraction = actor.activityObject
+              ? { object: actor.activityObject, phase: 'acting', startedAt: now }
+              : null;
+          }
+        } else {
+          actor.motion = stepSteeredMotion(actor.motion, null, delta, {
+            id: actor.id,
+            kind: 'npc',
+            profile: actor.profile,
+            neighbors: actorNeighbors(runtime, actor.id),
+            isWalkable: isWorldPositionWalkable,
+          });
+          actor.x = actor.motion.x;
+          actor.y = actor.motion.y;
+          if (actor.activityObject && actor.activity?.phase === 'interact') {
+            actor.motion.facing = realmObjectFacing(actor.motion, actor.activityObject);
+          }
+        }
+      }
+      runtime.movementMetrics.npcMoving = demoActors.filter((actor) => actor.activity?.phase === 'commute').length;
     };
 
     const update = (delta, now) => {
@@ -1994,34 +2275,52 @@ export default function RealmWorldV3({
       let inputX = Number(keys.has('d') || keys.has('arrowright')) - Number(keys.has('a') || keys.has('arrowleft'));
       let inputY = Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'));
       let route = runtime.route;
+      updateRemoteActors(delta, now);
+      updateDemoActors(delta, now);
+      let steeringTarget = null;
       if (!inputX && !inputY && route) {
         let waypoint = route.path[route.index];
-        while (waypoint && distance(runtime.motion, waypoint) <= ROUTE_ARRIVAL) {
+        while (waypoint && distance(runtime.motion, waypoint) <= (
+          route.index === route.path.length - 1 ? ROUTE_ARRIVAL : ROUTE_LOOK_AHEAD
+        )) {
           route.index += 1;
           waypoint = route.path[route.index];
         }
         if (!waypoint) {
           runtime.route = null;
           if (route.object) beginInteraction(route.object);
+          else runtime.intent = createMovementIntent('idle', null, { issuedAt: now });
           route = null;
         } else {
-          const length = distance(runtime.motion, waypoint) || 1;
-          inputX = (waypoint.x - runtime.motion.x) / length;
-          inputY = (waypoint.y - runtime.motion.y) / length;
+          steeringTarget = waypoint;
         }
+      } else if (inputX || inputY) {
+        const length = Math.hypot(inputX, inputY) || 1;
+        steeringTarget = {
+          x: runtime.motion.x + inputX / length * 3.6,
+          y: runtime.motion.y + inputY / length * 3.6,
+        };
+        runtime.intent = createMovementIntent('manual', steeringTarget, { source: 'direct-input', issuedAt: now });
       }
       const previousDistance = runtime.motion.distanceTravelled;
-      const routeInput = { x: inputX, y: inputY };
-      runtime.motion = stepRealmMotion(route ? settleMotionForRouteTurn(runtime.motion, routeInput) : runtime.motion, routeInput, delta, {
-        maxSpeed: WALK_SPEED,
-        acceleration: route ? 25 : 28,
-        deceleration: 36,
+      const playerPortal = steeringTarget ? portalForSegment(runtime.motion, steeringTarget, REALM_NAV_PORTALS) : null;
+      if (playerPortal) {
+        const passage = reservePortalPassage(runtime.portalReservations, { id: sessionId, priority: 100 }, playerPortal, now);
+        if (!passage.granted) {
+          steeringTarget = null;
+          runtime.movementMetrics.portalWaits += 1;
+        }
+      } else releasePortalPassage(runtime.portalReservations, sessionId);
+      runtime.motion = stepSteeredMotion(runtime.motion, steeringTarget, delta, {
+        id: sessionId,
+        kind: 'player',
+        neighbors: actorNeighbors(runtime, sessionId),
         isWalkable: isWorldPositionWalkable,
       });
       const movedThisStep = runtime.motion.distanceTravelled - previousDistance;
       if (route) {
-        route.stuckFor = movedThisStep < .002 && Math.hypot(inputX, inputY) > .1 ? (route.stuckFor || 0) + delta : 0;
-        if (route.stuckFor > .32) {
+        route.stuckFor = movedThisStep < .002 && steeringTarget ? (route.stuckFor || 0) + delta : 0;
+        if (route.stuckFor > .48) {
           const recoveredPath = findRealmPath({
             start: runtime.motion,
             target: route.target,
@@ -2033,10 +2332,13 @@ export default function RealmWorldV3({
             route.path = recoveredPath;
             route.index = 0;
             route.origin = { x: runtime.motion.x, y: runtime.motion.y };
+            runtime.movementMetrics.repaths += 1;
           }
           route.stuckFor = 0;
           runtime.motion = { ...runtime.motion, vx: 0, vy: 0 };
         }
+      } else if (!inputX && !inputY && Math.hypot(runtime.motion.vx, runtime.motion.vy) < .1 && runtime.intent.type === 'manual') {
+        runtime.intent = createMovementIntent('idle', null, { issuedAt: now });
       }
       if (runtime.motion.distanceTravelled - runtime.lastFootstep >= .62) {
         runtime.lastFootstep = runtime.motion.distanceTravelled;
@@ -2060,12 +2362,16 @@ export default function RealmWorldV3({
       const viewport = runtime.viewport;
       const halfW = viewport.width / viewport.tile / 2;
       const halfH = viewport.height / (viewport.tile * REALM_WORLD_Y_SCALE) / 2;
+      const deadZoneTarget = cameraTargetWithDeadZone(runtime.camera, runtime.motion, { halfW, halfH }, {
+        deadZoneX: viewport.width < 520 ? .11 : .16,
+        deadZoneY: viewport.width < 520 ? .09 : .13,
+        lookAhead: reducedMotion ? 0 : viewport.width < 520 ? .12 : .22,
+      });
       const targetCamera = {
-        x: clamp(runtime.motion.x, Math.min(WORLD.cols / 2, halfW), Math.max(WORLD.cols / 2, WORLD.cols - halfW)),
-        y: clamp(runtime.motion.y, Math.min(WORLD.rows / 2, halfH), Math.max(WORLD.rows / 2, WORLD.rows - halfH)),
+        x: clamp(deadZoneTarget.x, Math.min(WORLD.cols / 2, halfW), Math.max(WORLD.cols / 2, WORLD.cols - halfW)),
+        y: clamp(deadZoneTarget.y, Math.min(WORLD.rows / 2, halfH), Math.max(WORLD.rows / 2, WORLD.rows - halfH)),
       };
-      runtime.camera = stepRealmCamera(runtime.camera, targetCamera, delta, { frequency: reducedMotion ? 12 : 4.2, damping: .92, maxVelocity: reducedMotion ? 40 : 17 });
-      updateRemoteActors(delta);
+      runtime.camera = stepRealmCamera(runtime.camera, targetCamera, delta, { frequency: reducedMotion ? 12 : 3.6, damping: .96, maxVelocity: reducedMotion ? 40 : 13 });
       for (const particle of runtime.effects) {
         particle.life -= delta;
         particle.x += particle.vx * delta;
@@ -2074,23 +2380,25 @@ export default function RealmWorldV3({
         particle.spin += delta * 4;
       }
       runtime.effects = runtime.effects.filter((particle) => particle.life > 0);
-      for (const actor of [...runtime.demoActors.values()].slice(0, quality.ambientActors)) {
-        const target = actor.waypoints[actor.waypointIndex] || actor.waypoints[0];
-        const remaining = stepSpatialActor(actor, { x: target[0], y: target[1] }, delta, {
-          maxSpeed: 1.45,
-          acceleration: 8,
-          deceleration: 12,
-        });
-        if (remaining < .22) {
-          actor.waypointIndex = (actor.waypointIndex + 1) % actor.waypoints.length;
-          actor.spatialRoute = null;
-          continue;
-        }
-      }
-
       if (now - lastUiSync >= 100) {
         lastUiSync = now;
         const actor = runtime.motion;
+        const spatialActors = [
+          { ...actor, id: sessionId, radius: .3, priority: 100 },
+          ...runtime.remotes.values(),
+          ...runtime.demoActors.values(),
+        ];
+        let overlapCount = 0;
+        for (let left = 0; left < spatialActors.length; left += 1) {
+          for (let right = left + 1; right < spatialActors.length; right += 1) {
+            if (personalSpaceOverlap(spatialActors[left], spatialActors[right], .02)) overlapCount += 1;
+          }
+        }
+        runtime.movementMetrics.overlaps = overlapCount;
+        runtime.movementMetrics.repaths = Math.max(
+          runtime.movementMetrics.repaths,
+          [...runtime.demoActors.values(), ...runtime.remotes.values()].reduce((sum, item) => sum + (item.repathCount || 0), 0),
+        );
         const nearestObject = WORLD_OBJECTS.reduce((best, object) => {
           const objectDistance = distance(actor, object);
           return !best || objectDistance < best.distance ? { object, distance: objectDistance } : best;
@@ -2114,6 +2422,21 @@ export default function RealmWorldV3({
           canvasRef.current.dataset.realmPlayerScreenX = (runtime.viewport.width / 2 + (actor.x - runtime.camera.x) * runtime.viewport.tile).toFixed(2);
           canvasRef.current.dataset.realmPlayerScreenY = (runtime.viewport.height / 2 + (actor.y - runtime.camera.y) * runtime.viewport.tile * REALM_WORLD_Y_SCALE).toFixed(2);
           canvasRef.current.dataset.realmLocomotion = actor.locomotion;
+          canvasRef.current.dataset.realmMovementVersion = String(REALM_MOVEMENT_VERSION);
+          canvasRef.current.dataset.realmMovementIntent = runtime.intent.type;
+          canvasRef.current.dataset.realmPlayerSpeed = Math.hypot(actor.vx, actor.vy).toFixed(3);
+          canvasRef.current.dataset.realmActorOverlaps = String(runtime.movementMetrics.overlaps);
+          canvasRef.current.dataset.realmRepaths = String(runtime.movementMetrics.repaths);
+          canvasRef.current.dataset.realmRemoteCorrection = runtime.movementMetrics.remoteCorrection.toFixed(3);
+          canvasRef.current.dataset.realmNpcMoving = String(runtime.movementMetrics.npcMoving);
+          canvasRef.current.dataset.realmPortalWaits = String(runtime.movementMetrics.portalWaits + spatialActors.reduce((sum, item) => sum + (item.portalWaits || 0), 0));
+          canvasRef.current.dataset.realmActorState = JSON.stringify(spatialActors.map((item) => ({
+            id: item.id || item.realmIdentity,
+            x: Number(item.x).toFixed(2),
+            y: Number(item.y).toFixed(2),
+            locomotion: item.motion?.locomotion || item.locomotion || 'idle',
+            activity: item.activity?.phase || (item.realmIdentity ? 'remote' : 'player'),
+          })));
           canvasRef.current.dataset.realmInteraction = runtime.interaction?.phase || 'idle';
           canvasRef.current.dataset.realmCollision = worldCollisionAt(actor)?.id || 'none';
         }
@@ -2153,6 +2476,8 @@ export default function RealmWorldV3({
         status: playerStatus,
         archetype: playerArchetype,
         motion: runtime.motion,
+        priority: 100,
+        radius: .3,
         player: true,
       }];
       const sceneNodes = [
@@ -2176,7 +2501,10 @@ export default function RealmWorldV3({
         const screenY = offsetY + projectRealmY(node.value.y, tile);
         const edgeDistance = Math.min(screenX, width - screenX, screenY, height - screenY);
         const localPlayer = node.type === 'actor' && node.value.player;
-        const edgeAlpha = localPlayer ? 1 : clamp((edgeDistance + 44) / 112, node.type === 'actor' ? .18 : 0, 1);
+        let edgeAlpha = localPlayer ? 1 : clamp((edgeDistance + 44) / 112, node.type === 'actor' ? .18 : 0, 1);
+        if (node.type === 'actor' && node.value.waygateUntil > now) {
+          edgeAlpha *= clamp(1 - (node.value.waygateUntil - now) / 360, .18, 1);
+        }
         if (edgeAlpha <= .02) continue;
         ctx.save();
         ctx.globalAlpha *= edgeAlpha;
@@ -2199,7 +2527,7 @@ export default function RealmWorldV3({
             rewarded: actor.player && runtime.rewardedUntil > now,
             compactLabel: quality.id === 'low',
             reducedMotion,
-            interaction: actor.player ? runtime.interaction : null,
+            interaction: actor.player ? runtime.interaction : actor.activityInteraction || null,
             art: artRef.current,
           });
           if (actor.player) {
@@ -2216,6 +2544,7 @@ export default function RealmWorldV3({
         .slice(playerNodeIndex + 1)
         .some((node) => sceneNodeOccludesActor(node, playerActor, tile)));
       if (playerOccluded) drawActorOcclusionSilhouette(ctx, playerActor, tile, now, artRef.current, reducedMotion);
+      if (debug) drawMovementDebug(ctx, runtime, actors, tile);
       ctx.restore();
       if (screenLayerRef.current.canvas) ctx.drawImage(screenLayerRef.current.canvas, 0, 0, width, height);
       if (canvasRef.current) {
@@ -2303,8 +2632,14 @@ export default function RealmWorldV3({
 
   const pressDirection = (key, pressed) => {
     runtimeRef.current.route = null;
-    if (pressed) keysRef.current.add(key);
-    else keysRef.current.delete(key);
+    if (pressed) {
+      releaseInteractionSlot(runtimeRef.current.interactionReservations, sessionId);
+      runtimeRef.current.intent = createMovementIntent('manual', null, { source: 'touch', issuedAt: performance.now() });
+      keysRef.current.add(key);
+    } else {
+      keysRef.current.delete(key);
+      if (!keysRef.current.size) runtimeRef.current.intent = createMovementIntent('idle', null, { issuedAt: performance.now() });
+    }
   };
 
   const nudgeDirection = (key) => {
@@ -2338,6 +2673,7 @@ export default function RealmWorldV3({
       className={worldStyles.stage}
       aria-label={t('Không gian Guildhall tương tác')}
       data-realm-world-version="3"
+      data-realm-movement-version={REALM_MOVEMENT_VERSION}
       data-realm-quality={quality.id}
       data-realm-depth="2.5d"
       data-realm-art-ready={artReady ? 'true' : 'false'}
@@ -2445,7 +2781,7 @@ export default function RealmWorldV3({
         <span aria-hidden="true" />
       </div>}
 
-      {debug && <output className={worldStyles.debug}>V3 · {quality.id} · {metrics.fps.toFixed(0)} fps · frame {metrics.p95.toFixed(1)} ms · render {metrics.renderP95.toFixed(1)} ms · {people.length} remote</output>}
+      {debug && <output className={worldStyles.debug}>V3 / Move V{REALM_MOVEMENT_VERSION} · {quality.id} · {metrics.fps.toFixed(0)} fps · render {metrics.renderP95.toFixed(1)} ms · {people.length} remote · {runtimeRef.current.movementMetrics.npcMoving} moving · {runtimeRef.current.movementMetrics.overlaps} overlap</output>}
       {arrival && <button type="button" className={worldStyles.skipArrival} onClick={() => setArrival(false)}>{t('Bỏ qua chuyển cảnh')}</button>}
       <span className={`${worldStyles.waygateTransition} ${waygate || arrival ? worldStyles.waygateTransitionActive : ''}`} aria-hidden="true" />
     </section>

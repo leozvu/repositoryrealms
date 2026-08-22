@@ -42,6 +42,14 @@ export const WORLD_OBJECTS = [
 
 export const REALM_ACTOR_RADIUS = .28;
 
+// Capacity-limited passages let the movement director serialize narrow stairs
+// and gates instead of allowing multiple actors to occupy the same visual lane.
+export const REALM_NAV_PORTALS = Object.freeze([
+  Object.freeze({ id: 'council-stair', minX: 22.35, maxX: 25.65, minY: 22.9, maxY: 27.2, capacity: 1 }),
+  Object.freeze({ id: 'eastern-stair', minX: 37.75, maxX: 41.25, minY: 23.05, maxY: 27.4, capacity: 1 }),
+  Object.freeze({ id: 'south-gate', minX: 20.25, maxX: 27.75, minY: 33.35, maxY: 38.4, capacity: 2 }),
+]);
+
 // Geometry is authored in the same 48x44 world coordinates as the unified
 // scene plate. These colliders are the spatial contract used by local input,
 // click-to-walk, ambient actors and remote presence interpolation.
