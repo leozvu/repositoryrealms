@@ -110,7 +110,7 @@ test('v3 component owns continuous motion over one unified 2.5D scene plate', ()
   assert.match(source, /normalizeRealmWorldPeople/);
   assert.match(source, /Canonical receipt đã xác nhận/);
   assert.match(source, /REALM_CHARACTER_ATLAS_ROWS/);
-  assert.match(source, /drawArchitectureOcclusion/);
+  assert.match(source, /drawArchitectureOccluder/);
   assert.match(source, /demo-elf/);
   assert.match(source, /demo-dwarf/);
   assert.doesNotMatch(source, /@remotion\/player/);

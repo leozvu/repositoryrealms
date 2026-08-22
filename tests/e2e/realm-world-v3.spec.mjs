@@ -36,6 +36,10 @@ test('v3 is a live layered world with bounded locomotion over one unified scene 
   await expect(world).toHaveAttribute('data-realm-quality', isMobile ? 'low' : /medium|high/);
   await expect(page.locator('[data-realm-world-version="3"] img[src*="guildhall-environment"]')).toHaveCount(0);
   await expect.poll(async () => Number(await canvas.getAttribute('data-realm-x'))).toBeGreaterThan(0);
+  await expect(canvas).toHaveAttribute('data-realm-player-visible', 'true');
+  await expect(canvas).toHaveAttribute('data-realm-player-alpha', '1.00');
+  await expect(canvas).toHaveAttribute('data-realm-player-occluded', /clear|silhouette/);
+  await expect(canvas).toHaveAttribute('data-realm-collision', 'none');
 
   const before = await canvas.evaluate((element) => ({ x: Number(element.dataset.realmX), y: Number(element.dataset.realmY) }));
   if (isMobile) {
@@ -62,6 +66,47 @@ test('v3 is a live layered world with bounded locomotion over one unified scene 
   const screenshot = testInfo.outputPath(isMobile ? 'realm-world-v3-mobile.png' : 'realm-world-v3-desktop.png');
   await page.screenshot({ path: screenshot, fullPage: false });
   await testInfo.attach('Realm World v3', { path: screenshot, contentType: 'image/png' });
+});
+
+test('actor remains visible and collision-free while routing around authored architecture', async ({ page }) => {
+  const canvas = page.locator('canvas[data-realm-runtime="canvas-2d-fixed-step"]');
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent('realm:move', {
+    detail: { objectId: 'command-dais', direct: true },
+  })));
+  const commandSurface = page.getByRole('complementary', { name: 'Phòng điều hành', exact: true });
+  await expect(commandSurface).toBeVisible({ timeout: 5_000 });
+  await commandSurface.getByRole('button', { name: 'Đóng', exact: true }).click();
+
+  await page.evaluate(() => {
+    window.__realmSpatialSamples = [];
+    window.__realmSpatialSampler = window.setInterval(() => {
+      const world = document.querySelector('canvas[data-realm-runtime="canvas-2d-fixed-step"]');
+      if (!world) return;
+      window.__realmSpatialSamples.push({
+        x: Number(world.dataset.realmX),
+        y: Number(world.dataset.realmY),
+        collision: world.dataset.realmCollision,
+        visible: world.dataset.realmPlayerVisible,
+        alpha: world.dataset.realmPlayerAlpha,
+        locomotion: world.dataset.realmLocomotion,
+      });
+    }, 32);
+    window.dispatchEvent(new CustomEvent('realm:move', { detail: { x: 15.5, y: 17.5 } }));
+  });
+
+  await expect.poll(async () => {
+    const position = await canvas.evaluate((element) => ({ x: Number(element.dataset.realmX), y: Number(element.dataset.realmY) }));
+    return position.x < 16.1 && position.y > 16.9;
+  }, { timeout: 12_000 }).toBe(true);
+  const samples = await page.evaluate(() => {
+    window.clearInterval(window.__realmSpatialSampler);
+    return window.__realmSpatialSamples;
+  });
+  expect(samples.length).toBeGreaterThan(8);
+  expect(samples.some((sample) => sample.locomotion === 'walk' || sample.locomotion === 'start')).toBe(true);
+  expect(samples.every((sample) => sample.collision === 'none')).toBe(true);
+  expect(samples.every((sample) => sample.visible === 'true' && sample.alpha === '1.00')).toBe(true);
+  expect(samples.some((sample) => sample.x >= 18.15 && sample.x <= 29.85 && sample.y >= 12.05 && sample.y <= 14.75)).toBe(false);
 });
 
 test('business interaction is embodied by the actor and acknowledged by the environment', async ({ page }, testInfo) => {

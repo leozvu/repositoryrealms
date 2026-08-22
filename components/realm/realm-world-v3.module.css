@@ -240,7 +240,8 @@
 .actionActions > button:not(:first-child) { width: 44px; justify-content: center; padding: 0; color: #d9bf7d; background: rgba(255,255,255,.055); }
 .actionActions > button:first-child:hover { background: #e4c77e; }
 .actionActions > button:not(:first-child):hover { background: rgba(255,255,255,.1); }
-.actionTouch { display: none !important; }
+.actionTouch,
+.actionSound { display: none !important; }
 .actionActions > button:active { transform: translateY(1px) scale(.985); }
 .actionRibbon kbd { display: grid; width: 23px; height: 23px; place-items: center; border: 1px solid rgba(35, 27, 14, .26); border-radius: 5px; background: rgba(255, 255, 255, .2); font-family: var(--font-mono), monospace; font-size: .58rem; }
 
@@ -401,7 +402,8 @@
   .journey { top: 132px; min-width: min(310px, calc(100vw - 24px)); }
   .journey em { max-width: 82px; }
   .touchToggle { display: flex !important; }
-  .actionTouch { display: inline-flex !important; }
+  .actionTouch,
+  .actionSound { display: inline-flex !important; }
   .touchToggle span:first-child { display: inline !important; font-size: 1rem; line-height: 1; }
   .touchControls[data-open='true'] { display: grid; bottom: 88px; }
   .reward { padding: 13px 14px; }

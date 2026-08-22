@@ -32,15 +32,18 @@ import {
 } from '@/lib/realm-visual-runtime';
 import {
   PRIVATE_ZONES,
+  REALM_ARCHITECTURE_OCCLUDERS,
   ROOMS,
-  WALLS,
   WORLD,
   WORLD_OBJECTS,
   distance,
   isWorldPositionWalkable,
+  nearestWalkableWorldPosition,
   normalizeWorldPosition,
+  objectInteractionPoints,
   privateZoneAt,
   roomAt,
+  worldCollisionAt,
 } from './world';
 import worldStyles from './realm-world-v3.module.css';
 
@@ -113,17 +116,12 @@ const DEMO_ACTORS = Object.freeze([
 ]);
 
 const STATUS_COLORS = Object.freeze({ available: '#7cc39b', busy: '#d6a455', focus: '#aa9bd6', dnd: '#cf7278', away: '#87948d' });
-const OBJECT_RADIUS = 1.25;
 const INTERACTION_RADIUS = 1.85;
 const WALK_SPEED = 4.65;
 const ROUTE_ARRIVAL = .2;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
-}
-
-function lerp(a, b, amount) {
-  return a + (b - a) * amount;
 }
 
 function seededNoise(x, y) {
@@ -261,14 +259,76 @@ function buildMaterialPatterns(ctx, image, tile) {
   return patterns;
 }
 
-function pathToObject(object) {
-  const candidates = [
-    { x: object.x, y: object.y + 1.45 },
-    { x: object.x + 1.45, y: object.y },
-    { x: object.x - 1.45, y: object.y },
-    { x: object.x, y: object.y - 1.45 },
-  ];
-  return candidates.find(isWorldPositionWalkable) || normalizeWorldPosition(object);
+function pathToObject(object, origin = null) {
+  const candidates = objectInteractionPoints(object);
+  if (origin) candidates.sort((left, right) => distance(left, origin) - distance(right, origin));
+  return candidates[0] || nearestWalkableWorldPosition(object);
+}
+
+function objectAtWorldPoint(point) {
+  return [...WORLD_OBJECTS].reverse().find((object) => {
+    const visual = REALM_OBJECT_VISUALS[object.id];
+    const halfWidth = (visual?.width || 3.8) * .54;
+    const visualTop = object.y - (visual?.height || 3.8) * .9 / REALM_WORLD_Y_SCALE;
+    return point.x >= object.x - halfWidth
+      && point.x <= object.x + halfWidth
+      && point.y >= visualTop
+      && point.y <= object.y + .9;
+  }) || null;
+}
+
+function spatialTargetKey(point) {
+  return `${Math.round(point.x * 2)},${Math.round(point.y * 2)}`;
+}
+
+function settleMotionForRouteTurn(motion, input) {
+  const speed = Math.hypot(motion.vx, motion.vy);
+  const inputLength = Math.hypot(input.x, input.y);
+  if (speed < .08 || inputLength < .01) return motion;
+  const alignment = (motion.vx * input.x + motion.vy * input.y) / (speed * inputLength);
+  if (alignment >= .72) return motion;
+  const retention = alignment < .15 ? .08 : .32;
+  return { ...motion, vx: motion.vx * retention, vy: motion.vy * retention };
+}
+
+function stepSpatialActor(actor, target, delta, options = {}) {
+  const safeTarget = nearestWalkableWorldPosition(target, actor.motion);
+  const targetKey = spatialTargetKey(safeTarget);
+  if (!actor.spatialRoute || actor.spatialRoute.targetKey !== targetKey) {
+    actor.spatialRoute = {
+      targetKey,
+      index: 0,
+      path: findRealmPath({
+        start: actor.motion,
+        target: safeTarget,
+        cols: WORLD.cols,
+        rows: WORLD.rows,
+        isWalkable: isWorldPositionWalkable,
+      }),
+    };
+  } else if (actor.spatialRoute.path.length) {
+    actor.spatialRoute.path[actor.spatialRoute.path.length - 1] = safeTarget;
+  }
+
+  let waypoint = actor.spatialRoute.path[actor.spatialRoute.index];
+  while (waypoint && distance(actor.motion, waypoint) <= ROUTE_ARRIVAL) {
+    actor.spatialRoute.index += 1;
+    waypoint = actor.spatialRoute.path[actor.spatialRoute.index];
+  }
+  const remaining = waypoint ? distance(actor.motion, waypoint) || 1 : 0;
+  const input = waypoint ? {
+    x: (waypoint.x - actor.motion.x) / remaining,
+    y: (waypoint.y - actor.motion.y) / remaining,
+  } : {};
+  actor.motion = stepRealmMotion(settleMotionForRouteTurn(actor.motion, input), input, delta, {
+    maxSpeed: options.maxSpeed,
+    acceleration: options.acceleration,
+    deceleration: options.deceleration,
+    isWalkable: isWorldPositionWalkable,
+  });
+  actor.x = actor.motion.x;
+  actor.y = actor.motion.y;
+  return distance(actor.motion, safeTarget);
 }
 
 function roomTheme(room) {
@@ -497,37 +557,175 @@ function buildStaticWorld(tile, art) {
   return canvas;
 }
 
-function drawPlateSlice(ctx, image, tile, x, y, width, height, alpha = 1) {
-  const imageWidth = image?.naturalWidth || image?.width;
-  const imageHeight = image?.naturalHeight || image?.height;
-  if (!imageWidth || !imageHeight) return;
-  const sourceX = x / WORLD.cols * imageWidth;
-  const sourceY = y / WORLD.rows * imageHeight;
-  const sourceWidth = width / WORLD.cols * imageWidth;
-  const sourceHeight = height / WORLD.rows * imageHeight;
+function traceArchitectureOccluder(ctx, occluder, tile) {
+  if (occluder.type === 'polygon') {
+    occluder.points.forEach(([x, y], index) => {
+      const screenX = x * tile;
+      const screenY = projectRealmY(y, tile);
+      if (index === 0) ctx.moveTo(screenX, screenY);
+      else ctx.lineTo(screenX, screenY);
+    });
+    ctx.closePath();
+    return;
+  }
+
+  const steps = 28;
+  for (let index = 0; index <= steps; index += 1) {
+    const angle = occluder.start + (occluder.end - occluder.start) * index / steps;
+    const x = (occluder.cx + Math.cos(angle) * occluder.outerRx) * tile;
+    const y = projectRealmY(occluder.cy + Math.sin(angle) * occluder.outerRy, tile);
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  for (let index = steps; index >= 0; index -= 1) {
+    const angle = occluder.start + (occluder.end - occluder.start) * index / steps;
+    ctx.lineTo(
+      (occluder.cx + Math.cos(angle) * occluder.innerRx) * tile,
+      projectRealmY(occluder.cy + Math.sin(angle) * occluder.innerRy, tile),
+    );
+  }
+  ctx.closePath();
+}
+
+function drawArchitectureOccluder(ctx, occluder, art, tile) {
+  const image = art?.scenePlate;
+  if (!image) return;
+  const destinationWidth = WORLD.cols * tile;
+  const destinationHeight = projectRealmY(WORLD.rows, tile);
+  const imageWidth = image.naturalWidth || image.width;
+  const imageHeight = image.naturalHeight || image.height;
+  const bounds = occluder.type === 'polygon'
+    ? occluder.points.reduce((box, [x, y]) => ({
+      minX: Math.min(box.minX, x * tile),
+      maxX: Math.max(box.maxX, x * tile),
+      minY: Math.min(box.minY, projectRealmY(y, tile)),
+      maxY: Math.max(box.maxY, projectRealmY(y, tile)),
+    }), { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity })
+    : {
+      minX: (occluder.cx - occluder.outerRx) * tile,
+      maxX: (occluder.cx + occluder.outerRx) * tile,
+      minY: projectRealmY(occluder.cy - occluder.outerRy, tile),
+      maxY: projectRealmY(occluder.cy + occluder.outerRy, tile),
+    };
+  const destinationX = Math.max(0, Math.floor(bounds.minX) - 1);
+  const destinationY = Math.max(0, Math.floor(bounds.minY) - 1);
+  const destinationRight = Math.min(destinationWidth, Math.ceil(bounds.maxX) + 1);
+  const destinationBottom = Math.min(destinationHeight, Math.ceil(bounds.maxY) + 1);
+  const cropWidth = Math.max(1, destinationRight - destinationX);
+  const cropHeight = Math.max(1, destinationBottom - destinationY);
   ctx.save();
-  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  traceArchitectureOccluder(ctx, occluder, tile);
+  ctx.clip();
   ctx.drawImage(
     image,
-    sourceX,
-    sourceY,
-    sourceWidth,
-    sourceHeight,
-    x * tile,
-    projectRealmY(y, tile),
-    width * tile,
-    height * tile * REALM_WORLD_Y_SCALE,
+    destinationX / destinationWidth * imageWidth,
+    destinationY / destinationHeight * imageHeight,
+    cropWidth / destinationWidth * imageWidth,
+    cropHeight / destinationHeight * imageHeight,
+    destinationX,
+    destinationY,
+    cropWidth,
+    cropHeight,
   );
   ctx.restore();
 }
 
-function drawArchitectureOcclusion(ctx, art, tile) {
-  if (!art?.scenePlate) return;
-  // Re-sampling the same plate keeps material, light and perspective exact.
-  // These slices sit in front of actors to create real architectural depth.
-  drawPlateSlice(ctx, art.scenePlate, tile, 13.2, 12.4, 21.6, 5.8, .99);
-  drawPlateSlice(ctx, art.scenePlate, tile, 0, 33.8, 20.2, 10.2, 1);
-  drawPlateSlice(ctx, art.scenePlate, tile, 27.8, 33.8, 20.2, 10.2, 1);
+function architectureOccluderPoints(occluder, tile) {
+  if (occluder.type === 'polygon') {
+    return occluder.points.map(([x, y]) => ({ x: x * tile, y: projectRealmY(y, tile) }));
+  }
+  const steps = 28;
+  const points = [];
+  for (let index = 0; index <= steps; index += 1) {
+    const angle = occluder.start + (occluder.end - occluder.start) * index / steps;
+    points.push({
+      x: (occluder.cx + Math.cos(angle) * occluder.outerRx) * tile,
+      y: projectRealmY(occluder.cy + Math.sin(angle) * occluder.outerRy, tile),
+    });
+  }
+  for (let index = steps; index >= 0; index -= 1) {
+    const angle = occluder.start + (occluder.end - occluder.start) * index / steps;
+    points.push({
+      x: (occluder.cx + Math.cos(angle) * occluder.innerRx) * tile,
+      y: projectRealmY(occluder.cy + Math.sin(angle) * occluder.innerRy, tile),
+    });
+  }
+  return points;
+}
+
+function pointInsidePolygon(point, points) {
+  let inside = false;
+  for (let current = 0, previous = points.length - 1; current < points.length; previous = current, current += 1) {
+    const a = points[current];
+    const b = points[previous];
+    const crosses = (a.y > point.y) !== (b.y > point.y)
+      && point.x < (b.x - a.x) * (point.y - a.y) / ((b.y - a.y) || .00001) + a.x;
+    if (crosses) inside = !inside;
+  }
+  return inside;
+}
+
+function sceneNodeOccludesActor(node, actor, tile) {
+  const archetype = actor.archetype || classifyRealmActor(actor);
+  const base = tile * archetype.race.scale * .96;
+  const actorSamples = [
+    { x: actor.x * tile, y: projectRealmY(actor.y, tile) - base * .45 },
+    { x: actor.x * tile, y: projectRealmY(actor.y, tile) - base * 1.05 },
+  ];
+  if (node.type === 'architecture') {
+    const points = architectureOccluderPoints(node.value, tile);
+    return actorSamples.some((point) => pointInsidePolygon(point, points));
+  }
+  if (node.type !== 'object') return false;
+  const visual = REALM_OBJECT_VISUALS[node.value.id];
+  if (!visual) return false;
+  const width = tile * visual.width;
+  const height = tile * visual.height;
+  const left = node.value.x * tile - width / 2;
+  const right = left + width;
+  const top = projectRealmY(node.value.y, tile) - height * .87;
+  const bottom = top + height;
+  return actorSamples.some((point) => point.x >= left && point.x <= right && point.y >= top && point.y <= bottom);
+}
+
+function drawActorOcclusionSilhouette(ctx, actor, tile, time, art, reducedMotion) {
+  const archetype = actor.archetype || classifyRealmActor(actor);
+  const race = archetype.race;
+  const motion = actor.motion || createRealmMotionState(actor);
+  const moving = motion.locomotion === 'walk' || motion.locomotion === 'start';
+  const gait = moving ? Math.sin(motion.gaitTime * Math.PI * 2.25 * race.gait) : Math.sin(time * .0018 + actor.x) * .05;
+  const bounce = reducedMotion ? 0 : moving ? Math.abs(gait) * tile * .045 : Math.sin(time * .0015 + actor.y) * tile * .015;
+  const [faceX, faceY] = facingVector(motion.facing);
+  const row = REALM_CHARACTER_ATLAS_ROWS[race.id];
+  const sheet = art?.characterTurnaround;
+  const base = tile * race.scale * .96;
+  const height = base * (race.id === 'dwarf' ? 2.18 : 2.42);
+  const width = height * 1.25;
+  ctx.save();
+  ctx.translate(actor.x * tile, projectRealmY(actor.y, tile) - bounce);
+  ctx.globalAlpha = .34;
+  ctx.filter = 'brightness(0) saturate(100%) invert(84%) sepia(20%) saturate(785%) hue-rotate(109deg) brightness(94%) contrast(91%)';
+  ctx.shadowColor = 'rgba(119, 220, 190, .95)';
+  ctx.shadowBlur = 9;
+  if (Number.isFinite(row) && sheet) {
+    const frame = row * 4 + actorFacingColumn(faceX, faceY);
+    drawAtlasFrame(ctx, sheet, frame, 4, 5, -width / 2, -height * .92, width, height, 1);
+  } else {
+    ctx.fillStyle = '#83d7bf';
+    ctx.beginPath();
+    ctx.ellipse(0, -base * .7, base * .36, base * .76, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.filter = 'none';
+  ctx.shadowBlur = 7;
+  ctx.globalAlpha = .82;
+  ctx.strokeStyle = '#8edcc5';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(0, base * .17, base * .46, base * .18, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
 }
 
 function buildTorchLight(tile) {
@@ -938,24 +1136,6 @@ function drawObjectVisual(ctx, object, tile, time, state, art) {
   ctx.restore();
 }
 
-function drawOccluder(ctx, node, tile, art) {
-  if (!art?.occluders) return;
-  const width = node.width * tile;
-  const height = node.height * tile;
-  drawAtlasFrame(
-    ctx,
-    art.occluders,
-    node.frame,
-    4,
-    3,
-    node.x * tile - width / 2,
-    projectRealmY(node.y, tile) - height * .9,
-    width,
-    height,
-    .98,
-  );
-}
-
 function facingVector(facing) {
   const map = {
     up: [0, -1], 'up-right': [.7, -.7], right: [1, 0], 'down-right': [.7, .7],
@@ -1349,29 +1529,27 @@ function drawRoute(ctx, route, tile, time) {
   ctx.restore();
 }
 
-function drawParticles(ctx, effects, tile) {
-  for (const particle of effects) {
-    ctx.save();
-    ctx.globalAlpha = clamp(particle.life / particle.maxLife, 0, 1);
-    ctx.translate(particle.x * tile, projectRealmY(particle.y, tile));
-    if (particle.kind === 'gold') {
-      ctx.fillStyle = '#e7bd51';
-      ctx.beginPath();
-      ctx.ellipse(0, 0, tile * .075, tile * .04, particle.spin, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#fff0a8';
-      ctx.stroke();
-    } else if (particle.kind === 'dust') {
-      ctx.fillStyle = particle.color || '#b7aa86';
-      ctx.beginPath();
-      ctx.ellipse(0, 0, tile * .04, tile * .018, particle.spin, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = particle.color || '#e18853';
-      ctx.fillRect(-2, -2, 4, 4);
-    }
-    ctx.restore();
+function drawParticle(ctx, particle, tile) {
+  ctx.save();
+  ctx.globalAlpha = clamp(particle.life / particle.maxLife, 0, 1);
+  ctx.translate(particle.x * tile, projectRealmY(particle.y, tile));
+  if (particle.kind === 'gold') {
+    ctx.fillStyle = '#e7bd51';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, tile * .075, tile * .04, particle.spin, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff0a8';
+    ctx.stroke();
+  } else if (particle.kind === 'dust') {
+    ctx.fillStyle = particle.color || '#b7aa86';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, tile * .04, tile * .018, particle.spin, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    ctx.fillStyle = particle.color || '#e18853';
+    ctx.fillRect(-2, -2, 4, 4);
   }
+  ctx.restore();
 }
 
 function drawScreenTreatment(ctx, width, height) {
@@ -1642,7 +1820,7 @@ export default function RealmWorldV3({
 
   const routeTo = useCallback((target, object = null) => {
     const runtime = runtimeRef.current;
-    const safeTarget = normalizeWorldPosition(target);
+    const safeTarget = nearestWalkableWorldPosition(target, runtime.motion);
     const path = findRealmPath({
       start: runtime.motion,
       target: safeTarget,
@@ -1651,7 +1829,14 @@ export default function RealmWorldV3({
       isWalkable: isWorldPositionWalkable,
     });
     if (!path.length) return false;
-    runtime.route = { path, index: 0, object, origin: { x: runtime.motion.x, y: runtime.motion.y } };
+    runtime.route = {
+      path,
+      index: 0,
+      object,
+      target: safeTarget,
+      origin: { x: runtime.motion.x, y: runtime.motion.y },
+      stuckFor: 0,
+    };
     runtime.selectedObject = object;
     setSelectedObject(object);
     setJourney(object ? { object, phase: 'traveling', progress: 'Đang tìm đường' } : null);
@@ -1665,7 +1850,7 @@ export default function RealmWorldV3({
     setWaygate(true);
     setJourney({ object, phase: 'waygate', progress: 'Đang đi qua Waygate' });
     const moveTimer = window.setTimeout(() => {
-      const target = pathToObject(object);
+      const target = pathToObject(object, runtimeRef.current.motion);
       runtimeRef.current.motion = createRealmMotionState(target);
       runtimeRef.current.camera = createRealmCameraState(target);
       runtimeRef.current.route = null;
@@ -1683,12 +1868,12 @@ export default function RealmWorldV3({
     const handler = (event) => {
       if (event.detail?.objectId) {
         const object = WORLD_OBJECTS.find((item) => item.id === event.detail.objectId);
-        if (object) return event.detail.direct ? waygateTo(object) : routeTo(pathToObject(object), object);
+        if (object) return event.detail.direct ? waygateTo(object) : routeTo(pathToObject(object, runtimeRef.current.motion), object);
       }
       if (event.detail?.x == null || event.detail?.y == null) return;
       const object = WORLD_OBJECTS.find((item) => distance(item, event.detail) < .8) || null;
       if (event.detail.direct && object) waygateTo(object);
-      else routeTo(object ? pathToObject(object) : event.detail, object);
+      else routeTo(object ? pathToObject(object, runtimeRef.current.motion) : event.detail, object);
     };
     window.addEventListener('realm:move', handler);
     return () => window.removeEventListener('realm:move', handler);
@@ -1785,7 +1970,8 @@ export default function RealmWorldV3({
         if (!Number.isFinite(targetX) || !Number.isFinite(targetY)) continue;
         let actor = runtime.remotes.get(key);
         if (!actor) {
-          actor = { ...person, x: targetX, y: targetY, targetX, targetY, motion: createRealmMotionState({ x: targetX, y: targetY }) };
+          const initial = nearestWalkableWorldPosition({ x: targetX, y: targetY });
+          actor = { ...person, ...initial, targetX, targetY, motion: createRealmMotionState(initial), spatialRoute: null };
           runtime.remotes.set(key, actor);
         }
         actor.targetX = targetX;
@@ -1793,16 +1979,11 @@ export default function RealmWorldV3({
         actor.name = person.name;
         actor.status = person.status;
         actor.archetype = person.archetype;
-        const beforeX = actor.x;
-        const beforeY = actor.y;
-        const smoothing = 1 - Math.exp(-delta * 9);
-        actor.x = lerp(actor.x, actor.targetX, smoothing);
-        actor.y = lerp(actor.y, actor.targetY, smoothing);
-        const dx = actor.x - beforeX;
-        const dy = actor.y - beforeY;
-        actor.motion = stepRealmMotion(actor.motion, { x: dx * 20, y: dy * 20 }, delta, { maxSpeed: WALK_SPEED, acceleration: 20, isWalkable: () => true });
-        actor.motion.x = actor.x;
-        actor.motion.y = actor.y;
+        stepSpatialActor(actor, { x: actor.targetX, y: actor.targetY }, delta, {
+          maxSpeed: 5.8,
+          acceleration: 26,
+          deceleration: 36,
+        });
       }
       for (const key of runtime.remotes.keys()) if (!eligible.has(key)) runtime.remotes.delete(key);
     };
@@ -1830,12 +2011,33 @@ export default function RealmWorldV3({
         }
       }
       const previousDistance = runtime.motion.distanceTravelled;
-      runtime.motion = stepRealmMotion(runtime.motion, { x: inputX, y: inputY }, delta, {
+      const routeInput = { x: inputX, y: inputY };
+      runtime.motion = stepRealmMotion(route ? settleMotionForRouteTurn(runtime.motion, routeInput) : runtime.motion, routeInput, delta, {
         maxSpeed: WALK_SPEED,
         acceleration: route ? 25 : 28,
         deceleration: 36,
         isWalkable: isWorldPositionWalkable,
       });
+      const movedThisStep = runtime.motion.distanceTravelled - previousDistance;
+      if (route) {
+        route.stuckFor = movedThisStep < .002 && Math.hypot(inputX, inputY) > .1 ? (route.stuckFor || 0) + delta : 0;
+        if (route.stuckFor > .32) {
+          const recoveredPath = findRealmPath({
+            start: runtime.motion,
+            target: route.target,
+            cols: WORLD.cols,
+            rows: WORLD.rows,
+            isWalkable: isWorldPositionWalkable,
+          });
+          if (recoveredPath.length) {
+            route.path = recoveredPath;
+            route.index = 0;
+            route.origin = { x: runtime.motion.x, y: runtime.motion.y };
+          }
+          route.stuckFor = 0;
+          runtime.motion = { ...runtime.motion, vx: 0, vy: 0 };
+        }
+      }
       if (runtime.motion.distanceTravelled - runtime.lastFootstep >= .62) {
         runtime.lastFootstep = runtime.motion.distanceTravelled;
         if (soundOn) audioRef.current?.tone('step');
@@ -1874,19 +2076,16 @@ export default function RealmWorldV3({
       runtime.effects = runtime.effects.filter((particle) => particle.life > 0);
       for (const actor of [...runtime.demoActors.values()].slice(0, quality.ambientActors)) {
         const target = actor.waypoints[actor.waypointIndex] || actor.waypoints[0];
-        const remaining = Math.hypot(target[0] - actor.motion.x, target[1] - actor.motion.y);
-        if (remaining < .22) {
-          actor.waypointIndex = (actor.waypointIndex + 1) % actor.waypoints.length;
-          continue;
-        }
-        actor.motion = stepRealmMotion(actor.motion, { x: (target[0] - actor.motion.x) / remaining, y: (target[1] - actor.motion.y) / remaining }, delta, {
+        const remaining = stepSpatialActor(actor, { x: target[0], y: target[1] }, delta, {
           maxSpeed: 1.45,
           acceleration: 8,
           deceleration: 12,
-          isWalkable: isWorldPositionWalkable,
         });
-        actor.x = actor.motion.x;
-        actor.y = actor.motion.y;
+        if (remaining < .22) {
+          actor.waypointIndex = (actor.waypointIndex + 1) % actor.waypoints.length;
+          actor.spatialRoute = null;
+          continue;
+        }
       }
 
       if (now - lastUiSync >= 100) {
@@ -1916,6 +2115,7 @@ export default function RealmWorldV3({
           canvasRef.current.dataset.realmPlayerScreenY = (runtime.viewport.height / 2 + (actor.y - runtime.camera.y) * runtime.viewport.tile * REALM_WORLD_Y_SCALE).toFixed(2);
           canvasRef.current.dataset.realmLocomotion = actor.locomotion;
           canvasRef.current.dataset.realmInteraction = runtime.interaction?.phase || 'idle';
+          canvasRef.current.dataset.realmCollision = worldCollisionAt(actor)?.id || 'none';
         }
       }
     };
@@ -1958,15 +2158,25 @@ export default function RealmWorldV3({
       const sceneNodes = [
         ...WORLD_OBJECTS.map((value) => ({ type: 'object', y: value.y, value })),
         ...actors.map((value) => ({ type: 'actor', y: value.y, value })),
+        ...runtime.effects.map((value) => ({ type: 'particle', y: value.y, value })),
+        ...REALM_ARCHITECTURE_OCCLUDERS.map((value) => ({ type: 'architecture', y: value.depthY, value })),
       ].sort((a, b) => {
-        const priority = { object: 1, actor: 2 };
+        const priority = { object: 1, actor: 2, particle: 3, architecture: 4 };
         return a.y - b.y || priority[a.type] - priority[b.type];
       });
-      for (const node of sceneNodes) {
+      let playerRendered = false;
+      let playerNodeIndex = -1;
+      for (let nodeIndex = 0; nodeIndex < sceneNodes.length; nodeIndex += 1) {
+        const node = sceneNodes[nodeIndex];
+        if (node.type === 'architecture') {
+          drawArchitectureOccluder(ctx, node.value, artRef.current, tile);
+          continue;
+        }
         const screenX = offsetX + node.value.x * tile;
         const screenY = offsetY + projectRealmY(node.value.y, tile);
         const edgeDistance = Math.min(screenX, width - screenX, screenY, height - screenY);
-        const edgeAlpha = clamp((edgeDistance + 28) / 96, 0, 1);
+        const localPlayer = node.type === 'actor' && node.value.player;
+        const edgeAlpha = localPlayer ? 1 : clamp((edgeDistance + 44) / 112, node.type === 'actor' ? .18 : 0, 1);
         if (edgeAlpha <= .02) continue;
         ctx.save();
         ctx.globalAlpha *= edgeAlpha;
@@ -1979,7 +2189,7 @@ export default function RealmWorldV3({
             rewarded: runtime.rewardObject?.id === object.id && runtime.rewardObject.until > now,
             interaction: runtime.interaction?.object?.id === object.id ? runtime.interaction : null,
           }, artRef.current);
-        } else {
+        } else if (node.type === 'actor') {
           const actor = node.value;
           const emote = activeEmotes[actor.id] || activeEmotes[actor.userId] || activeEmotes[actor.realmIdentity];
           drawActor(ctx, actor, tile, now, {
@@ -1992,13 +2202,27 @@ export default function RealmWorldV3({
             interaction: actor.player ? runtime.interaction : null,
             art: artRef.current,
           });
+          if (actor.player) {
+            playerRendered = true;
+            playerNodeIndex = nodeIndex;
+          }
+        } else {
+          drawParticle(ctx, node.value, tile);
         }
         ctx.restore();
       }
-      drawParticles(ctx, runtime.effects, tile);
-      drawArchitectureOcclusion(ctx, artRef.current, tile);
+      const playerActor = actors.find((actor) => actor.player);
+      const playerOccluded = Boolean(playerActor && playerNodeIndex >= 0 && sceneNodes
+        .slice(playerNodeIndex + 1)
+        .some((node) => sceneNodeOccludesActor(node, playerActor, tile)));
+      if (playerOccluded) drawActorOcclusionSilhouette(ctx, playerActor, tile, now, artRef.current, reducedMotion);
       ctx.restore();
       if (screenLayerRef.current.canvas) ctx.drawImage(screenLayerRef.current.canvas, 0, 0, width, height);
+      if (canvasRef.current) {
+        canvasRef.current.dataset.realmPlayerVisible = playerRendered ? 'true' : 'false';
+        canvasRef.current.dataset.realmPlayerAlpha = '1.00';
+        canvasRef.current.dataset.realmPlayerOccluded = playerOccluded ? 'silhouette' : 'clear';
+      }
     };
 
     const tick = (now) => {
@@ -2055,7 +2279,7 @@ export default function RealmWorldV3({
   const onPointerMove = (event) => {
     const point = canvasPoint(event);
     const runtime = runtimeRef.current;
-    const object = WORLD_OBJECTS.find((item) => distance(item, point) <= OBJECT_RADIUS) || null;
+    const object = objectAtWorldPoint(point);
     runtime.hoveredObject = object;
     canvasRef.current.style.cursor = object ? 'pointer' : 'crosshair';
   };
@@ -2069,9 +2293,9 @@ export default function RealmWorldV3({
       callbacksRef.current.onPerson(person);
       return;
     }
-    const object = WORLD_OBJECTS.find((item) => distance(item, point) <= OBJECT_RADIUS);
+    const object = objectAtWorldPoint(point);
     if (object) {
-      routeTo(pathToObject(object), object);
+      routeTo(pathToObject(object, runtime.motion), object);
       return;
     }
     routeTo(point);
@@ -2138,7 +2362,7 @@ export default function RealmWorldV3({
         <span><strong>{t(ROOM_COPY[currentRoom.id] || currentRoom.name)}</strong><small>{t('Thế giới trực tiếp · không gian và công việc cùng một ngữ cảnh')}</small></span>
       </div>}
 
-      {!workspaceOpen && !focusedObject && <div className={worldStyles.worldControls}>
+      {!workspaceOpen && (!focusedObject || locationOpen || signalOpen) && <div className={worldStyles.worldControls}>
         <button type="button" className={worldStyles.soundControl} aria-label={t(soundOn ? 'Tắt âm thanh Realm' : 'Bật âm thanh Realm')} aria-pressed={soundOn} onClick={toggleSound}><Icon name={soundOn ? 'bolt' : 'mic'} size={17} /><span>{t(soundOn ? 'Âm thanh bật' : 'Âm thanh')}</span></button>
         <button type="button" aria-label={t('Mở danh sách địa điểm')} aria-expanded={locationOpen} onClick={() => { setLocationOpen((open) => !open); setSignalOpen(false); setTouchOpen(false); }}><Icon name="map" size={17} /><span>{t('Waygate')}</span></button>
         <button type="button" aria-label={t('Ra hiệu')} aria-expanded={signalOpen} onClick={() => { setSignalOpen((open) => !open); setLocationOpen(false); setTouchOpen(false); }}><Icon name="bolt" size={17} /><span>{t('Ra hiệu')}</span></button>
@@ -2169,8 +2393,9 @@ export default function RealmWorldV3({
           <span className={worldStyles.actionActions}>
             {nearbyObject
               ? <button type="button" onClick={() => beginInteraction(focusedObject)}><kbd>E</kbd>{t(focusedCopy.verb)}</button>
-              : <button type="button" onClick={() => routeTo(pathToObject(focusedObject), focusedObject)}><Icon name="map" size={16} />{t('Đi tới')}</button>}
+              : <button type="button" onClick={() => routeTo(pathToObject(focusedObject, runtimeRef.current.motion), focusedObject)}><Icon name="map" size={16} />{t('Đi tới')}</button>}
             <button type="button" aria-label={t('Mở danh sách địa điểm')} onClick={() => { setLocationOpen(true); setSignalOpen(false); setTouchOpen(false); }}><Icon name="map" size={16} /></button>
+            <button type="button" className={worldStyles.actionSound} aria-label={t(soundOn ? 'Tắt âm thanh Realm' : 'Bật âm thanh Realm')} aria-pressed={soundOn} onClick={toggleSound}><Icon name={soundOn ? 'bolt' : 'mic'} size={16} /></button>
             <button type="button" className={worldStyles.actionTouch} aria-label={t('Mở điều khiển di chuyển')} onClick={() => { setTouchOpen(true); setLocationOpen(false); setSignalOpen(false); }}><span aria-hidden="true">✥</span></button>
           </span>
         </div>

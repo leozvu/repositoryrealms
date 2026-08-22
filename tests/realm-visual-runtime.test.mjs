@@ -92,10 +92,14 @@ test('live component consumes the runtime scene graph without replacing fixed-st
   assert.match(source, /data-realm-depth="2\.5d"/);
   assert.match(source, /data-realm-art-ready/);
   assert.match(source, /drawObjectVisual/);
-  assert.match(source, /drawArchitectureOcclusion/);
+  assert.match(source, /drawArchitectureOccluder/);
+  assert.match(source, /REALM_ARCHITECTURE_OCCLUDERS/);
   assert.match(source, /art\.scenePlate/);
+  assert.doesNotMatch(source, /drawPlateSlice/);
   assert.match(source, /realmObjectFacing/);
   assert.match(source, /drawForgedActorSkin/);
+  assert.match(source, /drawActorOcclusionSilhouette/);
+  assert.match(source, /dataset\.realmPlayerOccluded/);
   assert.match(source, /removeWhiteMatte/);
   assert.match(source, /REALM_WORLD_FIXED_STEP/);
   assert.doesNotMatch(source, /\/visual-forge\/v1\//);
