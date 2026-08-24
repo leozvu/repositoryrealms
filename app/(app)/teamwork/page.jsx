@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon, Avatar, useToast } from '@/components/ui';
 import PageHeader from '@/components/system/PageHeader';
 import StatePanel from '@/components/system/StatePanel';
 import ReceiptBar from '@/components/system/ReceiptBar';
+import { createExecutionIdempotencyKey } from '@/lib/execution-client';
 import styles from './team-work.module.css';
 
 const OPEN = new Set(['todo', 'doing', 'in_progress', 'review', 'waiting', 'blocked']);
@@ -42,31 +43,40 @@ function TaskRow({ task, row, index, count, busy, onMove, onSelect, onUnblock, d
   const isOver = drag && drag.memberId === row.member.id && drag.task.id !== task.id && drag.overId === task.id;
   return (
     <article className={styles.task} data-state={task.status} data-dragging={isDragging || undefined} data-over={isOver || undefined}
-      draggable={draggable}
-      onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; setDrag({ memberId: row.member.id, task, index, overId: null }); }}
       onDragOver={e => { if (drag && drag.memberId === row.member.id && drag.task.id !== task.id) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (drag.overId !== task.id) setDrag({ ...drag, overId: task.id }); } }}
       onDrop={e => { e.preventDefault(); if (drag && drag.memberId === row.member.id && drag.task.id !== task.id) onMove(drag.task, row, index); setDrag(null); }}
       onDragEnd={() => setDrag(null)}>
-      <div className={styles.taskOrder} aria-label={`Ưu tiên ${index + 1}`}><strong>{index + 1}</strong></div>
+      <div
+        className={styles.taskOrder}
+        aria-label={`Ưu tiên ${index + 1}. Có thể kéo để đổi vị trí.`}
+        draggable={draggable}
+        title="Kéo để đổi thứ tự"
+        onDragStart={e => {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', task.id);
+          setDrag({ memberId: row.member.id, task, index, overId: null });
+        }}
+      ><strong>{index + 1}</strong></div>
       <div className={styles.taskBody}>
         <div className={styles.taskTitle}><h4>{task.title}</h4><span>{STATUS[task.status] || task.status}</span></div>
         <p>{task.project?.name || 'Việc chung'} · {task.estHours || 0}h dự kiến · Version {task.workVersion}</p>
         {task.blockReason && <p className={styles.blockReason}>Blocker: {task.blockReason}</p>}
         <IntelligenceBadge value={task.intelligence} />
       </div>
-      <div className={styles.taskActions}>
+      <div className={styles.taskActions} draggable={false} onDragStart={(event) => event.stopPropagation()}>
         {OPEN.has(task.status) && <>
-          <button className="btn btn-outline btn-sm" disabled={busy || index === 0} onClick={() => onMove(task, row, index - 1)} aria-label={`Đưa ${task.title} lên một vị trí`}>Lên</button>
-          <button className="btn btn-outline btn-sm" disabled={busy || index === count - 1} onClick={() => onMove(task, row, index + 1)} aria-label={`Đưa ${task.title} xuống một vị trí`}>Xuống</button>
+          <button type="button" draggable={false} className="btn btn-outline btn-sm" disabled={busy || index === 0} onClick={() => onMove(task, row, index - 1)} aria-label={`Đưa ${task.title} lên một vị trí`}>Lên</button>
+          <button type="button" draggable={false} className="btn btn-outline btn-sm" disabled={busy || index === count - 1} onClick={() => onMove(task, row, index + 1)} aria-label={`Đưa ${task.title} xuống một vị trí`}>Xuống</button>
         </>}
-        {task.status === 'blocked' && <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => onUnblock(task)}>Gỡ chặn</button>}
-        {OPEN.has(task.status) && <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => onSelect(task)}>Điều phối</button>}
+        {task.status === 'blocked' && <button type="button" draggable={false} className="btn btn-outline btn-sm" disabled={busy} onClick={() => onUnblock(task)}>Gỡ chặn</button>}
+        {OPEN.has(task.status) && <button type="button" draggable={false} className="btn btn-primary btn-sm" disabled={busy} onClick={() => onSelect(task)}>Điều phối</button>}
       </div>
     </article>
   );
 }
 
 function ActionPanel({ task, members, allTasks, busy, onClose, onAction }) {
+  const panelRef = useRef(null);
   const [assigneeId, setAssigneeId] = useState(task.assigneeId || '');
   const [reasonCode, setReasonCode] = useState('dependency');
   const [reason, setReason] = useState('');
@@ -83,6 +93,13 @@ function ActionPanel({ task, members, allTasks, busy, onClose, onAction }) {
     && OPEN.has(candidate.status)
     && candidate.assigneeId === task.assigneeId
     && candidate.projectId === task.projectId);
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    panel.focus({ preventScroll: true });
+  }, []);
 
   const delegate = () => onAction({
     action: 'task.assign', entityId: task.id,
@@ -108,7 +125,7 @@ function ActionPanel({ task, members, allTasks, busy, onClose, onAction }) {
   });
 
   return (
-    <section className={styles.actionPanel} aria-labelledby="execution-action-title">
+    <section ref={panelRef} className={styles.actionPanel} role="dialog" aria-modal="false" aria-labelledby="execution-action-title" tabIndex={-1}>
       <div className={styles.panelHead}>
         <div><p className={styles.eyebrow}>Thao tác quản lý</p><h2 id="execution-action-title">Điều phối: {task.title}</h2></div>
         <button className="icon-btn" onClick={onClose} aria-label="Đóng bảng điều phối"><Icon name="x" size={18} /></button>
@@ -184,6 +201,7 @@ export default function TeamWorkPage() {
   const [busyId, setBusyId] = useState('');
   const [selected, setSelected] = useState(null);
   const [receipt, setReceipt] = useState(null);
+  const [actionError, setActionError] = useState('');
   const [drag, setDrag] = useState(null); // {memberId, task, index, overId} — kéo thả trong hàng đợi 1 nhân viên
 
   const load = useCallback(async () => {
@@ -210,8 +228,9 @@ export default function TeamWorkPage() {
 
   const act = async (command) => {
     setBusyId(command.entityId);
+    setActionError('');
     try {
-      const key = `team-work:${command.action}:${command.entityId}:${crypto.randomUUID()}`;
+      const key = createExecutionIdempotencyKey('team-work', command.action);
       const response = await fetch('/api/execution/actions', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key }, body: JSON.stringify(command),
       });
@@ -220,13 +239,15 @@ export default function TeamWorkPage() {
       toast('Task ERP đã được cập nhật và có receipt.');
       setReceipt({
         title: 'Đã cập nhật công việc',
-        detail: body.receipt?.id ? `Biên nhận ${body.receipt.id}` : `Thao tác ${command.action} đã được máy chủ chấp nhận.`,
+        detail: body.action?.id ? `Biên nhận ${body.action.id}` : `Thao tác ${command.action} đã được máy chủ chấp nhận.`,
         time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
       });
       setSelected(null);
       await load();
     } catch (requestError) {
-      toast(requestError.message || 'Không thể điều phối Task.', 'error');
+      const message = requestError.message || 'Không thể điều phối Task.';
+      setActionError(message);
+      toast(message, 'error');
     } finally {
       setBusyId('');
     }
@@ -264,6 +285,7 @@ export default function TeamWorkPage() {
         </dl>
       </section>
       {receipt && <ReceiptBar {...receipt} action={<button className="icon-btn" onClick={() => setReceipt(null)} aria-label="Đóng biên nhận"><Icon name="x" size={15} /></button>} />}
+      {actionError && <div className={styles.actionError} role="alert"><span>{actionError}</span><button type="button" onClick={() => setActionError('')} aria-label="Đóng thông báo lỗi"><Icon name="x" size={15} /></button></div>}
       <div className={styles.live} aria-live="polite">{loading ? 'Đang đồng bộ Task ERP…' : error || `Đã đồng bộ ${metrics.open} việc đang mở.`}</div>
       {error && <StatePanel compact state="error" title={error} action={<button className="btn btn-outline" onClick={load}>Thử lại</button>} />}
       {selected && <ActionPanel key={selected.id} task={selected} members={members} allTasks={allTasks} busy={busyId === selected.id} onClose={() => setSelected(null)} onAction={act} />}
