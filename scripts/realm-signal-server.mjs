@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { WebSocket, WebSocketServer } from 'ws';
 import { PARTY_CLIENT_MESSAGE_TYPES, PARTY_SERVER_MESSAGE_TYPES, REALM_GATEWAY_ID } from '../lib/realm-party.js';
+import { COOPERATION_MESSAGE_TYPES } from '../lib/realm-cooperation.js';
 import { RealmPartyDirectory } from '../lib/realm-party-directory.js';
 import { isRealmMessage, normalizeProfile } from '../lib/realm-protocol.js';
 import { realmRoomKey, verifyRealmToken } from '../lib/realm-token.js';
@@ -230,6 +231,7 @@ wss.on('connection', (socket) => {
     }
     if (!isRealmMessage(message) || message.senderId !== sub) return socket.close(1008, 'Invalid Realm message');
     if (PARTY_SERVER_MESSAGE_TYPES.includes(message.type)) return socket.close(1008, 'Server-only Realm message');
+    if (COOPERATION_MESSAGE_TYPES.includes(message.type) && !message.targetId) return socket.close(1008, 'Cooperation messages require a Party target');
     if (message.type === 'presence') {
       socket.realmProfile = normalizeProfile(message.payload?.profile);
       message = {

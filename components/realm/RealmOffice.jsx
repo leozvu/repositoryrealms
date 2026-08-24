@@ -21,6 +21,7 @@ import {
   roomAt,
 } from './world';
 import { createRealmDemoGuestProfile, DEFAULT_PROFILE, isInVoiceRange, mergeRealmPresencePeople, normalizeProfile } from '@/lib/realm-protocol';
+import { realmWorkSessionTaskComment } from '@/lib/realm-cooperation';
 import {
   REALM_OPERATIONS_STORAGE_KEY,
   advanceRealmQuest,
@@ -78,11 +79,16 @@ import AdventurerChronicle from './AdventurerChronicle';
 import { useProximityMedia } from './useProximityMedia';
 import { usePartySfuMedia } from './usePartySfuMedia';
 import { useRealmParty } from './useRealmParty';
+import { useRealmCooperation } from './useRealmCooperation';
 import { useRealmPresence } from './useRealmPresence';
 import { useRealmChangeFeed } from './useRealmChangeFeed';
 import RealmNotificationBell from './RealmNotificationBell';
+import LivingGuildhallMotion from './LivingGuildhallMotion';
+import GuildhallScene from './GuildhallScene';
+import RealmWorldV3 from './RealmWorldV3';
+import { RealmCooperationHud, RealmCooperationPanel } from './RealmCooperation';
 import { useCollaborationDirectory } from '@/components/collaboration/useCollaborationDirectory';
-import { LanguageSwitch } from '@/components/LanguageProvider';
+import { LanguageSwitch, useLanguage } from '@/components/LanguageProvider';
 import {
   preferredCollaborationAvailability,
   persistWorkspaceSurface,
@@ -94,16 +100,31 @@ import {
   parseRealmExperienceContext,
   realmJourneyForContext,
 } from '@/lib/realm-experience';
+import { realmWorldV3Enabled } from '@/lib/realm-world-v3';
 import styles from './realm-office.module.css';
+import guild from './guildhall-shell.module.css';
 
 const PROFILE_STORAGE_KEY = 'crmegoric-realms-profile-v1';
 const GUEST_ID_STORAGE_KEY = 'crmegoric-realms-guest-id-v1';
-const PROFILE_ROLES = ['Realm Builder', 'Questsmith', 'Guild Master', 'Alchemist', 'Scout'];
+const PROFILE_ROLES = [
+  'High Elf · Guild Steward',
+  'Dwarf · Forge Engineer',
+  'Human · Goldkeeper',
+  'Moon Elf · Archivist',
+  'Halfling · Community Host',
+  'Half-Orc · Project Warden',
+  'Realm Builder',
+  'Questsmith',
+  'Guild Master',
+  'Alchemist',
+  'Scout',
+];
 const ERP_SYNC_REQUESTED = process.env.NEXT_PUBLIC_REALM_ERP_SYNC === '1';
 const GENERATED_ART_REQUESTED = realmGeneratedArtEnabled();
 const ENVIRONMENT_ART_REQUESTED = realmGeneratedEnvironmentEnabled();
 const PROP_ART_REQUESTED = realmGeneratedPropEnabled();
 const UI_ART_REQUESTED = realmGeneratedUiEnabled();
+const WORLD_V3_REQUESTED = realmWorldV3Enabled();
 const GENERATED_UI_ART_ASSETS = Object.freeze([
   ...realmGeneratedUiAssets(),
   ...realmGeneratedErpUiAssets(),
@@ -170,14 +191,14 @@ const STATUS = {
 
 const NAV = [
   { id: 'briefing', label: 'Đại sảnh', icon: 'dashboard' },
-  { id: 'quests', label: 'Quest Board', icon: 'tasks' },
-  { id: 'command', label: 'Royal Command', icon: 'shield' },
-  { id: 'campaigns', label: 'Chiến dịch', icon: 'projects' },
-  { id: 'guild', label: 'Guild', icon: 'staff' },
-  { id: 'treasury', label: 'Royal Treasury', icon: 'wallet' },
-  { id: 'shop', label: 'Arcane Forge', icon: 'settings' },
-  { id: 'chat', label: 'Lantern Chat', icon: 'meeting' },
-  { id: 'party', label: 'Party Voice', icon: 'phone' },
+  { id: 'quests', label: 'Bàn công việc', icon: 'tasks' },
+  { id: 'command', label: 'Phòng điều hành', icon: 'shield' },
+  { id: 'campaigns', label: 'Phòng dự án', icon: 'projects' },
+  { id: 'guild', label: 'Thành viên', icon: 'staff' },
+  { id: 'treasury', label: 'Kho bạc Gold', icon: 'wallet' },
+  { id: 'shop', label: 'Xưởng phẩm', icon: 'settings' },
+  { id: 'chat', label: 'Lantern Mail', icon: 'meeting' },
+  { id: 'party', label: 'Council Voice', icon: 'phone' },
 ];
 
 const CAMPAIGNS = [
@@ -185,6 +206,30 @@ const CAMPAIGNS = [
   { id: 'campaign-2', name: 'Website Nhà Giả Kim', owner: 'Đỗ Quốc Anh', progress: 46, health: 'Cần chú ý', color: '#e7ad58' },
   { id: 'campaign-3', name: 'Hội chợ phương Bắc', owner: 'Trần Khánh Linh', progress: 63, health: 'Ổn định', color: '#64c48d' },
 ];
+
+function workSessionCandidateForQuest(quest) {
+  if (!quest) return null;
+  const questBoard = WORLD_OBJECTS.find((object) => object.id === 'quest-board');
+  return {
+    work: {
+      kind: 'task',
+      id: quest.businessRef || quest.id,
+      title: quest.title,
+      context: quest.project,
+      status: quest.status,
+    },
+    anchor: {
+      objectId: questBoard?.id || 'quest-board',
+      x: questBoard?.x || 38,
+      y: (questBoard?.y || 21.5) + 1.35,
+    },
+    agenda: [
+      { id: 'outcome', label: 'Chốt kết quả cần bàn giao' },
+      { id: 'execution', label: `Xử lý ${Math.max(0, quest.total - quest.progress)} tiêu chí còn lại` },
+      { id: 'review', label: `Review với ${quest.reviewer || 'người duyệt ERP'}` },
+    ],
+  };
+}
 
 const ERP_DESK_POSITIONS = [
   ...STAFF.map(({ x, y }) => ({ x, y })),
@@ -1030,7 +1075,7 @@ function RemoteVideoTile({ person, stream, connectionState, onSelect }) {
         ? <video ref={remoteVideoRef} autoPlay playsInline />
         : <span className={styles.videoAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span>}
       <span className={`${styles.connectionPip} ${connectionState === 'connected' ? styles.connectionLive : ''}`} aria-label={connectionLabel} />
-      <span className={styles.videoName}>{person.name}</span>
+      <span className={styles.videoName} data-no-i18n>{person.name}</span>
     </button>
   );
 }
@@ -1079,11 +1124,11 @@ function MediaDock({
     : connectedPeers ? `${connectedPeers} P2P live` : remotePeers.length ? 'Đang kết nối' : 'Yên tĩnh';
 
   return (
-    <section className={styles.mediaDock} aria-label="Vùng trò chuyện theo khoảng cách">
+    <section className={styles.mediaDock} aria-label="Council Voice theo khoảng cách" data-living-motion="council-voice">
       <div className={styles.mediaHeader}>
         <div>
-          <span className={styles.eyebrow}>Spatial party</span>
-          <strong>{nearby.length ? `${nearby.length} người trong tầm thoại` : 'Chưa có ai trong tầm thoại'}</strong>
+          <span className={styles.eyebrow}>Council Voice</span>
+          <strong>{nearby.length ? `${nearby.length} người đang ở gần` : 'Không gian đang yên tĩnh'}</strong>
           <small>{transportLabel}</small>
         </div>
         <span className={connectedPeers || mediaTopology === 'sfu' ? styles.liveBadge : styles.quietBadge} aria-live="polite">{badgeLabel}</span>
@@ -1092,7 +1137,7 @@ function MediaDock({
         <div className={styles.videoTile}>
           {cameraOn ? <video ref={videoRef} autoPlay muted playsInline /> : <span className={styles.videoAvatar} style={{ '--avatar-color': profile.color }}>{initials(profile.name)}</span>}
           <span className={`${styles.connectionPip} ${styles.connectionLive}`} aria-label="Bạn đang online" />
-          <span className={styles.videoName}>{profile.name}</span>
+          <span className={styles.videoName} data-no-i18n>{profile.name}</span>
         </div>
         {nearby.slice(0, 5).map((person) => <RemoteVideoTile key={person.id} person={person} stream={remoteStreams[person.id]} connectionState={connectionStates[person.id]} onSelect={onPerson} />)}
       </div>
@@ -1105,8 +1150,23 @@ function MediaDock({
   );
 }
 
-function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world' }) {
+function useCompactRealmViewport() {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 760px)');
+    const sync = () => setCompact(media.matches);
+    sync();
+    media.addEventListener?.('change', sync);
+    return () => media.removeEventListener?.('change', sync);
+  }, []);
+  return compact;
+}
+
+function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world', worldVersion = 'v3' }) {
   const toast = useToast();
+  const { t } = useLanguage();
+  const compactViewport = useCompactRealmViewport();
+  const usesWorldV3 = WORLD_V3_REQUESTED && worldVersion !== 'v2';
   const tavernEnabled = pilotFeatures?.tavern !== false;
   const realmNav = useMemo(() => tavernEnabled ? NAV : NAV.filter((item) => !['treasury', 'shop'].includes(item.id)), [tavernEnabled]);
   const dataSource = useMemo(
@@ -1120,6 +1180,14 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const viewerRealUserId = dataSource.isErp ? (initialBridge?.actor?.id || null) : null;
   const [mode, setMode] = useState(initialMode === 'ledger' ? 'ledger' : 'world');
   const [activePanel, setActivePanel] = useState('briefing');
+  const [surfaceOpen, setSurfaceOpen] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
+
+  useEffect(() => {
+    if (surfaceOpen && mode === 'world') document.documentElement.dataset.realmWorkspaceOpen = 'true';
+    else delete document.documentElement.dataset.realmWorkspaceOpen;
+    return () => { delete document.documentElement.dataset.realmWorkspaceOpen; };
+  }, [mode, surfaceOpen]);
   const [ledgerView, setLedgerView] = useState('personal');
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [profile, setProfile] = useState(initialProfile);
@@ -1128,6 +1196,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const [mapStyle, setMapStyle] = useState(REALM_MAP_STYLE_DEFAULT);
   const [position, setPosition] = useState({ ...DEFAULT_WORLD_POSITION, zoneId: null });
   const positionRef = useRef(position);
+  const positionStateSyncRef = useRef(0);
   const [activeObject, setActiveObject] = useState(null);
   const [nearby, setNearby] = useState([]);
   const [privateZone, setPrivateZone] = useState(null);
@@ -1173,6 +1242,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const mediaRef = useRef(null);
   const screenRef = useRef(null);
   const videoRef = useRef(null);
+  const realmShellRef = useRef(null);
   const emoteTimersRef = useRef(new Map());
   const mainStageRef = useRef(null);
   const inspectorRef = useRef(null);
@@ -1437,8 +1507,10 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     sendEmote: broadcastEmote,
     sendSignal,
     sendParty,
+    sendCooperation,
     subscribeSignal,
     subscribeParty,
+    subscribeCooperation,
   } = useRealmPresence({ positionRef, profile, status: playerStatus, onChat: receiveChat, onEmote: showEmote });
   const {
     party,
@@ -1457,6 +1529,22 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     partyAuthority: networkInfo.partyAuthority === true,
     sendParty,
     subscribeParty,
+  });
+  const {
+    workSession,
+    notice: cooperationNotice,
+    startSession: startCooperationSession,
+    setReady: setCooperationReady,
+    setPhase: setCooperationPhase,
+    toggleAgenda: toggleCooperationAgenda,
+    addNote: addCooperationNote,
+    finishSession: finishCooperationSession,
+  } = useRealmCooperation({
+    sessionId,
+    profile,
+    party,
+    sendCooperation,
+    subscribeCooperation,
   });
   const partyMemberIds = useMemo(
     () => new Set((party?.members || []).filter((member) => member.id !== sessionId).map((member) => member.id)),
@@ -1515,6 +1603,10 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   useEffect(() => {
     if (partyNotice) toast(partyNotice.text, partyNotice.tone);
   }, [partyNotice, toast]);
+
+  useEffect(() => {
+    if (cooperationNotice) toast(cooperationNotice.text, cooperationNotice.tone);
+  }, [cooperationNotice, toast]);
 
   useEffect(() => { positionRef.current = position; }, [position]);
   useEffect(() => {
@@ -1656,7 +1748,12 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   }, [broadcastEmote, sessionId, showEmote, toast]);
 
   const handlePosition = useCallback((next, object) => {
-    setPosition((current) => (Math.abs(current.x - next.x) + Math.abs(current.y - next.y) > 0.03 ? { ...next } : current));
+    positionRef.current = { ...next };
+    const now = typeof performance === 'undefined' ? Date.now() : performance.now();
+    if (now - positionStateSyncRef.current >= 750) {
+      positionStateSyncRef.current = now;
+      setPosition((current) => (Math.abs(current.x - next.x) + Math.abs(current.y - next.y) > 0.03 ? { ...next } : current));
+    }
     setActiveObject((current) => (current?.id === object?.id ? current : object));
   }, []);
 
@@ -1666,8 +1763,6 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
       person.name,
       person.role,
       person.status,
-      Number(person.x).toFixed(2),
-      Number(person.y).toFixed(2),
     ].join(':')).join('|');
     setNearby((current) => signature(current) === signature(people) ? current : people);
     setPrivateZone((current) => current?.id === zone?.id ? current : zone);
@@ -1686,18 +1781,33 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     if (campaign) setSelectedCampaign(campaign);
     setMode('world');
     setActivePanel(panel);
+    setSurfaceOpen(true);
     if (announce) toast(announce);
     return true;
   }, [businessBridge, tavernEnabled, toast]);
 
   const openObject = useCallback((object) => {
-    openAuthorizedPanel(object.panel, { announce: `Đã mở ${object.name}` });
+    openAuthorizedPanel(object.panel);
   }, [openAuthorizedPanel]);
 
   const moveToObject = (panel) => {
-    if (!openAuthorizedPanel(panel)) return;
+    if (!tavernEnabled && ['treasury', 'shop'].includes(panel)) {
+      toast('Tavern đang tạm tắt theo release policy.', 'error');
+      return;
+    }
+    const access = realmAccessForPanel(businessBridge?.access, panel);
+    if (!access.allowed) {
+      toast(access.reason || 'Session ERP không có quyền mở khu vực này.', 'error');
+      return;
+    }
     const object = WORLD_OBJECTS.find((item) => item.panel === panel);
-    if (object) window.dispatchEvent(new CustomEvent('realm:move', { detail: { x: object.x, y: object.y + 1.1 } }));
+    if (object) {
+      setMode('world');
+      setSurfaceOpen(false);
+      window.dispatchEvent(new CustomEvent('realm:move', { detail: { x: object.x, y: object.y, objectId: object.id, direct: true } }));
+      return;
+    }
+    openAuthorizedPanel(panel);
   };
 
   useEffect(() => {
@@ -2010,15 +2120,28 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     () => mergeRealmPresencePeople({ staff: dataSource.isErp ? erpDirectoryPeople : STAFF, remotePlayers, selfProfile: profile }),
     [dataSource.isErp, erpDirectoryPeople, profile, remotePlayers],
   );
-  const worldStaff = useMemo(() => realmPeople.filter((person) => !person.isRemote), [realmPeople]);
+  const realmRosterPeople = useMemo(() => [{
+    ...profile,
+    id: viewerRealUserId || `self:${profile.name}`,
+    userId: viewerRealUserId || undefined,
+    status: playerStatus,
+    presence: playerStatus,
+    online: true,
+    isSelf: true,
+    statusText: 'Bạn đang hiện diện trong Realm',
+  }, ...realmPeople], [playerStatus, profile, realmPeople, viewerRealUserId]);
+  const worldStaff = useMemo(
+    () => realmPeople.filter((person) => !person.isRemote && (!dataSource.isErp || person.online)),
+    [dataSource.isErp, realmPeople],
+  );
   const onlineCount = realmPeople.filter((person) => person.isRemote || person.online || !dataSource.isErp).length + 1;
   const guildDashboard = useMemo(
-    () => realmLocalFixture(dataSource, createRealmGuildDemoDashboard({ members: realmPeople, quests, campaigns: CAMPAIGNS })),
-    [dataSource, quests, realmPeople],
+    () => realmLocalFixture(dataSource, createRealmGuildDemoDashboard({ members: realmRosterPeople, quests, campaigns: CAMPAIGNS })),
+    [dataSource, quests, realmRosterPeople],
   );
   const commandDashboard = useMemo(
-    () => realmLocalFixture(dataSource, createRealmCommandCenterDemoDashboard({ members: realmPeople, quests })),
-    [dataSource, quests, realmPeople],
+    () => realmLocalFixture(dataSource, createRealmCommandCenterDemoDashboard({ members: realmRosterPeople, quests })),
+    [dataSource, quests, realmRosterPeople],
   );
   const chronicleDashboard = useMemo(
     () => realmLocalFixture(dataSource, createRealmChronicleDemoDashboard({ profile, career, quests, ledger, wallet })),
@@ -2112,6 +2235,97 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
 
   useEffect(() => { setPartyConfirm(null); }, [party?.id]);
 
+  const nextWorkQuest = useMemo(
+    () => quests.find((quest) => quest.status === 'active')
+      || quests.find((quest) => quest.status === 'ready')
+      || quests.find((quest) => quest.status !== 'claimed')
+      || null,
+    [quests],
+  );
+  const workSessionCandidate = useMemo(() => workSessionCandidateForQuest(nextWorkQuest), [nextWorkQuest]);
+
+  const openCooperationPanel = useCallback(() => {
+    setMode('world');
+    setActivePanel('party');
+    setSurfaceOpen(true);
+    setVoiceOpen(false);
+  }, []);
+
+  const startWorkSession = useCallback((candidate = workSessionCandidate) => {
+    if (!party) {
+      openCooperationPanel();
+      toast('Mời một đồng đội vào Party trước khi mở phiên phối hợp.', 'error');
+      return false;
+    }
+    if (party.hostId !== sessionId) {
+      openCooperationPanel();
+      toast('Host của Party sẽ mở phiên phối hợp cho cả nhóm.', 'error');
+      return false;
+    }
+    if (!candidate) {
+      toast('Chưa có Task phù hợp để mở phiên phối hợp.', 'error');
+      return false;
+    }
+    const started = startCooperationSession(candidate);
+    if (started) openCooperationPanel();
+    return started;
+  }, [openCooperationPanel, party, sessionId, startCooperationSession, toast, workSessionCandidate]);
+
+  const startWorkSessionForQuest = useCallback((quest) => {
+    const candidate = workSessionCandidateForQuest(quest);
+    if (workSession && workSession.work.id !== candidate?.work.id) {
+      openCooperationPanel();
+      toast('Hãy khép phiên hiện tại trước khi chuyển sang Task khác.', 'error');
+      return false;
+    }
+    if (workSession) {
+      openCooperationPanel();
+      return true;
+    }
+    return startWorkSession(candidate);
+  }, [openCooperationPanel, startWorkSession, toast, workSession]);
+
+  const rallyToWorkSession = useCallback(() => {
+    if (!workSession?.anchor) return;
+    setSurfaceOpen(false);
+    setMode('world');
+    window.dispatchEvent(new CustomEvent('realm:move', { detail: { ...workSession.anchor } }));
+    toast(`Đang tới điểm hẹn của “${workSession.work.title}”.`);
+  }, [toast, workSession]);
+
+  const openWorkSessionTask = useCallback(() => {
+    if (!workSession) return;
+    setMode('world');
+    setActivePanel(workSession.work.kind === 'project' ? 'campaigns' : 'quests');
+    setSurfaceOpen(true);
+    setVoiceOpen(false);
+  }, [workSession]);
+
+  const publishWorkSessionNote = useCallback(async (note) => {
+    if (operationsSource !== 'erp' || !workSession || workSession.work.kind !== 'task') return false;
+    try {
+      const command = realmWorkSessionTaskComment(workSession, note);
+      const response = await fetch('/api/execution/actions', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': command.idempotencyKey,
+        },
+        body: JSON.stringify(command.body),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || 'ERP từ chối ghi chú này.');
+      setRealmDataRevision((current) => current + 1);
+      toast(payload.idempotent ? 'Ghi chú này đã có trong Task ERP.' : 'Đã ghi shared log vào Task ERP với biên nhận.');
+      return true;
+    } catch (error) {
+      toast(error.message || 'Không thể ghi shared log vào Task ERP.', 'error');
+      return false;
+    }
+  }, [operationsSource, toast, workSession]);
+
   const panel = useMemo(() => {
     if (activePanel === 'party') {
       const pendingInvites = party?.pendingInvites || (outgoingInvite ? [{
@@ -2128,7 +2342,22 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
         : null;
       return (
         <>
-          <PanelHeading eyebrow="Private meeting" title="Party Voice" text="Room nhiều thành viên giữ voice hoạt động ngoài bán kính spatial 5 ô; gateway quản lý host, roster và lời mời." />
+          <PanelHeading eyebrow="Phòng hội đồng" title="Council Voice" text="Không gian trao đổi riêng giữ cuộc thoại liên tục khi các thành viên di chuyển giữa các phòng." />
+          <RealmCooperationPanel
+            party={party}
+            session={workSession}
+            selfId={sessionId}
+            candidate={workSessionCandidate}
+            onStart={startWorkSession}
+            onReady={setCooperationReady}
+            onPhase={setCooperationPhase}
+            onAgenda={toggleCooperationAgenda}
+            onNote={addCooperationNote}
+            onRally={rallyToWorkSession}
+            onOpenWork={openWorkSessionTask}
+            onPublishNote={operationsSource === 'erp' ? publishWorkSessionNote : undefined}
+            onFinish={finishCooperationSession}
+          />
           {party ? (
             <>
               <div className={styles.partyStatusCard}>
@@ -2148,7 +2377,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                     <article className={styles.partyMember} key={member.id}>
                       <span className={styles.personAvatar} style={{ '--avatar-color': member.profile.color }}>{initials(member.profile.name)}</span>
                       <span>
-                        <strong>{member.profile.name}</strong>
+                        <strong data-no-i18n>{member.profile.name}</strong>
                         <small>{member.id === party.hostId ? 'Host' : 'Member'}{isSelf ? ' · Bạn' : ''}</small>
                       </span>
                       <span className={online ? styles.liveBadge : styles.quietBadge}>{online ? 'Online' : 'Đang nối lại'}</span>
@@ -2167,7 +2396,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                   {pendingInvites.map((inviteState) => (
                     <article className={styles.partyPendingCard} key={inviteState.targetId}>
                       <span className={styles.playerHeroAvatar} style={{ '--avatar-color': inviteState.targetProfile.color }}>{initials(inviteState.targetProfile.name)}</span>
-                      <div><strong>{inviteState.targetProfile.name}</strong><p>Đã gửi lời mời; chỗ được giữ đến khi họ phản hồi.</p></div>
+                      <div><strong data-no-i18n>{inviteState.targetProfile.name}</strong><p>Đã gửi lời mời; chỗ được giữ đến khi họ phản hồi.</p></div>
                       <button type="button" className={styles.secondaryButton} onClick={() => cancelInvite(inviteState.targetId)}>Thu hồi</button>
                     </article>
                   ))}
@@ -2180,7 +2409,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                     {candidates.map((person) => (
                       <button type="button" key={person.id} onClick={() => inviteToParty(person)}>
                         <Avatar className={styles.personAvatar} style={{ '--avatar-color': person.color }} userId={person.userId || null} name={person.name} />
-                        <span><strong>{person.name}</strong><small>{person.role}</small></span>
+                        <span><strong data-no-i18n>{person.name}</strong><small data-no-i18n>{person.role}</small></span>
                         <Icon name="plus" size={17} />
                       </button>
                     ))}
@@ -2225,7 +2454,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                   {remotePlayers.map((person) => (
                     <button type="button" key={person.id} onClick={() => inviteToParty(person)}>
                       <Avatar className={styles.personAvatar} style={{ '--avatar-color': person.color }} userId={person.userId || null} name={person.name} />
-                      <span><strong>{person.name}</strong><small>{person.role}</small></span>
+                      <span><strong data-no-i18n>{person.name}</strong><small data-no-i18n>{person.role}</small></span>
                       <Icon name="plus" size={17} />
                     </button>
                   ))}
@@ -2268,6 +2497,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
           <PanelHeading
             eyebrow="Player interaction"
             title={selectedPerson.name}
+            titleNoTranslate
             text={`${selectedPerson.role} · ${selectedPerson.isRemote ? 'Đang ở trong Realm' : selectedPerson.isErpDirectory ? selectedPerson.online ? `Đang online tại ${(selectedPerson.surfaces || []).map((surface) => surface === 'realm' ? 'Realm' : 'ERP').join(' + ')}` : 'Nhân sự ERP · hiện đang offline' : 'Người chơi Realm'}`}
           />
           <div className={styles.playerHero}>
@@ -2351,7 +2581,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
           <div className={styles.profilePreview}>
             <span className={styles.profileAvatar} style={{ '--avatar-color': profileDraft.color }}>
               <span className={styles.portraitFallback}>{initials(profileDraft.name || DEFAULT_PROFILE.name)}</span>
-              <img className={styles.portraitImage} src={realmGeneratedCharacterPortraitUrl(profileDraft.name || DEFAULT_PROFILE.name)} alt="" aria-hidden="true" />
+              <img className={styles.portraitImage} src={realmGeneratedCharacterPortraitUrl(profileDraft)} alt="" aria-hidden="true" />
               <RealPortrait userId={viewerRealUserId} className={styles.portraitImage} />
             </span>
             <span><strong>{profileDraft.name || DEFAULT_PROFILE.name}</strong><small>{profileDraft.role}</small></span>
@@ -2400,10 +2630,11 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                 <span className={styles.priority}>{quest.priority}</span>
                 <Gold amount={quest.reward} />
               </div>
-              <h3>{quest.title}</h3>
-              <p>{quest.project} · Duyệt bởi {quest.reviewer}</p>
-              <div className={styles.progressLabel}><span>{quest.progress}/{quest.total} tiêu chí</span><span>{quest.due}</span></div>
+              <h3 data-no-i18n>{quest.title}</h3>
+              <p><span data-no-i18n>{quest.project}</span> · Duyệt bởi <span data-no-i18n>{quest.reviewer}</span></p>
+              <div className={styles.progressLabel}><span>{quest.progress}/{quest.total} tiêu chí</span><span data-no-i18n>{quest.due}</span></div>
               <div className={styles.progress}><i style={{ width: `${quest.progress / quest.total * 100}%` }} /></div>
+              {quest.status !== 'claimed' && <button type="button" className={styles.secondaryButton} onClick={() => startWorkSessionForQuest(quest)}><Icon name="people" size={15} />{workSession?.work.id === (quest.businessRef || quest.id) ? 'Mở phiên phối hợp' : 'Phối hợp cùng Party'}</button>}
               {quest.status === 'ready' && <button type="button" className={styles.primaryButton} disabled={operationsSyncState === 'syncing'} onClick={() => claimQuest(quest)}>Nhận {quest.reward} Gold</button>}
               {quest.status === 'active' && (operationsSource === 'erp'
                 ? <Link className={styles.secondaryButton} href={quest.links?.task || realmRecordHref('task', quest.businessRef)}>Mở Task ERP</Link>
@@ -2430,12 +2661,24 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
 
     if (activePanel === 'guild') return (
       <>
+        {compactViewport && (
+          <section className={styles.mobilePresenceControl} aria-label="Trạng thái hiện diện của bạn">
+            <span style={{ '--presence-color': STATUS[playerStatus].color }}><i /><strong>Hiện diện</strong><small>Chia sẻ trạng thái tự nguyện với Guild</small></span>
+            <select value={playerStatus} onChange={(event) => setPlayerStatus(rememberCollaborationAvailability(event.target.value))} aria-label="Trạng thái hiện diện">
+              {Object.entries(STATUS).map(([value, item]) => <option value={value} key={value}>{item.label}</option>)}
+            </select>
+          </section>
+        )}
         <GuildHall
           compact
           operationsSource={operationsSource}
           localDashboard={guildDashboard}
-          presence={realmPeople}
+          presence={realmRosterPeople}
           onSelectMember={(member) => {
+            if (member.id === (viewerRealUserId || `self:${profile.name}`) || member.name === profile.name) {
+              openAuthorizedPanel('profile');
+              return;
+            }
             const person = realmPeople.find((item) => item.id === member.id || item.name === member.name);
             if (person) selectPerson(person);
             else if (operationsSource === 'erp') window.location.assign(realmRecordHref('staff', member.id));
@@ -2466,8 +2709,12 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
 
     if (activePanel === 'treasury') return (
       <section className={styles.treasurySurface} data-realm-business-surface="treasury">
-        <PanelHeading eyebrow="Royal Treasury" title="Ví & sổ Gold" text="Wallet dùng để đổi vật phẩm; lịch sử Gold đã kiếm không bị giảm khi chi tiêu." />
-        <div className={styles.balanceCard}><span>Gold khả dụng</span><strong>{wallet}</strong><small>Renown mùa này: {career.renown.toLocaleString('vi-VN')} XP · Level {career.level}</small></div>
+        <PanelHeading eyebrow="Kho bạc Realm" title="Gold của bạn" text="Mỗi Gold đều có nguồn gốc từ một đóng góp được ghi nhận; chi tiêu không xóa lịch sử đã kiếm." />
+        <div className={styles.balanceCard}><span>Gold khả dụng</span><strong>{wallet}</strong><small>{career.renown.toLocaleString('vi-VN')} Renown · Level {career.level}</small></div>
+        <div className={styles.treasuryActions}>
+          <button type="button" className={styles.primaryButton} onClick={() => { setMode('ledger'); setLedgerView('rewards'); }}>Mở Hội đồng Gold</button>
+          <button type="button" className={styles.secondaryButton} onClick={() => { setMode('ledger'); setLedgerView('treasury'); }}>Vào Xưởng phẩm</button>
+        </div>
         <LedgerList ledger={ledger} />
       </section>
     );
@@ -2548,149 +2795,122 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
         </div>
       </>
     );
-  }, [activePanel, businessBridge, cancelInvite, career.level, career.renown, chatText, commandDashboard, confirmPartyAction, contactReceipt, contactSending, currentRoom?.name, dataSource.isErp, embassyDashboard, guildDashboard, handleLocalTreasuryChange, incomingInvite, inviteToParty, ledger, localWarRoom, mediaTopology, messages, moveToSelectedPerson, nearby.length, networkInfo, onlineCount, openAuthorizedPanel, operationsSource, operationsSyncState, outgoingInvite, party, partyConfirm, position, profile.color, profile.name, profileDraft, quests, realmDataRevision, realmPeople, refreshRealmOperations, remotePlayers, selectPerson, selectedCampaign, selectedPerson, sendContactToSelected, sendWhisperToSelected, sessionId, sfuMedia.status, transportState, treasuryDashboard, triggerEmote, wallet, whisperText]);
+  }, [activePanel, addCooperationNote, businessBridge, cancelInvite, career.level, career.renown, chatText, commandDashboard, compactViewport, confirmPartyAction, contactReceipt, contactSending, currentRoom?.name, dataSource.isErp, embassyDashboard, finishCooperationSession, guildDashboard, handleLocalTreasuryChange, incomingInvite, inviteToParty, ledger, localWarRoom, mediaTopology, messages, moveToSelectedPerson, nearby.length, networkInfo, onlineCount, openAuthorizedPanel, openWorkSessionTask, operationsSource, operationsSyncState, outgoingInvite, party, partyConfirm, playerStatus, position, profile.color, profile.name, profileDraft, publishWorkSessionNote, quests, rallyToWorkSession, realmDataRevision, realmPeople, realmRosterPeople, refreshRealmOperations, remotePlayers, selectPerson, selectedCampaign, selectedPerson, sendContactToSelected, sendWhisperToSelected, sessionId, setCooperationPhase, setCooperationReady, sfuMedia.status, startWorkSession, startWorkSessionForQuest, toggleCooperationAgenda, transportState, treasuryDashboard, triggerEmote, viewerRealUserId, wallet, whisperText, workSession, workSessionCandidate]);
+
+  const surfaceTitle = activePanel === 'profile'
+    ? 'Hồ sơ nhân vật'
+    : activePanel === 'person'
+      ? selectedPerson?.name || 'Đồng đội'
+      : realmNav.find((item) => item.id === activePanel)?.label || 'Bàn làm việc';
+  const nextQuest = quests.find((quest) => quest.status === 'ready') || quests.find((quest) => quest.status === 'active') || null;
 
   return (
     <main
-      className={`${styles.realmShell} ${mode === 'ledger' ? styles.ledgerShell : ''}`}
+      ref={realmShellRef}
+      className={`${styles.realmShell} ${guild.shell} ${mode === 'ledger' ? styles.ledgerShell : ''}`}
       data-realm-ui-art={uiArtState}
+      data-realm-ui-mode={mode === 'ledger' ? 'ledger' : surfaceOpen ? 'workspace' : voiceOpen ? 'voice' : 'explore'}
       style={UI_ART_REQUESTED ? GENERATED_UI_ART_STYLE : undefined}
     >
+      <LivingGuildhallMotion scopeRef={realmShellRef} mode={mode} />
       <a className={styles.skipLink} href="#realm-main-content">Bỏ qua điều hướng, tới nội dung Realm</a>
       <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">{navigationAnnouncement}</span>
-      <header className={styles.topbar}>
-        <div className={styles.brandCompact}>
-          <span className={styles.brandShield}><Icon name="shield" size={20} /></span>
-          <span><strong>CRMegoric Realms</strong><small>Virtual Medieval Office · {workspaceLabel}</small></span>
+
+      <header className={guild.commandBar}>
+        <div className={guild.brand}>
+          <span className={guild.brandMark}><Icon name="shield" size={18} /></span>
+          <span className={guild.brandText}><strong>CRMegoric Realms</strong><small><span data-no-i18n>{workspaceLabel}</span><span> · Guildhall đang hoạt động</span></small></span>
         </div>
-        <div className={styles.topbarCenter}>
-          <button type="button" className={mode === 'world' ? styles.activeMode : ''} onClick={() => setMode('world')} aria-pressed={mode === 'world'}><Icon name="dashboard" size={16} />Realm</button>
-          {erpHref && <Link className={styles.erpGateway} href={erpHref} onClick={handoffToErp} aria-label="Mở workspace ERP CRM gốc" title="Mở đầy đủ menu và chức năng ERP · CRM" aria-busy={erpHandoffState === 'loading' || undefined}><Icon name="reports" size={16} />{erpHandoffState === 'loading' ? 'Đang mở…' : 'ERP · CRM'}</Link>}
-          <button type="button" className={mode === 'ledger' ? styles.activeMode : ''} onClick={() => setMode('ledger')} aria-pressed={mode === 'ledger'} title="Sổ gamified chỉ thuộc Realm"><Icon name="wallet" size={16} />Sổ Realm</button>
-        </div>
-        <div className={styles.topbarRight}>
-          <LanguageSwitch compact className={styles.realmLanguageSwitch} />
-          {dataSource.isErp && <span className={`${styles.feedBadge} ${styles[`feedBadge_${changeFeed.state}`] || ''}`} title={`ERP change-feed · ${changeFeed.eventCount} sự kiện đã nhận`} aria-label={`ERP change-feed ${changeFeed.state}`}><i />{changeFeed.state === 'ready' ? 'ERP live' : changeFeed.state === 'connecting' ? 'Đang nối' : 'Feed chậm'}</span>}
-          {dataSource.isErp && <RealmNotificationBell dataRevision={realmDataRevision} />}
-          <label className={styles.statusSelect}>
-            <span className={styles.statusDot} style={{ '--status-color': STATUS[playerStatus].color }} />
-            <select value={playerStatus} onChange={(event) => {
-              const nextStatus = rememberCollaborationAvailability(event.target.value);
-              setPlayerStatus(nextStatus);
-            }} aria-label="Trạng thái hiện diện">
+        <nav className={guild.modeRail} aria-label="Chuyển không gian làm việc">
+          <button type="button" className={mode === 'world' ? guild.modeActive : ''} onClick={() => { setMode('world'); setSurfaceOpen(false); }} aria-label="Guildhall" aria-pressed={mode === 'world'}><Icon name="map" size={16} /><span>Guildhall</span></button>
+          {erpHref && <Link href={erpHref} onClick={handoffToErp} aria-label="Mở workspace ERP CRM gốc" aria-busy={erpHandoffState === 'loading' || undefined}><Icon name="work" size={16} /><span>{erpHandoffState === 'loading' ? 'Đang mở' : 'ERP · CRM'}</span></Link>}
+          <button type="button" className={mode === 'ledger' ? guild.modeActive : ''} onClick={() => { setMode('ledger'); setSurfaceOpen(false); setVoiceOpen(false); }} aria-label="Chronicle" aria-pressed={mode === 'ledger'}><Icon name="ledger" size={16} /><span>Chronicle</span></button>
+        </nav>
+        <div className={guild.commandActions}>
+          <LanguageSwitch compact />
+          {dataSource.isErp && !compactViewport && <RealmNotificationBell dataRevision={realmDataRevision} />}
+          {!compactViewport && <label className={guild.presenceSelect} style={{ '--presence-color': STATUS[playerStatus].color }}>
+            <i />
+            <select value={playerStatus} onChange={(event) => setPlayerStatus(rememberCollaborationAvailability(event.target.value))} aria-label="Trạng thái hiện diện">
               {Object.entries(STATUS).map(([value, item]) => <option value={value} key={value}>{item.label}</option>)}
             </select>
-          </label>
-          <span className={styles.walletPill}><Gold amount={wallet} /></span>
+          </label>}
+          {!compactViewport && <button type="button" className={guild.goldButton} onClick={() => { setMode('ledger'); setLedgerView('personal'); setSurfaceOpen(false); setVoiceOpen(false); }} aria-label={`${t('Mở Chronicle')}, ${t('số dư')} ${wallet} Gold`}><span className={guild.goldCoin}>G</span><strong>{wallet.toLocaleString('vi-VN')} Gold</strong></button>}
+          <button type="button" className={guild.profileButton} onClick={() => openAuthorizedPanel('profile')} aria-label="Mở hồ sơ nhân vật"><span style={{ '--avatar-color': profile.color }}>{initials(profile.name)}</span></button>
         </div>
       </header>
 
       {incomingInvite && (
-        <section className={styles.partyInviteBanner} role="alertdialog" aria-labelledby="party-invite-title" aria-describedby="party-invite-copy">
-          <span className={styles.partyInviteIcon}><Icon name="phone" size={22} /></span>
-          <div>
-            <strong id="party-invite-title">{incomingInvite.hostProfile.name} mời bạn vào Party Voice</strong>
-            <p id="party-invite-copy">Room hiện có {incomingInvite.memberCount}/{incomingInvite.maxMembers} người và giữ voice hoạt động khi bạn sang phòng khác.</p>
-          </div>
-          <div className={styles.partyInviteActions}>
-            <button type="button" className={styles.inviteDecline} onClick={declineInvite}>Từ chối</button>
-            <button type="button" className={styles.inviteAccept} onClick={acceptPartyInvite}>Tham gia</button>
-          </div>
+        <section className={guild.invite} role="alertdialog" aria-labelledby="party-invite-title" aria-describedby="party-invite-copy">
+          <span className={guild.inviteIcon}><Icon name="phone" size={20} /></span>
+          <div><strong id="party-invite-title"><span data-no-i18n>{incomingInvite.hostProfile.name}</span> mời bạn vào Party Voice</strong><p id="party-invite-copy">{incomingInvite.memberCount}/{incomingInvite.maxMembers} người · cuộc thoại tiếp tục khi di chuyển giữa các phòng.</p></div>
+          <div className={guild.inviteActions}><button type="button" onClick={declineInvite}>Từ chối</button><button type="button" onClick={acceptPartyInvite}>Tham gia</button></div>
         </section>
       )}
 
-      <div className={styles.appGrid}>
-        <aside className={styles.sidebar} aria-label="Điều hướng Realm">
-          <button type="button" className={`${styles.profileCard} ${activePanel === 'profile' ? styles.profileCardActive : ''}`} onClick={() => { setMode('world'); setActivePanel('profile'); }}>
-            <span className={styles.profileAvatar} style={{ '--avatar-color': profile.color }}>
-              <span className={styles.portraitFallback}>{initials(profile.name)}</span>
-              <img className={styles.portraitImage} src={realmGeneratedCharacterPortraitUrl(profile.name || DEFAULT_PROFILE.name)} alt="" aria-hidden="true" />
-              <RealPortrait userId={viewerRealUserId} className={styles.portraitImage} />
-            </span>
-            <span><strong>{profile.name}</strong><small>Level {career.level} · {profile.role}</small></span>
-            <Icon name="settings" size={15} />
-          </button>
-          <label className={styles.mobileNavigator} htmlFor="realm-mobile-destination">
-            <span><Icon name="dashboard" size={17} />Khu vực</span>
-            <select id="realm-mobile-destination" value={mode === 'ledger' ? `ledger:${ledgerView}` : `world:${activePanel}`} onChange={(event) => {
-              const [nextMode, destination] = event.target.value.split(':');
-              if (nextMode === 'ledger') {
-                setMode('ledger');
-                setLedgerView(destination || 'personal');
-              } else {
-                moveToObject(destination || 'briefing');
-              }
-            }}>
-              {realmNav.map((item) => {
-                const access = realmAccessForPanel(businessBridge?.access, item.id);
-                return <option key={item.id} value={`world:${item.id}`} disabled={!access.allowed}>{item.label}{!access.allowed ? ' · khóa' : ''}</option>;
-              })}
-              <option value="world:profile">Hồ sơ nhân vật</option>
-              {mode === 'world' && !realmNav.some((item) => item.id === activePanel) && activePanel !== 'profile' && (
-                <option value={`world:${activePanel}`} disabled>Ngữ cảnh đang mở</option>
-              )}
-              <option value="ledger:personal">Sổ nhân vật</option>
-              <option value="ledger:guild">Guild Hall · Sổ Realm</option>
-              {tavernEnabled && <option value="ledger:treasury">Tavern · Sổ Realm</option>}
-            </select>
-          </label>
-          <nav>
-            <span className={styles.navLabel}>Vương quốc</span>
-            {realmNav.map((item) => {
-              const access = realmAccessForPanel(businessBridge?.access, item.id);
-              return (
-                <button type="button" key={item.id} disabled={!access.allowed} title={!access.allowed ? access.reason : undefined}
-                  className={activePanel === item.id && mode === 'world' ? styles.navActive : ''} onClick={() => moveToObject(item.id)}>
-                  <Icon name={item.icon} size={18} /><span>{item.label}</span>
-                  {!access.allowed && <b className={styles.navLock} aria-label="Không khả dụng"><Icon name="shield" size={12} /></b>}
-                  {access.allowed && item.id === 'quests' && <b>{quests.filter((quest) => quest.status !== 'claimed').length}</b>}
-                  {access.allowed && item.id === 'party' && (party || incomingInvite || outgoingInvite) && <b>{party ? party.members.length : '1'}</b>}
-                </button>
-              );
-            })}
-            <span className={styles.navLabel}>Hệ thống</span>
-            <button type="button" className={activePanel === 'profile' && mode === 'world' ? styles.navActive : ''} onClick={() => { setMode('world'); setActivePanel('profile'); }}><Icon name="staff" size={18} /><span>Hồ sơ nhân vật</span></button>
-            {erpHref && <Link href={erpHref} onClick={handoffToErp} aria-busy={erpHandoffState === 'loading' || undefined}><Icon name="reports" size={18} /><span>{erpHandoffState === 'loading' ? 'Đang mở ERP · CRM…' : 'Mở ERP · CRM gốc'}</span></Link>}
-            <button type="button" className={mode === 'ledger' ? styles.navActive : ''} onClick={() => setMode('ledger')} title="Giao diện gamified, không thay thế ERP"><Icon name="wallet" size={18} /><span>{tavernEnabled ? 'Sổ Realm & Tavern' : 'Sổ Realm'}</span></button>
-          </nav>
-          <div className={styles.onlineSummary}><span><i />{onlineCount} online</span><small>{TRANSPORT[transportState]?.short || 'Solo mode'}</small></div>
-        </aside>
+      {mode === 'world' ? (
+        <section id="realm-main-content" ref={mainStageRef} tabIndex={-1} className={guild.worldViewport}>
+          <div className={guild.worldTitle} data-living-motion="great-hall">
+            <span>{usesWorldV3 ? 'Realm World v3' : 'Realm World v2 · rollback'}</span>
+            <h1>Guildhall</h1>
+            <p>Người, công việc, voice và Gold cùng tồn tại trong một thế giới.</p>
+          </div>
 
-        <section id="realm-main-content" ref={mainStageRef} tabIndex={-1} className={styles.mainStage}>
-          {mode === 'world' ? (
-            <>
-              <div className={styles.worldTopline}>
-                <div><span className={styles.eyebrow}>Bạn đang ở</span><h1>{currentRoom?.name || 'Hành lang lâu đài'}</h1></div>
-                <div className={styles.worldToplineActions}>
-                  <label className={styles.mapStylePicker}>
-                    <Icon name="settings" size={17} />
-                    <span><small>Cảnh quan</small><select value={mapStyle} onChange={changeMapStyle} aria-label="Đổi phong cách bản đồ lâu đài">
-                      {REALM_MAP_STYLES.map((preset) => <option key={preset.id} value={preset.id}>{preset.label}</option>)}
-                    </select></span>
-                  </label>
-                  <div className={styles.zoneInfo}><Icon name={privateZone || party ? 'shield' : 'meeting'} size={17} /><span>{party ? 'Party Voice: kết nối xuyên phòng' : privateZone ? `Phòng riêng: ${privateZone.name}` : 'Spatial audio: bán kính 5 ô'}</span></div>
-                </div>
+          {usesWorldV3 ? (
+            <RealmWorldV3
+              activePanel={activePanel}
+              workspaceOpen={surfaceOpen}
+              playerStatus={playerStatus}
+              playerProfile={profile}
+              position={position}
+              staff={worldStaff}
+              remotePlayers={remotePlayers}
+              activeEmotes={activeEmotes}
+              sessionId={sessionId}
+              onPosition={handlePosition}
+              onNearby={handleNearby}
+              onObjectOpen={openObject}
+              onPerson={selectPerson}
+              onEmote={triggerEmote}
+              wallet={wallet}
+              demoMode={demoMode}
+              cooperationSession={workSession}
+            />
+          ) : (
+            <GuildhallScene
+              activePanel={activePanel}
+              playerStatus={playerStatus}
+              playerProfile={profile}
+              position={position}
+              staff={worldStaff}
+              remotePlayers={remotePlayers}
+              activeEmotes={activeEmotes}
+              sessionId={sessionId}
+              onPosition={handlePosition}
+              onNearby={handleNearby}
+              onObjectOpen={openObject}
+              onPerson={selectPerson}
+              onEmote={triggerEmote}
+            />
+          )}
+
+          {!surfaceOpen && workSession && (
+            <RealmCooperationHud
+              session={workSession}
+              selfId={sessionId}
+              onReady={setCooperationReady}
+              onRally={rallyToWorkSession}
+              onOpen={openCooperationPanel}
+              onOpenWork={openWorkSessionTask}
+            />
+          )}
+
+          {voiceOpen && !surfaceOpen && (
+            <div className={guild.voiceTray}>
+              <div className={guild.voiceTrayHeader}>
+                <div><span>Council Voice</span><strong>Cuộc gọi theo không gian</strong></div>
+                <button type="button" onClick={() => openAuthorizedPanel('party')}><Icon name="people" size={16} />Quản lý phiên thoại</button>
               </div>
-              <WorldCanvas
-                onObjectOpen={openObject}
-                onEmote={triggerEmote}
-                activePanel={activePanel}
-                playerStatus={playerStatus}
-                playerProfile={profile}
-                onPosition={handlePosition}
-                onNearby={handleNearby}
-                staff={worldStaff}
-                remotePlayers={remotePlayers}
-                activeEmotes={activeEmotes}
-                sessionId={sessionId}
-                mapStyle={mapStyle}
-                position={position}
-              />
-              {activeObject && (
-                <button type="button" className={styles.interactPrompt} onClick={() => openObject(activeObject)}>
-                  <kbd>E</kbd><span><strong>{activeObject.name}</strong><small>{activeObject.hint}</small></span>
-                </button>
-              )}
               <MediaDock
                 nearby={voiceNearby}
                 cameraOn={cameraOn}
@@ -2710,15 +2930,42 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
                 onShare={toggleShare}
                 onPerson={selectPerson}
               />
+            </div>
+          )}
+
+          {!surfaceOpen && <nav className={guild.actionDock} aria-label="Hành động chính trong Guildhall" data-living-motion="action-dock">
+            <div className={guild.dockPrompt}>
+              {nextQuest ? <strong data-no-i18n data-realm-next-quest>{nextQuest.title}</strong> : <strong>{t('Guildhall đã sẵn sàng')}</strong>}
+              <small>{nextQuest ? <><span data-no-i18n>{nextQuest.project}</span><span> · {t(nextQuest.due)}</span></> : `${onlineCount} người đang có mặt · ${TRANSPORT[transportState]?.short || 'Solo mode'}`}</small>
+            </div>
+            <div className={guild.dockActions}>
+              <button type="button" className={`${guild.dockAction} ${voiceOpen ? guild.dockActionActive : ''}`} aria-pressed={voiceOpen} onClick={() => setVoiceOpen((open) => !open)}><Icon name="mic" size={21} /><span>Voice</span></button>
+              <button type="button" className={guild.dockAction} onClick={() => moveToObject('quests')}><Icon name="work" size={21} /><span>Công việc</span></button>
+              <button type="button" className={guild.dockAction} onClick={() => { setMode('ledger'); setLedgerView('personal'); setSurfaceOpen(false); setVoiceOpen(false); }}><Icon name="wallet" size={21} /><span>Gold</span></button>
+              <button type="button" className={guild.dockAction} onClick={() => moveToObject('guild')} aria-label={`${t('Mọi người')}, ${onlineCount} online`}><Icon name="people" size={21} /><span>Mọi người</span></button>
+            </div>
+          </nav>}
+
+          {surfaceOpen && (
+            <>
+              <button type="button" className={guild.surfaceBackdrop} onClick={() => setSurfaceOpen(false)} aria-label="Đóng bàn làm việc" />
+              <aside ref={inspectorRef} className={guild.surface} aria-label={surfaceTitle}>
+                <header className={guild.surfaceHeader}><div><span>Bàn làm việc Guildhall</span><strong>{surfaceTitle}</strong></div><button type="button" onClick={() => setSurfaceOpen(false)} aria-label="Đóng"><Icon name="x" size={18} /></button></header>
+                <div className={guild.surfaceBody}>{panel}</div>
+              </aside>
             </>
-          ) : (
+          )}
+        </section>
+      ) : (
+        <section id="realm-main-content" ref={mainStageRef} tabIndex={-1} className={guild.ledgerViewport}>
+          <div className={guild.ledgerContainer}>
             <LedgerMode
               profile={profile}
               playerStatus={playerStatus}
               career={career}
               quests={quests}
               ledger={ledger}
-              staff={realmPeople}
+              staff={realmRosterPeople}
               wallet={wallet}
               onAdvanceQuest={advanceQuest}
               onClaimQuest={claimQuest}
@@ -2735,28 +2982,22 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
               guildDashboard={guildDashboard}
               commandDashboard={commandDashboard}
               chronicleDashboard={chronicleDashboard}
-              guildPresence={realmPeople}
+              guildPresence={realmRosterPeople}
               embassyDashboard={embassyDashboard}
               businessBridge={businessBridge}
               dataRevision={realmDataRevision}
               ledgerView={ledgerView}
               onLedgerViewChange={setLedgerView}
             />
-          )}
+          </div>
         </section>
-
-        <aside ref={inspectorRef} tabIndex={-1} className={styles.inspector} aria-label="Bảng thông tin CRMegoric">
-          <div className={styles.inspectorScroll}>{mode === 'ledger'
-            ? <CharacterDossier profile={profile} playerStatus={playerStatus} career={career} wallet={wallet} operationsSource={operationsSource} operationsSyncState={operationsSyncState} operationsSyncMeta={operationsSyncMeta} businessBridge={businessBridge} onOperationsRefresh={refreshRealmOperations} onCopySupportId={copyRealmSupportId} onOpenRealm={() => { setMode('world'); setActivePanel('briefing'); }} />
-            : panel}</div>
-        </aside>
-      </div>
+      )}
     </main>
   );
 }
 
-function PanelHeading({ eyebrow, title, text }) {
-  return <header className={styles.panelHeading}><span>{eyebrow}</span><h2>{title}</h2><p>{text}</p></header>;
+function PanelHeading({ eyebrow, title, text, titleNoTranslate = false }) {
+  return <header className={styles.panelHeading}><span>{eyebrow}</span><h2 data-no-i18n={titleNoTranslate || undefined}>{title}</h2><p>{text}</p></header>;
 }
 
 function Gold({ amount }) {
@@ -2767,7 +3008,7 @@ function LedgerList({ ledger }) {
   return (
     <div className={styles.ledgerList}>
       {ledger.map((entry) => (
-        <div key={entry.id}><span><strong>{entry.label}</strong><small>{entry.at}</small></span><b className={entry.amount > 0 ? styles.earn : entry.amount < 0 ? styles.spend : styles.neutral}>{entry.amount > 0 ? '+' : ''}{entry.amount} G</b></div>
+        <div key={entry.id}><span><strong data-no-i18n>{entry.label}</strong><small>{entry.at}</small></span><b className={entry.amount > 0 ? styles.earn : entry.amount < 0 ? styles.spend : styles.neutral}>{entry.amount > 0 ? '+' : ''}{entry.amount} G</b></div>
       ))}
     </div>
   );
@@ -2877,8 +3118,8 @@ function LedgerMode({
     }
   }, [accessManifest, ledgerView, onLedgerViewChange]);
   return (
-    <div className={styles.ledgerMode}>
-      <header className={styles.ledgerHero}>
+    <div className={styles.ledgerMode} data-realm-ledger-root>
+      <header className={styles.ledgerHero} data-realm-ledger-section>
         <div>
           <span className={styles.eyebrow}>Royal operations · ERP & CRM</span>
           <h1>Sổ điều hành CRMegoric</h1>
@@ -2887,7 +3128,7 @@ function LedgerMode({
         <span className={`${styles.syncBadge} ${styles[`syncBadge_${sync.tone}`] || ''}`} aria-live="polite"><Icon name={sync.icon} size={16} /> {sync.label}</span>
       </header>
 
-      <nav className={styles.ledgerViewTabs} aria-label="Chọn khu vực điều hành ERP">
+      <nav className={styles.ledgerViewTabs} aria-label="Chọn khu vực điều hành ERP" data-realm-ledger-tabs>
         {ledgerTabs.map((tab) => {
           const access = realmAccessForSurface(accessManifest, tab.key);
           return <button type="button" key={tab.key} disabled={!access.allowed} title={!access.allowed ? access.reason : undefined}
@@ -2901,7 +3142,7 @@ function LedgerMode({
       <SyncIntegrityCard source={operationsSource} state={operationsSyncState} meta={operationsSyncMeta} onRefresh={onOperationsRefresh} onCopySupportId={onCopySupportId} />
 
       {accessManifest && (
-        <section className={styles.accessManifest} aria-label="Quyền truy cập phiên ERP">
+        <section className={styles.accessManifest} aria-label="Quyền truy cập phiên ERP" data-realm-ledger-section>
           <span><Icon name="shield" size={17} /></span>
           <div><strong>Quyền phiên ERP đã đồng bộ</strong><small>{accessManifest.roles.join(' + ')} · {grantedSurfaces}/{totalSurfaces} khu vực khả dụng · {accessManifest.moduleMode === 'configured' ? 'module theo cấu hình công ty' : accessManifest.moduleMode === 'demo' ? 'quyền mô phỏng staging' : 'module theo mặc định tương thích'}</small></div>
         </section>
@@ -2960,12 +3201,12 @@ function LedgerMode({
           dataRevision={dataRevision}
         />
       ) : <>
-      <section className={styles.identityBridge} aria-label="Hồ sơ nhân sự kết nối nhân vật">
+      <section className={styles.identityBridge} aria-label="Hồ sơ nhân sự kết nối nhân vật" data-realm-ledger-section>
         <span className={styles.dossierCrest} style={{ '--avatar-color': profile.color }}><Icon name="shield" size={25} /></span>
         <div className={styles.identityCopy}>
           <span>ERP profile · Hồ sơ nhân sự / Character profile</span>
-          <h2>{profile.name}</h2>
-          <p>{profile.role} · Level {career.level} · <i style={{ '--status-color': status.color }} /> {status.label}</p>
+          <h2 data-no-i18n>{profile.name}</h2>
+          <p><span data-no-i18n>{profile.role}</span> · Level {career.level} · <i style={{ '--status-color': status.color }} /> {status.label}</p>
         </div>
         <div className={styles.ledgerKpis}>
           <span><small>Gold khả dụng</small><strong>{wallet} G</strong></span>
@@ -2982,7 +3223,7 @@ function LedgerMode({
         dataRevision={dataRevision}
       />
 
-      <section className={styles.ledgerSection} aria-labelledby="realm-erp-portals-title">
+      <section className={styles.ledgerSection} aria-labelledby="realm-erp-portals-title" data-realm-ledger-section>
         <div className={styles.sectionHead}><div><span>Business bridge</span><h2 id="realm-erp-portals-title">Cổng nghiệp vụ ERP/CRM</h2></div><p>Medieval label chỉ là lớp giao diện; route, dữ liệu và RBAC vẫn thuộc ERP gốc.</p></div>
         <div className={styles.bridgePortalGrid}>
           {(businessBridge?.portals || REALM_CORE_PORTALS).map((portal) => (
@@ -3002,15 +3243,15 @@ function LedgerMode({
         </div>
       </section>
 
-      <section className={styles.ledgerSection}>
+      <section className={styles.ledgerSection} data-realm-ledger-section>
         <div className={styles.sectionHead}><div><span>Work registry</span><h2>Quest ↔ công việc ERP/CRM</h2></div><p>Thao tác ở bảng này cập nhật ngay nhân vật trong Realm.</p></div>
         <div className={styles.tableWrap}>
           <table>
             <thead><tr><th>Mã / phân hệ</th><th>Công việc</th><th>Tiến độ</th><th>Phê duyệt</th><th className={styles.num}>Gold</th><th>Thao tác</th></tr></thead>
             <tbody>{quests.map((quest) => (
               <tr key={quest.id}>
-                <td><strong>{quest.businessRef || quest.id}</strong><small>{quest.module || 'Tasks'}</small></td>
-                <td><strong>{quest.title}</strong><small>{quest.project} · {quest.due}</small></td>
+                <td><strong data-no-i18n>{quest.businessRef || quest.id}</strong><small data-no-i18n>{quest.module || 'Tasks'}</small></td>
+                <td><strong data-no-i18n>{quest.title}</strong><small><span data-no-i18n>{quest.project}</span> · {quest.due}</small></td>
                 <td><span className={styles.progressText}>{quest.progress}/{quest.total}</span><small>{quest.status === 'ready' ? 'Đủ điều kiện' : quest.status === 'claimed' ? 'Đã hoàn tất' : 'Đang thực hiện'}</small></td>
                 <td><span className={styles.tableStatus}>{quest.approval || `Duyệt bởi ${quest.reviewer}`}</span></td>
                 <td className={styles.num}><strong>+{quest.reward} G</strong><small>+{quest.renown} XP</small></td>
@@ -3027,10 +3268,10 @@ function LedgerMode({
         </div>
       </section>
       <div className={styles.ledgerColumns}>
-        <section className={styles.ledgerSection}><div className={styles.sectionHead}><div><span>Reward accounting</span><h2>Gold journal</h2></div><p>Append-only demo</p></div><LedgerList ledger={ledger} /></section>
-        <section className={styles.ledgerSection}><div className={styles.sectionHead}><div><span>Team availability</span><h2>Presence</h2></div><p>Trạng thái tự nguyện</p></div><div className={styles.roster}>{staff.map((person) => {
+        <section className={styles.ledgerSection} data-realm-ledger-section><div className={styles.sectionHead}><div><span>Reward accounting</span><h2>Gold journal</h2></div><p>Append-only demo</p></div><LedgerList ledger={ledger} /></section>
+        <section className={styles.ledgerSection} data-realm-ledger-section><div className={styles.sectionHead}><div><span>Team availability</span><h2>Presence</h2></div><p>Trạng thái tự nguyện</p></div><div className={styles.roster}>{staff.map((person) => {
           const personStatus = STATUS[person.status] || STATUS.available;
-          return <article key={person.id} className={styles.personRow}><span className={styles.personAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span><span><strong>{person.name}</strong><small>{person.role}</small></span><span className={styles.presenceLabel}><i style={{ '--status-color': personStatus.color }} />{personStatus.label}</span></article>;
+          return <article key={person.id} className={styles.personRow}><span className={styles.personAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span><span><strong data-no-i18n>{person.name}</strong><small data-no-i18n>{person.role}</small></span><span className={styles.presenceLabel}><i style={{ '--status-color': personStatus.color }} />{personStatus.label}</span></article>;
         })}</div></section>
       </div>
       </>}
@@ -3046,7 +3287,7 @@ function CharacterDossier({ profile, playerStatus, career, wallet, operationsSou
       <span className={styles.eyebrow}>Live employee status</span>
       <div className={styles.dossierIdentity}>
         <span className={styles.dossierCrest} style={{ '--avatar-color': profile.color }}><Icon name="shield" size={27} /></span>
-        <div><h2 id="character-dossier-title">{profile.name}</h2><p>STAFF-001 · {profile.role}</p></div>
+        <div><h2 id="character-dossier-title" data-no-i18n>{profile.name}</h2><p>STAFF-001 · <span data-no-i18n>{profile.role}</span></p></div>
       </div>
       <div className={styles.levelRow}><span>Level {career.level}</span><strong>{career.renown.toLocaleString('vi-VN')} / {career.nextLevelRenown.toLocaleString('vi-VN')} XP</strong></div>
       <div className={styles.careerProgress} role="progressbar" aria-label="Tiến độ level nhân vật" aria-valuemin="0" aria-valuemax="100" aria-valuenow={career.levelProgress}><i style={{ width: `${career.levelProgress}%` }} /></div>
@@ -3082,6 +3323,6 @@ function CharacterDossier({ profile, playerStatus, career, wallet, operationsSou
   );
 }
 
-export default function RealmOffice({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world' }) {
-  return <ToastProvider><RealmOfficeInner erpHref={erpHref} demoMode={demoMode} workspaceLabel={workspaceLabel} initialBridge={initialBridge} pilotFeatures={pilotFeatures} initialMode={initialMode} /></ToastProvider>;
+export default function RealmOffice({ erpHref = '/dashboard', demoMode = false, workspaceLabel = 'Demo entity', initialBridge = null, pilotFeatures = null, initialMode = 'world', worldVersion = 'v3' }) {
+  return <ToastProvider><RealmOfficeInner erpHref={erpHref} demoMode={demoMode} workspaceLabel={workspaceLabel} initialBridge={initialBridge} pilotFeatures={pilotFeatures} initialMode={initialMode} worldVersion={worldVersion} /></ToastProvider>;
 }

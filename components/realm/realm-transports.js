@@ -2,8 +2,13 @@
 
 import { REALM_CHANNEL } from '../../lib/realm-protocol.js';
 
-export function resolveRealmGatewayUrl() {
+export function resolveRealmGatewayUrl(location = globalThis.window?.location) {
   const configured = process.env.NEXT_PUBLIC_REALM_SIGNAL_URL?.trim();
+  if (configured === 'auto') {
+    if (!location?.hostname) return '';
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${location.hostname}:3301/realm`;
+  }
   return configured || '';
 }
 

@@ -5,7 +5,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const source = fs.readFileSync(path.join(root, 'app/login/page.jsx'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'app/login/LoginForm.jsx'), 'utf8');
 
 test('login credentials cannot fall back to a pre-hydration GET submission', () => {
   assert.match(source, /useEffect\(\(\) => \{ setHydrated\(true\); \}, \[\]\)/);

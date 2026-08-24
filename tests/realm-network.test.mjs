@@ -46,11 +46,20 @@ test('demo guest identity is stable per browser profile and distinct across brow
   assert.equal(createRealmDemoGuestProfile({ name: 'Sơn Vũ' }, 'browser-abc1234').name, 'Sơn Vũ');
 });
 
-test('gateway signaling is opt-in and never probes an unconfigured local service', () => {
+test('gateway signaling is opt-in and can follow the app host for LAN collaboration', () => {
   const previous = process.env.NEXT_PUBLIC_REALM_SIGNAL_URL;
   try {
     delete process.env.NEXT_PUBLIC_REALM_SIGNAL_URL;
     assert.equal(resolveRealmGatewayUrl(), '');
+    process.env.NEXT_PUBLIC_REALM_SIGNAL_URL = 'auto';
+    assert.equal(
+      resolveRealmGatewayUrl({ protocol: 'http:', hostname: '192.168.4.23' }),
+      'ws://192.168.4.23:3301/realm',
+    );
+    assert.equal(
+      resolveRealmGatewayUrl({ protocol: 'https:', hostname: 'realm.example.test' }),
+      'wss://realm.example.test:3301/realm',
+    );
     process.env.NEXT_PUBLIC_REALM_SIGNAL_URL = '  wss://realm.example.test/realm  ';
     assert.equal(resolveRealmGatewayUrl(), 'wss://realm.example.test/realm');
   } finally {

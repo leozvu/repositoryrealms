@@ -9,7 +9,6 @@ import { initials } from '@/lib/format';
 import { rolesOf } from '@/lib/perm';
 import styles from './workforce.module.css';
 
-const FEATURE_ENABLED = process.env.NEXT_PUBLIC_CEO_GROUP_WORKFORCE === '1';
 const ACTION = 'group_workforce.request';
 
 const COPY = {
@@ -117,7 +116,7 @@ export default function CeoWorkforcePage() {
     setLoading(false);
   }, [c.loadError]);
 
-  useEffect(() => { if (sessionStatus === 'authenticated' && FEATURE_ENABLED) load(); }, [load, sessionStatus]);
+  useEffect(() => { if (sessionStatus === 'authenticated') load(); }, [load, sessionStatus]);
 
   const employers = useMemo(() => {
     const ids = new Set(directory.map((profile) => profile.targetEntityId));
@@ -192,7 +191,7 @@ export default function CeoWorkforcePage() {
   };
 
   if (sessionStatus === 'loading') return <div className={styles.loading}>{c.loadError}</div>;
-  if (!FEATURE_ENABLED || !rolesOf(session?.user).includes('DIRECTOR') || forbidden) return <Forbidden />;
+  if (!rolesOf(session?.user).includes('DIRECTOR') || forbidden) return <Forbidden />;
   const formatDate = (value) => value
     ? new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'vi-VN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
     : '—';

@@ -9,6 +9,7 @@ test-results/
 *.db-journal
 .DS_Store
 .claude/
+.codex-runtime/
 
 .vercel
 supabase/
@@ -24,3 +25,4 @@ qa/production-observation/reports/
 # file tạm phiên làm việc — chứa secret, KHÔNG commit
 *.tmp
 .tmp-*.mjs
+.env*

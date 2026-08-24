@@ -7,5 +7,5 @@ import RealmOffice from '@/components/realm/RealmOffice';
 export default async function RealmDemoPage({ searchParams }) {
   if (process.env.VERCEL_ENV === 'production') notFound();
   const query = await searchParams;
-  return <RealmOffice erpHref="/dashboard" demoMode initialMode={query?.view === 'ledger' ? 'ledger' : 'world'} />;
+  return <RealmOffice erpHref="/dashboard" demoMode initialMode={query?.view === 'ledger' ? 'ledger' : 'world'} worldVersion={query?.world === 'v2' ? 'v2' : 'v3'} />;
 }

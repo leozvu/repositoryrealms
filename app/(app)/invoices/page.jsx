@@ -1,9 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useResource, Icon, Modal, ConfirmDialog, EmptyState, Badge, Forbidden, ExportCsv, AsyncButton, useToast } from '@/components/ui';
-import DocEditor, { printDoc, nextCode } from '@/components/DocEditor';
+import { printDoc, nextCode } from '@/components/DocEditor';
 import { SendEmailModal } from '@/components/SendEmail';
 import { money, fmtDate, todayISO, docGrand, paidOf, remainOf } from '@/lib/format';
+import PageHeader from '@/components/system/PageHeader';
 
 function PayModal({ inv, onDone, onClose }) {
   const remain = remainOf(inv);
@@ -22,7 +24,7 @@ function PayModal({ inv, onDone, onClose }) {
     onDone(); onClose();
   };
   return (
-    <Modal title={`Ghi nhận thanh toán — ${inv.code}`} onClose={onClose}
+    <Modal title={`Ghi nhận thanh toán · ${inv.code}`} onClose={onClose}
       footer={<><button className="btn btn-outline" onClick={onClose}>Hủy</button>
         <button className="btn btn-primary" onClick={submit}>Ghi nhận</button></>}>
       <div className="detail-stats">
@@ -68,7 +70,7 @@ function FromHoursModal({ projects, onClose, onDone }) {
     const j = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) return toast(j.error || 'Có lỗi', 'error');
-    toast(`Đã tạo ${j.code} từ ${j._hours}h của ${j._people} người — giờ đó đã đánh dấu là đã xuất`);
+    toast(`Đã tạo ${j.code} từ ${j._hours}h của ${j._people} người. Giờ đó đã được đánh dấu là đã xuất.`);
     onDone(); onClose();
   };
 
@@ -92,12 +94,12 @@ function FromHoursModal({ projects, onClose, onDone }) {
           {!pv ? <div style={{ fontSize: '.85rem', color: 'var(--muted)' }}>Đang xem giờ chưa xuất…</div>
             : !pv.totalHours ? <div style={{ fontSize: '.85rem', color: 'var(--muted)' }}>Dự án này không còn giờ nào chưa xuất hóa đơn.</div>
               : <>
-                <div style={{ fontSize: '.85rem', marginBottom: 6 }}><b>{pv.totalHours}h</b> chưa xuất — sẽ thành {pv.lines.length} dòng hóa đơn:</div>
+                <div style={{ fontSize: '.85rem', marginBottom: 6 }}><b>{pv.totalHours}h</b> chưa xuất, sẽ thành {pv.lines.length} dòng hóa đơn:</div>
                 <table style={{ fontSize: '.82rem' }}>
                   <thead><tr><th>Nhân sự</th><th className="num">Giờ</th><th className="num">Thành tiền</th></tr></thead>
                   <tbody>{pv.lines.map(l => (
                     <tr key={l.userId}><td>{l.name}</td><td className="num">{l.hours}h</td>
-                      <td className="num">{+rate ? money(Math.round(l.hours * +rate)) : '—'}</td></tr>
+                      <td className="num">{+rate ? money(Math.round(l.hours * +rate)) : 'Chưa có'}</td></tr>
                   ))}</tbody>
                 </table>
                 <div style={{ fontSize: '.9rem', marginTop: 8 }}>Tạm tính (chưa VAT): <b style={{ color: 'var(--primary)' }}>{money(tong)}</b></div>
@@ -116,6 +118,7 @@ export default function InvoicesPage() {
   const [f, setF] = useState('all');
   const [modal, setModal] = useState(null);
   const toast = useToast();
+  const router = useRouter();
   if (forbidden) return <Forbidden />;
 
   const client = id => clients.rows.find(c => c.id === id);
@@ -141,11 +144,21 @@ export default function InvoicesPage() {
       // cùng nhóm với kỳ trước → Phân tích chỉ tính kỳ mới nhất vào MRR, không cộng dồn
       recGroup: v.recGroup || `RET-${v.clientId}-${Date.now().toString(36)}`,
     });
-    if (r) toast(`Đã tạo ${code} cho kỳ ${date.slice(0, 7)} — kiểm tra rồi gửi khách`);
+    if (r) toast(`Đã tạo ${code} cho kỳ ${date.slice(0, 7)}. Hãy kiểm tra rồi gửi khách.`);
   };
 
   return (
-    <>
+    <div className="record-index-page">
+      <PageHeader
+        icon="invoices"
+        meta="Tài chính · Phải thu"
+        title="Hóa đơn và thu tiền"
+        description="Theo dõi số đã thu, số còn lại, hạn thanh toán và lịch sử xử lý."
+        actions={<button className="btn btn-primary" onClick={() => {
+          if (!clients.rows.length) return toast('Hãy thêm khách hàng trước', 'error');
+          router.push('/invoices/new');
+        }}><Icon name="plus" size={16} />Tạo hóa đơn</button>}
+      />
       <div className="grid kpi-grid" style={{ marginBottom: 16 }}>
         <div className="card kpi"><span className="kpi-label">Đã thu</span><div className="kpi-value" style={{ color: 'var(--accent)' }}>{money(totalOf('paid'))}</div></div>
         <div className="card kpi"><span className="kpi-label">Chờ thanh toán</span><div className="kpi-value">{money(totalOf('sent'))}</div></div>
@@ -171,7 +184,7 @@ export default function InvoicesPage() {
         }}><Icon name="clock" size={16} /><span>Xuất từ giờ công</span></button>
         <button className="btn btn-primary" onClick={() => {
           if (!clients.rows.length) return toast('Hãy thêm khách hàng trước', 'error');
-          setModal({ mode: 'add' });
+          router.push('/invoices/new');
         }}><Icon name="plus" size={16} /><span>Tạo hóa đơn</span></button>
       </div>
       <div className="table-wrap">
@@ -182,7 +195,7 @@ export default function InvoicesPage() {
               <tr key={v.id}>
                 <td><span className="cell-main" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   {v.code}{v.recurring && <span title="Hóa đơn định kỳ" style={{ color: 'var(--primary)', display: 'inline-flex' }}><Icon name="repeat" size={14} /></span>}</span></td>
-                <td>{client(v.clientId)?.name || '—'}</td>
+                <td>{client(v.clientId)?.name || 'Chưa có khách hàng'}</td>
                 <td>{fmtDate(v.date)}</td>
                 <td style={v.status === 'overdue' ? { color: 'var(--danger)', fontWeight: 600 } : {}}>{fmtDate(v.dueDate)}</td>
                 <td className="num" style={{ fontWeight: 700 }}>{money(docGrand(v))}</td>
@@ -197,7 +210,7 @@ export default function InvoicesPage() {
                   <button className="icon-btn" title="Gửi email cho khách" aria-label={`Gửi email hóa đơn ${v.code}`}
                     onClick={() => setModal({ mode: 'email', row: v })}><Icon name="mail" size={16} /></button>
                   <button className="icon-btn" title="In / xuất PDF" onClick={() => printDoc(v, 'invoice', client(v.clientId)?.name || '', client(v.clientId) || {})}><Icon name="print" size={16} /></button>
-                  <button className="icon-btn" onClick={() => setModal({ mode: 'edit', row: v })} aria-label="Sửa"><Icon name="edit" size={16} /></button>
+                  <button className="icon-btn" onClick={() => router.push(`/invoices/${v.id}`)} aria-label="Mở trình soạn hóa đơn"><Icon name="edit" size={16} /></button>
                   <button className="icon-btn danger" onClick={() => setModal({ mode: 'del', row: v })} aria-label="Xóa"><Icon name="trash" size={16} /></button>
                 </div></td>
               </tr>
@@ -206,16 +219,12 @@ export default function InvoicesPage() {
           </tbody>
         </table>
       </div>
-      {modal?.mode === 'add' && <DocEditor kind="invoice" doc={null} clients={clients.rows} projects={projects.rows} services={services.rows} allDocs={rows}
-        onClose={() => setModal(null)} onSave={async d => { await create({ ...d, payments: '[]' }); toast('Đã tạo hóa đơn'); }} />}
-      {modal?.mode === 'edit' && <DocEditor kind="invoice" doc={modal.row} clients={clients.rows} projects={projects.rows} services={services.rows} allDocs={rows}
-        onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, d); toast('Đã cập nhật'); }} />}
       {modal?.mode === 'pay' && <PayModal inv={modal.row} onDone={refresh} onClose={() => setModal(null)} />}
       {modal?.mode === 'fromHours' && <FromHoursModal projects={projects.rows.filter(p => p.status !== 'done')}
         onDone={refresh} onClose={() => setModal(null)} />}
       {modal?.mode === 'email' && <SendEmailModal type="invoice" doc={modal.row} defaultTo={client(modal.row.clientId)?.email || ''} onClose={() => setModal(null)} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa hóa đơn ${modal.row.code}?`}
         onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); }} />}
-    </>
+    </div>
   );
 }

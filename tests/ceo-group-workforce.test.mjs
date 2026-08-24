@@ -16,8 +16,8 @@ test('group workforce is a CEO Portal-only surface backed by shared RepositoryRe
   const contract = REPOSITORY_REALMS_ACTION_CONTRACTS.find((row) => row.action === 'group_workforce.request');
 
   assert.match(navigation, /key: 'ceo-workforce'.*ceoPortalOnly: true/);
-  assert.match(shell, /NEXT_PUBLIC_CEO_GROUP_WORKFORCE/);
-  assert.match(page, /FEATURE_ENABLED/);
+  assert.match(shell, /!item\.ceoPortalOnly \|\| ceoPortal/);
+  assert.doesNotMatch(page, /NEXT_PUBLIC_CEO_GROUP_WORKFORCE|FEATURE_ENABLED/);
   assert.match(page, /messaging\/directory/);
   assert.match(page, /group_workforce\.request/);
   assert.match(target, /sharedWithCeoPortal/);

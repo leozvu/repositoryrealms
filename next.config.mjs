@@ -1,3 +1,5 @@
+import { deploymentBranding } from './lib/deployment-profile.js';
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const contentSecurityPolicy = [
@@ -29,7 +31,7 @@ const securityHeaders = [
 const nextConfig = {
   poweredByHeader: false,
   async redirects() {
-    return [{ source: '/', destination: '/dashboard', permanent: false }];
+    return [{ source: '/', destination: deploymentBranding().homePath, permanent: false }];
   },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];

@@ -1,7 +1,20 @@
 'use client';
 // UI kit dùng chung: icon, toast, modal, form động, hook dữ liệu — port từ v1
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import * as Dialog from '@radix-ui/react-dialog';
+import {
+  ArrowRight, ArrowsClockwise, Article, Bank, Bell, Briefcase, Buildings,
+  Cake, CalendarBlank, CaretDown, CaretRight, CaretUp, ChartBar, ChartLineUp,
+  ChatCircle, ChatTeardropText, Check, CheckSquare, ClipboardText, Clock,
+  Columns, Command, Compass, DeviceMobile, DotsThree, DownloadSimple,
+  EnvelopeSimple, EyeSlash, FileText, FloppyDisk, Folder, FolderOpen, Funnel,
+  GearSix, House, IdentificationCard, Kanban, Lightning, LinkSimple, List,
+  ListChecks, Lock, MagnifyingGlass, MapTrifold, Microphone, Money, Monitor,
+  NotePencil, PencilSimple, Percent, Phone, Plus, Printer, Pulse, Receipt,
+  ShieldCheck, ShieldWarning, SidebarSimple, SignOut, SortAscending, SquaresFour,
+  Sun, Tag, Target, Trash, TrendDown, TrendUp, UploadSimple, User, Users,
+  UsersThree, VideoCamera, Wallet, Warning, WarningCircle, X,
+} from '@phosphor-icons/react';
 import { BADGE } from '@/lib/format';
 import { ROLE_LABEL } from '@/lib/perm';
 
@@ -122,17 +135,37 @@ const RAW = {
   'chevron-down': '<polyline points="6 9 12 15 18 9"/>',
 };
 export function Icon({ name, size = 20 }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor"
-      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-      dangerouslySetInnerHTML={{ __html: RAW[name] || RAW.alert }} />
-  );
+  const icons = {
+    alert: WarningCircle, approval: CheckSquare, arrow: ArrowRight, bell: Bell,
+    board: Kanban, bolt: Lightning, brief: Article, cake: Cake, calendar: CalendarBlank,
+    camera: VideoCamera, cash: Money, chart: ChartLineUp, chat: ChatCircle,
+    check: Check, checklist: ListChecks, chevron: CaretRight,
+    'chevron-down': CaretDown, 'chevron-up': CaretUp, clients: UsersThree,
+    clock: Clock, close: X, command: Command, dashboard: SquaresFour,
+    download: DownloadSimple, edit: PencilSimple, eyeOff: EyeSlash, finance: Bank,
+    folder: Folder, home: House, inbox: ChatTeardropText, invoices: Receipt,
+    leads: Target, ledger: ClipboardText, link: LinkSimple, lock: Lock, logout: SignOut,
+    mail: EnvelopeSimple, map: MapTrifold, meeting: Users, menu: List,
+    messages: ChatCircle, mic: Microphone, mobile: DeviceMobile, more: DotsThree,
+    note: NotePencil, panel: SidebarSimple, people: UsersThree, person: User,
+    percent: Percent, phone: Phone, plus: Plus, print: Printer, projects: FolderOpen,
+    quotes: FileText, receipt: Receipt, repeat: ArrowsClockwise, reports: ChartBar,
+    screen: Monitor, search: MagnifyingGlass, settings: GearSix, shield: ShieldCheck,
+    sort: SortAscending, staff: IdentificationCard, tag: Tag, tasks: CheckSquare,
+    timeline: Pulse, trash: Trash, trendDown: TrendDown, trendUp: TrendUp,
+    upload: UploadSimple, wallet: Wallet, warning: Warning, x: X,
+    columns: Columns, filter: Funnel, save: FloppyDisk, company: Buildings,
+    work: Briefcase, restricted: ShieldWarning,
+  };
+  const Glyph = icons[name] || WarningCircle;
+  return <Glyph size={size} weight="regular" aria-hidden="true" focusable="false" />;
 }
 
 /* ---------- Badge ---------- */
 export function Badge({ map, k }) {
   const [label, cls] = BADGE[map]?.[k] || [k, 'b-gray'];
-  return <span className={`badge ${cls}`}><span className="dot"></span>{label}</span>;
+  const icon = cls === 'b-green' ? 'check' : cls === 'b-red' ? 'warning' : cls === 'b-yellow' ? 'alert' : 'note';
+  return <span className={`badge ${cls}`}><Icon name={icon} size={12} />{label}</span>;
 }
 
 /* ---------- Toast ---------- */
@@ -191,29 +224,23 @@ export function AsyncButton({ onClick, pendingLabel = 'Đang xử lý…', disab
 
 /* ---------- Modal ---------- */
 export function Modal({ title, children, footer, large, className = '', onClose }) {
-  useEffect(() => {
-    const h = e => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', h);
-    return () => document.removeEventListener('keydown', h);
-  }, [onClose]);
-  const dialog = (
-    <div className="modal-overlay" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className={`modal ${large ? 'modal-lg' : ''} ${className}`.trim()} role="dialog" aria-modal="true" aria-label={title}>
+  return (
+    <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="modal-overlay" />
+        <Dialog.Content className={`modal ${large ? 'modal-lg' : ''} ${className}`.trim()} aria-describedby={undefined}>
         <div className="modal-head">
-          <div className="modal-title">{title}</div>
-          <button className="icon-btn" onClick={onClose} aria-label="Đóng"><Icon name="x" size={16} /></button>
+          <Dialog.Title className="modal-title">{title}</Dialog.Title>
+          <Dialog.Close asChild>
+            <button className="icon-btn" aria-label="Đóng"><Icon name="x" size={16} /></button>
+          </Dialog.Close>
         </div>
         <div className="modal-body">{children}</div>
         {footer && <div className="modal-foot">{footer}</div>}
-      </div>
-    </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
-  // v3.37 (feedback Egoric): PORTAL ra document.body. Modal từng render bên trong #view —
-  // #view của theme Realm có isolation:isolate nên z-index 100 của modal bị NHỐT trong
-  // stacking context đó: topbar (z 30) đè lên đầu modal, lớp phủ mờ không che nổi
-  // topbar/sidebar → nhìn như modal "dính" vào bảng phía sau. Ra body là thoát hết.
-  if (typeof document === 'undefined') return dialog; // SSR không render modal — giữ an toàn
-  return createPortal(dialog, document.body);
 }
 
 export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa', modalClassName = '' }) {

@@ -72,14 +72,14 @@
       "status": "verified"
     },
     {
-      "id": "mobile-destination-navigation",
+      "id": "mobile-contextual-navigation",
       "phase": 22,
       "layer": "responsive",
       "source": "components/realm/RealmOffice.jsx",
       "signals": [
-        "realm-mobile-destination",
-        "mobileNavigator",
-        "ledger:personal"
+        "guild.actionDock",
+        "Hành động chính trong Guildhall",
+        "setLedgerView('personal')"
       ],
       "missingSignals": [],
       "status": "verified"
@@ -350,8 +350,8 @@
       "source": "tests/e2e/realm-smoke.spec.mjs",
       "signals": [
         "Realm presentation context restores without persisting business identifiers",
-        "name: 'Khu vực'",
-        "'ledger:treasury'"
+        "name: 'Chronicle'",
+        "ledgerView: 'treasury'"
       ],
       "missingSignals": [],
       "status": "verified"

@@ -35,6 +35,99 @@ test('English UI copy translates dynamic Realm status without translating record
   assert.equal(translateUiCopy('Khóa sổ chiến dịch Rồng Xanh', 'en'), 'Blue Dragon Operations Window');
 });
 
+test('workplace rehab copy switches the entity shell and action-first home completely', () => {
+  const copy = {
+    'Khách hàng · Dự án · Tài chính': 'Clients · Projects · Finance',
+    'Mở CEO Terminal': 'Open CEO Terminal',
+    'Trang chủ': 'Home',
+    'Bán hàng': 'Sales',
+    'Quản trị và hệ thống': 'Administration & system',
+    'Cần bạn xử lý': 'Needs your action',
+    'Nhịp vận hành': 'Operating pulse',
+    'Thay đổi đáng chú ý': 'Notable changes',
+    'Dòng tiền và việc cần xử lý': 'Cash flow and work requiring action',
+    'Ngoại lệ và phân bổ công việc': 'Exceptions and work allocation',
+  };
+  for (const [vietnamese, english] of Object.entries(copy)) {
+    assert.equal(translateUiCopy(vietnamese, 'en'), english, vietnamese);
+    assert.equal(translateUiCopy(vietnamese, 'vi'), vietnamese, vietnamese);
+  }
+});
+
+test('workplace rehab dynamic status preserves record names while translating UI context', () => {
+  assert.equal(translateUiCopy('Chào Quân', 'en'), 'Hello, Quân');
+  assert.equal(translateUiCopy('Từ Nguyễn Minh An', 'en'), 'From Nguyễn Minh An');
+  assert.equal(translateUiCopy('Quá hạn 5 ngày', 'en'), 'Overdue by 5 days');
+  assert.equal(translateUiCopy('1 dự án trễ', 'en'), '1 late project');
+  assert.equal(translateUiCopy('4 cơ hội', 'en'), '4 opportunities');
+  assert.equal(translateUiCopy('1 hóa đơn quá hạn, tổng 43 triệu chưa thu — cần nhắc nợ ngay.', 'en'), '1 overdue invoice, with 43 triệu still uncollected — follow up now.');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
+test('Realm great hall translates metric labels and mobile navigation completely', () => {
+  assert.equal(translateUiCopy('0 việc đang mở', 'en'), '0 open work items');
+  assert.equal(translateUiCopy('0 cần chú ý', 'en'), '0 need attention');
+  assert.equal(translateUiCopy('1 chờ quyết định', 'en'), '1 pending decision');
+  assert.equal(translateUiCopy('2 phòng dự án', 'en'), '2 project rooms');
+  assert.equal(translateUiCopy('3 dự án liên quan', 'en'), '3 related projects');
+  assert.equal(translateUiCopy('4 chưa đọc', 'en'), '4 unread');
+  assert.equal(translateUiCopy('Việc tôi', 'en'), 'My Work');
+  assert.equal(translateUiCopy('Xem thêm', 'en'), 'More');
+  assert.equal(translateUiCopy('Đã khôi phục khu vực Realm gần nhất.', 'en'), 'Restored your most recent Realm area.');
+  assert.equal(translateUiCopy('Đã khôi phục khu vực làm việc gần nhất trong Realm.', 'en'), 'Restored your most recent workspace area in Realm.');
+});
+
+test('mobile workspace keeps a reachable language switch in the navigation drawer', () => {
+  const shell = fs.readFileSync(new URL('../components/Shell.jsx', import.meta.url), 'utf8');
+  const css = fs.readFileSync(new URL('../app/globals.css', import.meta.url), 'utf8');
+  const feedbackCss = fs.readFileSync(new URL('../components/realm/realm-feedback-launcher.module.css', import.meta.url), 'utf8');
+  assert.match(shell, /sidebar-language-row[^\n]+LanguageSwitch compact/);
+  assert.match(css, /sidebar-language-row\{display:flex/);
+  assert.match(feedbackCss, /bottom:\s*calc\(84px[^;]+;\s*z-index:\s*44/);
+});
+
+test('Phase 4 Inbox and Collaboration copy is available in English without translating record names', () => {
+  assert.equal(translateUiCopy('Hộp thư hợp nhất', 'en'), 'Unified Inbox');
+  assert.equal(translateUiCopy('Điều phối cộng tác', 'en'), 'Collaboration');
+  assert.equal(translateUiCopy('Không hiển thị raw heartbeat, thời lượng online, Task, Gold hoặc điểm hiệu suất.', 'en'), 'Raw heartbeat, online duration, Tasks, Gold, and performance scores are never displayed.');
+  assert.equal(translateUiCopy('Message record đã được lưu: msg_01', 'en'), 'Message record saved: msg_01');
+  assert.equal(translateUiCopy('Contact request đã được ghi nhận: contact_01.', 'en'), 'Contact request recorded: contact_01.');
+  assert.equal(translateUiCopy('Chiến dịch mùa thu', 'en'), 'Chiến dịch mùa thu');
+});
+
+test('Phase 5 Project Realm and Chronicle copy is available in English without translating record names', () => {
+  assert.equal(translateUiCopy('Project Realm', 'en'), 'Project Realm');
+  assert.equal(translateUiCopy('Tín hiệu cần quyết định', 'en'), 'Signals requiring a decision');
+  assert.equal(translateUiCopy('Chronicle này là AuditLog ERP chỉ đọc.', 'en'), 'This Chronicle is the read-only ERP AuditLog.');
+  assert.equal(translateUiCopy('Không sửa lịch sử tại đây.', 'en'), 'History cannot be edited here.');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
+test('Phase 6 World Map and CEO Terminal copy preserves executive accounting meanings', () => {
+  assert.equal(translateUiCopy('Bản đồ bốn công ty', 'en'), 'Four-company Map');
+  assert.equal(translateUiCopy('Danh sách công ty tương đương', 'en'), 'Equivalent company list');
+  assert.equal(translateUiCopy('Không phải recognized revenue', 'en'), 'Not recognized revenue');
+  assert.equal(translateUiCopy('GMV không phải revenue', 'en'), 'GMV is not revenue');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
+test('Phase 7 Employee Profile and Recognition copy preserves privacy and Gold meaning', () => {
+  assert.equal(translateUiCopy('Hồ sơ nhân sự', 'en'), 'Employee Profile');
+  assert.equal(translateUiCopy('Kỹ năng & bằng chứng', 'en'), 'Skills & evidence');
+  assert.equal(translateUiCopy('Số dư hiện tại', 'en'), 'Current balance');
+  assert.equal(translateUiCopy('Hạn mức policy cá nhân', 'en'), 'Personal policy limit');
+  assert.equal(translateUiCopy('Mở Hội đồng Gold', 'en'), 'Open Gold Council');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
+test('Phase 8 final experience copy is available in English without translating record names', () => {
+  assert.equal(translateUiCopy('Thông báo', 'en'), 'Notifications');
+  assert.equal(translateUiCopy('Tìm kiếm toàn hệ thống', 'en'), 'Search & Commands');
+  assert.equal(translateUiCopy('Cài đặt Realm', 'en'), 'Realm Settings');
+  assert.equal(translateUiCopy('Không gian làm việc di động', 'en'), 'Mobile Workspace');
+  assert.equal(translateUiCopy('Chiến dịch Rồng Xanh', 'en'), 'Chiến dịch Rồng Xanh');
+});
+
 test('every Vietnamese ERP navigation label has an English counterpart', () => {
   const vietnamese = /[À-ỹĐđ]/;
   const missing = ERP_NAV

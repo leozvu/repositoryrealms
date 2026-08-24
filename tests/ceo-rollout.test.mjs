@@ -170,7 +170,7 @@ test('CEO-9 migration, routes and all outbound adapters are wired without deploy
   assert.match(migration, /CeoRolloutReceipt/);
   assert.doesNotMatch(migration, /Task|Invoice|Payout|LiveSession/);
   for (const file of [
-    'lib/ceo-unified-dashboard-admin.js', 'lib/ceo-identity-admin.js', 'lib/ceo-messaging-admin.js',
+    'lib/ceo-unified-dashboard-admin.js', 'lib/ceo-decision-queue-admin.js', 'lib/ceo-identity-admin.js', 'lib/ceo-messaging-admin.js',
     'lib/ceo-federation-admin.js', 'lib/ceo-command-gateway-admin.js',
   ]) assert.match(fs.readFileSync(path.join(ROOT, file), 'utf8'), /assertCeoRolloutCapability/);
   for (const file of [

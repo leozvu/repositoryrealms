@@ -109,9 +109,9 @@ test('business surfaces expose stable visual identities at existing component bo
   }
 });
 
-test('runtime business props cover seven objects inside a strict payload budget', async () => {
+test('runtime business props cover eight objects inside a strict payload budget', async () => {
   const assets = realmGeneratedPropAssets();
-  assert.equal(assets.length, 7);
+  assert.equal(assets.length, 8);
   let totalBytes = 0;
   for (const asset of assets) {
     const file = path.join(ROOT, 'public', asset.url.replace(/^\//, ''));
@@ -140,7 +140,7 @@ test('every declared world business object has one generated prop binding', asyn
   const worldSource = await readFile(path.join(ROOT, 'components', 'realm', 'world.js'), 'utf8');
   const objectBlock = worldSource.match(/export const WORLD_OBJECTS = \[([\s\S]*?)\n\];/)?.[1] || '';
   const objectIds = [...objectBlock.matchAll(/\{ id: '([^']+)', panel:/g)].map((match) => match[1]);
-  assert.equal(objectIds.length, 7);
+  assert.equal(objectIds.length, 8);
   assert.deepEqual(new Set(realmGeneratedPropAssets().map((asset) => asset.objectId)), new Set(objectIds));
 });
 

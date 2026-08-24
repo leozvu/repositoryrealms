@@ -39,7 +39,9 @@ async function contactAction(id, action) {
   return payload.contact;
 }
 
-export function WorkspaceSurfaceSwitch({ realm = false, pilot = null }) {
+export function WorkspaceSurfaceSwitch({ realm = false, pilot = null, realmV2Available = false }) {
+  // The spatial world is the canonical Realm entrance. Realm v2 remains the
+  // structured ledger/workspace reached from inside the Realm experience.
   const href = realm ? '/dashboard' : '/realm';
   const surface = realm ? 'erp' : 'realm';
   const unavailable = !realm && pilot && !pilot.allowed;
@@ -64,10 +66,10 @@ export function WorkspaceSurfaceSwitch({ realm = false, pilot = null }) {
   };
   return (
     <Link
-      className={realm ? styles.realmToErp : 'btn btn-outline btn-sm'}
+      className={realm ? styles.realmToErp : `${styles.erpToRealm} btn btn-sm`}
       href={href}
       onClick={rememberPreference}
-      aria-label={realm ? 'Trở về workspace ERP CRM gốc' : 'Mở văn phòng Realm tùy chọn'}
+      aria-label={realm ? 'Trở về workspace ERP CRM gốc' : 'Bước vào Realm với nhân vật và voice theo khoảng cách'}
     >
       <Icon name={realm ? 'reports' : 'shield'} size={15} />
       <span>{label}</span>
@@ -83,7 +85,7 @@ export default function CollaborationBridge() {
   const [workingId, setWorkingId] = useState(null);
   const dismissedRef = useRef(new Set());
   const announcedRef = useRef(new Set());
-  const surface = pathname === '/realm' || pathname.startsWith('/realm/') ? 'realm' : 'erp';
+  const surface = pathname === '/realm' || pathname.startsWith('/realm/') || pathname.startsWith('/realm-v2') ? 'realm' : 'erp';
 
   const heartbeat = useCallback(async () => {
     const saved = preferredCollaborationAvailability();

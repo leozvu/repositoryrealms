@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createEnvelope, isRealmMessage, normalizeProfile } from '@/lib/realm-protocol';
 import { normalizeRealmText, realmEmote } from '@/lib/realm-social';
 import { PARTY_CLIENT_MESSAGE_TYPES, PARTY_MESSAGE_TYPES } from '@/lib/realm-party';
+import { COOPERATION_MESSAGE_TYPES } from '@/lib/realm-cooperation';
 import {
   createBroadcastTransport,
   createGatewayTransport,
@@ -37,6 +38,7 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
   const onEmoteRef = useRef(onEmote);
   const signalHandlersRef = useRef(new Set());
   const partyHandlersRef = useRef(new Set());
+  const cooperationHandlersRef = useRef(new Set());
 
   useEffect(() => { profileRef.current = normalizeProfile(profile); }, [profile]);
   useEffect(() => { statusRef.current = status; }, [status]);
@@ -127,6 +129,13 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
 
       if (PARTY_MESSAGE_TYPES.includes(message.type)) {
         for (const handler of partyHandlersRef.current) {
+          handler({ from: message.senderId, type: message.type, payload: message.payload });
+        }
+        return;
+      }
+
+      if (COOPERATION_MESSAGE_TYPES.includes(message.type)) {
+        for (const handler of cooperationHandlersRef.current) {
           handler({ from: message.senderId, type: message.type, payload: message.payload });
         }
         return;
@@ -274,6 +283,16 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
     return () => partyHandlersRef.current.delete(handler);
   }, []);
 
+  const sendCooperation = useCallback((type, targetId, payload = {}) => {
+    if (!COOPERATION_MESSAGE_TYPES.includes(type) || !targetId) return false;
+    return publish(type, payload, targetId);
+  }, [publish]);
+
+  const subscribeCooperation = useCallback((handler) => {
+    cooperationHandlersRef.current.add(handler);
+    return () => cooperationHandlersRef.current.delete(handler);
+  }, []);
+
   return {
     sessionId,
     remotePlayers,
@@ -285,7 +304,9 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
     sendEmote,
     sendSignal,
     sendParty,
+    sendCooperation,
     subscribeSignal,
     subscribeParty,
+    subscribeCooperation,
   };
 }

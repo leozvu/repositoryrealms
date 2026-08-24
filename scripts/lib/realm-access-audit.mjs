@@ -34,7 +34,7 @@ const ENFORCEMENT_CONTRACTS = [
   { id: 'economy-api', source: 'app/api/realm-demo/economy/route.js', signals: ["realmSurfaceDecision(user, 'economy'", 'if (!access.allowed)'] },
   { id: 'embassy-api', source: 'app/api/realm-demo/embassy/route.js', signals: ["realmSurfaceDecision(user, 'embassy'", 'if (!access.allowed)'] },
   { id: 'war-room-api', source: 'app/api/realm-demo/war-room/route.js', signals: ["realmSurfaceDecision(user, 'campaigns'", 'if (!access.allowed)'] },
-  { id: 'world-navigation', source: 'components/realm/RealmOffice.jsx', signals: ['realmAccessForPanel(businessBridge?.access, item.id)', 'disabled={!access.allowed}'] },
+  { id: 'world-navigation', source: 'components/realm/RealmOffice.jsx', signals: ['const access = realmAccessForPanel(businessBridge?.access, panel)', '<GuildhallScene', 'onObjectOpen={openObject}'] },
   { id: 'ledger-navigation', source: 'components/realm/RealmOffice.jsx', signals: ['realmAccessForSurface(accessManifest, tab.key)', 'title={!access.allowed ? access.reason'] },
   { id: 'locked-portals', source: 'components/realm/RealmOffice.jsx', signals: ['businessBridge?.unavailablePortals', 'aria-disabled="true"'] },
 ];

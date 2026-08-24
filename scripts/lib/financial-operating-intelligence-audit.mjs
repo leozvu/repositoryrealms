@@ -13,7 +13,7 @@ const CONTRACTS = [
   { id: 'finance-authorization', layer: 'authorization', source: 'lib/financial-operating-intelligence-admin.js', signals: ['financialIntelligenceScope', "hasAny(user, ['ACCOUNTANT'])", 'financial_intelligence_scope_missing'] },
   { id: 'salary-rate-does-not-leak', layer: 'privacy', source: 'tests/financial-operating-intelligence-admin.test.mjs', signals: ["includes('salary'), false", "includes('hourlyRate'), false", "includes('17600000'), false"] },
   { id: 'private-finance-api', layer: 'api', source: 'app/api/finance/intelligence/route.js', signals: ['currentUser()', 'loadFinancialOperatingIntelligence', "'Cache-Control': 'private, no-store'"] },
-  { id: 'erp-financial-intelligence-first', layer: 'ui', source: 'app/(app)/finance/page.jsx', signals: ['FinancialIntelligencePanel', 'Sổ quỹ &amp; giao dịch', "fetch('/api/finance/intelligence'"] },
+  { id: 'erp-financial-intelligence-first', layer: 'ui', source: 'app/(app)/finance/page.jsx', signals: ['FinancialIntelligencePanel', 'Sổ giao dịch', "fetch('/api/finance/intelligence'"] },
   { id: 'realm-shares-canonical-loader', layer: 'parity', source: 'lib/realm-treasury-admin.js', signals: ["import { loadFinancialOperatingIntelligence }", 'financialIntelligence: finance?.financialIntelligence'] },
   { id: 'royal-ledger-ui', layer: 'ui', source: 'components/realm/RoyalTreasuryExchange.jsx', signals: ['The Steward&apos;s Margin Table', 'Steward Queue', 'Không phải accounting profit', 'không phải ranking'] },
   { id: 'responsive-accessible-finance', layer: 'ux', source: 'components/finance/financial-intelligence.module.css', signals: ['min-height: 44px', '@media (max-width: 700px)', '@media (prefers-reduced-motion: reduce)'] },
@@ -43,7 +43,7 @@ export function buildFinancialOperatingIntelligenceAudit(root) {
     { id: 'cash-and-margin-have-distinct-sources', expected: 'true:true:true', actual: `${domain.includes("cashBalance: 'recorded_transactions_vnd'")}:${domain.includes("laborCost: 'declared_timelog_x_current_rate_not_payroll'")}:${domain.includes('isAccountingProfit: false')}` },
     { id: 'fail-closed-financial-json', expected: 'true:true', actual: `${domain.includes('strictArray')}:${domain.includes('malformedInvoices')}` },
     { id: 'advisory-no-ranking-no-auto-money-action', expected: 'true:true:true', actual: `${domain.includes('employeeRanking: false')}:${domain.includes('automaticPayment: false')}:${domain.includes('automaticInvoiceCreation: false')}` },
-    { id: 'financial-intelligence-precedes-ledger-crud', expected: 'true', actual: String(erpUi.indexOf('FinancialIntelligencePanel') >= 0 && erpUi.indexOf('FinancialIntelligencePanel') < erpUi.indexOf('Sổ quỹ &amp; giao dịch')) },
+    { id: 'financial-intelligence-precedes-ledger-crud', expected: 'true', actual: String(erpUi.indexOf('FinancialIntelligencePanel') >= 0 && erpUi.indexOf('FinancialIntelligencePanel') < erpUi.indexOf('Sổ giao dịch')) },
     { id: 'realm-and-erp-share-server-loader', expected: 'true:true', actual: `${realmAdmin.includes("import { loadFinancialOperatingIntelligence }")}:${erpUi.includes("fetch('/api/finance/intelligence'")}` },
   ].map((scenario) => ({ ...scenario, status: scenario.actual === scenario.expected ? 'verified' : 'failed' }));
   return {

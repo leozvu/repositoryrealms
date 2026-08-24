@@ -1,0 +1,55 @@
+   ▲ Next.js 15.5.21
+   - Local:        http://localhost:3334
+   - Network:      http://192.168.4.23:3334
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 6.5s
+ ○ Compiling /realm-v2/phase-7-qa ...
+ ✓ Compiled /realm-v2/phase-7-qa in 2.7s (762 modules)
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 3536ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 106ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 113ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 97ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 98ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 138ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 142ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 158ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 128ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 125ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 124ms
+ ✓ Compiled in 697ms (762 modules)
+ ✓ Compiled in 415ms (762 modules)
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 271ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 108ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 115ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 104ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 101ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 114ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 106ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 103ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 105ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 117ms
+ ✓ Compiled in 680ms (762 modules)
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 277ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 96ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 118ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 115ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 112ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 120ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 113ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 112ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 107ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 100ms
+ ✓ Compiled in 393ms (752 modules)
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 349ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 104ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 119ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 118ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 148ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 116ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 129ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 136ms
+ GET /realm-v2/phase-7-qa?screen=employee-profile 200 in 128ms
+ GET /realm-v2/phase-7-qa?screen=recognition 200 in 130ms
+[?25h

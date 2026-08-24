@@ -7,8 +7,8 @@ import { createRealmErpBridge } from '@/lib/realm-business-bridge';
 import { loadRealmPilotDecision } from '@/lib/realm-pilot';
 
 export const metadata = {
-  title: 'Realm Office · CRMegoric ERP',
-  description: 'Không gian làm việc medieval dùng chung tài khoản, dữ liệu và phân quyền với CRMegoric ERP · CRM.',
+  title: 'Realm · RepositoryRealms',
+  description: 'Không gian làm việc dùng chung tài khoản, dữ liệu và phân quyền với RepositoryRealms.',
 };
 
 export default async function RealmPage({ searchParams }) {
@@ -36,6 +36,7 @@ export default async function RealmPage({ searchParams }) {
       initialBridge={initialBridge}
       pilotFeatures={pilot.config.features}
       initialMode={initialMode}
+      worldVersion={query?.world === 'v2' ? 'v2' : 'v3'}
     />
   );
 }

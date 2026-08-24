@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-07-30T02:38:16.005Z",
+  "results": [
+    {
+      "slug": "home",
+      "viewport": "desktop",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-1-qa",
+      "heading": "Realm Home",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "my-work",
+      "viewport": "desktop",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-1-qa",
+      "heading": "Việc của tôi",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "home",
+      "viewport": "mobile",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-1-qa",
+      "heading": "Realm Home",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    },
+    {
+      "slug": "my-work",
+      "viewport": "mobile",
+      "status": 200,
+      "finalPath": "/realm-v2/phase-1-qa",
+      "heading": "Việc của tôi",
+      "mobileNavItems": 5,
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [],
+      "failedResponses": []
+    }
+  ],
+  "actionChecks": [
+    {
+      "action": "task.transition",
+      "entityId": "task-1",
+      "expectedState": "todo",
+      "nextState": "in_progress",
+      "idempotencyKeyPresent": true
+    }
+  ]
+}

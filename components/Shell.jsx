@@ -1,138 +1,217 @@
 'use client';
-// Khung ứng dụng v2.1: sidebar theo 7 vai trò + badge phê duyệt
+
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { SessionProvider, signOut } from 'next-auth/react';
-import { Icon, Modal, Avatar, AsyncButton, ToastProvider, useToast, RoleLabelsCtx, ModulesCtx } from './ui';
-import { initials } from '@/lib/format';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import {
+  Icon, Modal, Avatar, AsyncButton, ToastProvider, useToast,
+  RoleLabelsCtx, ModulesCtx,
+} from './ui';
 import { rolesOf, hasAny, ROLE_LABEL } from '@/lib/perm';
 import { modOn } from '@/lib/modules';
 import { ERP_NAV } from '@/lib/erp-navigation';
-import { realmRecordHref } from '@/lib/realm-business-bridge';
+import {
+  MOBILE_NAV_KEYS, currentWorkspaceLocation, workspaceNavigation,
+} from '@/lib/workspace-navigation';
 import CollaborationBridge, { WorkspaceSurfaceSwitch } from './collaboration/CollaborationBridge';
 import { useRealmChangeFeed } from './realm/useRealmChangeFeed';
 import { NOTIFICATION_SYNC_EVENT } from '@/lib/notification-inbox';
 import RealmFeedbackLauncher from './realm/RealmFeedbackLauncher';
 import RealmPilotOnboarding from './realm/RealmPilotOnboarding';
 import { LanguageSwitch, useLanguage } from './LanguageProvider';
+import { GLOBAL_SEARCH_GROUPS, searchGroupRows } from '@/lib/global-search-contract';
 
-/* v3.14: TỰ GẮN NHÃN CỘT CHO BẢNG.
-   Toàn app có 19 trang bảng, mỗi bảng viết tay riêng. Trên điện thoại, bảng 8 cột buộc phải
-   cuộn ngang mới đọc được — mà ERP thì gần như toàn bảng.
-   Cách làm: thay vì sửa tay 19 trang (dễ sót, dễ lệch), đọc <thead> rồi gắn data-label vào
-   từng <td>. CSS ở globals.css dùng nhãn đó để biến mỗi dòng thành một thẻ khi màn hình hẹp.
-   Một chỗ này lo cho cả 19 trang và mọi bảng viết sau này.
+const NAV = ERP_NAV;
 
-   Lưu ý: chỉ theo dõi childList (KHÔNG theo dõi attributes) — nếu theo dõi attributes thì
-   chính việc gắn data-label sẽ kích hoạt lại observer thành vòng lặp vô tận. */
-function useTableLabels(pathname) {
-  useEffect(() => {
-    let timer = 0;
-    const apply = () => {
-      for (const t of document.querySelectorAll('.table-wrap table')) {
-        const heads = [...t.querySelectorAll('thead th')].map(th => th.textContent.trim());
-        if (!heads.length) continue;
-        for (const tr of t.querySelectorAll('tbody tr')) {
-          const tds = tr.children;
-          // dòng gộp ô (trạng thái rỗng "Chưa có dữ liệu") không khớp số cột → bỏ qua
-          if (tds.length !== heads.length) continue;
-          for (let i = 0; i < tds.length; i++) {
-            if (heads[i] && tds[i].dataset.label !== heads[i]) tds[i].dataset.label = heads[i];
-          }
-        }
-      }
-    };
-    // Gộp nhiều biến động DOM liên tiếp thành 1 lần chạy.
-    // KHÔNG dùng requestAnimationFrame: trình duyệt treo rAF khi tab đang ẩn, nên bảng mở ở
-    // tab nền sẽ không bao giờ được gắn nhãn (đã dính đúng lỗi này lúc kiểm thử).
-    const schedule = () => { clearTimeout(timer); timer = setTimeout(apply, 0); };
-    schedule();
-    // v3.37: theo dõi cả document.body (không chỉ #view) — Modal đã portal ra body,
-    // bảng bên trong modal vẫn phải được gắn nhãn cột cho mobile.
-    const root = document.body || document.getElementById('view');
-    const mo = new MutationObserver(schedule);
-    if (root) mo.observe(root, { childList: true, subtree: true });
-    return () => { mo.disconnect(); clearTimeout(timer); };
-  }, [pathname]);
-}
-
-// v3.4: tìm kiếm toàn cục Ctrl+K — gom mọi resource user được đọc
-const SEARCH_GROUPS = [
-  { res: 'clients', label: 'Khách hàng', icon: 'clients', text: r => [r.name, r.contact, r.industry, r.phone], title: r => r.name, sub: r => r.industry || '', href: r => `/clients/${r.id}` },
-  { res: 'leads', label: 'Khách tiềm năng', icon: 'leads', text: r => [r.name, r.company, r.phone, r.email], title: r => r.company || r.name, sub: r => r.name, href: r => realmRecordHref('lead', r.id) },
-  { res: 'projects', label: 'Dự án', icon: 'projects', text: r => [r.name, r.service], title: r => r.name, sub: r => r.service || '', href: r => realmRecordHref('project', r.id) },
-  { res: 'tasks', label: 'Công việc', icon: 'tasks', text: r => [r.title, r.note], title: r => r.title, sub: r => r.status, href: r => realmRecordHref('task', r.id) },
-  { res: 'invoices', label: 'Hóa đơn', icon: 'invoices', text: r => [r.code], title: r => r.code, sub: r => r.date, href: () => '/invoices' },
-  { res: 'tickets', label: 'Ticket', icon: 'check', text: r => [r.code, r.title], title: r => `${r.code}: ${r.title}`, sub: r => r.status, href: () => '/tickets' },
-  { res: 'vendors', label: 'Nhà cung cấp', icon: 'wallet', text: r => [r.name, r.type], title: r => r.name, sub: r => r.type || '', href: () => '/vendors' },
-  { res: 'contracts', label: 'Hợp đồng', icon: 'shield', text: r => [r.code, r.partner], title: r => `${r.code} — ${r.partner}`, sub: r => r.endDate || '', href: () => '/contracts' },
-  { res: 'users', label: 'Nhân sự', icon: 'staff', text: r => [r.name, r.email, r.title], title: r => r.name, sub: r => r.title || '', href: r => realmRecordHref('staff', r.id) },
+const CEO_TABS = [
+  ['Tổng quan', '/ceo-overview'],
+  ['Điều hướng', '/ceo-navigator'],
+  ['Briefing', '/ceo-briefing'],
+  ['Quyết định', '/ceo-decisions'],
+  ['Công ty', '/ceo-world'],
+  ['Lệnh điều hành', '/ceo-commands'],
+  ['Nhân lực', '/ceo-workforce'],
+  ['Hộp thư', '/ceo-inbox'],
+  ['Danh mục', '/ceo-registry'],
+  ['An ninh', '/ceo-security'],
+  ['Triển khai', '/ceo-rollout'],
 ];
 
-function GlobalSearch({ onClose }) {
-  const [q, setQ] = useState('');
-  const [data, setData] = useState({});
-  const router = useRouter();
+function useDebouncedValue(value, delay = 180) {
+  const [debounced, setDebounced] = useState(value);
   useEffect(() => {
-    let alive = true;
-    Promise.all(SEARCH_GROUPS.map(async g => {
-      const res = await fetch('/api/data/' + g.res).catch(() => null);
-      return [g.res, res?.ok ? await res.json() : []];
-    })).then(pairs => alive && setData(Object.fromEntries(pairs)));
-    return () => { alive = false; };
-  }, []);
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
 
-  const results = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    if (needle.length < 2) return [];
-    return SEARCH_GROUPS.map(g => ({
-      ...g,
-      items: (data[g.res] || []).filter(r => g.text(r).filter(Boolean).join(' ').toLowerCase().includes(needle)).slice(0, 5),
-    })).filter(g => g.items.length);
-  }, [q, data]);
+export function GlobalSearch({ onClose, commands = [] }) {
+  const [query, setQuery] = useState('');
+  const [data, setData] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const debouncedQuery = useDebouncedValue(query);
+  const router = useRouter();
 
-  const go = (g, r) => { onClose(); router.push(g.href(r)); };
+  useEffect(() => {
+    const needle = debouncedQuery.trim();
+    if (needle.length < 2) {
+      setData({});
+      setLoading(false);
+      setError('');
+      return undefined;
+    }
+    const controller = new AbortController();
+    setLoading(true);
+    setError('');
+    Promise.all(GLOBAL_SEARCH_GROUPS.map(async (group) => {
+      const response = await fetch(`/api/data/${group.res}`, { signal: controller.signal });
+      if (!response.ok) return [group.res, []];
+      const rows = await response.json();
+      return [group.res, Array.isArray(rows) ? rows : []];
+    }))
+      .then((pairs) => setData(Object.fromEntries(pairs)))
+      .catch((searchError) => {
+        if (searchError.name !== 'AbortError') setError('Không thể tải kết quả. Hãy thử lại.');
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [debouncedQuery]);
 
+  const resultGroups = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    const destinations = commands
+      .filter((command) => !needle || command.label.toLowerCase().includes(needle))
+      .slice(0, needle ? 5 : 7);
+    const records = needle.length < 2 ? [] : GLOBAL_SEARCH_GROUPS
+      .map((group) => ({ ...group, items: searchGroupRows(group, data[group.res], needle, 5) }))
+      .filter((group) => group.items.length);
+    return { destinations, records };
+  }, [commands, data, query]);
+
+  const flattened = useMemo(() => [
+    ...resultGroups.destinations.map((item) => ({ kind: 'command', href: item.href })),
+    ...resultGroups.records.flatMap((group) => group.items.map((row) => ({
+      kind: 'record', href: group.href(row), group, row,
+    }))),
+  ], [resultGroups]);
+
+  useEffect(() => setActiveIndex(0), [query, data]);
+
+  const go = (href) => {
+    onClose();
+    router.push(href);
+  };
+
+  const onKeyDown = (event) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveIndex((index) => Math.min(index + 1, Math.max(0, flattened.length - 1)));
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveIndex((index) => Math.max(0, index - 1));
+    }
+    if (event.key === 'Enter' && flattened[activeIndex]) {
+      event.preventDefault();
+      go(flattened[activeIndex].href);
+    }
+  };
+
+  let cursor = 0;
   return (
-    <Modal title="Tìm kiếm toàn hệ thống" onClose={onClose}>
-      <input autoFocus placeholder="Gõ tên khách, deal, dự án, việc, hóa đơn, ticket… (≥2 ký tự)" value={q}
-        onChange={e => setQ(e.target.value)}
-        onKeyDown={e => { if (e.key === 'Enter' && results[0]?.items[0]) go(results[0], results[0].items[0]); }}
-        style={{ width: '100%', marginBottom: 10 }} />
-      <div style={{ maxHeight: 380, overflowY: 'auto' }}>
-        {results.map(g => (
-          <div key={g.res}>
-            <div className="nav-section" style={{ padding: '8px 0 2px' }}>{g.label}</div>
-            {g.items.map(r => (
-              <div key={r.id} className="act-item" style={{ cursor: 'pointer', alignItems: 'center' }} onClick={() => go(g, r)}>
-                <span style={{ color: 'var(--muted)', flex: 'none', display: 'flex' }}><Icon name={g.icon} size={15} /></span>
-                <div style={{ flex: 1 }}>
-                  <div className="act-title">{g.title(r)}</div>
-                  <div className="act-sub">{g.sub(r)}</div>
-                </div>
-              </div>
-            ))}
+    <Modal title="Tìm kiếm và mở nhanh" onClose={onClose} className="command-dialog">
+      <div className="command-search-field">
+        <Icon name="search" size={18} />
+        <input
+          autoFocus
+          aria-label="Tìm bản ghi hoặc chức năng"
+          placeholder="Tìm khách hàng, dự án, hóa đơn hoặc chức năng"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={onKeyDown}
+        />
+        <kbd>Esc</kbd>
+      </div>
+      <div className="command-results" role="listbox" aria-label="Kết quả tìm kiếm" aria-busy={loading || undefined}>
+        {resultGroups.destinations.length > 0 && (
+          <section className="command-group">
+            <h3>{query.trim() ? 'Chức năng' : 'Mở nhanh'}</h3>
+            {resultGroups.destinations.map((command) => {
+              const index = cursor++;
+              return (
+                <button
+                  key={command.href}
+                  type="button"
+                  role="option"
+                  aria-selected={index === activeIndex}
+                  className="command-result"
+                  data-active={index === activeIndex || undefined}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  onClick={() => go(command.href)}
+                >
+                  <Icon name={command.icon || 'arrow'} size={17} />
+                  <span><strong>{command.label}</strong><small>{command.groupLabel}</small></span>
+                  <Icon name="arrow" size={15} />
+                </button>
+              );
+            })}
+          </section>
+        )}
+        {loading && (
+          <div className="command-loading" aria-live="polite">
+            <span className="sk sk-line" /><span className="sk sk-line" /><span className="sk sk-line" />
           </div>
+        )}
+        {error && <div className="command-state command-state-error"><Icon name="warning" />{error}</div>}
+        {!loading && !error && resultGroups.records.map((group) => (
+          <section className="command-group" key={group.res}>
+            <h3>{group.label}</h3>
+            {group.items.map((row) => {
+              const index = cursor++;
+              return (
+                <button
+                  key={row.id}
+                  type="button"
+                  role="option"
+                  aria-selected={index === activeIndex}
+                  className="command-result"
+                  data-active={index === activeIndex || undefined}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  onClick={() => go(group.href(row))}
+                >
+                  <Icon name={group.icon} size={17} />
+                  <span><strong>{group.title(row)}</strong><small>{group.sub(row)}</small></span>
+                  <Icon name="arrow" size={15} />
+                </button>
+              );
+            })}
+          </section>
         ))}
-        {q.trim().length >= 2 && !results.length && <p style={{ fontSize: '.83rem', color: 'var(--muted)' }}>Không tìm thấy "{q}".</p>}
-        {q.trim().length < 2 && <p style={{ fontSize: '.78rem', color: 'var(--muted)' }}>Mẹo: mở nhanh bằng <b>Ctrl+K</b> ở bất kỳ đâu. Kết quả tôn trọng phân quyền của bạn.</p>}
+        {!loading && !error && query.trim().length >= 2 && !resultGroups.records.length && (
+          <div className="command-state"><Icon name="search" />Không có bản ghi phù hợp với “{query.trim()}”.</div>
+        )}
+        {query.trim().length < 2 && (
+          <p className="command-hint">Gõ ít nhất 2 ký tự để tìm bản ghi. Dùng phím mũi tên để chọn và Enter để mở.</p>
+        )}
       </div>
     </Modal>
   );
 }
 
-// v3.5: chuông thông báo — gom gán việc, phê duyệt, kết quả duyệt một chỗ
-/* v3.40: đăng ký thiết bị nhận thông báo nền (Web Push).
-   Trả 'granted' | 'denied' | 'unsupported' | 'error'. Push gửi rỗng — service worker tự
-   lấy nội dung từ /api/notifications, nên không có dữ liệu nghiệp vụ đi qua máy chủ đẩy. */
 async function subscribePush(vapidPublicKey) {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) return 'unsupported';
   const permission = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
   if (permission !== 'granted') return permission === 'denied' ? 'denied' : 'error';
   const registration = await navigator.serviceWorker.ready;
   const raw = atob(vapidPublicKey.replace(/-/g, '+').replace(/_/g, '/'));
-  const applicationServerKey = Uint8Array.from(raw, char => char.charCodeAt(0));
+  const applicationServerKey = Uint8Array.from(raw, (char) => char.charCodeAt(0));
   const subscription = await registration.pushManager.getSubscription()
     || await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });
   const response = await fetch('/api/push/subscribe', {
@@ -142,323 +221,568 @@ async function subscribePush(vapidPublicKey) {
   return response.ok ? 'granted' : 'error';
 }
 
-function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
+export function NotificationsModal({ onClose, onChanged, dataRevision = 0 }) {
   const [data, setData] = useState(null);
   const router = useRouter();
   const toast = useToast();
-  const load = useCallback(() => fetch('/api/notifications', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(setData), []);
+  const load = useCallback(() => fetch('/api/notifications', { cache: 'no-store' })
+    .then((response) => response.ok ? response.json() : null).then(setData), []);
+
   useEffect(() => { load(); }, [dataRevision, load]);
   useEffect(() => {
     window.addEventListener(NOTIFICATION_SYNC_EVENT, load);
     return () => window.removeEventListener(NOTIFICATION_SYNC_EVENT, load);
   }, [load]);
-  const open = async n => {
-    const response = await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: n.id }) });
+
+  const openNotification = async (notification) => {
+    const response = await fetch('/api/notifications', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: notification.id }),
+    });
     if (!response.ok) return toast('Không thể cập nhật thông báo', 'error');
     window.dispatchEvent(new CustomEvent(NOTIFICATION_SYNC_EVENT));
-    onChanged?.(); onClose();
-    if (n.route) router.push(n.route);
+    onChanged?.();
+    onClose();
+    if (notification.route) router.push(notification.route);
+    return true;
   };
+
   const readAll = async () => {
-    const res = await fetch('/api/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ all: true }) });
-    if (!res.ok) return toast('Không thể cập nhật thông báo', 'error');
+    const response = await fetch('/api/notifications', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ all: true }),
+    });
+    if (!response.ok) return toast('Không thể cập nhật thông báo', 'error');
     window.dispatchEvent(new CustomEvent(NOTIFICATION_SYNC_EVENT));
-    onChanged?.(); await load(); toast('Đã đánh dấu tất cả thông báo là đã đọc');
+    onChanged?.();
+    await load();
+    toast('Đã đánh dấu tất cả thông báo là đã đọc');
+    return true;
   };
-  const ago = t => {
-    const m = Math.round((Date.now() - new Date(t)) / 60000);
-    return m < 60 ? m + ' phút' : m < 1440 ? Math.round(m / 60) + ' giờ' : Math.round(m / 1440) + ' ngày';
+
+  const ago = (time) => {
+    const minutes = Math.round((Date.now() - new Date(time)) / 60000);
+    if (minutes < 60) return `${minutes} phút`;
+    if (minutes < 1440) return `${Math.round(minutes / 60)} giờ`;
+    return `${Math.round(minutes / 1440)} ngày`;
   };
+
   return (
-    <Modal title="Raven Inbox · Thông báo ERP" onClose={onClose}
-      footer={<>
-        {/* v3.40: bật thông báo nền cho thiết bị này (PWA đã cài thì báo cả khi đóng app) */}
-        {process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && (
-          <AsyncButton className="btn btn-outline" style={{ marginRight: 'auto' }} pendingLabel="Đang bật…"
-            onClick={async () => {
-              const state = await subscribePush(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY);
-              toast(state === 'granted' ? 'Đã bật thông báo trên thiết bị này'
-                : state === 'denied' ? 'Trình duyệt đang chặn thông báo — bật lại trong cài đặt trang'
-                : state === 'unsupported' ? 'Thiết bị/trình duyệt này chưa hỗ trợ thông báo nền'
-                : 'Không bật được thông báo', state === 'granted' ? 'success' : 'error');
-            }}>
-            <Icon name="bell" size={15} /> Bật thông báo thiết bị
-          </AsyncButton>
-        )}
-        <AsyncButton className="btn btn-outline" onClick={readAll}>Đọc tất cả</AsyncButton>
-        <button className="btn btn-primary" onClick={onClose}>Đóng</button></>}>
+    <Modal
+      title="Hộp thư thông báo"
+      onClose={onClose}
+      footer={(
+        <>
+          {process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && (
+            <AsyncButton
+              className="btn btn-outline"
+              pendingLabel="Đang bật…"
+              onClick={async () => {
+                const state = await subscribePush(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY);
+                toast(state === 'granted' ? 'Đã bật thông báo trên thiết bị này'
+                  : state === 'denied' ? 'Trình duyệt đang chặn thông báo'
+                    : state === 'unsupported' ? 'Thiết bị chưa hỗ trợ thông báo nền'
+                      : 'Không bật được thông báo', state === 'granted' ? 'success' : 'error');
+              }}
+            >
+              <Icon name="bell" size={15} /> Bật trên thiết bị
+            </AsyncButton>
+          )}
+          <AsyncButton className="btn btn-outline" onClick={readAll}>Đánh dấu đã đọc</AsyncButton>
+          <button className="btn btn-primary" onClick={onClose}>Đóng</button>
+        </>
+      )}
+    >
       <div className="notification-inbox-list" aria-live="polite">
-        {(data?.rows || []).map(n => (
-          <button type="button" key={n.id} className="notification-inbox-item" data-unread={!n.readAt || undefined} onClick={() => open(n)}>
-            <span className="notification-inbox-icon"><Icon name={n.icon || 'bell'} size={17} /></span>
+        {!data && <div className="state-inline"><span className="sk sk-line" /><span className="sk sk-line" /></div>}
+        {(data?.rows || []).map((notification) => (
+          <button
+            type="button"
+            key={notification.id}
+            className="notification-inbox-item"
+            data-unread={!notification.readAt || undefined}
+            onClick={() => openNotification(notification)}
+          >
+            <span className="notification-inbox-icon"><Icon name={notification.icon || 'bell'} size={17} /></span>
             <span className="notification-inbox-copy">
-              <span><b>{n.kindLabel || 'Realm Dispatch'}</b><small>{ago(n.createdAt)} trước</small></span>
-              <strong>{n.text}</strong>
-              <em>Mở {n.targetLabel || 'ERP · CRM'}</em>
+              <span><b>{notification.kindLabel || 'Thông báo công việc'}</b><small>{ago(notification.createdAt)} trước</small></span>
+              <strong>{notification.text}</strong>
+              <em>Mở {notification.targetLabel || 'bản ghi liên quan'}</em>
             </span>
           </button>
         ))}
-        {data && !data.rows.length && <p style={{ fontSize: '.85rem', color: 'var(--muted)' }}>Chưa có thông báo nào — khi bạn được gán việc, được giao ticket hoặc có yêu cầu chờ duyệt, chúng sẽ hiện ở đây.</p>}
+        {data && !data.rows.length && (
+          <div className="command-state"><Icon name="check" />Bạn đã xử lý hết thông báo.</div>
+        )}
       </div>
     </Modal>
   );
 }
 
-// v3.2: modal bật/tắt đăng nhập 2 lớp TOTP cho tài khoản của mình
 function TwoFAModal({ onClose }) {
-  const [info, setInfo] = useState(null); // {enabled, secret, url}
+  const [info, setInfo] = useState(null);
   const [code, setCode] = useState('');
-  const [err, setErr] = useState('');
+  const [error, setError] = useState('');
   const toast = useToast();
-  useEffect(() => { fetch('/api/users/2fa').then(r => r.json()).then(setInfo); }, []);
 
-  const call = async method => {
-    setErr('');
-    const res = await fetch('/api/users/2fa', {
+  useEffect(() => { fetch('/api/users/2fa').then((response) => response.json()).then(setInfo); }, []);
+
+  const call = async (method) => {
+    setError('');
+    const response = await fetch('/api/users/2fa', {
       method, headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(method === 'POST' ? { secret: info.secret, code } : { code }),
     });
-    const j = await res.json().catch(() => ({}));
-    if (!res.ok) { setErr(j.error || 'Có lỗi xảy ra'); return; }
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      setError(body.error || 'Có lỗi xảy ra');
+      return false;
+    }
     toast(method === 'POST' ? 'Đã bật đăng nhập 2 lớp' : 'Đã tắt đăng nhập 2 lớp');
     onClose();
+    return true;
   };
 
   return (
-    <Modal title="Bảo mật — đăng nhập 2 lớp (2FA)" onClose={onClose}
-      footer={<>
-        <button className="btn btn-outline" onClick={onClose}>Đóng</button>
-        {info && (info.enabled
-          ? <AsyncButton className="btn btn-danger" onClick={() => call('DELETE')}>Tắt 2FA</AsyncButton>
-          : <AsyncButton className="btn btn-primary" onClick={() => call('POST')}>Bật 2FA</AsyncButton>)}
-      </>}>
-      {!info ? <p style={{ fontSize: '.85rem' }}>Đang tải…</p> : info.enabled ? (
-        <div style={{ fontSize: '.85rem', display: 'grid', gap: 10 }}>
-          <p>2FA <b style={{ color: 'var(--accent, #059669)' }}>đang bật</b> cho tài khoản của bạn. Nhập mã hiện tại từ ứng dụng xác thực để tắt.</p>
-          <input value={code} onChange={e => setCode(e.target.value)} placeholder="Mã 6 số" inputMode="numeric" maxLength={6} />
-          {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
-        </div>
-      ) : (
-        <div style={{ fontSize: '.85rem', display: 'grid', gap: 10 }}>
-          <p>1. Mở <b>Google Authenticator</b> (hoặc Authy, 1Password…) → thêm tài khoản → <b>nhập khóa thủ công</b>:</p>
-          <code style={{ padding: '8px 10px', background: 'var(--bg, #f1f5f9)', borderRadius: 8, letterSpacing: 1, wordBreak: 'break-all', fontWeight: 700 }}>
-            {info.secret.match(/.{1,4}/g).join(' ')}
-          </code>
-          <p>2. Nhập mã 6 số ứng dụng hiển thị để xác nhận:</p>
-          <input value={code} onChange={e => setCode(e.target.value)} placeholder="Mã 6 số" inputMode="numeric" maxLength={6} autoFocus />
-          {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
-          <p style={{ color: 'var(--muted)' }}>Sau khi bật, mỗi lần đăng nhập cần thêm mã từ điện thoại. Giữ khóa cẩn thận — mất điện thoại thì nhờ Giám đốc reset trong Hồ sơ nhân sự.</p>
+    <Modal
+      title="Bảo mật đăng nhập 2 lớp"
+      onClose={onClose}
+      footer={(
+        <>
+          <button className="btn btn-outline" onClick={onClose}>Đóng</button>
+          {info && (info.enabled
+            ? <AsyncButton className="btn btn-danger" onClick={() => call('DELETE')}>Tắt 2FA</AsyncButton>
+            : <AsyncButton className="btn btn-primary" onClick={() => call('POST')}>Bật 2FA</AsyncButton>)}
+        </>
+      )}
+    >
+      {!info ? <div className="state-inline"><span className="sk sk-line" /><span className="sk sk-line" /></div> : (
+        <div className="security-setup">
+          <p>{info.enabled
+            ? '2FA đang bật. Nhập mã hiện tại từ ứng dụng xác thực để tắt.'
+            : 'Nhập khóa dưới đây vào ứng dụng xác thực, sau đó nhập mã 6 số để xác nhận.'}</p>
+          {!info.enabled && <code>{info.secret.match(/.{1,4}/g).join(' ')}</code>}
+          <label htmlFor="two-factor-code">Mã xác thực</label>
+          <input id="two-factor-code" value={code} onChange={(event) => setCode(event.target.value)} inputMode="numeric" maxLength={6} autoFocus />
+          {error && <p className="field-error">{error}</p>}
         </div>
       )}
     </Modal>
   );
 }
 
-const NAV = ERP_NAV;
+function CreateMenu({ groups }) {
+  const available = new Map(groups.flatMap((group) => group.items.map((item) => [item.key, item])));
+  const options = [
+    ['tasks', 'Công việc', 'tasks'],
+    ['leads', 'Khách tiềm năng', 'leads'],
+    ['clients', 'Khách hàng', 'clients'],
+    ['quotes', 'Báo giá', 'quotes'],
+    ['invoices', 'Hóa đơn', 'invoices'],
+    ['projects', 'Dự án', 'projects'],
+  ].filter(([key]) => available.has(key));
 
-export default function Shell({ user, company, realmPilot, children }) {
+  if (!options.length) return null;
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button className="btn btn-primary shell-create"><Icon name="plus" size={16} />Tạo mới</button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content className="workspace-menu" sideOffset={8} align="end">
+          <DropdownMenu.Label className="workspace-menu-label">Tạo bản ghi</DropdownMenu.Label>
+          {options.map(([key, label, icon]) => (
+            <DropdownMenu.Item key={key} asChild>
+              <Link className="workspace-menu-item" href={['quotes', 'invoices'].includes(key) ? `${available.get(key).href}/new` : `${available.get(key).href}?create=1`}>
+                <Icon name={icon} size={16} /><span>{label}</span>
+              </Link>
+            </DropdownMenu.Item>
+          ))}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+}
+
+function UserMenu({ user, roles, roleLabels, onAvatar, onSecurity }) {
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button className="shell-user-trigger" aria-label="Mở menu tài khoản">
+          <Avatar userId={user.id} name={user.name} version={user.avatarVersion} size={32} />
+          <span><strong>{user.name}</strong><small>{roles.map((role) => roleLabels[role] || role).join(' · ')}</small></span>
+          <Icon name="chevron-down" size={14} />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content className="workspace-menu" sideOffset={8} align="end">
+          <DropdownMenu.Label className="workspace-menu-label">Tài khoản</DropdownMenu.Label>
+          <DropdownMenu.Item className="workspace-menu-item" onSelect={onAvatar}>
+            <Icon name="person" size={16} /><span>Đổi ảnh đại diện</span>
+          </DropdownMenu.Item>
+          <DropdownMenu.Item className="workspace-menu-item" onSelect={onSecurity}>
+            <Icon name="shield" size={16} /><span>Bảo mật 2FA</span>
+          </DropdownMenu.Item>
+          <DropdownMenu.Separator className="workspace-menu-separator" />
+          <DropdownMenu.Item className="workspace-menu-item workspace-menu-danger" onSelect={() => signOut({ callbackUrl: '/login' })}>
+            <Icon name="logout" size={16} /><span>Đăng xuất</span>
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+}
+
+function WorkspaceNav({ groups, pathname, pendingCount, unreadChat, onNavigate }) {
+  const location = currentWorkspaceLocation(groups, pathname);
+  const [expanded, setExpanded] = useState(() => new Set(location.group ? [location.group.key] : []));
+
+  useEffect(() => {
+    if (!location.group) return;
+    setExpanded((current) => new Set([...current, location.group.key]));
+  }, [location.group?.key]);
+
+  const toggle = (key) => setExpanded((current) => {
+    const next = new Set(current);
+    if (next.has(key)) next.delete(key); else next.add(key);
+    return next;
+  });
+
+  const itemCount = (item) => item.badge ? pendingCount : item.chatBadge ? unreadChat : 0;
+
+  return (
+    <nav id="nav" aria-label="Điều hướng chính">
+      {groups.map((group) => {
+        const active = location.group?.key === group.key;
+        const open = expanded.has(group.key);
+        const direct = group.items.length === 1 || group.key === 'home';
+        return (
+          <div className="workspace-nav-group" key={group.key} data-active={active || undefined}>
+            <div className="workspace-nav-row">
+              <Link
+                href={group.items[0].href}
+                className="workspace-nav-primary"
+                data-active={active || undefined}
+                onClick={onNavigate}
+              >
+                <Icon name={group.icon} size={19} />
+                <span>{group.label}</span>
+                {group.items.some((item) => item.badge) && pendingCount > 0 && <span className="nav-count">{pendingCount}</span>}
+              </Link>
+              {!direct && (
+                <button
+                  type="button"
+                  className="workspace-nav-toggle"
+                  aria-label={`${open ? 'Thu gọn' : 'Mở'} ${group.label}`}
+                  aria-expanded={open}
+                  onClick={() => toggle(group.key)}
+                >
+                  <Icon name={open ? 'chevron-up' : 'chevron-down'} size={14} />
+                </button>
+              )}
+            </div>
+            {!direct && open && (
+              <div className="workspace-nav-children">
+                {group.items.map((item) => {
+                  const path = item.href.split('?')[0];
+                  const itemActive = pathname === path || pathname.startsWith(`${path}/`);
+                  const count = itemCount(item);
+                  return (
+                    <Link
+                      key={item.key}
+                      href={item.href}
+                      className="workspace-nav-child"
+                      data-active={itemActive || undefined}
+                      aria-current={itemActive ? 'page' : undefined}
+                      onClick={onNavigate}
+                    >
+                      <Icon name={item.icon} size={16} /><span>{item.label}</span>
+                      {count > 0 && <span className="nav-count">{count}</span>}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </nav>
+  );
+}
+
+function MobileNavigation({ groups, pathname, onNavigate }) {
+  const entries = MOBILE_NAV_KEYS.map((key) => groups.find((group) => group.key === key)).filter(Boolean);
+  return (
+    <nav className="mobile-workspace-nav" aria-label="Điều hướng di động">
+      {entries.map((group) => {
+        const destination = group.key === 'operations'
+          ? group.items.find((item) => item.key === 'approvals') || group.items[0]
+          : group.key === 'realm'
+            ? group.items.find((item) => item.key === 'messages') || group.items[0]
+            : group.items[0];
+        const path = destination.href.split('?')[0];
+        const active = pathname === path || pathname.startsWith(`${path}/`)
+          || group.items.some((item) => pathname.startsWith(item.href.split('?')[0]));
+        return (
+          <Link key={group.key} href={destination.href} data-active={active || undefined} onClick={onNavigate}>
+            <Icon name={group.key === 'operations' ? 'approval' : group.key === 'realm' ? 'inbox' : group.icon} size={20} />
+            <span>{group.shortLabel}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export default function Shell({
+  user, company, realmPilot, realmV2Theme = false, realmV2Available = false,
+  ceoPortal = false, ceoPortalOrigin = '', children,
+}) {
   const { locale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadChat, setUnreadChat] = useState(0);
   const [show2fa, setShow2fa] = useState(false);
-  const [avatarVer, setAvatarVer] = useState(0); // v3.38: bust cache sau khi đổi ảnh
+  const [avatarVersion, setAvatarVersion] = useState(0);
   const avatarInputRef = useRef(null);
   const [showSearch, setShowSearch] = useState(false);
-  const [showNotif, setShowNotif] = useState(false);
-  const [unreadNotif, setUnreadNotif] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [notificationRevision, setNotificationRevision] = useState(0);
+  const [goldBalance, setGoldBalance] = useState(null);
   const [roleLabels, setRoleLabels] = useState(ROLE_LABEL);
-  const [modules, setModules] = useState(null); // v3.17: null = chưa tải/công ty cũ → bật hết
-  const [todayLabel, setTodayLabel] = useState('');
-  useEffect(() => {
-    // Vercel renders in UTC while the browser uses the employee's local timezone.
-    // Resolve the label client-side so midnight never causes a hydration mismatch.
-    setTodayLabel(new Date().toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-    }));
-  }, [locale]);
-  useEffect(() => { // v3.6: chức danh tùy biến theo công ty · v3.17: phân hệ bật/tắt
-    fetch('/api/settings').then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (!d) return;
-        const overrides = Object.fromEntries(Object.entries(d.roleLabels || {}).filter(([, v]) => v && String(v).trim()));
-        setRoleLabels({ ...ROLE_LABEL, ...overrides });
-        if (Array.isArray(d.modules)) setModules(d.modules);
-      }).catch(() => {});
-  }, []);
+  const [modules, setModules] = useState(null);
   const pathname = usePathname();
   const router = useRouter();
-  const isRealmRoute = pathname === '/realm' || pathname.startsWith('/realm/');
-  useTableLabels(pathname); // v3.14: bảng đọc được trên điện thoại
-  const isFL = user?.userType === 'freelancer';
-  // v3.11: freelancer chỉ được ở /freelancer — chuyển hướng nếu lạc sang trang nhân viên
-  useEffect(() => { if (isFL && pathname !== '/freelancer') router.replace('/freelancer'); }, [isFL, pathname, router]);
-  // v3.17: vào thẳng URL trang có phân hệ đang TẮT → đưa về Dashboard. Chỉ chạy khi đã tải
-  // được modules (tránh redirect nhầm lúc chưa biết công ty bật gì).
+  const freelancer = user?.userType === 'freelancer';
+  const roles = rolesOf(user);
+  const isLegacyRealm = pathname === '/realm' || pathname.startsWith('/realm/');
+
   useEffect(() => {
-    if (isFL || !Array.isArray(modules)) return;
-    const cur = NAV.find(n => n.key && pathname.startsWith('/' + n.key));
-    if (cur && cur.mod && !modOn(cur.mod, modules)) router.replace('/dashboard');
-  }, [pathname, modules, isFL, router]);
-  const NAV_FL = [{ key: 'freelancer', label: 'Công việc của tôi', icon: 'tasks', roles: ['FREELANCER'] }];
-  const navList = isFL ? NAV_FL : NAV;
-  const current = navList.find(n => n.key && pathname.startsWith('/' + n.key));
-  const myRoles = rolesOf(user);
-  // v3.17: mục menu hiện khi (đúng vai trò) VÀ (phân hệ của nó đang bật). Mục lõi (không mod)
-  // luôn qua modOn. Freelancer đi lối riêng.
-  const visible = item => isFL
+    fetch('/api/settings').then((response) => response.ok ? response.json() : null)
+      .then((settings) => {
+        if (!settings) return;
+        const overrides = Object.fromEntries(Object.entries(settings.roleLabels || {})
+          .filter(([, value]) => value && String(value).trim()));
+        setRoleLabels({ ...ROLE_LABEL, ...overrides });
+        if (Array.isArray(settings.modules)) setModules(settings.modules);
+      }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (freelancer && pathname !== '/freelancer') router.replace('/freelancer');
+  }, [freelancer, pathname, router]);
+
+  useEffect(() => {
+    if (freelancer || !Array.isArray(modules)) return;
+    const current = NAV.find((item) => item.key && pathname.startsWith(`/${item.key}`));
+    if (current?.mod && !modOn(current.mod, modules)) router.replace('/dashboard');
+  }, [pathname, modules, freelancer, router]);
+
+  const visible = useCallback((item) => freelancer
     ? true
-    : (!item.ceoPortalOnly || process.env.NEXT_PUBLIC_CEO_GROUP_WORKFORCE === '1')
+    : (!item.ceoPortalOnly || ceoPortal)
       && (!item.realmSurface || realmPilot?.allowed)
       && hasAny(user, item.roles)
-      && modOn(item.mod, modules);
+      && modOn(item.mod, modules), [ceoPortal, freelancer, modules, realmPilot?.allowed, user]);
+
+  const groups = useMemo(() => workspaceNavigation(visible, { freelancer, ceoPortal }), [visible, freelancer, ceoPortal]);
+  const navigationGroups = useMemo(() => {
+    if (!ceoPortal) return groups;
+    const overview = groups.flatMap((group) => group.items).find((item) => item.key === 'ceo-overview');
+    return overview ? [{ key: 'more', label: 'CEO Terminal', shortLabel: 'CEO', icon: 'command', items: [overview] }] : [];
+  }, [ceoPortal, groups]);
+  const location = currentWorkspaceLocation(groups, pathname);
+  const commands = useMemo(() => groups.flatMap((group) => group.items.map((item) => ({
+    href: item.href, label: item.label, icon: item.icon, groupLabel: group.label,
+  }))), [groups]);
 
   const loadShellCounters = useCallback(() => {
-    fetch('/api/approvals').then(r => r.ok ? r.json() : null)
-      .then(d => d && setPendingCount(d.pendingCount || 0)).catch(() => {});
-    fetch('/api/chat').then(r => r.ok ? r.json() : null)
-      .then(d => d && setUnreadChat(d.totalUnread || 0)).catch(() => {});
-    fetch('/api/notifications').then(r => r.ok ? r.json() : null)
-      .then(d => d && setUnreadNotif(d.unread || 0)).catch(() => {});
+    fetch('/api/approvals').then((response) => response.ok ? response.json() : null)
+      .then((data) => data && setPendingCount(data.pendingCount || 0)).catch(() => {});
+    fetch('/api/chat').then((response) => response.ok ? response.json() : null)
+      .then((data) => data && setUnreadChat(data.totalUnread || 0)).catch(() => {});
+    fetch('/api/notifications').then((response) => response.ok ? response.json() : null)
+      .then((data) => data && setUnreadNotifications(data.unread || 0)).catch(() => {});
   }, []);
 
   const handleShellChanges = useCallback((feed) => {
     const domains = new Set(feed?.domains || []);
     if (!['notifications', 'communications', 'collaboration'].some((domain) => domains.has(domain))) return;
-    setNotificationRevision((currentRevision) => currentRevision + 1);
+    setNotificationRevision((revision) => revision + 1);
     loadShellCounters();
   }, [loadShellCounters]);
 
   useRealmChangeFeed({
-    enabled: process.env.NEXT_PUBLIC_REALM_ERP_SYNC === '1' && !isFL && !isRealmRoute,
+    enabled: process.env.NEXT_PUBLIC_REALM_ERP_SYNC === '1' && !freelancer && !isLegacyRealm,
     onChanges: handleShellChanges,
   });
 
   useEffect(() => {
     loadShellCounters();
-    const t = setInterval(loadShellCounters, 15000);
-    return () => clearInterval(t);
+    const timer = setInterval(loadShellCounters, 15000);
+    return () => clearInterval(timer);
   }, [pathname, loadShellCounters]);
 
-  useEffect(() => { // PWA: đăng ký service worker
+  useEffect(() => {
+    if (ceoPortal || freelancer || !realmPilot?.allowed) return undefined;
+    let alive = true;
+    fetch('/api/realm-v2/profile-recognition', { cache: 'no-store', credentials: 'same-origin' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload) => {
+        const balance = payload?.recognition?.summary?.balance;
+        if (alive && Number.isFinite(Number(balance))) setGoldBalance(Number(balance));
+      })
+      .catch(() => null);
+    return () => { alive = false; };
+  }, [ceoPortal, freelancer, realmPilot?.allowed]);
+
+  useEffect(() => {
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
   }, []);
 
-  // v3.40: thông báo nền. Nếu người dùng ĐÃ cho phép ở lần trước thì tự đăng ký lại
-  // subscription (đổi máy/xóa cache là mất) — không tự hỏi quyền, chỉ hỏi khi bấm nút 🔔.
   useEffect(() => {
     const key = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
     if (!key || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
     subscribePush(key).catch(() => {});
   }, []);
 
-  useEffect(() => { // v3.4: Ctrl+K mở tìm kiếm toàn cục
-    const h = e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setShowSearch(true); } };
-    window.addEventListener('keydown', h);
-    return () => window.removeEventListener('keydown', h);
+  useEffect(() => {
+    const handler = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setShowSearch(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, []);
+
+  useEffect(() => setOpen(false), [pathname]);
+
+  const uploadAvatar = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (file.size > 512 * 1024) {
+      window.alert('Ảnh vượt 512KB. Hãy crop hoặc nén ảnh rồi thử lại.');
+      return;
+    }
+    const form = new FormData();
+    form.append('file', file);
+    const response = await fetch('/api/avatar', { method: 'POST', body: form });
+    if (response.ok) setAvatarVersion((version) => version + 1);
+    else window.alert((await response.json().catch(() => ({})))?.error || 'Không thể tải ảnh lên');
+  };
 
   return (
     <SessionProvider>
-    <ToastProvider>
-    <RoleLabelsCtx.Provider value={roleLabels}>
-    <ModulesCtx.Provider value={modules}>
-      <CollaborationBridge />
-      {!isFL && realmPilot?.allowed && realmPilot?.config?.features?.feedback !== false && <RealmFeedbackLauncher />}
-      {!isFL && <RealmPilotOnboarding user={user} pilot={realmPilot} />}
-      <div
-        id="app"
-        className={isRealmRoute ? 'realm-immersive' : 'repository-realms-workspace'}
-        data-visual-system="phase-22"
-      >
-        <aside id="sidebar" className={open ? 'open' : ''}>
-          <div className="brand">
-            <div className="brand-logo">{(company || 'A')[0].toUpperCase()}</div>
-            <div className="brand-text">
-              <span className="brand-name">{company || 'Agency ERP'}</span>
-              <span className="brand-sub">ERP · CRM · 7 vai trò nghiệp vụ</span>
+      <ToastProvider>
+        <RoleLabelsCtx.Provider value={roleLabels}>
+          <ModulesCtx.Provider value={modules}>
+            {!ceoPortal && <CollaborationBridge />}
+            {!ceoPortal && !freelancer && realmPilot?.allowed && realmPilot?.config?.features?.feedback !== false && <RealmFeedbackLauncher />}
+            {!ceoPortal && !freelancer && <RealmPilotOnboarding user={user} pilot={realmPilot} />}
+            <div
+              id="app"
+              className={isLegacyRealm ? 'realm-immersive' : 'workspace-shell'}
+              data-visual-system="workplace-2026"
+              data-deployment-kind={ceoPortal ? 'ceo-portal' : 'entity'}
+            >
+              <aside id="sidebar" className={open ? 'open' : ''} aria-label="Thanh điều hướng">
+                <div className="brand">
+                  <div className="brand-logo"><Icon name={ceoPortal ? 'company' : 'command'} size={21} /></div>
+                  <div className="brand-text">
+                    <span className="brand-name">{company || 'RepositoryRealms'}</span>
+                    <span className="brand-sub">{ceoPortal ? 'CEO Terminal · 4 công ty' : 'Business workspace'}</span>
+                  </div>
+                </div>
+                {!ceoPortal && roles.includes('DIRECTOR') && ceoPortalOrigin && (
+                  <a className="ceo-terminal-entry" href={`${ceoPortalOrigin}/ceo-overview`} rel="noopener noreferrer">
+                    <Icon name="command" size={17} /><span>Mở CEO Terminal</span><Icon name="arrow" size={14} />
+                  </a>
+                )}
+                <WorkspaceNav
+                  groups={navigationGroups}
+                  pathname={pathname}
+                  pendingCount={pendingCount}
+                  unreadChat={unreadChat}
+                  onNavigate={() => setOpen(false)}
+                />
+                <div className="sidebar-footer">
+                  <span>Không gian làm việc</span>
+                  <strong>{roles.map((role) => roleLabels[role] || role).join(' · ')}</strong>
+                  <div className="sidebar-language-row"><span>Ngôn ngữ</span><LanguageSwitch compact /></div>
+                </div>
+              </aside>
+
+              <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={uploadAvatar} />
+              {show2fa && <TwoFAModal onClose={() => setShow2fa(false)} />}
+              {!ceoPortal && showSearch && <GlobalSearch commands={commands} onClose={() => setShowSearch(false)} />}
+              {showNotifications && (
+                <NotificationsModal
+                  dataRevision={notificationRevision}
+                  onClose={() => setShowNotifications(false)}
+                  onChanged={() => {
+                    setNotificationRevision((revision) => revision + 1);
+                    loadShellCounters();
+                  }}
+                />
+              )}
+
+              <button id="backdrop" className={open ? 'show' : ''} onClick={() => setOpen(false)} aria-label="Đóng menu" />
+              <div id="main">
+                <header id="topbar">
+                  <button id="menu-btn" onClick={() => setOpen(true)} aria-label="Mở menu"><Icon name="menu" /></button>
+                  <div className="page-identity">
+                    <div className="breadcrumbs" aria-label="Đường dẫn trang">
+                      <span>{location.group?.label || (ceoPortal ? 'CEO Terminal' : 'Không gian làm việc')}</span>
+                      {location.item && <><Icon name="chevron" size={12} /><span aria-current="page">{location.item.label}</span></>}
+                    </div>
+                    <h1 id="page-title">{location.item?.label || (ceoPortal ? 'CEO Terminal' : 'RepositoryRealms')}</h1>
+                  </div>
+                  <div className="topbar-right">
+                    {!ceoPortal && <WorkspaceSurfaceSwitch pilot={realmPilot} realmV2Available={realmV2Available} />}
+                    {!ceoPortal && realmPilot?.allowed && (
+                      <Link className="shell-gold-balance" href={realmV2Available ? '/realm-v2/recognition' : '/realm?view=ledger'} aria-label="Mở Kho bạc Gold">
+                        <span>G</span><strong>{goldBalance == null ? 'Gold' : goldBalance.toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN')}</strong>
+                      </Link>
+                    )}
+                    <CreateMenu groups={groups} />
+                    <button className="shell-command-trigger" onClick={() => { if (ceoPortal) router.push('/ceo-navigator'); else setShowSearch(true); }} aria-label={ceoPortal ? 'Mở điều hướng CEO' : 'Tìm kiếm toàn hệ thống'}>
+                      <Icon name="search" size={17} /><span>Tìm kiếm</span><kbd>Ctrl K</kbd>
+                    </button>
+                    <button className="shell-icon-button" onClick={() => setShowNotifications(true)} aria-label="Thông báo">
+                      <Icon name="bell" size={18} />
+                      {unreadNotifications > 0 && <span className="notification-count">{unreadNotifications > 99 ? '99+' : unreadNotifications}</span>}
+                    </button>
+                    <LanguageSwitch compact />
+                    <UserMenu
+                      user={{ ...user, avatarVersion }}
+                      roles={roles}
+                      roleLabels={roleLabels}
+                      onAvatar={() => avatarInputRef.current?.click()}
+                      onSecurity={() => setShow2fa(true)}
+                    />
+                  </div>
+                </header>
+                {ceoPortal && (
+                  <nav className="ceo-terminal-tabs" aria-label="Khu vực CEO Terminal">
+                    {CEO_TABS.map(([label, href]) => (
+                      <Link key={href} href={href} aria-current={pathname === href ? 'page' : undefined} data-active={pathname === href || undefined}>{label}</Link>
+                    ))}
+                  </nav>
+                )}
+                <main id="view">
+                  {freelancer && pathname !== '/freelancer'
+                    ? <div className="command-state"><Icon name="work" />Đang mở không gian công việc của bạn…</div>
+                    : children}
+                </main>
+              </div>
+              {!ceoPortal && <MobileNavigation groups={navigationGroups} pathname={pathname} onNavigate={() => setOpen(false)} />}
             </div>
-          </div>
-          <nav id="nav">
-            {navList.map((item, i) => {
-              if (item.section) {
-                const next = navList.findIndex((x, j) => j > i && x.section);
-                const group = navList.slice(i + 1, next === -1 ? undefined : next);
-                return group.some(visible) ? <div key={i} className="nav-section">{item.section}</div> : null;
-              }
-              if (!visible(item)) return null;
-              const active = pathname.startsWith('/' + item.key);
-              return (
-                <Link key={item.key} href={item.href || '/' + item.key} className={`nav-item ${active ? 'active' : ''}`} onClick={() => setOpen(false)}>
-                  <Icon name={item.icon} size={18} /><span>{item.label}</span>
-                  {item.badge && pendingCount > 0 && <span className="count" style={{ background: 'var(--danger)', color: '#fff' }}>{pendingCount}</span>}
-                  {item.chatBadge && unreadChat > 0 && <span className="count" style={{ background: 'var(--danger)', color: '#fff' }}>{unreadChat}</span>}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="user-chip">
-            {/* v3.38: bấm vào avatar để upload ảnh thật của mình (thay chữ cái đầu / nhân vật gán sẵn) */}
-            <button onClick={() => avatarInputRef.current?.click()} title="Đổi ảnh đại diện của bạn" aria-label="Đổi ảnh đại diện"
-              style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer' }}>
-              <Avatar userId={user.id} name={user.name} version={avatarVer} />
-            </button>
-            <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" hidden
-              onChange={async e => {
-                const f = e.target.files?.[0];
-                e.target.value = '';
-                if (!f) return;
-                if (f.size > 512 * 1024) { alert('Ảnh vượt 512KB — hãy crop/nén nhỏ lại rồi thử lại.'); return; }
-                const form = new FormData(); form.append('file', f);
-                const r = await fetch('/api/avatar', { method: 'POST', body: form });
-                if (r.ok) setAvatarVer(v => v + 1); else alert((await r.json().catch(() => ({})))?.error || 'Upload avatar thất bại');
-              }} />
-            <div>
-              <div className="uc-name">{user.name}</div>
-              <div className="uc-role">{myRoles.map(r => roleLabels[r] || r).join(' · ')}</div>
-            </div>
-            <button onClick={() => setShow2fa(true)} title="Bảo mật 2 lớp (2FA)" aria-label="Bảo mật 2 lớp">
-              <Icon name="shield" size={16} />
-            </button>
-            <button onClick={() => signOut({ callbackUrl: '/login' })} title="Đăng xuất" aria-label="Đăng xuất">
-              <Icon name="logout" size={16} />
-            </button>
-          </div>
-        </aside>
-        {show2fa && <TwoFAModal onClose={() => setShow2fa(false)} />}
-        {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}
-        {showNotif && <NotificationsModal dataRevision={notificationRevision} onClose={() => setShowNotif(false)}
-          onChanged={() => { setNotificationRevision((currentRevision) => currentRevision + 1); loadShellCounters(); }} />}
-        <div id="backdrop" className={open ? 'show' : ''} onClick={() => setOpen(false)}></div>
-        <div id="main">
-          <header id="topbar">
-            <button id="menu-btn" onClick={() => setOpen(true)} aria-label="Mở menu"><Icon name="menu" /></button>
-            <h1 id="page-title">{current?.label || 'Agency ERP'}</h1>
-            <div className="topbar-right">
-              <WorkspaceSurfaceSwitch pilot={realmPilot} />
-              <LanguageSwitch compact />
-              <button className="btn btn-outline btn-sm" onClick={() => setShowSearch(true)} title="Tìm kiếm toàn hệ thống (Ctrl+K)">
-                <Icon name="search" size={14} /><span> Ctrl+K</span>
-              </button>
-              <button className="btn btn-outline btn-sm" onClick={() => setShowNotif(true)} title="Thông báo" style={{ position: 'relative' }} aria-label="Thông báo">
-                {/* v3.14: 🔔 -> icon SVG. Emoji vẽ khác nhau trên Windows/Mac/Android và
-                    không đổi màu theo theme — đây lại là nút điều khiển chính trên thanh trên. */}
-                <Icon name="bell" size={15} />
-                {unreadNotif > 0 && <span className="count" style={{ position: 'absolute', top: -7, right: -7, background: 'var(--danger)', color: '#fff' }}>{unreadNotif}</span>}
-              </button>
-              <span id="today-label">{todayLabel}</span>
-              <span className={`role-chip role-${myRoles[0]}`}>{myRoles.map(r => roleLabels[r] || r).join(' · ')}</span>
-            </div>
-          </header>
-          <main id="view">{isFL && pathname !== '/freelancer'
-            ? <div className="empty" style={{ paddingTop: 80 }}><p>Đang chuyển tới trang của bạn…</p></div>
-            : children}</main>
-        </div>
-      </div>
-    </ModulesCtx.Provider>
-    </RoleLabelsCtx.Provider>
-    </ToastProvider>
+          </ModulesCtx.Provider>
+        </RoleLabelsCtx.Provider>
+      </ToastProvider>
     </SessionProvider>
   );
 }

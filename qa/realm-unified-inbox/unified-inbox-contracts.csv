@@ -5,7 +5,7 @@ scoped-read-state,api,app/api/notifications/route.js,"id: notificationId, userId
 safe-route-contract,contract,lib/notification-inbox.js,normalizeNotificationRoute | route.startsWith('//') | notificationRecordRoute | normalizeNotificationRow,,verified
 exact-record-notifications,server,lib/events.js,notificationRecordRoute('tasks' | notificationRecordRoute('leads' | notificationRecordRoute('tickets',,verified
 exact-approval-notifications,server,lib/approvals.js,"notificationRecordRoute('approvals', ap.id)",,verified
-erp-inbox-shared-sync,client,components/Shell.jsx,Raven Inbox · Thông báo ERP | NOTIFICATION_SYNC_EVENT | fetch('/api/notifications',,verified
+erp-inbox-shared-sync,client,components/Shell.jsx,"aria-label=""Thông báo"" | NOTIFICATION_SYNC_EVENT | fetch('/api/notifications'",,verified
 realm-inbox-shared-sync,client,components/realm/RealmNotificationBell.jsx,"NOTIFICATION_SYNC_EVENT | window.setInterval(refresh, 15_000) | aria-labelledby | closePanel",,verified
 approval-deep-link-consumer,client,app/(app)/approvals/page.jsx,get('focus') | scrollIntoView | data-inbox-focus,,verified
 ticket-deep-link-consumer,client,app/(app)/tickets/page.jsx,"get('focus') | setModal({ mode: 'edit', row: ticket })",,verified

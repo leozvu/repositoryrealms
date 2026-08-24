@@ -149,7 +149,7 @@
     {
       "id": "policy-aware-login",
       "layer": "client",
-      "source": "app/login/page.jsx",
+      "source": "app/login/LoginForm.jsx",
       "signals": [
         "fetch('/api/realm-demo/pilot'",
         "pilot.user?.allowed",
@@ -180,7 +180,7 @@
       "signals": [
         "persistWorkspaceSurface('erp')",
         "Mở workspace ERP CRM gốc",
-        "Mở ERP · CRM gốc"
+        "ERP · CRM"
       ],
       "missingSignals": [],
       "forbiddenSignals": [],

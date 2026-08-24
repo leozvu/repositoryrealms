@@ -47,6 +47,7 @@ const targetRoutes = {
   'app/api/ceo/v1/capabilities/route.js': 'CAPABILITIES_READ',
   'app/api/ceo/v1/health/route.js': 'HEALTH_READ',
   'app/api/ceo/v1/snapshot/route.js': 'SNAPSHOT_READ',
+  'app/api/ceo/v1/decisions/route.js': 'DECISIONS_READ',
   'app/api/ceo/v1/commands/route.js': 'COMMAND_DISPATCH',
   'app/api/ceo/v1/commands/receipts/route.js': 'COMMAND_RECEIPTS_READ',
   'app/api/ceo/v1/directory/route.js': 'DIRECTORY_READ',
@@ -66,6 +67,7 @@ const outboundFiles = [
   'lib/ceo-command-gateway-admin.js',
   'lib/ceo-messaging-admin.js',
   'lib/ceo-unified-dashboard-admin.js',
+  'lib/ceo-decision-queue-admin.js',
   'lib/ceo-federation-admin.js',
 ];
 const outboundChecks = outboundFiles.map((file) => ({ file, audienceHeader: read(file).includes("'X-CEO-Entity-ID'") }));

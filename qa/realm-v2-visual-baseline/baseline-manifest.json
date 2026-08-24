@@ -1,0 +1,2678 @@
+{
+  "version": 1,
+  "status": "Design complete / implementation partial",
+  "captureMode": "authenticated-current-implementation",
+  "baseUrl": "https://crmegoric-realms-demo-leozvu-leozs-projects-64a5f0c8.vercel.app",
+  "sourceCommit": "3be4588b7f6c684122abf73b5945706da550a4b5",
+  "capturedAt": "2026-07-30T02:04:42.557Z",
+  "authenticatedRole": "DIRECTOR",
+  "transientOnboardingDismissed": true,
+  "areaCount": 18,
+  "breakpointCount": 5,
+  "screenshotCount": 90,
+  "screenshots": [
+    {
+      "area": "home",
+      "productArea": "Realm Home",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/home",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "[next-auth][error][CLIENT_FETCH_ERROR] \nhttps://next-auth.js.org/errors#client_fetch_error Failed to fetch {error: Object, url: /api/auth/session, message: Failed to fetch}",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/data/leads"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/01-home--phone-375.png",
+      "bytes": 77876,
+      "sha256": "4559eed571463ea7482e9400c0136ff2b97836183447b2190d44ed1999b5d770"
+    },
+    {
+      "area": "my-work",
+      "productArea": "My Work",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/my-work",
+      "canonicalPath": "/myday",
+      "finalPath": "/myday",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/data/clients",
+          "500:/api/data/leads"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/02-my-work--phone-375.png",
+      "bytes": 137382,
+      "sha256": "9fcb001e9b732316adff8ce7581dc243caf48fd02ed4cf11bd49908bd37c9b84"
+    },
+    {
+      "area": "work-management",
+      "productArea": "Work Management",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/work-management",
+      "canonicalPath": "/tasks",
+      "finalPath": "/tasks",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/03-work-management--phone-375.png",
+      "bytes": 124386,
+      "sha256": "240b5002152a146045a6dcb391237c32ee4379557e0901402e7825554b532854"
+    },
+    {
+      "area": "action-center",
+      "productArea": "Action Center",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/action-center",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/04-action-center--phone-375.png",
+      "bytes": 81168,
+      "sha256": "96015dbc3fcbeda35010d2e6729940f7ecfa8b1d7c960aed98715620a3c0019d"
+    },
+    {
+      "area": "command-center",
+      "productArea": "Command Center",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/command-center",
+      "canonicalPath": "/ceo-commands",
+      "finalPath": "/ceo-commands",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/05-command-center--phone-375.png",
+      "bytes": 179745,
+      "sha256": "6e43177d2f9b7296b69639b3824920957bd63c45705e36fa6db61a697f67626a"
+    },
+    {
+      "area": "inbox",
+      "productArea": "Unified Inbox",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/inbox",
+      "canonicalPath": "/messages",
+      "finalPath": "/messages",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 400 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/registry",
+          "503:/api/ceo/v1/identity/session"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/06-inbox--phone-375.png",
+      "bytes": 32584,
+      "sha256": "1ddc7845fb3736a5e3aa9e7747248dd98ce1dd0c66879233a5b1d88e78272811"
+    },
+    {
+      "area": "projects",
+      "productArea": "Project Realm",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/projects",
+      "canonicalPath": "/projects",
+      "finalPath": "/projects",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/ceo/v1/directory/profile",
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/07-projects--phone-375.png",
+      "bytes": 59032,
+      "sha256": "559a665107feaacecc4095c39ce1769439325f00e2d7017083dfae4f0c796e03"
+    },
+    {
+      "area": "chronicle",
+      "productArea": "Chronicle",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/chronicle",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/08-chronicle--phone-375.png",
+      "bytes": 80689,
+      "sha256": "543ea04596eafecbd2c7bfa1c7cf69f27ab72cf29b0deccb694b30d8737143b2"
+    },
+    {
+      "area": "collaboration",
+      "productArea": "Collaboration / Presence",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/collaboration",
+      "canonicalPath": "/teamwork",
+      "finalPath": "/teamwork",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/09-collaboration--phone-375.png",
+      "bytes": 122842,
+      "sha256": "ca1562d5f5621dc7977c5c1c595203b28b56a585d944b4c9272439d48abed53d"
+    },
+    {
+      "area": "world-map",
+      "productArea": "World Map",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/world-map",
+      "canonicalPath": "/ceo-world",
+      "finalPath": "/ceo-world",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/10-world-map--phone-375.png",
+      "bytes": 87143,
+      "sha256": "be157398badc198cfc9d559280448ed813c2d31264770a3a1eb036a10ab6bafb"
+    },
+    {
+      "area": "ceo-terminal",
+      "productArea": "CEO Terminal",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/ceo-terminal",
+      "canonicalPath": "/ceo-overview",
+      "finalPath": "/ceo-overview",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/11-ceo-terminal--phone-375.png",
+      "bytes": 129596,
+      "sha256": "237a1bfaf237c658f6465b4d206df38867c6a34480013919f9f045b176e1c980"
+    },
+    {
+      "area": "employee-profile",
+      "productArea": "Employee Profile",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/employee-profile",
+      "canonicalPath": "/staff",
+      "finalPath": "/staff",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/dashboard",
+          "503:/api/ceo/v1/identity/session"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/12-employee-profile--phone-375.png",
+      "bytes": 88627,
+      "sha256": "074ff83f9bec68140ba81fbf9689162a4b0151c604ba7a46763a6d2fd3972454"
+    },
+    {
+      "area": "recognition",
+      "productArea": "Recognition / Gold Ledger",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/recognition",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/13-recognition--phone-375.png",
+      "bytes": 83092,
+      "sha256": "b2699e196606974ceb629f4e17a868414b80747bd597e4c24cd0c346fff76be3"
+    },
+    {
+      "area": "approvals",
+      "productArea": "Approvals",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/approvals",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/14-approvals--phone-375.png",
+      "bytes": 81168,
+      "sha256": "96015dbc3fcbeda35010d2e6729940f7ecfa8b1d7c960aed98715620a3c0019d"
+    },
+    {
+      "area": "notifications",
+      "productArea": "Notifications",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/notifications",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/leads",
+          "500:/api/insights",
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/15-notifications--phone-375.png",
+      "bytes": 83375,
+      "sha256": "8389320b79065dc34ebb55b79ce54ac8120451ead5476ffce6abc7e53a1300d0"
+    },
+    {
+      "area": "search",
+      "productArea": "Search / Command Palette",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/search",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients",
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/16-search--phone-375.png",
+      "bytes": 77876,
+      "sha256": "4559eed571463ea7482e9400c0136ff2b97836183447b2190d44ed1999b5d770"
+    },
+    {
+      "area": "settings",
+      "productArea": "Settings",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/settings",
+      "canonicalPath": "/settings",
+      "finalPath": "/settings",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/data/leads"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/17-settings--phone-375.png",
+      "bytes": 81224,
+      "sha256": "cd23d29561da2adde0c1d34c533aa86bef763bef17dc156a0ed8921369e9f2fa"
+    },
+    {
+      "area": "mobile",
+      "productArea": "Mobile Realm",
+      "breakpoint": "phone-375",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "aliasPath": "/realm-v2/mobile",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/apikeys",
+          "500:/api/data/clients",
+          "500:/api/data/leads"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/18-mobile--phone-375.png",
+      "bytes": 77881,
+      "sha256": "3de92a3ac6b6f196dd8373934e4aa268d2b63e3464527ff390bd51e00ed614aa"
+    },
+    {
+      "area": "home",
+      "productArea": "Realm Home",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/home",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients",
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/01-home--phone-390.png",
+      "bytes": 85437,
+      "sha256": "46e05f313bd02a685c265e6b606f99865b122c63c6cf5c257135f325ee326e58"
+    },
+    {
+      "area": "my-work",
+      "productArea": "My Work",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/my-work",
+      "canonicalPath": "/myday",
+      "finalPath": "/myday",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/data/leads"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/02-my-work--phone-390.png",
+      "bytes": 138714,
+      "sha256": "250a22341f564f45a21d373db5f0af7fb474893f71743e31e7cc54218772a64f"
+    },
+    {
+      "area": "work-management",
+      "productArea": "Work Management",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/work-management",
+      "canonicalPath": "/tasks",
+      "finalPath": "/tasks",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/03-work-management--phone-390.png",
+      "bytes": 157384,
+      "sha256": "8aa74d65e12ca45169d4274465ca23ae94d937d6d40f9467949a03957e2580f9"
+    },
+    {
+      "area": "action-center",
+      "productArea": "Action Center",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/action-center",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/04-action-center--phone-390.png",
+      "bytes": 85250,
+      "sha256": "c71f50e1f6971c8f7e8de753fd8b149a19448f56412ed25fe640c8925681a28c"
+    },
+    {
+      "area": "command-center",
+      "productArea": "Command Center",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/command-center",
+      "canonicalPath": "/ceo-commands",
+      "finalPath": "/ceo-commands",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/05-command-center--phone-390.png",
+      "bytes": 179410,
+      "sha256": "49aca2d8b77a970633114bc6e7785d985d1eb203cd60c6e2b148233865b8171f"
+    },
+    {
+      "area": "inbox",
+      "productArea": "Unified Inbox",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/inbox",
+      "canonicalPath": "/messages",
+      "finalPath": "/messages",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 400 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/registry",
+          "503:/api/ceo/v1/identity/session",
+          "500:/api/ceo/v1/directory/profile"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/06-inbox--phone-390.png",
+      "bytes": 33575,
+      "sha256": "fe9a065e782be5164d367b6e4443f6804787747dde0f1fe431d57ae13150efa8"
+    },
+    {
+      "area": "projects",
+      "productArea": "Project Realm",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/projects",
+      "canonicalPath": "/projects",
+      "finalPath": "/projects",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/07-projects--phone-390.png",
+      "bytes": 61571,
+      "sha256": "0a0b759c527b5baa6e88ba640846ae4ce447ab41f822c83a24d495b0a0f61e0c"
+    },
+    {
+      "area": "chronicle",
+      "productArea": "Chronicle",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/chronicle",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/08-chronicle--phone-390.png",
+      "bytes": 78530,
+      "sha256": "6244f8cad917a805c033bb1b9b9d683842ea3767b479e7ad7a1b693738524233"
+    },
+    {
+      "area": "collaboration",
+      "productArea": "Collaboration / Presence",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/collaboration",
+      "canonicalPath": "/teamwork",
+      "finalPath": "/teamwork",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/09-collaboration--phone-390.png",
+      "bytes": 127752,
+      "sha256": "e20ee137893b6935579f29e998fd878b17a005e93770fd31104661db12071a38"
+    },
+    {
+      "area": "world-map",
+      "productArea": "World Map",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/world-map",
+      "canonicalPath": "/ceo-world",
+      "finalPath": "/ceo-world",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/10-world-map--phone-390.png",
+      "bytes": 134103,
+      "sha256": "a3fcde1743393593264f9882041417728521192a065851983f08005e798a1213"
+    },
+    {
+      "area": "ceo-terminal",
+      "productArea": "CEO Terminal",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/ceo-terminal",
+      "canonicalPath": "/ceo-overview",
+      "finalPath": "/ceo-overview",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 400 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/11-ceo-terminal--phone-390.png",
+      "bytes": 132160,
+      "sha256": "74a9b15fadaedba27a8749613e6efb640fc1b031c6e13df1a4008e94670d0cbc"
+    },
+    {
+      "area": "employee-profile",
+      "productArea": "Employee Profile",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/employee-profile",
+      "canonicalPath": "/staff",
+      "finalPath": "/staff",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/dashboard"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/12-employee-profile--phone-390.png",
+      "bytes": 86293,
+      "sha256": "dd239fd71ccd9bfb98d0a391558bc6edbae67877a1a77a83d842f22a81d62d89"
+    },
+    {
+      "area": "recognition",
+      "productArea": "Recognition / Gold Ledger",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/recognition",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/13-recognition--phone-390.png",
+      "bytes": 78539,
+      "sha256": "554e416ada888626dcd6d54c56fe0e4c7dbfe0b500d77869332efd10c007cf18"
+    },
+    {
+      "area": "approvals",
+      "productArea": "Approvals",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/approvals",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/14-approvals--phone-390.png",
+      "bytes": 85251,
+      "sha256": "1d5eed051c86d7f72a4975489c9ec567e5bfb143b1229b40f73d47791bc410f4"
+    },
+    {
+      "area": "notifications",
+      "productArea": "Notifications",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/notifications",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/15-notifications--phone-390.png",
+      "bytes": 83063,
+      "sha256": "3b7fa7409225bd7a738c849c5b997d271bb9b5613df04d35c43cc6fef7dab3fc"
+    },
+    {
+      "area": "search",
+      "productArea": "Search / Command Palette",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/search",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/data/leads",
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/16-search--phone-390.png",
+      "bytes": 82446,
+      "sha256": "dacdd42e0f25fba180adacd27bd1152e84e306cdfab07e85a1a9033785aaa9b5"
+    },
+    {
+      "area": "settings",
+      "productArea": "Settings",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/settings",
+      "canonicalPath": "/settings",
+      "finalPath": "/settings",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/data/leads",
+          "500:/api/data/clients",
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/17-settings--phone-390.png",
+      "bytes": 85668,
+      "sha256": "a25e9483f080c7b60f37496088103ec5ae84ab765a13041f6aaac61c929c360e"
+    },
+    {
+      "area": "mobile",
+      "productArea": "Mobile Realm",
+      "breakpoint": "phone-390",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "aliasPath": "/realm-v2/mobile",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/18-mobile--phone-390.png",
+      "bytes": 82451,
+      "sha256": "1754a84f82bc98d45a98aea6c2e2aff20d26c3bb1f7cb53f329ca2d04d92e149"
+    },
+    {
+      "area": "home",
+      "productArea": "Realm Home",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/home",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/insights",
+          "500:/api/data/leads",
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/01-home--tablet-768.png",
+      "bytes": 125113,
+      "sha256": "5b3bc8900e9da0aee8f9080995537ac9a67022a27a15fb8e7e5e1742bf97d69d"
+    },
+    {
+      "area": "my-work",
+      "productArea": "My Work",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/my-work",
+      "canonicalPath": "/myday",
+      "finalPath": "/myday",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/02-my-work--tablet-768.png",
+      "bytes": 217079,
+      "sha256": "34bca00d65166ac66f16227eaba588ddaf3946b6eb424210eb0b0d723fb6a04a"
+    },
+    {
+      "area": "work-management",
+      "productArea": "Work Management",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/work-management",
+      "canonicalPath": "/tasks",
+      "finalPath": "/tasks",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/03-work-management--tablet-768.png",
+      "bytes": 145649,
+      "sha256": "032bbb5816beac02c9f1a725e8d3312c97528208b686131633791b8b0efb75b2"
+    },
+    {
+      "area": "action-center",
+      "productArea": "Action Center",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/action-center",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/04-action-center--tablet-768.png",
+      "bytes": 127311,
+      "sha256": "590f5703ec9cc033d5603caec9b22ee4748c9480065f143e9a65bbe371a68eda"
+    },
+    {
+      "area": "command-center",
+      "productArea": "Command Center",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/command-center",
+      "canonicalPath": "/ceo-commands",
+      "finalPath": "/ceo-commands",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/05-command-center--tablet-768.png",
+      "bytes": 237045,
+      "sha256": "8a802be5cb4711870bb08f96ec255972eba28bdd9ef1f781d26307dbf53eb2ab"
+    },
+    {
+      "area": "inbox",
+      "productArea": "Unified Inbox",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/inbox",
+      "canonicalPath": "/messages",
+      "finalPath": "/messages",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 400 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/registry",
+          "503:/api/ceo/v1/identity/session",
+          "500:/api/ceo/v1/directory/profile"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/06-inbox--tablet-768.png",
+      "bytes": 41594,
+      "sha256": "b539d9797347c0dda5be6ac1b20d1b8cb22e369162dcff6f52e588babd92424b"
+    },
+    {
+      "area": "projects",
+      "productArea": "Project Realm",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/projects",
+      "canonicalPath": "/projects",
+      "finalPath": "/projects",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/07-projects--tablet-768.png",
+      "bytes": 112209,
+      "sha256": "a6ff461e4651eb932f8c02b6f075e989e590d09b835fb1c1ce64eb22818ec08a"
+    },
+    {
+      "area": "chronicle",
+      "productArea": "Chronicle",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/chronicle",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/08-chronicle--tablet-768.png",
+      "bytes": 164096,
+      "sha256": "dec3c5a10ce5221f10dd1a484b30a8f20ab11038040e7121aa7d8c2de43f9738"
+    },
+    {
+      "area": "collaboration",
+      "productArea": "Collaboration / Presence",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/collaboration",
+      "canonicalPath": "/teamwork",
+      "finalPath": "/teamwork",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/09-collaboration--tablet-768.png",
+      "bytes": 175454,
+      "sha256": "a5280959db5977f3b1a72fc02258e47991dab97b381cf8cbe43f1dff1943eabe"
+    },
+    {
+      "area": "world-map",
+      "productArea": "World Map",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/world-map",
+      "canonicalPath": "/ceo-world",
+      "finalPath": "/ceo-world",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/10-world-map--tablet-768.png",
+      "bytes": 228803,
+      "sha256": "1b8ed688a38993dd14714c49818faaa51d4dcfe2dc74b17149337d40b19b2121"
+    },
+    {
+      "area": "ceo-terminal",
+      "productArea": "CEO Terminal",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/ceo-terminal",
+      "canonicalPath": "/ceo-overview",
+      "finalPath": "/ceo-overview",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 143,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 400 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/11-ceo-terminal--tablet-768.png",
+      "bytes": 189835,
+      "sha256": "2423192d6e27210bdf655bfe43a16d905507746c77eaae02a3e05a8f70933360"
+    },
+    {
+      "area": "employee-profile",
+      "productArea": "Employee Profile",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/employee-profile",
+      "canonicalPath": "/staff",
+      "finalPath": "/staff",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/identity/session",
+          "503:/api/ceo/v1/dashboard"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/12-employee-profile--tablet-768.png",
+      "bytes": 114317,
+      "sha256": "1dff3f8ca1b3d6dfad60a8ffa4dd35722f599a19403edc3612204d12de94df38"
+    },
+    {
+      "area": "recognition",
+      "productArea": "Recognition / Gold Ledger",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/recognition",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/13-recognition--tablet-768.png",
+      "bytes": 164096,
+      "sha256": "dec3c5a10ce5221f10dd1a484b30a8f20ab11038040e7121aa7d8c2de43f9738"
+    },
+    {
+      "area": "approvals",
+      "productArea": "Approvals",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/approvals",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/14-approvals--tablet-768.png",
+      "bytes": 127311,
+      "sha256": "590f5703ec9cc033d5603caec9b22ee4748c9480065f143e9a65bbe371a68eda"
+    },
+    {
+      "area": "notifications",
+      "productArea": "Notifications",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/notifications",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/15-notifications--tablet-768.png",
+      "bytes": 120748,
+      "sha256": "d754c6df8bbcf3047d8ebf4b0cf3a05a8475e4c3bed29a70373d07fb98211cd9"
+    },
+    {
+      "area": "search",
+      "productArea": "Search / Command Palette",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/search",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/leads",
+          "500:/api/insights",
+          "500:/api/data/clients",
+          "500:/api/data/leads"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/16-search--tablet-768.png",
+      "bytes": 120748,
+      "sha256": "d754c6df8bbcf3047d8ebf4b0cf3a05a8475e4c3bed29a70373d07fb98211cd9"
+    },
+    {
+      "area": "settings",
+      "productArea": "Settings",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/settings",
+      "canonicalPath": "/settings",
+      "finalPath": "/settings",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/17-settings--tablet-768.png",
+      "bytes": 126805,
+      "sha256": "40d29c8ec9a0713260a5784b4e2c2ceb1d3609591d35625f93d85e58419763b2"
+    },
+    {
+      "area": "mobile",
+      "productArea": "Mobile Realm",
+      "breakpoint": "tablet-768",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "aliasPath": "/realm-v2/mobile",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients",
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/18-mobile--tablet-768.png",
+      "bytes": 126520,
+      "sha256": "71311cfb8373bc08016e70758558c98727717625a036949c555b240904d481c1"
+    },
+    {
+      "area": "home",
+      "productArea": "Realm Home",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/home",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/leads",
+          "500:/api/data/leads",
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/01-home--laptop-1024.png",
+      "bytes": 161339,
+      "sha256": "ce4ef2ab5e30bd71d90697393d09ebd82c1f722d03f79263847a18b67c58882e"
+    },
+    {
+      "area": "my-work",
+      "productArea": "My Work",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/my-work",
+      "canonicalPath": "/myday",
+      "finalPath": "/myday",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/02-my-work--laptop-1024.png",
+      "bytes": 264056,
+      "sha256": "b6cd7a8a892f78b8b54661a452c9db6c76699b8bad49e5d75b9d8f3004038dd4"
+    },
+    {
+      "area": "work-management",
+      "productArea": "Work Management",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/work-management",
+      "canonicalPath": "/tasks",
+      "finalPath": "/tasks",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/03-work-management--laptop-1024.png",
+      "bytes": 205509,
+      "sha256": "271dd8ea4c239412798b2d8314f8b1fe0775fe2a2b69c5dad87c642252ee0160"
+    },
+    {
+      "area": "action-center",
+      "productArea": "Action Center",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/action-center",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/04-action-center--laptop-1024.png",
+      "bytes": 184082,
+      "sha256": "a263b2e0b6b3004c9e13bd11541a17d96d80689caf9f9926ad353d5f07142275"
+    },
+    {
+      "area": "command-center",
+      "productArea": "Command Center",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/command-center",
+      "canonicalPath": "/ceo-commands",
+      "finalPath": "/ceo-commands",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/05-command-center--laptop-1024.png",
+      "bytes": 299842,
+      "sha256": "17ff65df3dc40f1c6ca8d6e64ad6ff97fd2462558f224eff9d75d22106f491bf"
+    },
+    {
+      "area": "inbox",
+      "productArea": "Unified Inbox",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/inbox",
+      "canonicalPath": "/messages",
+      "finalPath": "/messages",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 400 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/identity/session",
+          "503:/api/ceo/v1/registry",
+          "500:/api/ceo/v1/directory/profile"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/06-inbox--laptop-1024.png",
+      "bytes": 99784,
+      "sha256": "26a55a9bf26e9cbc3a8b120e68cdb7f5755f870a2a5cd9c68aa78fe587638a0e"
+    },
+    {
+      "area": "projects",
+      "productArea": "Project Realm",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/projects",
+      "canonicalPath": "/projects",
+      "finalPath": "/projects",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/07-projects--laptop-1024.png",
+      "bytes": 132442,
+      "sha256": "e7c8465563d7ca433f7fe2676133be8fcddc61df4d21a179108d975e2ea06455"
+    },
+    {
+      "area": "chronicle",
+      "productArea": "Chronicle",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/chronicle",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/08-chronicle--laptop-1024.png",
+      "bytes": 199135,
+      "sha256": "976870ab3e3915b6ccad14c8ad5f333c48e16721c3103ec181f206fd1fbb0b3b"
+    },
+    {
+      "area": "collaboration",
+      "productArea": "Collaboration / Presence",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/collaboration",
+      "canonicalPath": "/teamwork",
+      "finalPath": "/teamwork",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/09-collaboration--laptop-1024.png",
+      "bytes": 224722,
+      "sha256": "1512eb6b533b44b31de8089e392ac82dac1132b7d91bddc3c2044dacb59c60f0"
+    },
+    {
+      "area": "world-map",
+      "productArea": "World Map",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/world-map",
+      "canonicalPath": "/ceo-world",
+      "finalPath": "/ceo-world",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/10-world-map--laptop-1024.png",
+      "bytes": 276538,
+      "sha256": "2cdb32c015d9d954b53e15944fb91d7eb689e77a623f325cd58ff4c4800fb079"
+    },
+    {
+      "area": "ceo-terminal",
+      "productArea": "CEO Terminal",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/ceo-terminal",
+      "canonicalPath": "/ceo-overview",
+      "finalPath": "/ceo-overview",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 156,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 400 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/11-ceo-terminal--laptop-1024.png",
+      "bytes": 237829,
+      "sha256": "467092b1bcb17bdf6f90ff5e20abbc39f58394fa42b6abc75b6eb591be0dc197"
+    },
+    {
+      "area": "employee-profile",
+      "productArea": "Employee Profile",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/employee-profile",
+      "canonicalPath": "/staff",
+      "finalPath": "/staff",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/identity/session",
+          "503:/api/ceo/v1/dashboard"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/12-employee-profile--laptop-1024.png",
+      "bytes": 165623,
+      "sha256": "ffa2333b2b5b7cb03bdfa6015f767a5df937b89c3dad6607213cf906ecb134c7"
+    },
+    {
+      "area": "recognition",
+      "productArea": "Recognition / Gold Ledger",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/recognition",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/13-recognition--laptop-1024.png",
+      "bytes": 199139,
+      "sha256": "a05a28bfafb3b8acf2c75e1342222a295c61ea195d4148c5adf68bea99d07539"
+    },
+    {
+      "area": "approvals",
+      "productArea": "Approvals",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/approvals",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/14-approvals--laptop-1024.png",
+      "bytes": 184082,
+      "sha256": "a263b2e0b6b3004c9e13bd11541a17d96d80689caf9f9926ad353d5f07142275"
+    },
+    {
+      "area": "notifications",
+      "productArea": "Notifications",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/notifications",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/15-notifications--laptop-1024.png",
+      "bytes": 163362,
+      "sha256": "36d8d9dd51819c2793d725b1274185c56734839428793419ef549607156652e6"
+    },
+    {
+      "area": "search",
+      "productArea": "Search / Command Palette",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/search",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients",
+          "500:/api/data/leads",
+          "500:/api/data/clients",
+          "500:/api/data/leads"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/16-search--laptop-1024.png",
+      "bytes": 161339,
+      "sha256": "ce4ef2ab5e30bd71d90697393d09ebd82c1f722d03f79263847a18b67c58882e"
+    },
+    {
+      "area": "settings",
+      "productArea": "Settings",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/settings",
+      "canonicalPath": "/settings",
+      "finalPath": "/settings",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/17-settings--laptop-1024.png",
+      "bytes": 149355,
+      "sha256": "d6fb3df253b89e2e9cbe492164b7304f6a31f2898ec231327c4cfcb45d973af3"
+    },
+    {
+      "area": "mobile",
+      "productArea": "Mobile Realm",
+      "breakpoint": "laptop-1024",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "aliasPath": "/realm-v2/mobile",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/apikeys",
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/18-mobile--laptop-1024.png",
+      "bytes": 158906,
+      "sha256": "08f78d41d44b31100e6e2bce7ae780d4394666c0a87ede14bf72263a431edcc8"
+    },
+    {
+      "area": "home",
+      "productArea": "Realm Home",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/home",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/leads",
+          "500:/api/insights",
+          "500:/api/data/clients",
+          "500:/api/data/leads"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/01-home--desktop-1440.png",
+      "bytes": 198129,
+      "sha256": "f7fbe264947b91a476e0059b61b5840574ff3204539ef92630ae0d819fea8005"
+    },
+    {
+      "area": "my-work",
+      "productArea": "My Work",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/my-work",
+      "canonicalPath": "/myday",
+      "finalPath": "/myday",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/02-my-work--desktop-1440.png",
+      "bytes": 296596,
+      "sha256": "9d1c98d6c48060b4adea03d98a8d5f02c02e095f01fdd5d86cfc86bb3bf0a0a9"
+    },
+    {
+      "area": "work-management",
+      "productArea": "Work Management",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/work-management",
+      "canonicalPath": "/tasks",
+      "finalPath": "/tasks",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/03-work-management--desktop-1440.png",
+      "bytes": 247025,
+      "sha256": "b787d729a967e31b136627185e1c47de49da4609dde66d487eac1cd3dbb084f2"
+    },
+    {
+      "area": "action-center",
+      "productArea": "Action Center",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/action-center",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/04-action-center--desktop-1440.png",
+      "bytes": 224076,
+      "sha256": "53643a41894bd0845a113abc2e3d0ca2271d2f6adeb5670aeb018f0346a0a04a"
+    },
+    {
+      "area": "command-center",
+      "productArea": "Command Center",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/command-center",
+      "canonicalPath": "/ceo-commands",
+      "finalPath": "/ceo-commands",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 400 ()"
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/05-command-center--desktop-1440.png",
+      "bytes": 337222,
+      "sha256": "0587b59d95578bc6a4d61e97bbe65ab3390df422fdd3ad5d8b67ad77b3f36e5a"
+    },
+    {
+      "area": "inbox",
+      "productArea": "Unified Inbox",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/inbox",
+      "canonicalPath": "/messages",
+      "finalPath": "/messages",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/identity/session",
+          "503:/api/ceo/v1/registry",
+          "500:/api/ceo/v1/directory/profile"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/06-inbox--desktop-1440.png",
+      "bytes": 113916,
+      "sha256": "e74a8de9c263e63ddbb8eeb33b4c3a702fd43a5cf6ad8364d18ca3d92891e47b"
+    },
+    {
+      "area": "projects",
+      "productArea": "Project Realm",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/projects",
+      "canonicalPath": "/projects",
+      "finalPath": "/projects",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/07-projects--desktop-1440.png",
+      "bytes": 162824,
+      "sha256": "e9632af6cff197c3bce525efe095d1fc78003349a09f6daab4bc6d4087d71d2e"
+    },
+    {
+      "area": "chronicle",
+      "productArea": "Chronicle",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/chronicle",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/08-chronicle--desktop-1440.png",
+      "bytes": 320837,
+      "sha256": "3aab1751e3dd87426554d779226c474e7869b41b13c376de69cbbf585ddc981e"
+    },
+    {
+      "area": "collaboration",
+      "productArea": "Collaboration / Presence",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/collaboration",
+      "canonicalPath": "/teamwork",
+      "finalPath": "/teamwork",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/09-collaboration--desktop-1440.png",
+      "bytes": 257816,
+      "sha256": "a2fe82d2c8e15032b0e48e6470e6151e2e6cabe62e2c85ceb6176f574d348541"
+    },
+    {
+      "area": "world-map",
+      "productArea": "World Map",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/world-map",
+      "canonicalPath": "/ceo-world",
+      "finalPath": "/ceo-world",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/10-world-map--desktop-1440.png",
+      "bytes": 947038,
+      "sha256": "ca6b4afd3031003572ccdcb73c1b0444d04cb0ece61927e5faa843ca6835e3e1"
+    },
+    {
+      "area": "ceo-terminal",
+      "productArea": "CEO Terminal",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/ceo-terminal",
+      "canonicalPath": "/ceo-overview",
+      "finalPath": "/ceo-overview",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 400 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/11-ceo-terminal--desktop-1440.png",
+      "bytes": 263992,
+      "sha256": "5d9c12fe4287e12ec4a9189e601d42a08a8630c52bb90438d0186ac048fc59b8"
+    },
+    {
+      "area": "employee-profile",
+      "productArea": "Employee Profile",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/employee-profile",
+      "canonicalPath": "/staff",
+      "finalPath": "/staff",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "503:/api/ceo/v1/identity/session",
+          "503:/api/ceo/v1/dashboard"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/12-employee-profile--desktop-1440.png",
+      "bytes": 205459,
+      "sha256": "104730eb0acfe948dc74dd0f8dac7da7a63dfe2b1d60766fd70ae4a897d1ee2e"
+    },
+    {
+      "area": "recognition",
+      "productArea": "Recognition / Gold Ledger",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/recognition",
+      "canonicalPath": "/realm",
+      "finalPath": "/realm",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/13-recognition--desktop-1440.png",
+      "bytes": 320780,
+      "sha256": "4fa59dea5a59aa37e039fb96daf82fa570048b4874565863d527753569a2f1d4"
+    },
+    {
+      "area": "approvals",
+      "productArea": "Approvals",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/approvals",
+      "canonicalPath": "/approvals",
+      "finalPath": "/approvals",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": []
+      },
+      "file": "qa/realm-v2-visual-baseline/current/14-approvals--desktop-1440.png",
+      "bytes": 224077,
+      "sha256": "5d19835a3d339c57846259164cf0edad59f76f992c265e1e21db389273e1f625"
+    },
+    {
+      "area": "notifications",
+      "productArea": "Notifications",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/notifications",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/clients",
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/15-notifications--desktop-1440.png",
+      "bytes": 192875,
+      "sha256": "857ee80e244ec4d387e03a0a299b87c417096c6b854d3aeec5a1c52c760ed241"
+    },
+    {
+      "area": "search",
+      "productArea": "Search / Command Palette",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/search",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/data/leads",
+          "500:/api/data/leads",
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/16-search--desktop-1440.png",
+      "bytes": 192879,
+      "sha256": "268f0afbd372e5c257372d7aac5078eec4a7407a862d4cdb00eb2cb0e7432743"
+    },
+    {
+      "area": "settings",
+      "productArea": "Settings",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/settings",
+      "canonicalPath": "/settings",
+      "finalPath": "/settings",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+        ],
+        "serverErrors": [
+          "500:/api/insights"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/17-settings--desktop-1440.png",
+      "bytes": 290677,
+      "sha256": "808e6d7c42657de0bf57576abf363d76d92810633388c25d23036d666e0162d0"
+    },
+    {
+      "area": "mobile",
+      "productArea": "Mobile Realm",
+      "breakpoint": "desktop-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "aliasPath": "/realm-v2/mobile",
+      "canonicalPath": "/dashboard",
+      "finalPath": "/dashboard",
+      "documentLanguage": "vi",
+      "horizontalOverflowPx": 0,
+      "visualUpgrade": "realm-v2-canonical",
+      "hasFiveItemMobileNav": false,
+      "navigationStatus": 200,
+      "runtimeIssues": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Loading the script 'https://vercel.live/_next-live/feedback/feedback.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline'\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.",
+          "Failed to load resource: the server responded with a status of 500 ()",
+          "Failed to load resource: the server responded with a status of 500 ()"
+        ],
+        "serverErrors": [
+          "500:/api/apikeys",
+          "500:/api/data/leads",
+          "500:/api/data/clients"
+        ]
+      },
+      "file": "qa/realm-v2-visual-baseline/current/18-mobile--desktop-1440.png",
+      "bytes": 192168,
+      "sha256": "d4b901d9edd3ef133877476633313d912ac26ee9147d6dc59076c754f0e4412f"
+    }
+  ]
+}

@@ -99,11 +99,12 @@ test('ERP and CRM ornament catalog exposes twelve optimized medieval-enterprise 
   assert.ok(assets.every((asset) => asset.url.includes('/erp-ui/elements-webp-v2/')));
 });
 
-test('business prop catalog exposes seven optimized deterministic bindings', () => {
+test('business prop catalog exposes eight optimized deterministic bindings', () => {
   const assets = realmGeneratedPropAssets();
-  assert.equal(assets.length, 7);
+  assert.equal(assets.length, 8);
   assert.deepEqual(new Set(assets.map((asset) => asset.objectId)), new Set(Object.keys(REALM_GENERATED_PROP_BINDINGS)));
   assert.equal(realmGeneratedPropBinding('guild-roster')?.asset, '011');
+  assert.equal(realmGeneratedPropBinding('command-dais')?.asset, '001');
   assert.equal(realmGeneratedPropBinding('realm-gate')?.proceduralUnderlay, true);
   assert.equal(realmGeneratedPropBinding('unknown'), null);
   assert.match(realmGeneratedPropUrl('4'), /prop-004\.webp$/);
@@ -141,16 +142,20 @@ test('character asset catalog contains six complete four-direction sets', () => 
     [...new Set(assets.map((asset) => asset.direction))],
     [...REALM_GENERATED_DIRECTIONS],
   );
-  assert.ok(assets.every((asset) => asset.url.endsWith('.png')));
+  assert.ok(assets.every((asset) => asset.url.endsWith('.webp')));
 });
 
 test('identity maps deterministically to a bounded character slot and URL', () => {
   const first = realmGeneratedCharacterSlot('user-42');
   assert.equal(realmGeneratedCharacterSlot('user-42'), first);
   assert.ok(first >= 1 && first <= 6);
-  assert.match(realmGeneratedCharacterUrl('user-42', 'left'), /character-0[1-6]-left\.png$/);
+  assert.match(realmGeneratedCharacterUrl('user-42', 'left'), /character-0[1-6]-left\.webp$/);
   assert.match(realmGeneratedCharacterKey('user-42', 'up'), /^0[1-6]:up$/);
-  assert.match(realmGeneratedCharacterPortraitUrl('user-42'), /characters\/directions\/character-0[1-6]-down\.png$/);
+  assert.match(realmGeneratedCharacterPortraitUrl('user-42'), /guildhall-reforged\/characters\/character-0[1-6]-down\.webp$/);
+  assert.equal(realmGeneratedCharacterSlot({ name: 'A', role: 'High Elf · Guild Steward' }), 1);
+  assert.equal(realmGeneratedCharacterSlot({ name: 'B', role: 'Dwarf · Forge Engineer' }), 2);
+  assert.equal(realmGeneratedCharacterSlot({ name: 'C', role: 'Moon Elf · Archivist' }), 4);
+  assert.equal(realmGeneratedCharacterSlot({ name: 'D', role: 'Half-Orc · Project Warden' }), 6);
 });
 
 test('movement delta resolves a stable top-down facing direction', () => {

@@ -155,7 +155,7 @@
       "source": "app/(app)/finance/page.jsx",
       "signals": [
         "FinancialIntelligencePanel",
-        "Sổ quỹ &amp; giao dịch",
+        "Sổ giao dịch",
         "fetch('/api/finance/intelligence'"
       ],
       "missingSignals": [],
