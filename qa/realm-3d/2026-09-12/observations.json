@@ -1,0 +1,24 @@
+{
+  "buildId": "XqK9DNvOKcAAPpTndPTy7",
+  "route": "/realm-demo?world=3d",
+  "status": "observations from a failed test; not passed release evidence",
+  "captureScale": "css",
+  "observations": [
+    {
+      "file": "observed-desktop-first-person.png",
+      "source": "test-results/realm-office-3d-3D-office--9c593-ras-without-layout-overflow-desktop-chromium/first-person.png",
+      "sha256": "d87b0b1ff0a307dc099816e1dec3da2bf1b5608e892a6e87e1e2ed78b382fd78",
+      "width": 1280,
+      "height": 720,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    },
+    {
+      "file": "observed-desktop-overview.png",
+      "source": "test-results/realm-office-3d-3D-office--9c593-ras-without-layout-overflow-desktop-chromium/overview.png",
+      "sha256": "05fdc78fb0d57330c53dda52c00962e3228d8c08af8996545d874e8a46694d08",
+      "width": 1280,
+      "height": 720,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    }
+  ]
+}

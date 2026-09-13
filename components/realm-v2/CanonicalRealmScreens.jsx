@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/components/LanguageProvider';
 import { useToast } from '@/components/ui';
+import { nextTaskAction, taskSnapshotFreshness } from '@/lib/task-presentation';
 import Icon from './Icon';
 import { Badge, Banner, Button, Panel, Segmented, SourcePill, StateView, Status } from './Primitives';
 import { MetricCard } from './WorkObjects';
@@ -75,9 +76,9 @@ function useCanonicalWorkspace() {
   return { ...state, reload: load };
 }
 
-function CanonicalTaskCard({ task, queue, busy, onTransition, compact = false }) {
+function CanonicalTaskCard({ task, queue, busy, onTransition, compact = false, generatedAt, refreshing = false }) {
   const overdue = isOverdue(task);
-  const nextState = ['todo'].includes(task.status) ? 'in_progress' : ['doing', 'in_progress', 'review'].includes(task.status) ? 'done' : null;
+  const action = nextTaskAction(task);
   return (
     <article className={styles.canonicalTask} data-task-id={task.id} data-overdue={overdue || undefined}>
       <div className={styles.taskTop}>
@@ -92,11 +93,11 @@ function CanonicalTaskCard({ task, queue, busy, onTransition, compact = false })
         <span><Icon name="clock" size={14}/> {dateLabel(task.dueDate)}</span>
         <span><Icon name="checklist" size={14}/> {QUEUE_COPY[queue]?.[0] || task.status}</span>
         {Number(task.estHours) > 0 && <span><Icon name="chart" size={14}/> {task.estHours}h dự kiến</span>}
-        <SourcePill source="ERP Task" freshness="Live"/>
+        <SourcePill source="ERP Task" freshness={taskSnapshotFreshness(generatedAt, { loading: refreshing })}/>
       </div>
       <div className={styles.canonicalTaskActions}>
         <Link className={styles.button} data-variant="secondary" href={`/tasks?focus=${encodeURIComponent(task.id)}&from=realm-v2`}><Icon name="arrow" size={16}/><span>Mở Task ERP</span></Link>
-        {nextState && <Button loading={busy} icon={nextState === 'done' ? 'check' : 'bolt'} onClick={() => onTransition(task, nextState)}>{nextState === 'done' ? 'Hoàn tất' : 'Bắt đầu'}</Button>}
+        {action && <Button loading={busy} icon={action.nextState === 'done' ? 'check' : 'bolt'} onClick={() => onTransition(task, action.nextState)}>{action.label}</Button>}
       </div>
     </article>
   );
@@ -198,7 +199,7 @@ function HomeScreen() {
 
         <aside className={styles.realmActionRail}>
           <Panel title="Việc tiếp theo" description="Ưu tiên từ hàng đợi ERP." actions={<Link className={styles.button} data-variant="secondary" href="/realm-v2/my-work">Toàn bộ</Link>}>
-            {nextTask ? <CanonicalTaskCard task={nextTask} queue={nextTask.queue} busy={busyId === nextTask.id} onTransition={transition} compact/> : <div className={styles.canonicalEmpty}><Icon name="check"/><strong>Không còn việc đang mở</strong></div>}
+            {nextTask ? <CanonicalTaskCard task={nextTask} queue={nextTask.queue} busy={busyId === nextTask.id} onTransition={transition} generatedAt={data.myWork.generatedAt} refreshing={data.loading} compact/> : <div className={styles.canonicalEmpty}><Icon name="check"/><strong>Không còn việc đang mở</strong></div>}
           </Panel>
           <Panel title="Cần can thiệp" description="Trở ngại và quá hạn, không phải điểm nhân sự.">
             {attention.length ? <div className={styles.list}>{attention.slice(0, 4).map((task) => <Link href={`/tasks?focus=${encodeURIComponent(task.id)}&from=realm-v2`} className={styles.listItem} key={task.id}><span className={styles.listIcon}><Icon name={task.queue === 'blocked' ? 'lock' : 'clock'}/></span><span className={styles.listCopy}><strong>{task.title}</strong><span>{task.project?.name || 'Công việc ERP'} · {dateLabel(task.dueDate)}</span></span><Badge tone="danger">{task.queue === 'blocked' ? 'Bị chặn' : 'Quá hạn'}</Badge></Link>)}</div> : <div className={styles.canonicalEmpty}><Icon name="check"/><strong>Không có cảnh báo cá nhân</strong></div>}
@@ -244,7 +245,7 @@ function MyWorkScreen() {
       <Panel title="Hàng đợi của bạn" description="Thứ tự và trạng thái được đọc trực tiếp từ Task ERP; hành động có receipt RepositoryRealms." actions={<Button variant="secondary" icon="refresh" loading={data.loading} onClick={data.reload}>Đồng bộ</Button>}>
         <div className={styles.canonicalFilters}><Segmented label="Lọc hàng đợi công việc" options={options} value={view} onChange={setView}/></div>
         <div className={styles.canonicalTaskList} aria-live="polite">
-          {visible.map((task) => <CanonicalTaskCard key={task.id} task={task} queue={task.queue} busy={busyId === task.id} onTransition={transition}/>) }
+          {visible.map((task) => <CanonicalTaskCard key={task.id} task={task} queue={task.queue} busy={busyId === task.id} onTransition={transition} generatedAt={data.myWork.generatedAt} refreshing={data.loading}/>) }
           {!visible.length && <div className={styles.canonicalEmpty}><Icon name="inbox"/><strong>Không có Task trong chế độ xem này</strong><span>Đổi bộ lọc hoặc mở Bảng công việc ERP để tạo/giao việc.</span><Link className={styles.button} data-variant="secondary" href="/tasks"><Icon name="arrow" size={16}/><span>Mở Bảng công việc ERP</span></Link></div>}
         </div>
       </Panel>

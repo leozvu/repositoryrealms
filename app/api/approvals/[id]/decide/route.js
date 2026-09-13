@@ -9,12 +9,25 @@ import { safelyPublishRealmChange } from '@/lib/realm-change-feed';
 import { notificationRecordRoute } from '@/lib/notification-inbox';
 import { decideRealmLaunchApproval } from '@/lib/realm-launch-approval';
 import { realmLaunchSecret } from '@/lib/realm-launch-token';
+import { settleVendorPaymentInTransaction, financialPaymentResponse, FinancialPaymentError } from '@/lib/financial-payment-command';
+import { enqueueEvent } from '@/lib/event-outbox';
 
 export async function POST(req, { params }) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const { decision, note } = await req.json(); // approve | reject
   const ap = await prisma.approval.findUnique({ where: { id: params.id } });
+  if (ap?.type === 'vendorbill' && ap.status === 'approved' && decision === 'approve') {
+    const finalStep = [...parseItems(ap.steps)].reverse().find(step => step.status === 'approved');
+    if (!canDecide(finalStep, user)) return NextResponse.json({ error: 'Bạn không có quyền duyệt bước này' }, { status: 403 });
+    try {
+      await executeApproval(ap, user);
+      return NextResponse.json(ap);
+    } catch (error) {
+      const response = financialPaymentResponse(error);
+      return NextResponse.json(response.body, { status: response.status });
+    }
+  }
   if (!ap || ap.status !== 'pending') return NextResponse.json({ error: 'Yêu cầu không tồn tại hoặc đã xử lý' }, { status: 400 });
   if (ap.type === 'realm_launch') {
     try {
@@ -113,6 +126,24 @@ export async function POST(req, { params }) {
       return NextResponse.json({ error: error?.message || 'Không thể thực hiện bàn giao Task.', code: error?.code || 'task_handoff_failed' }, { status: error?.status || 409 });
     }
     if (taskChange) await emitEvent('tasks', 'update', taskChange.updatedTask, taskChange.before, user);
+  } else if (ap.type === 'vendorbill') {
+    try {
+      updated = await prisma.$transaction(async (tx) => {
+        const claimed = await tx.approval.updateMany({ where: { id: ap.id, status: 'pending', steps: ap.steps }, data: decisionData });
+        if (claimed.count !== 1) throw new FinancialPaymentError('Yêu cầu vừa được xử lý. Hãy thử lại để xem kết quả.', 409, 'approval_decision_stale');
+        const decided = await tx.approval.findUnique({ where: { id: ap.id } });
+        await tx.auditLog.create({ data: { userId: user.id, userName: user.name, action: decision === 'approve' ? 'approve' : 'reject', entity: 'approvals', refId: ap.id, detail: ap.title } });
+        if (status === 'approved') await settleVendorPaymentInTransaction(tx, user, {
+          recordId: ap.refId, date: JSON.parse(ap.payload || '{}').date,
+          approvalId: ap.id, idempotencyKey: `approval_${ap.id}`,
+        });
+        await enqueueEvent(tx, { resource: 'approvals', event: 'update', row: decided, old: ap, user });
+        return decided;
+      }, { isolationLevel: 'Serializable' });
+    } catch (error) {
+      const response = financialPaymentResponse(error);
+      return NextResponse.json(response.body, { status: response.status });
+    }
   } else {
     updated = await prisma.approval.update({ where: { id: ap.id }, data: decisionData });
     await prisma.auditLog.create({

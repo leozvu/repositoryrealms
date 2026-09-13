@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui';
+import { nextTaskAction } from '@/lib/task-presentation';
 import Icon from './Icon';
 import { Badge, Banner, Button, Field, Panel, Segmented, SourcePill, StateView, Status } from './Primitives';
 import { Modal } from './Overlays';
@@ -197,7 +198,7 @@ function TaskTile({ task, onOpen, compact = false }) {
 function TaskActionDialog({ task, busy, onClose, onExecute }) {
   const [reason, setReason] = useState('');
   const [reasonCode, setReasonCode] = useState('dependency');
-  const nextTransition = task.status === 'todo' ? 'in_progress' : ['doing', 'in_progress', 'review'].includes(task.status) ? 'done' : null;
+  const nextAction = nextTaskAction(task);
   const nextEscalation = Math.min(3, Number(task.escalationLevel || 0) + 1);
   const pending = Boolean(busy);
   const finish = async (input, copy) => {
@@ -214,12 +215,12 @@ function TaskActionDialog({ task, busy, onClose, onExecute }) {
           <dl className={styles.definition}><dt>Người phụ trách</dt><dd>{task.member?.name || 'Chưa phân công'}</dd></dl>
           <dl className={styles.definition}><dt>Trạng thái canonical</dt><dd>{stateLabel(task)} · version {task.workVersion || 0}</dd></dl>
           <dl className={styles.definition}><dt>Deadline</dt><dd>{dateLabel(task.dueDate)}</dd></dl>
-          <dl className={styles.definition}><dt>Nguồn</dt><dd>ERP Task · Live</dd></dl>
+          <dl className={styles.definition}><dt>Nguồn</dt><dd>ERP Task · bản dữ liệu đã tải</dd></dl>
         </div>
-        {nextTransition && (
+        {nextAction && (
           <section className={styles.suggestedAction}>
-            <div><span className={styles.eyebrow}>Suggested action</span><strong>{nextTransition === 'done' ? 'Xác nhận Task đã hoàn tất' : 'Bắt đầu Task theo workflow ERP'}</strong><p>Authorization và transition graph được kiểm tra lại ở server.</p></div>
-            <Button loading={busy.endsWith('task.transition')} icon={nextTransition === 'done' ? 'check' : 'bolt'} onClick={() => finish({ action: 'task.transition', expectedState: task.status, nextState: nextTransition }, nextTransition === 'done' ? 'Task ERP đã hoàn tất.' : 'Task ERP đã bắt đầu.')}>{nextTransition === 'done' ? 'Hoàn tất' : 'Bắt đầu'}</Button>
+            <div><span className={styles.eyebrow}>Bước tiếp theo</span><strong>{nextAction.label}</strong><p>Hệ thống kiểm tra lại quyền và trạng thái công việc trước khi lưu.</p></div>
+            <Button loading={busy.endsWith('task.transition')} icon={nextAction.nextState === 'done' ? 'check' : 'bolt'} onClick={() => finish({ action: 'task.transition', expectedState: task.status, nextState: nextAction.nextState }, 'Đã cập nhật trạng thái công việc.')}>{nextAction.label}</Button>
           </section>
         )}
         <Field label="Lý do can thiệp" hint="Bắt buộc khi báo blocker hoặc escalation; nội dung được giới hạn bởi business rule.">

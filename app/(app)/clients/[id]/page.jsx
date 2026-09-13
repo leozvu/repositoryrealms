@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, useToast } from '@/components/ui';
+import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, useToast, ResourceError, Forbidden } from '@/components/ui';
 import { DocLinks } from '@/components/DocLinks';
 import { money, moneyShort, fmtDate, initials, docGrand, paidOf, remainOf, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
@@ -15,19 +15,25 @@ export default function ClientDetailPage() {
   const { id } = useParams();
   const { data: session } = useSession();
   const isMgmt = hasAny(session?.user, ['AM']);
-  const clients = useResource('clients');
-  const contacts = useResource('contacts');
-  const activities = useResource('activities');
-  const quotes = useResource('quotes');
-  const invoices = useResource('invoices');
-  const projects = useResource('projects');
-  const tickets = useResource('tickets');
-  const nps = useResource('nps');
-  const csat = useResource('csat');
+  const clients = useResource('clients', { id });
+  const contacts = useResource('contacts', { clientId: id });
+  const activities = useResource('activities', { refType: 'client', refId: id });
+  const quotes = useResource('quotes', { clientId: id });
+  const invoices = useResource('invoices', { clientId: id });
+  const projects = useResource('projects', { clientId: id });
+  const tickets = useResource('tickets', { clientId: id });
+  const nps = useResource('nps', { clientId: id });
+  const csat = useResource('csat', { clientId: id });
   const [modal, setModal] = useState(null);
   const toast = useToast();
 
   const client = clients.rows.find(c => c.id === id);
+  const financeReady = !invoices.loading && !invoices.error && !invoices.forbidden;
+  const projectsReady = !projects.loading && !projects.error && !projects.forbidden;
+  const feedbackReady = ![nps, csat].some(resource => resource.loading || resource.error || resource.forbidden);
+  const relatedResources = [['Người liên hệ', contacts], ['Hoạt động', activities], ['Báo giá', quotes], ['Hóa đơn', invoices], ['Dự án', projects], ['Hỗ trợ', tickets], ['NPS', nps], ['CSAT', csat]];
+  if (clients.forbidden) return <Forbidden />;
+  if (clients.error) return <ResourceError error={clients.error} onRetry={clients.refresh} loading={clients.loading} />;
   if (clients.loading) return null;
   if (!client) return <EmptyState title="Không tìm thấy khách hàng" sub="Có thể đã bị xóa hoặc bạn không có quyền xem" />;
 
@@ -69,12 +75,15 @@ export default function ClientDetailPage() {
   ];
   const saveContact = async d => {
     const data = { ...d, clientId: id, primary: d.primary === '1' };
-    if (modal.row) await contacts.update(modal.row.id, data); else await contacts.create(data);
+    const result = modal.row ? await contacts.update(modal.row.id, data) : await contacts.create(data);
+    if (!result) return false;
     toast('Đã lưu người liên hệ');
+    return result;
   };
 
   return (
     <>
+      {relatedResources.filter(([, resource]) => resource.error).map(([label, resource]) => <ResourceError key={label} error={`${label}: ${resource.error}`} onRetry={resource.refresh} loading={resource.loading} />)}
       <div className="toolbar">
         <Link href="/clients" className="btn btn-outline btn-sm">← Khách hàng</Link>
         <span style={{ fontSize: '1.05rem', fontWeight: 800 }}>{client.name}</span>
@@ -85,16 +94,16 @@ export default function ClientDetailPage() {
 
       <div className="grid kpi-grid">
         <div className="card kpi"><span className="kpi-label">Doanh thu lũy kế</span>
-          <div className="kpi-value" style={{ color: 'var(--accent)' }}>{money(revenue)}</div>
-          <div className="kpi-sub">{myInv.length} hóa đơn</div></div>
+          <div className="kpi-value" style={{ color: 'var(--accent)' }}>{financeReady ? money(revenue) : '—'}</div>
+          <div className="kpi-sub">{financeReady ? `${myInv.length} hóa đơn` : 'Chưa tải đủ dữ liệu hóa đơn'}</div></div>
         <div className="card kpi"><span className="kpi-label">Công nợ hiện tại</span>
-          <div className="kpi-value" style={{ color: debt ? 'var(--danger)' : 'inherit' }}>{money(debt)}</div></div>
+          <div className="kpi-value" style={{ color: debt ? 'var(--danger)' : 'inherit' }}>{financeReady ? money(debt) : '—'}</div></div>
         <div className="card kpi"><span className="kpi-label">Dự án</span>
-          <div className="kpi-value">{myProjects.filter(p => p.status === 'active').length}<span style={{ fontSize: '.85rem', color: 'var(--muted)' }}> / {myProjects.length}</span></div>
+          <div className="kpi-value">{projectsReady ? myProjects.filter(p => p.status === 'active').length : '—'}<span style={{ fontSize: '.85rem', color: 'var(--muted)' }}> / {projectsReady ? myProjects.length : '—'}</span></div>
           <div className="kpi-sub">đang chạy / tổng</div></div>
         <div className="card kpi"><span className="kpi-label">Hài lòng</span>
-          <div className="kpi-value">{avgNps !== null ? `NPS ${avgNps}` : '—'}</div>
-          <div className="kpi-sub">{avgCsat !== null ? `CSAT ${avgCsat}★ · ` : ''}{myNps.length + myCsat.length} phản hồi</div></div>
+          <div className="kpi-value">{feedbackReady && avgNps !== null ? `NPS ${avgNps}` : '—'}</div>
+          <div className="kpi-sub">{feedbackReady ? `${avgCsat !== null ? `CSAT ${avgCsat}★ · ` : ''}${myNps.length + myCsat.length} phản hồi` : 'Chưa tải đủ dữ liệu phản hồi'}</div></div>
       </div>
 
       <div className="grid two-col" style={{ marginTop: 16, alignItems: 'start' }}>
@@ -120,6 +129,7 @@ export default function ClientDetailPage() {
               ? <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Bạn không có quyền xem danh bạ thương mại.</p>
               : <p style={{ fontSize: '.8rem', color: 'var(--muted)' }}>Chưa có ai — người liên hệ cũ: {client.contact || '—'}</p>)}
             {client.note && <p style={{ fontSize: '.78rem', color: 'var(--muted)', borderTop: '1px solid var(--border)', paddingTop: 10, marginTop: 8 }}>📝 {client.note}</p>}
+            {(client.originSource || client.originCampaign) && <p style={{ fontSize: '.78rem', color: 'var(--muted)' }}>Nguồn Lead khi chuyển đổi: {client.originSource || 'Chưa ghi nhận'}{client.originCampaign && ` · Chiến dịch: ${client.originCampaign}`}</p>}
           </div>
         </div>
 
@@ -152,7 +162,7 @@ export default function ClientDetailPage() {
         fields={CONTACT_FIELDS} data={modal.row ? { ...modal.row, primary: modal.row.primary ? '1' : '' } : {}}
         onClose={() => setModal(null)} onSave={saveContact} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa "${modal.row.name}" khỏi danh bạ?`} onClose={() => setModal(null)}
-        onYes={async () => { await contacts.remove(modal.row.id); toast('Đã xóa'); }} />}
+        onYes={async () => { const result = await contacts.remove(modal.row.id); if (!result) return false; toast('Đã xóa'); return result; }} />}
     </>
   );
 }

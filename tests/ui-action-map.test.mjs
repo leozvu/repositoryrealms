@@ -58,6 +58,16 @@ test('object assignment in Realm error tracing is not classified as navigation',
   assert.ok(!saveProfile?.routeTargets.includes('responseError'));
 });
 
+test('conditional capture controls trace every selected callback to browser media actions', () => {
+  const captureControl = actionMap.actions.find(action => action.source === 'components/realm/RealmOffice.jsx'
+    && action.handler.includes("control.id === 'mic' ? toggleMic"));
+  assert.ok(captureControl);
+  assert.notEqual(captureControl.mappingStatus, 'unresolved');
+  for (const handler of ['toggleMic', 'toggleCamera', 'toggleShare']) assert.ok(captureControl.handlerChain.includes(handler));
+  assert.ok(captureControl.browserActions.includes('navigator.mediaDevices.getUserMedia'));
+  assert.ok(captureControl.browserActions.includes('navigator.mediaDevices.getDisplayMedia'));
+});
+
 test('action map artifacts are deterministic', () => {
   const first = renderActionMapArtifacts(actionMap);
   const second = renderActionMapArtifacts(buildUiActionMap(root));

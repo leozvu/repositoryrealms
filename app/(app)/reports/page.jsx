@@ -1,7 +1,11 @@
 'use client';
 import { useResource, Icon, Forbidden, EmptyState } from '@/components/ui';
 import { BarChart, DonutChart, Funnel } from '@/components/charts';
-import { money, monthKey, hourRate, paidOf, docGrand, itemsTotal, thisMonth, LEAD_STAGES } from '@/lib/format';
+import { money, monthKey, hourRate, thisMonth, LEAD_STAGES } from '@/lib/format';
+
+import { transactionAmountVnd } from '@/lib/money';
+import { financialConversionIssues, invoiceReceivableVnd, invoiceCollectedVnd, invoiceSubtotalVnd, invoiceVatVnd } from '@/lib/financial-reporting';
+import StatePanel from '@/components/system/StatePanel';
 
 export default function ReportsPage() {
   const transactions = useResource('transactions');
@@ -12,6 +16,8 @@ export default function ReportsPage() {
   const users = useResource('users');
   const clients = useResource('clients');
   if (transactions.forbidden) return <Forbidden />;
+  const conversionIssues = financialConversionIssues({ transactions: transactions.rows, invoices: invoices.rows });
+  if (conversionIssues.length) return <StatePanel state="error" title="Chưa thể tổng hợp báo cáo VND" description={`${conversionIssues.length} bản ghi có số tiền hoặc tỷ giá không hợp lệ. Kiểm tra sổ giao dịch và hóa đơn trước khi tổng hợp.`} action={<a className="btn btn-outline" href="/finance">Mở sổ giao dịch</a>} />;
 
   const clientName = id => clients.rows.find(c => c.id === id)?.name || '—';
   const salaryOf = id => users.rows.find(u => u.id === id)?.salary || 0;
@@ -22,15 +28,15 @@ export default function ReportsPage() {
     const d = new Date(); d.setMonth(d.getMonth() + m);
     const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     labels.push('T' + (d.getMonth() + 1));
-    inc.push(transactions.rows.filter(t => t.type === 'income' && monthKey(t.date) === k).reduce((s, t) => s + t.amount, 0));
-    exp.push(transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === k).reduce((s, t) => s + t.amount, 0));
+    inc.push(transactions.rows.filter(t => t.type === 'income' && monthKey(t.date) === k).reduce((s, t) => s + transactionAmountVnd(t), 0));
+    exp.push(transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === k).reduce((s, t) => s + transactionAmountVnd(t), 0));
   }
   const totalInc = inc.reduce((a, b) => a + b, 0), totalExp = exp.reduce((a, b) => a + b, 0);
 
   // Cơ cấu chi phí
   const catColors = ['#2563EB', '#7C3AED', '#DB2777', '#D97706', '#059669', '#0891B2', '#64748B'];
   const byCat = {};
-  transactions.rows.filter(t => t.type === 'expense').forEach(t => byCat[t.category || 'Khác'] = (byCat[t.category || 'Khác'] || 0) + t.amount);
+  transactions.rows.filter(t => t.type === 'expense').forEach(t => byCat[t.category || 'Khác'] = (byCat[t.category || 'Khác'] || 0) + transactionAmountVnd(t));
   const catData = Object.entries(byCat).sort((a, b) => b[1] - a[1]).map(([label, value], i) => ({ label, value, color: catColors[i % catColors.length] }));
 
   // Phễu bán hàng
@@ -47,8 +53,8 @@ export default function ReportsPage() {
 
   // Lợi nhuận theo dự án
   const projectFinance = p => {
-    const income = transactions.rows.filter(t => t.type === 'income' && t.projectId === p.id).reduce((s, t) => s + t.amount, 0);
-    const expense = transactions.rows.filter(t => t.type === 'expense' && t.projectId === p.id).reduce((s, t) => s + t.amount, 0);
+    const income = transactions.rows.filter(t => t.type === 'income' && t.projectId === p.id).reduce((s, t) => s + transactionAmountVnd(t), 0);
+    const expense = transactions.rows.filter(t => t.type === 'expense' && t.projectId === p.id).reduce((s, t) => s + transactionAmountVnd(t), 0);
     const logs = timelogs.rows.filter(l => l.projectId === p.id);
     const hours = logs.reduce((s, l) => s + l.hours, 0);
     const labor = logs.reduce((s, l) => s + l.hours * hourRate(salaryOf(l.userId)), 0);
@@ -57,7 +63,7 @@ export default function ReportsPage() {
 
   // Top khách theo doanh thu đã thu
   const revByClient = {};
-  invoices.rows.forEach(v => { const p = paidOf(v); if (p) revByClient[v.clientId] = (revByClient[v.clientId] || 0) + p; });
+  invoices.rows.filter(v => !['draft', 'void'].includes(v.status)).forEach(v => { const p = invoiceCollectedVnd(v); if (p) revByClient[v.clientId] = (revByClient[v.clientId] || 0) + p; });
   const top = Object.entries(revByClient).sort((a, b) => b[1] - a[1]).slice(0, 6);
   const maxTop = Math.max(...top.map(t => t[1]), 1);
 
@@ -68,12 +74,12 @@ export default function ReportsPage() {
     const tm = thisMonth();
     const lm = (() => { const d = new Date(); d.setMonth(d.getMonth() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; })();
     const sum = (arr, f) => arr.reduce((a, b) => a + f(b), 0);
-    const mInc = sum(transactions.rows.filter(t => t.type === 'income' && monthKey(t.date) === tm), t => t.amount);
-    const mExp = sum(transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === tm), t => t.amount);
-    const pInc = sum(transactions.rows.filter(t => t.type === 'income' && monthKey(t.date) === lm), t => t.amount);
-    const ar = sum(invoices.rows.filter(v => v.status !== 'draft'), v => Math.max(0, docGrand(v) - paidOf(v)));
+    const mInc = sum(transactions.rows.filter(t => t.type === 'income' && monthKey(t.date) === tm), transactionAmountVnd);
+    const mExp = sum(transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === tm), transactionAmountVnd);
+    const pInc = sum(transactions.rows.filter(t => t.type === 'income' && monthKey(t.date) === lm), transactionAmountVnd);
+    const ar = sum(invoices.rows.filter(v => !['draft', 'void'].includes(v.status)), invoiceReceivableVnd);
     const mCat = {};
-    transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === tm).forEach(t => mCat[t.category || 'Khác'] = (mCat[t.category || 'Khác'] || 0) + t.amount);
+    transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === tm).forEach(t => mCat[t.category || 'Khác'] = (mCat[t.category || 'Khác'] || 0) + transactionAmountVnd(t));
     const insights = await fetch('/api/insights').then(r => r.ok ? r.json() : []).catch(() => []);
     let area = document.getElementById('print-area');
     if (!area) { area = document.createElement('div'); area.id = 'print-area'; document.body.appendChild(area); }
@@ -101,7 +107,7 @@ export default function ReportsPage() {
           `<tr><td style="width:220px">${esc(clientName(cid))}</td><td class="num">${money(v)}</td></tr>`).join('')}</tbody></table>
         ${Array.isArray(insights) && insights.length ? `<h3 style="margin-top:16px">Điểm cần chú ý (AI Summary)</h3>
         <ul style="font-size:.92em;line-height:1.6">${insights.filter(i => ['bad', 'warn'].includes(i.level)).slice(0, 8).map(i => `<li>${esc(i.text)}</li>`).join('')}</ul>` : ''}
-        <p style="margin-top:16px;font-size:.85em;color:#666">Báo cáo sinh tự động từ Agency ERP.</p>
+        <p style="margin-top:16px;font-size:.85em;color:#666">Báo cáo sinh tự động từ Agency ERP. Số tiền được quy đổi VND theo tỷ giá ghi sổ.</p>
       </div>`;
     window.print();
   };
@@ -175,7 +181,7 @@ export default function ReportsPage() {
           <table>
             {(() => {
               const months = [-2, -1, 0].map(off => { const d = new Date(); d.setMonth(d.getMonth() + off); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; });
-              const sum = (type, k, cat) => transactions.rows.filter(t => t.type === type && monthKey(t.date) === k && (!cat || t.category === cat)).reduce((s, t) => s + t.amount, 0);
+              const sum = (type, k, cat) => transactions.rows.filter(t => t.type === type && monthKey(t.date) === k && (!cat || t.category === cat)).reduce((s, t) => s + transactionAmountVnd(t), 0);
               const expCats = [...new Set(transactions.rows.filter(t => t.type === 'expense').map(t => t.category || 'Khác'))];
               return (
                 <>
@@ -206,9 +212,9 @@ export default function ReportsPage() {
             <thead><tr><th>Quý</th><th className="num">Doanh thu trước thuế</th><th className="num">VAT đầu ra</th><th className="num">Số hóa đơn</th></tr></thead>
             <tbody>{[1, 2, 3, 4].map(q => {
               const year = new Date().getFullYear();
-              const inQ = invoices.rows.filter(v => v.status !== 'draft' && +v.date.slice(0, 4) === year && Math.ceil(+v.date.slice(5, 7) / 3) === q);
-              const sub = inQ.reduce((s, v) => s + itemsTotal(v), 0);
-              const vat = inQ.reduce((s, v) => s + Math.round(itemsTotal(v) * (v.vat || 0) / 100), 0);
+              const inQ = invoices.rows.filter(v => !['draft', 'void'].includes(v.status) && +v.date.slice(0, 4) === year && Math.ceil(+v.date.slice(5, 7) / 3) === q);
+              const sub = inQ.reduce((s, v) => s + invoiceSubtotalVnd(v), 0);
+              const vat = inQ.reduce((s, v) => s + invoiceVatVnd(v), 0);
               return (
                 <tr key={q}><td><b>Quý {q}</b></td>
                   <td className="num">{money(sub)}</td>
@@ -218,7 +224,7 @@ export default function ReportsPage() {
             })}</tbody>
           </table>
         </div>
-        <p style={{ fontSize: '.74rem', color: 'var(--muted)', padding: '0 18px 14px' }}>Tính trên hóa đơn đã phát hành (trừ nháp). VAT đầu vào bổ sung khi có hóa đơn NCC kèm thuế suất — dự kiến v2.4.</p>
+        <p style={{ fontSize: '.74rem', color: 'var(--muted)', padding: '0 18px 14px' }}>Quy đổi VND theo tỷ giá ghi sổ trên hóa đơn đã phát hành (trừ nháp và hủy). VAT đầu vào bổ sung khi có hóa đơn NCC kèm thuế suất — dự kiến v2.4.</p>
       </div>
 
       <div className="card" style={{ marginTop: 16 }}>

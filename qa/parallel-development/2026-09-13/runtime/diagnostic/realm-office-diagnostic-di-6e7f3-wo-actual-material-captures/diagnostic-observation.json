@@ -1,0 +1,103 @@
+{
+  "scope": "960x600 DPR1 reduced-motion functional/visual diagnostic; not standard profile, D60 or AAA evidence",
+  "seededPreference": {
+    "quality": "balanced",
+    "resolution": "auto"
+  },
+  "tracing": false,
+  "viewport": {
+    "width": 960,
+    "height": 600
+  },
+  "events": [
+    {
+      "name": "document loaded",
+      "elapsedMs": 533
+    },
+    {
+      "name": "balanced materials ready",
+      "elapsedMs": 20266
+    },
+    {
+      "name": "directory opened",
+      "elapsedMs": 36989
+    },
+    {
+      "name": "archive route selected",
+      "elapsedMs": 41701
+    },
+    {
+      "name": "real briefing opened after arrival",
+      "elapsedMs": 53835
+    },
+    {
+      "name": "returned to world",
+      "elapsedMs": 59266
+    },
+    {
+      "name": "balanced screenshot captured",
+      "elapsedMs": 77107
+    }
+  ],
+  "observations": [
+    {
+      "name": "initial balanced",
+      "elapsedMs": 29312,
+      "world": {
+        "realmWorldVersion": "3d",
+        "ready": "true",
+        "camera": "follow",
+        "quality": "balanced",
+        "materials": "ready",
+        "renderScale": "0.45",
+        "resolutionPreference": "auto",
+        "playerX": "2.67",
+        "playerZ": "7.67",
+        "frameP95": "567",
+        "cameraX": "5.189",
+        "cameraY": "2.900",
+        "cameraZ": "13.982",
+        "drawCalls": "88",
+        "triangles": "141610"
+      },
+      "canvas": {
+        "width": 432,
+        "height": 270
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    },
+    {
+      "name": "archive balanced before screenshot",
+      "elapsedMs": 67189,
+      "world": {
+        "realmWorldVersion": "3d",
+        "ready": "true",
+        "camera": "first",
+        "quality": "balanced",
+        "materials": "ready",
+        "renderScale": "0.45",
+        "resolutionPreference": "auto",
+        "playerX": "-10.16",
+        "playerZ": "-3.72",
+        "frameP95": "367",
+        "cameraX": "-10.164",
+        "cameraY": "1.650",
+        "cameraZ": "-3.718",
+        "drawCalls": "34",
+        "triangles": "128106"
+      },
+      "canvas": {
+        "width": 432,
+        "height": 270
+      },
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "[.WebGL-0x5e6c02437c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x5e6c02437c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x5e6c02437c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "[.WebGL-0x5e6c02437c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ]
+}

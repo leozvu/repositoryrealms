@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "collectedAt": "2026-09-08T21:47:24.512Z",
+  "runLabel": "realm-office-final",
+  "notes": [
+    "Production build demo QA: desktop and mobile Chromium; software renderer; 8/8 Playwright checks passed."
+  ],
+  "sourceDirectories": [
+    "test-results/realm-office-3d-3D-office--9c593-ras-without-layout-overflow-desktop-chromium",
+    "test-results/realm-office-3d-3D-office--9c593-ras-without-layout-overflow-mobile-chromium",
+    "test-results/realm-office-3d-an-explici-20e3b-es-returning-from-Chronicle-desktop-chromium",
+    "test-results/realm-office-3d-an-explici-20e3b-es-returning-from-Chronicle-mobile-chromium",
+    "test-results/realm-office-3d-each-work--4d559-ts-existing-workspace-panel-desktop-chromium",
+    "test-results/realm-office-3d-each-work--4d559-ts-existing-workspace-panel-mobile-chromium"
+  ],
+  "context": {
+    "route": "/realm-demo?world=3d",
+    "dataMode": "demo",
+    "renderer": "software rendering (QA run context; not detected from PNG bytes)",
+    "performanceScope": "Behavior and visual evidence only; not a hardware FPS benchmark.",
+    "testStatus": "Not evaluated by this collector. Refer to the original Playwright results.",
+    "timestampScope": "PNG timestamps are source file modification times, not independently verified capture times.",
+    "buildScope": "BUILD_ID and source hashes observed at collection time; they do not alone prove which build produced each PNG."
+  },
+  "build": {
+    "id": "Do-KXUwnxjvEvYlSb2LwD",
+    "path": ".next/BUILD_ID",
+    "bytes": 21,
+    "sha256": "702acd266c422d73a321ce71b6358f2a97403a07d94651c5f4c67c3b52831624",
+    "modifiedAt": "2026-09-08T21:46:14.905Z"
+  },
+  "sourceFiles": [
+    {
+      "path": "components/realm/three/guildhallScene.js",
+      "bytes": 32170,
+      "sha256": "b27ce9b7971f39b39798c7175cc7adc330103efe165ea73f228375c6068b9409",
+      "modifiedAt": "2026-09-08T20:31:03.961Z"
+    },
+    {
+      "path": "components/realm/three/officeAvatar.js",
+      "bytes": 9646,
+      "sha256": "e347eed13ea1c49319528e703e26197fdd2a898ba97fcc42ced5bf647047e975",
+      "modifiedAt": "2026-09-08T20:52:29.742Z"
+    },
+    {
+      "path": "components/realm/three/officeRuntime.js",
+      "bytes": 24115,
+      "sha256": "b3377c3720545335b78cb152ab57836b4e8e98d97d391ee73e59c72087d780e0",
+      "modifiedAt": "2026-09-08T21:13:30.169Z"
+    },
+    {
+      "path": "components/realm/three/officeQuality.js",
+      "bytes": 2865,
+      "sha256": "4bee11206db8da44986145eb904ba6e514496a2258237e0c4534f649ac796bc7",
+      "modifiedAt": "2026-09-08T21:02:16.946Z"
+    },
+    {
+      "path": "components/realm/RealmWorld3D.jsx",
+      "bytes": 11482,
+      "sha256": "d8a6f897478906e5d94abe0ec7aa617d27c36d81c5a501001a5b52dbd98275ad",
+      "modifiedAt": "2026-09-08T21:43:03.261Z"
+    },
+    {
+      "path": "components/realm/realm-world-3d.module.css",
+      "bytes": 11326,
+      "sha256": "f234d65050324e0396ead45ffc8e3bace27bfed806a7aefe43606a43c12a24b0",
+      "modifiedAt": "2026-09-08T21:13:48.582Z"
+    },
+    {
+      "path": "components/realm/RealmOffice.jsx",
+      "bytes": 169403,
+      "sha256": "2e3b6a5ef951a20debb7b6f1dba7a34eb7ba27b756e8ab33efe70c3f11b8dd4d",
+      "modifiedAt": "2026-09-08T21:02:33.751Z"
+    },
+    {
+      "path": "components/realm/realm-office.module.css",
+      "bytes": 101077,
+      "sha256": "dc2531a67485eb5a9535f4204809e92a6f37820dd90fa06c61cb09980b43246f",
+      "modifiedAt": "2026-09-08T20:05:49.120Z"
+    },
+    {
+      "path": "tests/e2e/realm-office-3d.spec.mjs",
+      "bytes": 4975,
+      "sha256": "662d01412963ad4057a32aff4f6fa9a5708a12da0ca3dc3fb46f0575acb89653",
+      "modifiedAt": "2026-09-08T21:16:54.790Z"
+    },
+    {
+      "path": "playwright.config.mjs",
+      "bytes": 1223,
+      "sha256": "45c36fd4806503bea06be18c1a56b75d4fbe25ab172ec76b442a252c7fe70b74",
+      "modifiedAt": "2026-09-08T20:05:49.432Z"
+    }
+  ],
+  "images": [
+    {
+      "file": "desktop-first-person.png",
+      "source": "test-results/realm-office-3d-3D-office--9c593-ras-without-layout-overflow-desktop-chromium/first-person.png",
+      "sourceModifiedAt": "2026-09-08T21:22:47.942Z",
+      "bytes": 583394,
+      "sha256": "ac99f7b25673c82afb442af5809d8316d396ebab56bd7a80e1a31db5fc8ab41f",
+      "width": 1280,
+      "height": 720,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    },
+    {
+      "file": "desktop-overview.png",
+      "source": "test-results/realm-office-3d-3D-office--9c593-ras-without-layout-overflow-desktop-chromium/overview.png",
+      "sourceModifiedAt": "2026-09-08T21:22:51.526Z",
+      "bytes": 734446,
+      "sha256": "85ab6786d65566f9261bb55fc55bd70d3ba2d4bde019860780b2fb758bcc6725",
+      "width": 1280,
+      "height": 720,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    },
+    {
+      "file": "desktop-work-panel.png",
+      "source": "test-results/realm-office-3d-each-work--4d559-ts-existing-workspace-panel-desktop-chromium/work-panel.png",
+      "sourceModifiedAt": "2026-09-08T21:23:19.988Z",
+      "bytes": 553880,
+      "sha256": "7df6e7746032648ccc26eed2654da6e8bb72d17209f71330de5c71f05ed7deab",
+      "width": 1280,
+      "height": 720,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    },
+    {
+      "file": "desktop-high-profile.png",
+      "source": "test-results/realm-office-3d-an-explici-20e3b-es-returning-from-Chronicle-desktop-chromium/high-profile.png",
+      "sourceModifiedAt": "2026-09-08T21:25:12.272Z",
+      "bytes": 1013882,
+      "sha256": "1fe4162c84e1a83fefebdd228e3c1bfe35215e264faed19478f55e007a49d96b",
+      "width": 1280,
+      "height": 720,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    },
+    {
+      "file": "mobile-first-person.png",
+      "source": "test-results/realm-office-3d-3D-office--9c593-ras-without-layout-overflow-mobile-chromium/first-person.png",
+      "sourceModifiedAt": "2026-09-08T21:25:27.465Z",
+      "bytes": 882094,
+      "sha256": "d599b4b8dfd13f016de5465e767fcfec33dbeec2637941322a158904144c4695",
+      "width": 1081,
+      "height": 1999,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    },
+    {
+      "file": "mobile-overview.png",
+      "source": "test-results/realm-office-3d-3D-office--9c593-ras-without-layout-overflow-mobile-chromium/overview.png",
+      "sourceModifiedAt": "2026-09-08T21:25:29.929Z",
+      "bytes": 1506947,
+      "sha256": "6c2caac750c9c1a05baf616943bff3b1ad2a9af91acf14dfbf2cd0036d60696f",
+      "width": 1081,
+      "height": 1999,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    },
+    {
+      "file": "mobile-work-panel.png",
+      "source": "test-results/realm-office-3d-each-work--4d559-ts-existing-workspace-panel-mobile-chromium/work-panel.png",
+      "sourceModifiedAt": "2026-09-08T21:25:45.654Z",
+      "bytes": 400039,
+      "sha256": "793cd416960207d4a4d28a95ea432d3fdcaca041ed0848519e5f03f6413e6b35",
+      "width": 1081,
+      "height": 1999,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    },
+    {
+      "file": "mobile-high-profile.png",
+      "source": "test-results/realm-office-3d-an-explici-20e3b-es-returning-from-Chronicle-mobile-chromium/high-profile.png",
+      "sourceModifiedAt": "2026-09-08T21:26:42.645Z",
+      "bytes": 1853724,
+      "sha256": "aeee5aec0e23aafdfef2b83d0e467542f02ed2a1acaa2487bc7364bb628847ea",
+      "width": 1081,
+      "height": 1999,
+      "pngIntegrity": "signature, chunk CRCs and decoded scanlines verified"
+    }
+  ]
+}

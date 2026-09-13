@@ -1,3 +1,22 @@
 /qa/** text eol=lf
 /prisma/migrations/**/*.sql text eol=lf
 /prisma/realm-rollbacks/*.sql text eol=lf
+
+# Image/media evidence must never pass through text newline normalization.
+# These later rules override /qa/** above; existing damaged evidence requires
+# recapture from its source, not byte repair or re-normalization.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.glb binary
+*.mp4 binary
+*.webm binary
+*.mp3 binary
+*.wav binary
+*.ogg binary
+*.pdf binary
+*.zip binary

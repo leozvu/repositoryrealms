@@ -1,0 +1,274 @@
+TAP version 13
+# Subtest: office coordinates roundtrip through shared presence without distorting valid positions
+ok 1 - office coordinates roundtrip through shared presence without distorting valid positions
+  ---
+  duration_ms: 24.5474
+  type: 'test'
+  ...
+# Subtest: the actor body stays inside the room even after a large movement frame
+ok 2 - the actor body stays inside the room even after a large movement frame
+  ---
+  duration_ms: 1.1606
+  type: 'test'
+  ...
+# Subtest: a long or diagonal movement frame cannot tunnel through walls or a closed corner
+ok 3 - a long or diagonal movement frame cannot tunnel through walls or a closed corner
+  ---
+  duration_ms: 0.6556
+  type: 'test'
+  ...
+# Subtest: A* detours around furniture and simplification preserves collision clearance
+ok 4 - A* detours around furniture and simplification preserves collision clearance
+  ---
+  duration_ms: 25.9576
+  type: 'test'
+  ...
+# Subtest: A* refuses an unreachable target inside a sealed enclosure
+ok 5 - A* refuses an unreachable target inside a sealed enclosure
+  ---
+  duration_ms: 81.9454
+  type: 'test'
+  ...
+# Subtest: A* can leave a walkable position when the rounded grid origin lies inside furniture
+ok 6 - A* can leave a walkable position when the rounded grid origin lies inside furniture
+  ---
+  duration_ms: 2.1835
+  type: 'test'
+  ...
+# Subtest: keyboard movement follows camera yaw with equal cardinal and diagonal speed
+ok 7 - keyboard movement follows camera yaw with equal cardinal and diagonal speed
+  ---
+  duration_ms: 13.7086
+  type: 'test'
+  ...
+# Subtest: every 3D portal opens the exact established ERP companion destination
+ok 8 - every 3D portal opens the exact established ERP companion destination
+  ---
+  duration_ms: 0.8874
+  type: 'test'
+  ...
+# Subtest: avatar profile updates preserve skin, bounded dimensions and textured clothing
+ok 9 - avatar profile updates preserve skin, bounded dimensions and textured clothing
+  ---
+  duration_ms: 160.6484
+  type: 'test'
+  ...
+# Subtest: walking feet remain level, clear the floor and settle after movement ends
+ok 10 - walking feet remain level, clear the floor and settle after movement ends
+  ---
+  duration_ms: 146.3606
+  type: 'test'
+  ...
+# Subtest: avatar teardown disposes shared geometry, materials and textures exactly once
+ok 11 - avatar teardown disposes shared geometry, materials and textures exactly once
+  ---
+  duration_ms: 63.206
+  type: 'test'
+  ...
+# Subtest: camera boom stops before a thin wall and does not block a clear overhead view
+ok 12 - camera boom stops before a thin wall and does not block a clear overhead view
+  ---
+  duration_ms: 5.601
+  type: 'test'
+  ...
+# Subtest: parallel, diagonal and zero-length camera paths are bounded and finite
+ok 13 - parallel, diagonal and zero-length camera paths are bounded and finite
+  ---
+  duration_ms: 2.16
+  type: 'test'
+  ...
+# Subtest: the real archive shelves obstruct the follow camera and all work destinations can be reached closely
+ok 14 - the real archive shelves obstruct the follow camera and all work destinations can be reached closely
+  ---
+  duration_ms: 1103.2402
+  type: 'test'
+  ...
+# Subtest: overview ray reaches the project workstation through the lifted ceiling after camera mode changes
+ok 15 - overview ray reaches the project workstation through the lifted ceiling after camera mode changes
+  ---
+  duration_ms: 1311.3118
+  type: 'test'
+  ...
+# Subtest: 3D command-desk position survives reload even where legacy architecture is blocked
+ok 16 - 3D command-desk position survives reload even where legacy architecture is blocked
+  ---
+  duration_ms: 1249.9339
+  type: 'test'
+  ...
+# Subtest: same-name authenticated colleague remains selectable and selected identity survives session reconnect
+ok 17 - same-name authenticated colleague remains selectable and selected identity survives session reconnect
+  ---
+  duration_ms: 3.7435
+  type: 'test'
+  ...
+# Subtest: move intent waits for inspector unpause AND asynchronous world readiness, then dispatches only once
+ok 18 - move intent waits for inspector unpause AND asynchronous world readiness, then dispatches only once
+  ---
+  duration_ms: 1.514
+  type: 'test'
+  ...
+# Subtest: cancelled navigation cannot replay after another panel opens; failed mount times out once
+ok 19 - cancelled navigation cannot replay after another panel opens; failed mount times out once
+  ---
+  duration_ms: 0.7713
+  type: 'test'
+  ...
+# Subtest: capture controls reveal every active device without muting or stopping a task-side call
+ok 20 - capture controls reveal every active device without muting or stopping a task-side call
+  ---
+  duration_ms: 1.0662
+  type: 'test'
+  ...
+# Subtest: audio playback owns no tracks and prompts after autoplay denial, with cleanup suppressing stale prompt
+ok 21 - audio playback owns no tracks and prompts after autoplay denial, with cleanup suppressing stale prompt
+  ---
+  duration_ms: 1.0888
+  type: 'test'
+  ...
+# Subtest: actual JSX mounts call audio outside world/ledger/tray conditions and remote video is muted
+ok 22 - actual JSX mounts call audio outside world/ledger/tray conditions and remote video is muted
+  ---
+  duration_ms: 524.3654
+  type: 'test'
+  ...
+# Subtest: bundled material files match their source manifest and decode as finite 1K maps
+ok 23 - bundled material files match their source manifest and decode as finite 1K maps
+  ---
+  duration_ms: 321.7205
+  type: 'test'
+  ...
+# Subtest: UV mapping keeps a physical texture scale after world transforms and batching
+ok 24 - UV mapping keeps a physical texture scale after world transforms and batching
+  ---
+  duration_ms: 9.8638
+  type: 'test'
+  ...
+# Subtest: full and half planks retain physical grain density, tint, bounds and a shared draw call
+ok 25 - full and half planks retain physical grain density, tint, bounds and a shared draw call
+  ---
+  duration_ms: 12.4297
+  type: 'test'
+  ...
+# Subtest: textures finish loading into the same objects after switching to light graphics, and failures retain a fallback
+ok 26 - textures finish loading into the same objects after switching to light graphics, and failures retain a fallback
+  ---
+  duration_ms: 20.4581
+  type: 'test'
+  ...
+# Subtest: late texture callbacks cannot revive resources after leaving the 3D office
+ok 27 - late texture callbacks cannot revive resources after leaving the 3D office
+  ---
+  duration_ms: 6.5014
+  type: 'test'
+  ...
+# Subtest: light graphics preserves colors, transparent surfaces and instancing, and restores original PBR
+ok 28 - light graphics preserves colors, transparent surfaces and instancing, and restores original PBR
+  ---
+  duration_ms: 11.4774
+  type: 'test'
+  ...
+# Subtest: framebuffer budget bounds pixel work on large displays while preserving mobile density
+ok 29 - framebuffer budget bounds pixel work on large displays while preserving mobile density
+  ---
+  duration_ms: 0.9574
+  type: 'test'
+  ...
+# Subtest: a single stall does not lower quality; persistent slow rendering does
+ok 30 - a single stall does not lower quality; persistent slow rendering does
+  ---
+  duration_ms: 0.8124
+  type: 'test'
+  ...
+# Subtest: sustained load keeps explicitly selected PBR while bounding resolution without lowering the saved tier
+ok 31 - sustained load keeps explicitly selected PBR while bounding resolution without lowering the saved tier
+  ---
+  duration_ms: 4.2406
+  type: 'test'
+  ...
+# Subtest: two severe stalls trigger recovery promptly while an isolated compilation spike is ignored
+ok 32 - two severe stalls trigger recovery promptly while an isolated compilation spike is ignored
+  ---
+  duration_ms: 0.5854
+  type: 'test'
+  ...
+# Subtest: clarity preference maintains its floor under sustained load without changing material choice
+ok 33 - clarity preference maintains its floor under sustained load without changing material choice
+  ---
+  duration_ms: 0.5277
+  type: 'test'
+  ...
+# Subtest: resolution recovery needs sustained headroom and never counts a paused backdrop as headroom
+ok 34 - resolution recovery needs sustained headroom and never counts a paused backdrop as headroom
+  ---
+  duration_ms: 0.8491
+  type: 'test'
+  ...
+# Subtest: the constructed hall keeps all work areas mutually reachable around actual furniture
+ok 35 - the constructed hall keeps all work areas mutually reachable around actual furniture
+  ---
+  duration_ms: 1520.2165
+  type: 'test'
+  ...
+# Subtest: all eight workspace objects have raycast targets without visible proxy surfaces
+ok 36 - all eight workspace objects have raycast targets without visible proxy surfaces
+  ---
+  duration_ms: 490.7243
+  type: 'test'
+  ...
+# Subtest: the new desk keeps metric height through batching and window rays reach outside through masonry
+ok 37 - the new desk keeps metric height through batching and window rays reach outside through masonry
+  ---
+  duration_ms: 368.5579
+  type: 'test'
+  ...
+# Subtest: authored furniture has correct dimensions, a usable knee space and owned finite geometry
+ok 38 - authored furniture has correct dimensions, a usable knee space and owned finite geometry
+  ---
+  duration_ms: 26.3912
+  type: 'test'
+  ...
+# Subtest: readiness verifies the running RSC build and a successful HTML page
+ok 39 - readiness verifies the running RSC build and a successful HTML page
+  ---
+  duration_ms: 10.028
+  type: 'test'
+  ...
+# Subtest: start detaches a hidden loopback Next process with logfile descriptors and records its PID
+ok 40 - start detaches a hidden loopback Next process with logfile descriptors and records its PID
+  ---
+  duration_ms: 888.8335
+  type: 'test'
+  ...
+# Subtest: repeated start reuses a matching live build and never spawns over occupied ports
+ok 41 - repeated start reuses a matching live build and never spawns over occupied ports
+  ---
+  duration_ms: 542.3688
+  type: 'test'
+  ...
+# Subtest: status is read-only and an incomplete build never launches Next
+ok 42 - status is read-only and an incomplete build never launches Next
+  ---
+  duration_ms: 145.6092
+  type: 'test'
+  ...
+# Subtest: a startup deadline preserves diagnostic PID/logs and releases the start lock without killing the process
+ok 43 - a startup deadline preserves diagnostic PID/logs and releases the start lock without killing the process
+  ---
+  duration_ms: 68.4997
+  type: 'test'
+  ...
+# Subtest: spawn failure releases the lock and does not leave a false PID record
+ok 44 - spawn failure releases the lock and does not leave a false PID record
+  ---
+  duration_ms: 33.7896
+  type: 'test'
+  ...
+1..44
+# tests 44
+# suites 0
+# pass 44
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3336.6139

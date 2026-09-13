@@ -41,11 +41,31 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: crmegoric_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U ci -d crmegoric_ci"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
     env:
       DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/crmegoric_ci?schema=public
       DIRECT_URL: postgresql://ci:ci@127.0.0.1:5432/crmegoric_ci?schema=public
+      CI_TEST_DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/crmegoric_ci?schema=public
+      PAYMENT_TEST_DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/codex_payment_test?schema=public
       NEXTAUTH_SECRET: ci-only-secret-0123456789abcdef0123456789abcdef
       NEXTAUTH_URL: http://127.0.0.1:3400
+      REALM_PILOT_E2E_EMAIL: director@realm.test
+      REALM_PILOT_E2E_PASSWORD: ci-only-disposable-password-2026
+      NEXT_PUBLIC_REALM_ERP_SYNC: '1'
+      REALM_ERP_SYNC_ENABLED: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -53,15 +73,64 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run migration:ci
+      - run: node scripts/seed-ci-fixtures.mjs
+      - name: Prepare isolated payment concurrency database
+        run: |
+          PGPASSWORD=ci createdb -h 127.0.0.1 -U ci codex_payment_test
+          DATABASE_URL="$PAYMENT_TEST_DATABASE_URL" DIRECT_URL="$PAYMENT_TEST_DATABASE_URL" npx prisma migrate deploy
       - run: npm run config:check
       - run: npm run test:coverage
       - run: npm run audit:prod
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Authenticated ERP and Realm fixtures with durable event delivery
+        shell: bash
+        run: |
+          set -euo pipefail
+          # This worker may only consume the disposable service database above.
+          node --input-type=module <<'NODE'
+          import { assertCiDatabase } from './scripts/seed-ci-fixtures.mjs';
+          const expected = assertCiDatabase(process.env.CI_TEST_DATABASE_URL);
+          for (const key of ['DATABASE_URL', 'DIRECT_URL']) {
+            if (assertCiDatabase(process.env[key]) !== expected) throw new Error(`${key} must match the disposable CI fixture database.`);
+          }
+          NODE
+          # Playwright recreates test-results on startup; keep worker logs outside it.
+          mkdir -p "$RUNNER_TEMP/realm-ci"
+          outbox_log="$RUNNER_TEMP/realm-ci/event-outbox-worker.log"
+          node scripts/event-outbox-worker.mjs watch --poll-ms 250 > "$outbox_log" 2>&1 &
+          worker_pid=$!
+          cleanup() {
+            status=$?
+            trap - EXIT INT TERM
+            kill -TERM "$worker_pid" 2>/dev/null || true
+            # Let the worker drain its claimed transaction before forcing shutdown.
+            for attempt in $(seq 1 50); do
+              if ! kill -0 "$worker_pid" 2>/dev/null; then break; fi
+              sleep 0.2
+            done
+            if kill -0 "$worker_pid" 2>/dev/null; then
+              printf '%s\n' 'Worker exceeded the 10 second shutdown window.' >> "$outbox_log"
+              kill -KILL "$worker_pid" 2>/dev/null || true
+              if [ "$status" -eq 0 ]; then status=1; fi
+            fi
+            wait "$worker_pid" || true
+            exit "$status"
+          }
+          trap cleanup EXIT
+          trap 'exit 130' INT
+          trap 'exit 143' TERM
+          npm run test:e2e
+          node scripts/audit-image-integrity.mjs --root test-results
+          # A worker that exited early must not produce a green delivery gate.
+          kill -0 "$worker_pid"
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: playwright-and-outbox-report
+          path: |
+            playwright-report/
+            test-results/
+            ${{ runner.temp }}/realm-ci/
           retention-days: 7

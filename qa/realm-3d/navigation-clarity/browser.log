@@ -1,0 +1,17 @@
+
+Running 8 tests using 1 worker
+
+(node:29344) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [desktop-chromium] › tests\e2e\realm-office-3d.spec.mjs:22:1 › 3D office has functional first-person and overview cameras without layout overflow (34.0s)
+  ok 2 [desktop-chromium] › tests\e2e\realm-office-3d.spec.mjs:39:1 › medieval work bay opens the real archive and preserves camera controls on return (1.3m)
+  ok 3 [desktop-chromium] › tests\e2e\realm-office-3d.spec.mjs:77:1 › resolution preference survives reload and its menu is keyboard accessible (46.0s)
+  ok 4 [desktop-chromium] › tests\e2e\realm-office-3d.spec.mjs:100:1 › each work location can be reached and opens its existing workspace panel (1.5m)
+(node:12888) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 5 [mobile-chromium] › tests\e2e\realm-office-3d.spec.mjs:22:1 › 3D office has functional first-person and overview cameras without layout overflow (19.8s)
+  ok 6 [mobile-chromium] › tests\e2e\realm-office-3d.spec.mjs:39:1 › medieval work bay opens the real archive and preserves camera controls on return (57.9s)
+  ok 7 [mobile-chromium] › tests\e2e\realm-office-3d.spec.mjs:77:1 › resolution preference survives reload and its menu is keyboard accessible (25.4s)
+  ok 8 [mobile-chromium] › tests\e2e\realm-office-3d.spec.mjs:100:1 › each work location can be reached and opens its existing workspace panel (29.8s)
+
+  8 passed (7.4m)

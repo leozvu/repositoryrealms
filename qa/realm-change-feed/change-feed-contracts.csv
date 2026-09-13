@@ -2,7 +2,9 @@ id,layer,source,signals,missingSignals,status
 append-only-model,database,prisma/schema.prisma,"model RealmChangeEvent | domains        String | @@index([createdAt, id])",,verified
 additive-migration,database,prisma/migrations/20260718170000_add_realm_change_feed/migration.sql,"CREATE TABLE ""RealmChangeEvent"" | CREATE INDEX ""RealmChangeEvent_createdAt_id_idx""",,verified
 erp-event-publisher,server,lib/events.js,await step('Realm change feed' | publishRealmChange(prisma,,verified
-awaited-resource-events,api,app/api/data/[resource]/route.js,"await emitEvent(params.resource, 'create'",,verified
+awaited-resource-events,api,app/api/data/[resource]/route.js,"await commitRecordMutation(prisma, { resource: params.resource, event: 'create'",,verified
+atomic-resource-event-intent,server,lib/record-mutation.js,"return db.$transaction(async tx => | await tx.auditLog.create | await enqueueEvent(tx, { resource, event, row: changed",,verified
+durable-event-publisher,server,lib/events.js,"export async function processDurableEvent(tx, payload, job) | await publishRealmChange(tx, { resource, action: event, entityId: row?.id, actorId: user?.id })",,verified
 authenticated-cursor-api,api,app/api/realm-demo/changes/route.js,"const user = await currentUser() | loadRealmChangeFeed(prisma, user, { cursor }) | realmJsonResponse(trace, feed",,verified
 payload-free-response,server,lib/realm-change-feed.js,"select: { id: true, createdAt: true, domains: true } | domains: [...domainSet].sort() | eventCount: rows.length",,verified
 fail-soft-publisher,server,lib/realm-change-feed.js,safelyPublishRealmChange | return null,,verified

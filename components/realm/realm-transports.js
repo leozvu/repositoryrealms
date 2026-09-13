@@ -12,13 +12,13 @@ export function resolveRealmGatewayUrl(location = globalThis.window?.location) {
   return configured || '';
 }
 
-export function createBroadcastTransport({ onMessage }) {
+export function createBroadcastTransport({ onMessage, mapId = 'castle' }) {
   let channel;
   return {
     kind: 'broadcast',
     async connect() {
       if (typeof BroadcastChannel === 'undefined') throw new Error('BroadcastChannel unsupported');
-      channel = new BroadcastChannel(REALM_CHANNEL);
+      channel = new BroadcastChannel(mapId === 'castle' ? REALM_CHANNEL : `${REALM_CHANNEL}:${mapId}`);
       channel.onmessage = (event) => onMessage(event.data);
     },
     send(message) {
@@ -66,6 +66,7 @@ export function createGatewayTransport({
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok || !payload.token) throw new Error(payload.error || 'Realm token unavailable');
+      if (payload.mapId !== mapId) throw new Error('Realm map is not enabled on this gateway');
       onToken(payload);
       return payload.token;
     } finally {

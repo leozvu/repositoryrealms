@@ -233,6 +233,13 @@ function traceNode(node, analysis, trace = createTrace(), options = {}) {
     return true;
   };
 
+  // JSX may select a callback rather than call it: onClick={ready ? save : retry}.
+  // Follow the actual branch targets through the same trace rules as direct handlers.
+  if (node.type === 'ConditionalExpression') {
+    traceNode(node.consequent, analysis, trace, { visitedFunctions });
+    traceNode(node.alternate, analysis, trace, { visitedFunctions });
+  }
+
   if (node.type === 'Identifier') {
     const resolved = traceFunction(node.name);
     if (!resolved && (/^on[A-Z]/.test(node.name) || analysis.componentProps.has(node.name))) trace.callbacks.add(node.name);
@@ -265,6 +272,15 @@ function traceNode(node, analysis, trace = createTrace(), options = {}) {
     const chain = calleeChain(current.callee);
     const base = chain[0] || '';
     const member = chain.at(-1) || '';
+
+    // The dynamically loaded Three.js runtime exposes a small presentation API.
+    // Enumerate that contract; arbitrary ref methods remain unresolved by this audit.
+    if (analysis.relativeFile === 'components/realm/RealmWorld3D.jsx'
+      && base === 'runtime' && chain[1] === 'current') {
+      if (['changeCamera', 'resetCamera', 'setQuality', 'setResolutionPreference', 'toggleAudio', 'direction', 'walkTo'].includes(member)) trace.localMutations.add(`realm3d.${member}`);
+      if (member === 'interact') trace.callbacks.add('onObjectOpen');
+      if (member === 'selectPerson') trace.callbacks.add('onPerson');
+    }
 
     if (base === 'fetch') {
       const endpoint = endpointExpression(current.arguments[0], analysis);

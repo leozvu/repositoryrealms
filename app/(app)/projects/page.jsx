@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useResource, useServiceLines, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast } from '@/components/ui';
+import { useResource, useServiceLines, Icon, FormModal, ConfirmDialog, EmptyState, Badge, useToast, ResourceError, Forbidden } from '@/components/ui';
 import { DocLinksModal } from '@/components/DocLinks';
 import { moneyShort, fmtDate, todayISO, BADGE } from '@/lib/format';
 import { hasAny } from '@/lib/perm';
@@ -13,7 +13,7 @@ const HEALTH = { green: ['Ổn định', 'green'], amber: ['Cần chú ý', 'amb
 export default function ProjectsPage() {
   const { data: session } = useSession();
   const isMgmt = hasAny(session?.user, ['PM']); // Dự án: PM + Giám đốc
-  const { rows, create, update, remove } = useResource('projects');
+  const { rows, error, loading, forbidden, refresh, create, update, remove } = useResource('projects');
   const clients = useResource('clients');
   const templates = useResource('projecttemplates');
   const [q, setQ] = useState('');
@@ -21,6 +21,7 @@ export default function ProjectsPage() {
   const [modal, setModal] = useState(null);
   const [stats, setStats] = useState({});
   const [canMoney, setCanMoney] = useState(false);
+  const [templateIssue, setTemplateIssue] = useState(null);
   const toast = useToast();
 
   const loadStats = () => fetch('/api/projects/stats').then(r => r.ok ? r.json() : null)
@@ -57,8 +58,11 @@ export default function ProjectsPage() {
     return true;
   };
 
+  if (forbidden) return <Forbidden />;
   return (
     <>
+      <ResourceError error={error} onRetry={refresh} loading={loading} />
+      {templateIssue && <div className="resource-error" role="alert"><span>Dự án đã được tạo, nhưng chưa xác minh được kết quả áp mẫu. Kiểm tra dự án trước khi thử áp lại.</span><Link className="btn btn-outline btn-sm" href={`/projects/${templateIssue}`}>Mở dự án đã tạo</Link></div>}
       <div className="toolbar">
         <div className="search-box"><Icon name="search" size={15} /><input placeholder="Tìm dự án…" value={q} onChange={e => setQ(e.target.value)} /></div>
         <select className="filter" value={f} onChange={e => setF(e.target.value)}>
@@ -114,15 +118,22 @@ export default function ProjectsPage() {
                 </tr>
               );
             })}
-            {!filtered.length && <tr><td colSpan={9}><EmptyState title="Chưa có dự án" /></td></tr>}
+            {!filtered.length && !error && <tr><td colSpan={9}><EmptyState title="Chưa có dự án" /></td></tr>}
           </tbody>
         </table>
       </div>
       {modal?.mode === 'add' && <FormModal title="Thêm dự án" fields={FIELDS} data={{ status: 'planning', progress: 0, autoProgress: '1', startDate: todayISO() }}
         onClose={() => setModal(null)} onSave={async d => {
           const p = await create(norm(d));
-          if (p && modal.template) { await applyTemplate(modal.template, p.id); loadStats(); }
+          if (!p) return false;
+          setTemplateIssue(null);
+          if (modal.template) {
+            try { if (!await applyTemplate(modal.template, p.id)) setTemplateIssue(p.id); }
+            catch { setTemplateIssue(p.id); }
+            loadStats();
+          }
           else toast('Đã thêm dự án');
+          return p;
         }}
         extraFooter={templates.rows.length > 0 && <select value={modal.template?.id || ''} onChange={e => setModal(m => ({ ...m, template: templates.rows.find(t => t.id === e.target.value) }))}
           style={{ marginRight: 'auto', maxWidth: 200 }}>
@@ -130,10 +141,10 @@ export default function ProjectsPage() {
           {templates.rows.map(t => <option key={t.id} value={t.id}>Mẫu: {t.name}</option>)}
         </select>} />}
       {modal?.mode === 'edit' && <FormModal title="Sửa dự án" fields={FIELDS} data={{ ...modal.row, autoProgress: modal.row.autoProgress ? '1' : '' }}
-        onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, norm(d)); toast('Đã cập nhật'); loadStats(); }} />}
+        onClose={() => setModal(null)} onSave={async d => { const result = await update(modal.row.id, norm(d)); if (!result) return false; toast('Đã cập nhật'); loadStats(); return result; }} />}
       {modal?.mode === 'docs' && <DocLinksModal refType="project" refId={modal.row.id} name={modal.row.name} onClose={() => setModal(null)} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa dự án "${modal.row.name}"? Công việc thuộc dự án cần được xóa/chuyển trước.`}
-        onClose={() => setModal(null)} onYes={async () => { const r = await remove(modal.row.id); if (r) toast('Đã xóa'); }} />}
+        onClose={() => setModal(null)} onYes={async () => { const r = await remove(modal.row.id); if (!r) return false; toast('Đã xóa'); return r; }} />}
     </>
   );
 }

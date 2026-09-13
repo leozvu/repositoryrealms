@@ -9,7 +9,7 @@ import {
   rememberCollaborationAvailability,
   preferredCollaborationAvailability,
 } from '@/lib/collaboration';
-import { GLOBAL_SEARCH_GROUPS, searchGroupRows } from '@/lib/global-search-contract';
+import { GLOBAL_SEARCH_GROUPS } from '@/lib/global-search-contract';
 import Icon from './Icon';
 import { Badge, Banner, Button, Field, Panel, Segmented, SourcePill, StateView, Status, Toggle } from './Primitives';
 import styles from './realm-v2.module.css';
@@ -171,7 +171,7 @@ function SearchScreen() {
   const router = useRouter();
   const inputRef = useRef(null);
   const [query, setQuery] = useState('');
-  const [resources, setResources] = useState({});
+  const [resources, setResources] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
   const [recent, setRecent] = useState([]);
@@ -179,35 +179,38 @@ function SearchScreen() {
 
   useEffect(() => { setRecent(safeRecentSearches()); inputRef.current?.focus(); }, []);
   useEffect(() => {
-    let alive = true;
+    const needle = query.trim();
+    setResources(null);
+    setErrors([]);
+    if (needle.length < 2) { setLoading(false); return undefined; }
+    const controller = new AbortController();
     setLoading(true);
-    Promise.all(GLOBAL_SEARCH_GROUPS.map(async (group) => {
-      try {
-        const response = await fetch(`/api/data/${group.res}`, { cache: 'no-store', credentials: 'same-origin' });
-        const payload = await response.json().catch(() => ([]));
-        if (!response.ok) throw new Error(group.label);
-        return [group.res, Array.isArray(payload) ? payload : [], null];
-      } catch { return [group.res, [], group.label]; }
-    })).then((entries) => {
-      if (!alive) return;
-      setResources(Object.fromEntries(entries.map(([key, rows]) => [key, rows])));
-      setErrors(entries.map((entry) => entry[2]).filter(Boolean));
-      setLoading(false);
-    });
-    return () => { alive = false; };
-  }, []);
+    const timer = setTimeout(() => {
+      fetch(`/api/search?${new URLSearchParams({ q: needle, limit: '6' })}`, { cache: 'no-store', credentials: 'same-origin', signal: controller.signal })
+        .then(async response => {
+          const payload = await response.json();
+          if (!response.ok) throw new Error(payload.error || 'Không thể tải kết quả tìm kiếm.');
+          if (!controller.signal.aborted) setResources({ query: needle, groups: payload.groups });
+        })
+        .catch(error => { if (!controller.signal.aborted) setErrors([error.message || 'Không thể tải kết quả tìm kiếm.']); })
+        .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    }, 180);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [query]);
 
-  const groups = useMemo(() => GLOBAL_SEARCH_GROUPS.map((group) => ({
-    ...group, items: searchGroupRows(group, resources[group.res], query, 6),
-  })).filter((group) => group.items.length), [query, resources]);
+  const groups = useMemo(() => resources?.query !== query.trim() ? [] : GLOBAL_SEARCH_GROUPS.map((group) => {
+    const result = resources.groups.find(item => item.resource === group.res);
+    return { ...group, items: result?.items || [], hasMore: result?.hasMore || false };
+  }).filter((group) => group.items.length), [query, resources]);
+  const searching = query.trim().length >= 2 && (loading || (!errors.length && resources?.query !== query.trim()));
   const flat = useMemo(() => groups.flatMap((group) => group.items.map((row) => ({ group, row }))), [groups]);
-  useEffect(() => { setActive(0); }, [query]);
+  useEffect(() => { setActive(0); }, [query, resources]);
 
   const open = useCallback((href) => {
     const needle = query.trim();
     if (needle.length >= 2) {
       const next = [needle, ...safeRecentSearches().filter((item) => item !== needle)].slice(0, 5);
-      window.localStorage.setItem(SEARCH_RECENT_KEY, JSON.stringify(next));
+      try { window.localStorage.setItem(SEARCH_RECENT_KEY, JSON.stringify(next)); } catch { /* History storage must not block opening a record. */ }
       setRecent(next);
     }
     router.push(href);
@@ -225,15 +228,15 @@ function SearchScreen() {
     <section className={styles.searchHero} aria-labelledby="realm-search-title">
       <Icon name="search" size={26}/>
       <div><span className={styles.eyebrow}>Authorized search · ERP records</span><h2 id="realm-search-title">Bạn cần tìm gì?</h2></div>
-      <input ref={inputRef} className={styles.searchHeroInput} type="search" value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={onKeyDown} placeholder="Tên khách hàng, Task, dự án, hóa đơn…" aria-label="Tìm kiếm toàn hệ thống" aria-controls="realm-search-results" aria-activedescendant={flat[active] ? `realm-search-option-${flat[active].group.res}-${flat[active].row.id}` : undefined}/>
+      <input ref={inputRef} className={styles.searchHeroInput} type="search" value={query} maxLength={100} onChange={(event) => setQuery(event.target.value)} onKeyDown={onKeyDown} placeholder="Tên khách hàng, Task, dự án, hóa đơn…" aria-label="Tìm kiếm toàn hệ thống" aria-controls="realm-search-results" aria-activedescendant={flat[active] ? `realm-search-option-${flat[active].group.res}-${flat[active].row.id}` : undefined}/>
       <kbd>↑↓ chọn · Enter mở · Esc xóa</kbd>
     </section>
-    {errors.length > 0 && <Banner tone="warning">Một số nguồn bị giới hạn hoặc tạm gián đoạn: {errors.join(', ')}. Kết quả còn lại vẫn sử dụng đúng quyền API.</Banner>}
+    {errors.length > 0 && <Banner tone="warning">{errors.join('; ')}</Banner>}
     <div className={styles.searchLayout}>
       <Panel title={query.trim().length < 2 ? 'Bắt đầu tìm kiếm' : `Kết quả cho “${query.trim()}”`} description="Kết quả chỉ gồm bản ghi mà API hiện tại cho phép tài khoản này đọc.">
-        <div id="realm-search-results" role="listbox" aria-label="Kết quả tìm kiếm">
-          {loading ? <StateView state="loading" compact/> : query.trim().length < 2 ? <div className={styles.searchStart}><div><span className={styles.eyebrow}>Tìm gần đây</span>{recent.length ? recent.map((item) => <button type="button" key={item} onClick={() => setQuery(item)}><Icon name="clock" size={15}/>{item}</button>) : <span>Chưa có lịch sử tìm trên thiết bị này.</span>}</div><Banner>Lịch sử chỉ lưu cụm từ trên trình duyệt; không sao chép record hoặc dữ liệu nghiệp vụ.</Banner></div> : groups.length ? <div className={styles.searchGroups}>{groups.map((group) => <section key={group.res}>
-            <header><span>{group.label}</span><Badge>{group.items.length}</Badge></header>
+        <div id="realm-search-results" role="listbox" aria-label="Kết quả tìm kiếm" aria-busy={searching || undefined}>
+          {searching ? <StateView state="loading" compact/> : query.trim().length < 2 ? <div className={styles.searchStart}><div><span className={styles.eyebrow}>Tìm gần đây</span>{recent.length ? recent.map((item) => <button type="button" key={item} onClick={() => setQuery(item)}><Icon name="clock" size={15}/>{item}</button>) : <span>Chưa có lịch sử tìm trên thiết bị này.</span>}</div><Banner>Lịch sử chỉ lưu cụm từ trên trình duyệt; không sao chép record hoặc dữ liệu nghiệp vụ.</Banner></div> : errors.length ? <StateView state="error" compact/> : groups.length ? <div className={styles.searchGroups}>{groups.map((group) => <section key={group.res}>
+            <header><span>{group.label}</span><Badge>{group.items.length}{group.hasMore ? '+' : ''}</Badge></header>
             {group.items.map((row) => {
               flatIndex += 1;
               const index = flatIndex;
@@ -241,6 +244,7 @@ function SearchScreen() {
                 <span className={styles.listIcon}><Icon name={SEARCH_ICON[group.icon] || 'search'}/></span><span className={styles.listCopy}><strong>{group.title(row)}</strong><span>{group.sub(row) || group.label}</span></span><Icon name="arrow" size={15}/>
               </button>;
             })}
+            {group.hasMore && <p>Đang hiển thị 6 kết quả đầu. Thêm từ khóa để thu hẹp tìm kiếm.</p>}
           </section>)}</div> : <StateView state="empty" compact/>}
         </div>
       </Panel>
@@ -252,7 +256,7 @@ function SearchScreen() {
             <Link className={styles.listItem} href="/realm-v2/approvals"><span className={styles.listIcon}><Icon name="approval"/></span><span className={styles.listCopy}><strong>Mở phê duyệt</strong><span>Không bỏ qua maker-checker</span></span><Icon name="chevron" size={14}/></Link>
           </div>
         </Panel>
-        <SourcePill source="9 API data resources" freshness="RBAC hiện tại"/>
+        <SourcePill source="ERP server search" freshness="RBAC hiện tại"/>
       </aside>
     </div>
   </div>;

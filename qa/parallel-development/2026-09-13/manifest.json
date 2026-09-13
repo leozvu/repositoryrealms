@@ -1,0 +1,70 @@
+{
+  "buildId": "yyey-xTXFRNmrxTgh6bcx",
+  "algorithm": "sha256",
+  "artifacts": [
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/archive-unit.log",
+      "sha256": "bdda37eec1854417b3d34a2f108ace00e9fb3f48caf5c0be03818acb3c710c95"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/build.log",
+      "sha256": "9b2ac13f6a312c826496857754275fc9ac3019d3aaf7bebdb19795a467d12216"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/component-browser.log",
+      "sha256": "27de0f5690d8ac61869e51702191c19a826305c40ff051e7dcff2eb4b3bd8a38"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/full-tests.log",
+      "sha256": "255b5890e25e9f0da69c86d3cfb3859afbd8df46b1a4966dac4ae1be7c2299c5"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/initial-full-tests.log",
+      "sha256": "fc33beb7c87ea2e961cb44a2c0d604b67436a38ae51040de43c16463fe1d422e"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/postgres-lead-board.log",
+      "sha256": "4714420572f52ef206bfdaba13d395a1e270b7fdc4c65fdb6645f77873500454"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/realm-browser.log",
+      "sha256": "2d4b4bb40027689ddfc5bfc25d52733158b3b9a70084a8b61511d83a0c460588"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/realm-diagnostic-browser.log",
+      "sha256": "9fbbc6540cbbb77ebfe1c20a8b837e4652ebff32580a309625489c3a0839c4ac"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/REPORT.md",
+      "sha256": "e57225d1e7a063804e2afb329470a8a58ae5b30099e1e51e5115f0c0040bc7ae"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/runtime/diagnostic/realm-office-diagnostic-di-6e7f3-wo-actual-material-captures/archive-balanced-960.png",
+      "sha256": "f6dabcbcfe499fd083c0931c7cc8bf1eda3af73eb241adb3bb3f18259fe30729"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/runtime/diagnostic/realm-office-diagnostic-di-6e7f3-wo-actual-material-captures/diagnostic-observation.json",
+      "sha256": "8fbf24ffd52ab5538356493cfac3f746b702dea6ac66b45266f52d8795e64eb2"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/runtime/diagnostic/realm-office-diagnostic-di-6e7f3-wo-actual-material-captures/error-context.md",
+      "sha256": "3f774d5ab4fb074c02e6f7730487321d366df1abfd9f10e3c7b7ecddde99dd37"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/runtime/standard/realm-office-3d-medieval-w-699c0-s-camera-controls-on-return-desktop-chromium/error-context.md",
+      "sha256": "998bc7fafbde03ac8791425a3234d63a51804c6c9f06d87968e87f780fefed94"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/runtime/standard/realm-office-3d-medieval-w-699c0-s-camera-controls-on-return-desktop-chromium/trace.zip",
+      "sha256": "ddcf20a0b9a3905af9f743ab77b3144b019119eb316e352572ecf3acac63d9f0"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/runtime/standard/realm-office-3d-medieval-w-699c0-s-camera-controls-on-return-mobile-chromium/error-context.md",
+      "sha256": "989cb3c2ae6eacc501b278abea060496c90febd51fc760ddfd42a7cae077f901"
+    },
+    {
+      "path": "C:/Users/Asus/OneDrive/Tài liệu/Fak that shit/CRMegoric-Realm-3D/qa/parallel-development/2026-09-13/source-baseline.json",
+      "sha256": "05179857d59d9573742574e509b8eeca9380a9cb429d85dc95afd265d2e1827f"
+    }
+  ]
+}

@@ -17,7 +17,7 @@ const CONTRACTS = [
   { id: 'atomic-create-audit', layer: 'server', source: 'lib/realm-action-admin.js', signals: ['tx.taskComment.create', 'tx.activity.create', 'createAuditData', 'tx.realmActionReceipt.create'] },
   { id: 'safe-action-response', layer: 'api', source: 'app/api/realm-demo/actions/route.js', signals: ['action: result.action', "source: 'erp'", 'result.event ||'] },
   { id: 'cross-surface-event', layer: 'server', source: 'lib/realm-change-feed.js', signals: ["activities: ['embassy']", "taskcomments: ['operations', 'campaigns']"] },
-  { id: 'erp-notification', layer: 'server', source: 'lib/events.js', signals: ["resource === 'taskcomments'", 'bình luận việc', 'await notify(task.assigneeId', "resource === 'activities'", 'lên lịch follow-up'] },
+  { id: 'erp-notification', layer: 'server', source: 'lib/events.js', signals: ["resource === 'taskcomments'", 'bình luận việc', 'await sendNotification(task.assigneeId', "resource === 'activities'", 'lên lịch follow-up', 'const sendNotification = (ids, text, route) => notify(ids, text, route, ctx.db ? { db } : {})'] },
   { id: 'war-room-permission', layer: 'server', source: 'lib/realm-war-room-admin.js', signals: ["canWrite('taskcomments', user)", 'canComment: commentWriteAllowed'] },
   { id: 'embassy-permission', layer: 'server', source: 'lib/realm-embassy-admin.js', signals: ["canWrite('activities', user)", 'canFollowUp: followupWriteAllowed'] },
   { id: 'action-composer', layer: 'client', source: 'components/realm/RealmCreateActionDialog.jsx', signals: ['War Council note', 'Diplomatic follow-up', 'Idempotency-Key', 'Gửi War Council note', 'Lập Diplomatic follow-up', 'RepositoryRealms'] },

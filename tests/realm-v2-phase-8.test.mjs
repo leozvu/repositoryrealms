@@ -29,7 +29,13 @@ test('Search shares the ERP contract, respects API authorization and never execu
   const shell = read('components/Shell.jsx');
   assert.match(screen, /GLOBAL_SEARCH_GROUPS/);
   assert.match(shell, /GLOBAL_SEARCH_GROUPS/);
-  assert.match(screen, /\/api\/data\/\$\{group\.res\}/);
+  assert.match(screen, /\/api\/search\?/);
+  assert.match(shell, /\/api\/search\?/);
+  assert.doesNotMatch(screen, /\/api\/data\/\$\{group\.res\}/);
+  assert.doesNotMatch(shell, /\/api\/data\/\$\{group\.res\}/);
+  assert.match(screen, /signal: controller\.signal/);
+  assert.match(screen, /resources\?\.query !== query\.trim\(\)/);
+  assert.match(screen, /6 kết quả đầu/);
   assert.match(screen, /ArrowDown/);
   assert.match(screen, /ArrowUp/);
   assert.match(screen, /event\.key === 'Enter'/);

@@ -2,11 +2,15 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { hasAny } from '@/lib/perm';
-import { computeLine } from '@/lib/payroll';
+import { computePayrollLines, getPayrollTaxRules, PayrollCalculationError } from '@/lib/payroll';
 import { parseItems } from '@/lib/format';
 import { goldBonusFor, goldPayoutSettings } from '@/lib/gold-payout';
 
 const canManage = user => hasAny(user, ['HR', 'ACCOUNTANT']);
+function calculationError(error) {
+  if (error instanceof PayrollCalculationError) return NextResponse.json({ error: error.message, code: error.code }, { status: 400 });
+  throw error;
+}
 
 // v3.13: đọc Cài đặt để lấy hệ số OT + giờ vào ca chuẩn (dùng chung quy tắc đi muộn
 // với trang Chấm công: checkIn > workStart là muộn)
@@ -76,7 +80,8 @@ export async function POST(req) {
   if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!canManage(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const { month } = await req.json();
-  if (!/^\d{4}-\d{2}$/.test(month || '')) return NextResponse.json({ error: 'Tháng không hợp lệ' }, { status: 400 });
+  if (typeof month !== 'string' || !/^\d{4}-(?:0[1-9]|1[0-2])$/.test(month)) return NextResponse.json({ error: 'Tháng không hợp lệ' }, { status: 400 });
+  try { getPayrollTaxRules(month); } catch (error) { return calculationError(error); }
   const exists = await prisma.payroll.findUnique({ where: { month } });
   if (exists) return NextResponse.json({ error: `Bảng lương tháng ${month.slice(5)}/${month.slice(0, 4)} đã tồn tại` }, { status: 400 });
   // v3.13: chỉ nhân viên — freelancer trả theo phiếu payout riêng, không nằm trong bảng lương
@@ -87,14 +92,16 @@ export async function POST(req) {
   const { otMultiplier } = await shiftCfg();
   const att = await attendanceOf(month); // v3.13: giờ OT/đi muộn/nghỉ lấy thẳng từ chấm công
   const goldBonus = await goldBonusOf(month); // v3.41: thưởng Gold (rỗng khi công tắc tắt)
-  const lines = staff.map(s => {
+  const inputs = staff.map(s => {
     const gold = goldBonus[s.id] || { gold: 0, amount: 0 };
-    return computeLine({
+    return {
       userId: s.id, name: s.name, base: s.salary || 0, allowance: 0, bonus: gold.amount,
       goldEarned: gold.gold, goldBonus: gold.amount, // hiện trên phiếu để nhân sự đối chiếu
       ...(att[s.id] || { otHours: 0, lateCount: 0, offDays: 0 }),
-    }, otMultiplier);
+    };
   });
+  let lines;
+  try { lines = computePayrollLines(inputs, otMultiplier, month); } catch (error) { return calculationError(error); }
   const row = await prisma.payroll.create({ data: { month, lines: JSON.stringify(lines) } });
   await prisma.auditLog.create({ data: { userId: user.id, userName: user.name, action: 'create', entity: 'payroll', refId: row.id, detail: 'Bảng lương ' + month } });
   return NextResponse.json(row);
@@ -121,18 +128,21 @@ export async function PUT(req) {
     const staff = await prisma.user.findMany({
       where: { status: 'active', userType: { not: 'freelancer' } }, orderBy: { name: 'asc' },
     });
-    const fresh = staff.map(s => {
+    const inputs = staff.map(s => {
       const prev = old.find(l => l.userId === s.id) || {};
       const g = gold[s.id] || { gold: 0, amount: 0 };
       // thưởng tay HR nhập thêm = bonus cũ trừ phần Gold lần trước → cộng lại Gold mới
       const manualBonus = Math.max(0, (prev.bonus || 0) - (prev.goldBonus || 0));
-      return computeLine({
+      return {
         userId: s.id, name: s.name, base: s.salary || 0,
         allowance: prev.allowance || 0, bonus: manualBonus + g.amount,
+        dependents: prev.dependents ?? 0,
         goldEarned: g.gold, goldBonus: g.amount,
         ...(att[s.id] || { otHours: 0, lateCount: 0, offDays: 0 }),
-      }, otMultiplier);
+      };
     });
+    let fresh;
+    try { fresh = computePayrollLines(inputs, otMultiplier, p.month); } catch (error) { return calculationError(error); }
     const row = await prisma.payroll.update({ where: { id }, data: { lines: JSON.stringify(fresh) } });
     await prisma.auditLog.create({
       data: { userId: user.id, userName: user.name, action: 'update', entity: 'payroll', refId: id, detail: `Tính lại bảng lương ${p.month} từ chấm công` },
@@ -142,7 +152,8 @@ export async function PUT(req) {
 
   // v3.13: HR sửa được giờ OT nếu chấm công sai. Giữ nguyên otRate đã chốt lúc tạo bảng
   // (computeLine ưu tiên l.otRate) để đổi hệ số trong Cài đặt không âm thầm sửa bảng cũ.
-  const computed = (lines || []).map(l => computeLine(l, otMultiplier));
+  let computed;
+  try { computed = computePayrollLines(lines, otMultiplier, p.month); } catch (error) { return calculationError(error); }
   const row = await prisma.payroll.update({ where: { id }, data: { lines: JSON.stringify(computed) } });
   return NextResponse.json(row);
 }

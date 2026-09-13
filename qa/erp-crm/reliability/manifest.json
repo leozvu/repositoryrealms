@@ -1,0 +1,111 @@
+{
+  "buildId": "V02rgqPxlXEajFErBxGQh",
+  "recordedAt": "2026-09-13T01:36:44.8120189Z",
+  "unit": {
+    "passed": 1240,
+    "failed": 0,
+    "skipped": 0,
+    "database": "isolated loopback codex_payment_test"
+  },
+  "componentBrowser": {
+    "passed": 14,
+    "failed": 0,
+    "scope": "React DOM component harness with network/session/layout fixtures; not auth E2E"
+  },
+  "productionDeployed": false,
+  "files": [
+    {
+      "path": "browser.log",
+      "bytes": 2643,
+      "sha256": "9b04592b7af4e024297b60052ae999d7606a69b3dfe6affb3c7ed80d0f40e18a"
+    },
+    {
+      "path": "build.log",
+      "bytes": 22432,
+      "sha256": "c901f967e8bab6d4d0f15a2ffacd7f7a31f12812c7aed840ebdb2ee0107c2efe"
+    },
+    {
+      "path": "full-tests.log",
+      "bytes": 286880,
+      "sha256": "c98d46da14545dbaa8c16b0d42dd79f1ca5a5791eeebe570b2702e6d0fe45305"
+    },
+    {
+      "path": "initial-browser.log",
+      "bytes": 7391,
+      "sha256": "559ca410e93576d25bcaeeae97ec01c31efe59e07285c3ec6d4931395660b155"
+    },
+    {
+      "path": "initial-full-tests.log",
+      "bytes": 326404,
+      "sha256": "044da240b7828da07bbbcd2386216b251fcf47f6effdb2e64bbf7279e1dba6b5"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 5806,
+      "sha256": "3f104551b1325d42d042a86cab42976c63d47afc05112f46abf8852e3b784ff7"
+    },
+    {
+      "path": "source-baseline.json",
+      "bytes": 2187,
+      "sha256": "ae8d38051064c4655de76e0e7d1938e97af8a13978de9c70c96d515758f21661"
+    }
+  ],
+  "sources": [
+    {
+      "path": "components/ui.jsx",
+      "sha256": "18cb9716c688d22076abd4081fc8177a9e2fba4026bdc9c5890f05fb6f09f7cf"
+    },
+    {
+      "path": "lib/resource-client.js",
+      "sha256": "d2ed3ea8d888606692ea78109d3113296715636e5531d25711d395bbbbfec5c2"
+    },
+    {
+      "path": "lib/registry.js",
+      "sha256": "bdc5c8e60d753d874072aa55b8e73099dee37e73159a1cd6932b21cfacaeb019"
+    },
+    {
+      "path": "components/system/DataTable.jsx",
+      "sha256": "06d992a5615a132f804d55e5f19d8e4e8c8675b0e62a30d78fe32db19783ef29"
+    },
+    {
+      "path": "app/(app)/leads/page.jsx",
+      "sha256": "227094a7fd5b1a31a24c1de36d7e5b2bc7668e84c0d1c73642f772f0946aad83"
+    },
+    {
+      "path": "app/(app)/projects/page.jsx",
+      "sha256": "9c1725c104faaf0f06fa65df91ab80a8f5b8b2271ee300c58c1459d788c3bacb"
+    },
+    {
+      "path": "app/(app)/clients/[id]/page.jsx",
+      "sha256": "2347a82bad217f53cf8a4a5d288187698ca6499acc408e4c36337ec044f4f495"
+    },
+    {
+      "path": "app/(app)/myday/page.jsx",
+      "sha256": "4f013dde851ffbcbe00b0c59a5ca28140798fd3b1d1ef44595b2a016c5655a98"
+    },
+    {
+      "path": "tests/resource-client.test.mjs",
+      "sha256": "f8c7a23f3e61680ec7468c1d4814ff868a64211a1d1948edb5ef04ab5f66187c"
+    },
+    {
+      "path": "tests/collection-query.test.mjs",
+      "sha256": "da18d83ea438c0aa5d3d3cabbda16df5e43700e97682f9d127e52ab7cd03b3d1"
+    },
+    {
+      "path": "tests/e2e/erp-resource-ui.spec.mjs",
+      "sha256": "d08ab3a4f87c321239d17ba5706b3683338baedabc35e984579874f5b63c3dbf"
+    },
+    {
+      "path": "tests/e2e/erp-my-work-ui.spec.mjs",
+      "sha256": "eea8159c89bbeb44695c9f58402f84767a278a7884d93719bb75e4d736386ccc"
+    },
+    {
+      "path": "tests/helpers/erp-component-harness.mjs",
+      "sha256": "80645d73612f35d049cd0894e3262d18031da851a6a5950e1b4cccde839e2e4b"
+    },
+    {
+      "path": "playwright.erp-components.config.mjs",
+      "sha256": "a741c3e951ac07c1d010f7fc68953197be2a10032cc520e40548c64793cede18"
+    }
+  ]
+}

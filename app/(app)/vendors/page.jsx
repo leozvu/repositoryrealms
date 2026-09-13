@@ -1,7 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useResource, Icon, Modal, FormModal, ConfirmDialog, EmptyState, Forbidden, AsyncButton, useToast } from '@/components/ui';
 import { money, fmtDate, todayISO, daysFromNow, initials } from '@/lib/format';
+import { paymentAttempt } from '@/lib/payment-attempt';
 
 const VENDOR_TYPES = ['KOL / Influencer', 'Freelancer', 'Nhà in', 'Studio', 'Media / Báo chí', 'Phần mềm', 'Khác'];
 const parseQuotes = s => { try { return JSON.parse(s || '[]'); } catch { return []; } };
@@ -49,6 +50,7 @@ export default function VendorsPage() {
   const projects = useResource('projects');
   const rfqs = useResource('rfqs');
   const [modal, setModal] = useState(null);
+  const paymentAttempts = useRef(new Map());
   const toast = useToast();
   if (vendors.forbidden) return <Forbidden />;
 
@@ -75,14 +77,24 @@ export default function VendorsPage() {
   ];
 
   const payBill = async b => {
-    const res = await fetch(`/api/vendorbills/${b.id}/pay`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: todayISO() }),
-    });
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok) return toast(json.error || 'Có lỗi', 'error');
-    await bills.refresh();
-    toast(json._notice || `Đã thanh toán ${money(b.amount)}`, json._blocked ? 'error' : 'success');
+    const previous = paymentAttempts.current.get(b.id);
+    const attempt = paymentAttempt(previous, { date: previous?.body.date || todayISO() });
+    paymentAttempts.current.set(b.id, attempt);
+    try {
+      const res = await fetch(`/api/vendorbills/${b.id}/pay`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': attempt.key },
+        body: JSON.stringify(attempt.body),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) { toast(json.error || 'Chưa xác nhận được thanh toán. Hãy thử lại.', 'error'); return false; }
+      paymentAttempts.current.delete(b.id);
+      await bills.refresh();
+      toast(json._notice || `Đã thanh toán ${money(b.amount)}`, json._blocked ? 'error' : 'success');
+      return true;
+    } catch {
+      toast('Mất kết nối khi xác nhận thanh toán. Bấm lại để kiểm tra cùng yêu cầu an toàn.', 'error');
+      return false;
+    }
   };
 
   const pendingTotal = bills.rows.filter(b => b.status !== 'paid').reduce((s, b) => s + b.amount, 0);

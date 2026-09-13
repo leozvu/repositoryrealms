@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
 import { hasAny } from '@/lib/perm';
 import { parseStrict } from '@/lib/format';
+import { payrollNeedsTaxRecalculation, PayrollCalculationError } from '@/lib/payroll';
 
 // Chốt bảng lương: khóa sửa + ghi tổng chi phí công ty vào sổ quỹ (1 giao dịch nguyên tử)
 export async function POST(req, { params }) {
@@ -19,6 +20,17 @@ export async function POST(req, { params }) {
     return NextResponse.json({
       error: `Bảng lương tháng ${p.month} không đọc được dòng lương nào — chưa chốt để tránh ghi phiếu chi sai. Thử tạo lại bảng lương tháng này.`,
     }, { status: 400 });
+  }
+  try {
+    if (payrollNeedsTaxRecalculation(lines, p.month)) {
+      return NextResponse.json({
+        error: `Bảng lương tháng ${p.month} cần tính lại theo kỳ thuế trước khi chốt. Chọn “Tính lại từ chấm công” và kiểm tra các dòng lương.`,
+        code: 'payroll_tax_recalculation_required',
+      }, { status: 400 });
+    }
+  } catch (error) {
+    if (error instanceof PayrollCalculationError) return NextResponse.json({ error: error.message, code: error.code }, { status: 400 });
+    throw error;
   }
   const totalCost = lines.reduce((s, l) => s + (l.employerCost || 0), 0);
   const [updated] = await prisma.$transaction([

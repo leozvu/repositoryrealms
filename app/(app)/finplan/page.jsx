@@ -3,6 +3,10 @@ import { useState } from 'react';
 import { useResource, Icon, FormModal, ConfirmDialog, EmptyState, Forbidden, useToast } from '@/components/ui';
 import { money, moneyShort, moneyC, fmtDate, todayISO, thisMonth, monthKey, remainOf, localISO } from '@/lib/format';
 
+import { amountInVnd, transactionAmountVnd } from '@/lib/money';
+import { financialConversionIssues } from '@/lib/financial-reporting';
+import StatePanel from '@/components/system/StatePanel';
+
 const CATEGORIES = ['Lương nhân sự', 'Ngân sách quảng cáo', 'Văn phòng', 'Công cụ / phần mềm', 'Marketing nội bộ', 'Thanh toán nhà cung cấp', 'Thuế / phí', 'Khác'];
 
 // Số ngày quá hạn → nhóm aging
@@ -32,18 +36,19 @@ export default function FinPlanPage() {
   const [modal, setModal] = useState(null);
   const toast = useToast();
   if (invoices.forbidden || budgets.forbidden) return <Forbidden />;
+  const conversionIssues = financialConversionIssues({ transactions: transactions.rows, invoices: invoices.rows, shipments: ships.rows });
+  if (conversionIssues.length) return <StatePanel state="error" title="Chưa thể lập kế hoạch tiền VND" description={`${conversionIssues.length} bản ghi có số tiền hoặc tỷ giá không hợp lệ. Cập nhật tỷ giá ghi sổ để tính công nợ và ngân sách.`} action={<a className="btn btn-outline" href="/finance">Mở sổ giao dịch</a>} />;
 
   const cName = id => clients.rows.find(c => c.id === id)?.name || '—';
   const vName = id => vendors.rows.find(v => v.id === id)?.name || '—';
 
   /* ---------- AR / AP aging (v3.25: đa tiền tệ — quy VNĐ để gộp aging, giữ nguyên tệ để hiện) ---------- */
-  const toVnd = (amt, cur, fx) => (cur && cur !== 'VND') ? Math.round(amt * (fx || 1)) : amt;
   const ar = [
-    ...invoices.rows.filter(v => !['paid', 'draft'].includes(v.status) && remainOf(v) > 0)
-      .map(v => { const rem = remainOf(v); const cur = v.currency || 'VND'; return { code: v.code, who: cName(v.clientId), due: v.dueDate, amount: toVnd(rem, cur, v.fxRate), cur, native: rem, bucket: bucketOf(v.dueDate) }; }),
+    ...invoices.rows.filter(v => !['paid', 'draft', 'void'].includes(v.status) && remainOf(v) > 0)
+      .map(v => { const rem = remainOf(v); const cur = v.currency || 'VND'; return { code: v.code, who: cName(v.clientId), due: v.dueDate, amount: amountInVnd(rem, cur, v.fxRate), cur, native: rem, bucket: bucketOf(v.dueDate) }; }),
     // Lô hàng xuất chưa thu (ngoại tệ) — ngày dự thu ≈ ETA (hàng đến là thu). Đây là công nợ lớn nhất của Fretas.
-    ...ships.rows.filter(s => !['paid', 'draft'].includes(s.status) && s.amount > 0)
-      .map(s => { const cur = s.currency || 'VND'; const due = s.eta || s.etd; return { code: s.code, who: cName(s.clientId), due, amount: toVnd(s.amount, cur, s.fxRate), cur, native: s.amount, bucket: bucketOf(due) }; }),
+    ...ships.rows.filter(s => !['paid', 'draft', 'void'].includes(s.status) && s.amount > 0)
+      .map(s => { const cur = s.currency || 'VND'; const due = s.eta || s.etd; return { code: s.code, who: cName(s.clientId), due, amount: amountInVnd(s.amount, cur, s.fxRate), cur, native: s.amount, bucket: bucketOf(due) }; }),
   ];
   const uName = id => users.rows.find(u => u.id === id)?.name || 'Freelancer';
   const ap = [
@@ -57,23 +62,23 @@ export default function FinPlanPage() {
 
   /* ---------- Ngân sách vs thực tế ---------- */
   const monthBudgets = budgets.rows.filter(b => b.month === m);
-  const actualOf = cat => transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === m && t.category === cat).reduce((s, t) => s + t.amount, 0);
+  const actualOf = cat => transactions.rows.filter(t => t.type === 'expense' && monthKey(t.date) === m && t.category === cat).reduce((s, t) => s + transactionAmountVnd(t), 0);
 
   /* ---------- Dự báo dòng tiền 3 tháng ---------- */
   const payrollMonthly = users.rows.filter(u => u.status === 'active').reduce((s, u) => s + Math.round((u.salary || 0) * 1.215), 0);
   const fixedAvg = (() => { // chi phí cố định trung bình 3 tháng gần nhất (trừ lương + NCC đã tính riêng)
     const keys = [];
     for (let i = -2; i <= 0; i++) { const d = new Date(); d.setMonth(d.getMonth() + i); keys.push(localISO(d).slice(0, 7)); }
-    const total = transactions.rows.filter(t => t.type === 'expense' && keys.includes(monthKey(t.date)) && !['Lương nhân sự', 'Thanh toán nhà cung cấp'].includes(t.category)).reduce((s, t) => s + t.amount, 0);
+    const total = transactions.rows.filter(t => t.type === 'expense' && keys.includes(monthKey(t.date)) && !['Lương nhân sự', 'Thanh toán nhà cung cấp'].includes(t.category)).reduce((s, t) => s + transactionAmountVnd(t), 0);
     return Math.round(total / 3);
   })();
   const forecast = [];
   for (let i = 0; i < 3; i++) {
     const d = new Date(); d.setMonth(d.getMonth() + i);
     const k = localISO(d).slice(0, 7);
-    const inflow = invoices.rows.filter(v => !['paid', 'draft'].includes(v.status) && monthKey(v.dueDate) === k).reduce((s, v) => s + toVnd(remainOf(v), v.currency, v.fxRate), 0)
+    const inflow = invoices.rows.filter(v => !['paid', 'draft', 'void'].includes(v.status) && monthKey(v.dueDate) === k).reduce((s, v) => s + amountInVnd(remainOf(v), v.currency, v.fxRate), 0)
       // v3.25: lô hàng xuất dự thu quanh ngày ETA (quy VNĐ)
-      + ships.rows.filter(s => !['paid', 'draft'].includes(s.status) && monthKey(s.eta || s.etd) === k).reduce((s2, s) => s2 + toVnd(s.amount, s.currency, s.fxRate), 0);
+      + ships.rows.filter(s => !['paid', 'draft', 'void'].includes(s.status) && monthKey(s.eta || s.etd) === k).reduce((s2, s) => s2 + amountInVnd(s.amount, s.currency, s.fxRate), 0);
     const outVendor = bills.rows.filter(b => b.status !== 'paid' && monthKey(b.dueDate) === k).reduce((s, b) => s + b.amount, 0);
     const outflow = outVendor + payrollMonthly + fixedAvg;
     forecast.push({ k, label: `Tháng ${+k.slice(5)}/${k.slice(0, 4)}`, inflow, outflow, net: inflow - outflow });

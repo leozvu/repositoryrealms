@@ -41,6 +41,20 @@ test('work session binds a real work reference to one Party without copying ERP 
   assert.equal('taskStatus' in session, false);
 });
 
+test('the empty meeting room has zero progress before a work session exists', () => {
+  for (const value of [null, undefined, {}, { session: null }, [], false, 0]) {
+    assert.equal(normalizeRealmWorkSession(value), null);
+    assert.deepEqual(realmWorkSessionProgress(value), { ready: 0, members: 0, done: 0, agenda: 0 });
+  }
+});
+
+test('malformed nested meeting references are rejected without crashing the receiver', () => {
+  const session = createRealmWorkSession({ party, hostId: party.hostId, ...candidate }, 1000);
+  for (const key of ['work', 'anchor']) for (const value of [null, [], false]) {
+    assert.equal(normalizeRealmWorkSession({ session: { ...session, [key]: value } }), null);
+  }
+});
+
 test('every member can ready, update agenda and write a bounded shared log', () => {
   let session = createRealmWorkSession({ party, hostId: party.hostId, ...candidate }, 1000);
   session = applyRealmWorkSessionAction(session, party.members[1], {

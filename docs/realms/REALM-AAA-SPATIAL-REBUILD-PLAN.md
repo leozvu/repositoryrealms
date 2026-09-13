@@ -2,11 +2,17 @@
 
 Status: `IMPLEMENTED_CANDIDATE__RELEASE_GATE_FAILED`
 
-Working branch: `ux-ui-rehab`
+Work status: `IN_PROGRESS__RESUMED_BY_USER` — yêu cầu mới nhất mở lại Realm song song ERP/CRM và LeozOps (= Jarvis). Xem [kế hoạch tích hợp](../PARALLEL-PRODUCT-DEVELOPMENT.md). Release gate phía trên vẫn FAILED.
 
-Last updated: 2026-08-17
+Current implementation branch: `codex/realm-3d-office` (`ux-ui-rehab` is historical).
 
-Next executable milestone: `Phase 10 remediation - authored character/environment production and real multi-user soak`
+Last updated: 2026-09-13 UTC — user resumed concurrent product development.
+
+Resume checkpoint and remaining AAA roadmap: [REALM-AAA-RESUME-PLAN.md](REALM-AAA-RESUME-PLAN.md).
+
+Active product plan: [ERP/CRM and work experience](../ERP-CRM-WORK-EXPERIENCE-PLAN.md).
+
+Next milestone on explicit resumption: complete the scoped G1 work bay, production character and interaction evidence before expanding the office. Historical Phase 10 and failed release gate remain recorded below.
 
 ## 1. Source-of-truth contract
 
@@ -800,6 +806,40 @@ Accepted. Procedural actors and props prove locomotion, scene ownership, capabil
 ### D-008: Preserve mobile controls through visible contextual placement
 
 Accepted. CSS-hidden focusable controls are prohibited. Sound remains a visible world control; presence status moves to the visible Members surface on compact viewports; the hidden D-pad is disabled and removed from tab order until expanded.
+
+### D-009: Three.js 3D candidate and material/runtime remediation
+
+The user's September instruction explicitly prioritizes a real 3D workplace. The `codex/realm-3d-office` worktree introduces a Three.js camera, geometry, collision/pathfinding and material renderer, with existing business actions and presence identity retained outside the renderer. `?world=v3` remains the compatibility path. D-006 describes that compatibility renderer; it does not constrain this separately selected 3D candidate.
+
+September remediation bundles original CC0 PBR maps with provenance, corrects adult/furniture proportions, adds a removable overhead, and makes the HUD usable with keyboard/mobile controls. On 2026-09-12, floor instances are baked into two draw calls with metric UVs and per-piece color/offset. Explicit high graphics retains PBR/shadows while permitting bounded resolution reduction under sustained load; old WebGL contexts are released when leaving the world. These are candidate fixes, not a passed flagship gate.
+
+The September 9 browser run recorded nine passing tests, one mobile high-graphics timeout, and no final result for the remaining two. The failure reproduced on September 12 before the fixes. Authored character/environment production, physical-device performance and real multi-user soak remain open. Current evidence is tracked in [the implementation report](../REALM-3D-IMPLEMENTATION.md) and `qa/realm-3d/`; no benchmark score or release status has been upgraded from these changes.
+
+### D-010 — Design before further implementation (2026-09-12)
+
+The user requested a complete medieval character/environment design before further app work and clarified: visual quality first, engine undecided. The proposed [Medieval Workplace art direction v2](visual-forge/medieval-design-v2/ART-DIRECTION.md) and [interactive design board](visual-forge/medieval-design-v2/index.html) provide three generated concept images, spatial zoning, character and material direction, working UI mockup, asset requirements and a one-room production sequence.
+
+This design proposes realistic human proportions and grounded late-medieval architecture. The older fantasy families remain available for later development. No runtime renderer, user permissions or release gate changes in this design batch. Concept images are not in-engine evidence or production 3D assets. Implementation resumes with a reviewed art direction and a bounded room/character slice; the existing failed release gate remains unchanged.
+
+### D-011 — Evidence-based quality acceptance standard
+
+At the user's request, [Realm AAA Acceptance Rules v1](REALM-AAA-ACCEPTANCE-RULES-V1.md) defines 36 proposed mandatory release rules, a 12-category weighted review, device/load profiles, evidence requirements and G0–G3 acceptance stages. [The rule tracker](REALM-AAA-RULES-TRACKER-V1.csv) starts with every rule NOT_TESTED.
+
+This is an internal quality standard, not an industry AAA certification. Numeric thresholds are Realm proposals and are not attributed to Epic or Microsoft. The stricter final acceptance criteria supplement the historical benchmark table; no earlier score or failed gate has been upgraded. Device models and scope must be locked before evaluation. The design-only batch changes no runtime or engine decision.
+
+### D-012 — Begin medieval G1 construction after user authorization
+
+The user authorized continuing implementation from the reviewed research/design direction and quality rules. The first construction pass adds a metre-authored archive work bay, true masonry apertures, clear glazing and limited courtyard scenery within the existing Three.js runtime. Local part UVs survive static batching; actual floor-height and aperture ray tests guard the new geometry. All eight business destinations remain reachable and mapped to the same actions.
+
+This authorization permits implementation without asking again about the engine. It does not turn the concept images into production assets or pass the complete G0/G1 checklist. G1 remains In progress and the release gate remains failed. See [the construction evidence report](../../qa/realm-3d/medieval-g1/REPORT.md); the 36-rule tracker is not upgraded from these focused tests.
+
+### D-013 — Workstation arrival, camera obstruction and resolution recovery
+
+The next implementation pass requires automatic workstation opening within 18 cm of its navigation destination, faces the actor toward that station's work surface, and constrains the follow camera against explicit large-obstacle envelopes. This removes the previous early opening more than two metres away from the archive destination. Existing permission checks and business panels remain in use.
+
+Resolution now recovers after sustained rendering headroom. A persisted Clarity preference limits reduction to 75% of the current mode's capped render ratio; this is not a guarantee of 75% native display resolution or a D60 performance pass. Paused workspace background frames are excluded from active-frame diagnostics. Focused geometry, navigation and budget tests accompany desktop/mobile-emulation browser evidence in [the batch report](../../qa/realm-3d/navigation-clarity/REPORT.md).
+
+G1 remains In progress. This pass does not complete production character assets, seated interaction, architecture, lighting or physical-device acceptance. No release gate or AAA score is upgraded.
 
 ## 16. Execution order
 

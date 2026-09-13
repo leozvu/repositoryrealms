@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { Icon, Avatar, useAvatarUrl, ToastProvider, useToast } from '@/components/ui';
 import {
   DEFAULT_WORLD_POSITION,
@@ -86,6 +87,7 @@ import RealmNotificationBell from './RealmNotificationBell';
 import LivingGuildhallMotion from './LivingGuildhallMotion';
 import GuildhallScene from './GuildhallScene';
 import RealmWorldV3 from './RealmWorldV3';
+const RealmWorld3D = dynamic(() => import('./RealmWorld3D'), { ssr: false });
 import { RealmCooperationHud, RealmCooperationPanel } from './RealmCooperation';
 import { useCollaborationDirectory } from '@/components/collaboration/useCollaborationDirectory';
 import { LanguageSwitch, useLanguage } from '@/components/LanguageProvider';
@@ -101,6 +103,7 @@ import {
   realmJourneyForContext,
 } from '@/lib/realm-experience';
 import { realmWorldV3Enabled } from '@/lib/realm-world-v3';
+import { attachRealmCallAudio, realmCaptureControls, realmPersonPanelState, restoreRealmOfficePosition, scheduleRealmOfficeMove } from '@/lib/realm-office-lifecycle';
 import styles from './realm-office.module.css';
 import guild from './guildhall-shell.module.css';
 
@@ -1072,12 +1075,24 @@ function RemoteVideoTile({ person, stream, connectionState, onSelect }) {
   return (
     <button type="button" className={`${styles.videoTile} ${styles.videoTileButton}`} onClick={() => onSelect(person)} aria-label={`Mở tương tác với ${person.name}`} title={`${person.name} · ${connectionLabel}`}>
       {stream
-        ? <video ref={remoteVideoRef} autoPlay playsInline />
+        ? <video ref={remoteVideoRef} autoPlay muted playsInline />
         : <span className={styles.videoAvatar} style={{ '--avatar-color': person.color }}>{initials(person.name)}</span>}
       <span className={`${styles.connectionPip} ${connectionState === 'connected' ? styles.connectionLive : ''}`} aria-label={connectionLabel} />
       <span className={styles.videoName} data-no-i18n>{person.name}</span>
     </button>
   );
+}
+
+function RealmCallAudio({ stream }) {
+  const element = useRef(null);
+  const [blocked, setBlocked] = useState(false);
+  useEffect(() => {
+    setBlocked(false);
+    return attachRealmCallAudio(element.current, stream, () => setBlocked(true));
+  }, [stream]);
+  return <><audio ref={element} autoPlay playsInline hidden />{blocked && <button type="button" onClick={async () => {
+    try { await element.current?.play(); setBlocked(false); } catch { setBlocked(true); }
+  }}>Phát âm thanh cuộc gọi</button>}</>;
 }
 
 function MediaDock({
@@ -1166,6 +1181,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const toast = useToast();
   const { t } = useLanguage();
   const compactViewport = useCompactRealmViewport();
+  const usesWorld3D = worldVersion === '3d';
   const usesWorldV3 = WORLD_V3_REQUESTED && worldVersion !== 'v2';
   const tavernEnabled = pilotFeatures?.tavern !== false;
   const realmNav = useMemo(() => tavernEnabled ? NAV : NAV.filter((item) => !['treasury', 'shop'].includes(item.id)), [tavernEnabled]);
@@ -1182,6 +1198,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const [activePanel, setActivePanel] = useState('briefing');
   const [surfaceOpen, setSurfaceOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
+  const [pendingWorldMove, setPendingWorldMove] = useState(null);
 
   useEffect(() => {
     if (surfaceOpen && mode === 'world') document.documentElement.dataset.realmWorkspaceOpen = 'true';
@@ -1251,6 +1268,26 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   const previousSyncStateRef = useRef(null);
   const collaborationDirectory = useCollaborationDirectory({ enabled: dataSource.isErp });
 
+  const requestWorldMove = useCallback(detail => {
+    setMode('world');
+    setSurfaceOpen(false);
+    setPendingWorldMove({ ...detail });
+  }, []);
+  useEffect(() => {
+    if (!pendingWorldMove) return undefined;
+    if (mode !== 'world' || surfaceOpen) { setPendingWorldMove(null); return undefined; }
+    return scheduleRealmOfficeMove(pendingWorldMove, {
+      ready: () => {
+        if (!mainStageRef.current) return false;
+        if (!usesWorld3D) return true;
+        const world = mainStageRef.current.querySelector('[data-realm-world-version="3d"]');
+        return world?.dataset.ready === 'true' && world.dataset.paused !== 'true';
+      },
+      dispatch: detail => { window.dispatchEvent(new CustomEvent('realm:move', { detail })); setPendingWorldMove(null); },
+      onTimeout: () => { setPendingWorldMove(null); toast('Không gian chưa sẵn sàng di chuyển. Hãy thử lại sau khi tải xong.', 'error'); },
+    });
+  }, [mode, pendingWorldMove, surfaceOpen, toast, usesWorld3D]);
+
   const handoffToErp = useCallback(async (event) => {
     persistWorkspaceSurface('erp');
     sendRealmExperienceSignal(dataSource.isErp, 'erp_handoff', 'erp', realmJourneyForContext({ mode, panel: activePanel, ledgerView }));
@@ -1309,14 +1346,14 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
       setMode(initialMode === 'ledger' ? 'ledger' : restoredMode);
       setActivePanel(restoredPanel);
       setLedgerView(restoredLedgerView);
-      if (restored.position) setPosition((current) => ({ ...current, ...normalizeWorldPosition(restored.position) }));
+      if (restored.position) setPosition((current) => ({ ...current, ...restoreRealmOfficePosition(restored.position, { worldVersion, legacyNormalize: normalizeWorldPosition }) }));
       setNavigationAnnouncement('Đã khôi phục khu vực làm việc gần nhất trong Realm.');
       toast('Đã khôi phục khu vực Realm gần nhất.');
       sendRealmExperienceSignal(dataSource.isErp, 'continuity_restored', restoredMode === 'ledger' ? 'ledger' : 'realm', realmJourneyForContext({ ...restored, mode: restoredMode, panel: restoredPanel, ledgerView: restoredLedgerView }));
     }
     sendRealmExperienceSignal(dataSource.isErp, 'realm_opened', restored?.mode === 'ledger' ? 'ledger' : 'realm', restored ? realmJourneyForContext(restored) : null);
     setExperienceReady(true);
-  }, [businessBridge?.access, dataSource.isErp, initialMode, realmNav, toast]);
+  }, [businessBridge?.access, dataSource.isErp, initialMode, realmNav, toast, worldVersion]);
   useEffect(() => {
     if (!experienceReady) return undefined;
     const timer = window.setTimeout(() => {
@@ -1511,7 +1548,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     subscribeSignal,
     subscribeParty,
     subscribeCooperation,
-  } = useRealmPresence({ positionRef, profile, status: playerStatus, onChat: receiveChat, onEmote: showEmote });
+  } = useRealmPresence({ positionRef, profile, status: playerStatus, onChat: receiveChat, onEmote: showEmote, mapId: usesWorld3D ? 'guildhall-3d' : 'castle' });
   const {
     party,
     incomingInvite,
@@ -1787,7 +1824,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
   }, [businessBridge, tavernEnabled, toast]);
 
   const openObject = useCallback((object) => {
-    openAuthorizedPanel(object.panel);
+    return openAuthorizedPanel(object.panel);
   }, [openAuthorizedPanel]);
 
   const moveToObject = (panel) => {
@@ -1802,9 +1839,7 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     }
     const object = WORLD_OBJECTS.find((item) => item.panel === panel);
     if (object) {
-      setMode('world');
-      setSurfaceOpen(false);
-      window.dispatchEvent(new CustomEvent('realm:move', { detail: { x: object.x, y: object.y, objectId: object.id, direct: true } }));
+      requestWorldMove({ x: object.x, y: object.y, objectId: object.id, direct: true });
       return;
     }
     openAuthorizedPanel(panel);
@@ -2117,8 +2152,8 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     [collaborationDirectory.people],
   );
   const realmPeople = useMemo(
-    () => mergeRealmPresencePeople({ staff: dataSource.isErp ? erpDirectoryPeople : STAFF, remotePlayers, selfProfile: profile }),
-    [dataSource.isErp, erpDirectoryPeople, profile, remotePlayers],
+    () => mergeRealmPresencePeople({ staff: dataSource.isErp ? erpDirectoryPeople : STAFF, remotePlayers, selfProfile: { ...profile, userId: viewerRealUserId } }),
+    [dataSource.isErp, erpDirectoryPeople, profile, remotePlayers, viewerRealUserId],
   );
   const realmRosterPeople = useMemo(() => [{
     ...profile,
@@ -2152,23 +2187,24 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
     () => realmLocalFixture(dataSource, createRealmWarRoomDemoDashboard({ campaign: selectedCampaign || CAMPAIGNS[0], quests })),
     [dataSource, quests, selectedCampaign],
   );
-  const selectedPerson = realmPeople.find((person) => person.id === selectedPersonId) || null;
+  const selectedPerson = realmPeople.find((person) => (person.userId || person.id) === selectedPersonId) || null;
 
   const selectPerson = useCallback((person) => {
-    setSelectedPersonId(person.id);
+    const next = realmPersonPanelState(person);
+    if (!next) return;
+    setSelectedPersonId(next.selectedPersonId);
     setWhisperText('');
     setContactReceipt(null);
-    setMode('world');
-    setActivePanel('person');
+    setMode(next.mode);
+    setActivePanel(next.activePanel);
+    setSurfaceOpen(next.surfaceOpen);
   }, []);
 
   const moveToSelectedPerson = useCallback(() => {
     if (!selectedPerson) return;
-    window.dispatchEvent(new CustomEvent('realm:move', {
-      detail: { x: selectedPerson.x, y: selectedPerson.y + 0.9 },
-    }));
+    requestWorldMove({ x: selectedPerson.x, y: selectedPerson.y + 0.9 });
     toast(`Đang đi tới ${selectedPerson.name}`);
-  }, [selectedPerson, toast]);
+  }, [requestWorldMove, selectedPerson, toast]);
 
   const sendWhisperToSelected = useCallback((event) => {
     event.preventDefault();
@@ -2287,11 +2323,9 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
 
   const rallyToWorkSession = useCallback(() => {
     if (!workSession?.anchor) return;
-    setSurfaceOpen(false);
-    setMode('world');
-    window.dispatchEvent(new CustomEvent('realm:move', { detail: { ...workSession.anchor } }));
+    requestWorldMove(workSession.anchor);
     toast(`Đang tới điểm hẹn của “${workSession.work.title}”.`);
-  }, [toast, workSession]);
+  }, [requestWorldMove, toast, workSession]);
 
   const openWorkSessionTask = useCallback(() => {
     if (!workSession) return;
@@ -2840,6 +2874,20 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
         </div>
       </header>
 
+      {/* Keep remote audio mounted across panels/ledger; video tiles are muted
+          previews. Closing the Voice tray must not make the call one-way. */}
+      <div className={styles.mediaActions} style={{ position: 'fixed', zIndex: 60, left: 16, bottom: 98, maxWidth: 'calc(100vw - 32px)', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {Object.entries(remoteStreams).map(([id, stream]) => <RealmCallAudio key={id} stream={stream} />)}
+      </div>
+      {(micOn || cameraOn || sharing) && (mode !== 'world' || surfaceOpen || !voiceOpen) && <div
+        className={`${guild.voiceTrayHeader} ${styles.mediaActions}`} role="group" aria-label="Thiết bị đang phát trong cuộc gọi"
+        style={{ position: 'fixed', zIndex: 60, right: 16, bottom: 98, maxWidth: 'calc(100vw - 32px)', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {realmCaptureControls({ micOn, cameraOn, sharing }).map(control => <button type="button" key={control.id}
+          aria-label={control.label} onClick={control.id === 'mic' ? toggleMic : control.id === 'camera' ? toggleCamera : toggleShare}>
+          <Icon name={control.icon} size={17} />{control.label}
+        </button>)}
+      </div>}
+
       {incomingInvite && (
         <section className={guild.invite} role="alertdialog" aria-labelledby="party-invite-title" aria-describedby="party-invite-copy">
           <span className={guild.inviteIcon}><Icon name="phone" size={20} /></span>
@@ -2856,7 +2904,24 @@ function RealmOfficeInner({ erpHref = '/dashboard', demoMode = false, workspaceL
             <p>Người, công việc, voice và Gold cùng tồn tại trong một thế giới.</p>
           </div>
 
-          {usesWorldV3 ? (
+          {usesWorld3D ? (
+            <RealmWorld3D
+              activePanel={activePanel}
+              workspaceOpen={surfaceOpen}
+              playerStatus={playerStatus}
+              playerProfile={{ ...profile, userId: viewerRealUserId }}
+              position={position}
+              staff={worldStaff}
+              remotePlayers={remotePlayers}
+              sessionId={sessionId}
+              onPosition={handlePosition}
+              onNearby={handleNearby}
+              onObjectOpen={openObject}
+              onPerson={selectPerson}
+              demoMode={demoMode}
+              allowedPanels={[...realmNav.map(item => item.id), 'profile'].filter(panel => realmAccessForPanel(businessBridge?.access, panel).allowed)}
+            />
+          ) : usesWorldV3 ? (
             <RealmWorldV3
               activePanel={activePanel}
               workspaceOpen={surfaceOpen}

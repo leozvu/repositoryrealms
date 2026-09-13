@@ -1,0 +1,26 @@
+{
+  "project": "mobile-chromium",
+  "scope": "Functional/visual observation; not an AAA performance benchmark",
+  "viewport": {
+    "width": 393,
+    "height": 727
+  },
+  "world": {
+    "realmWorldVersion": "3d",
+    "ready": "true",
+    "camera": "first",
+    "quality": "high",
+    "materials": "ready",
+    "renderScale": "0.75",
+    "resolutionPreference": "clarity",
+    "playerX": "-10.09",
+    "playerZ": "-3.65",
+    "frameP95": "483",
+    "cameraX": "-10.086",
+    "cameraY": "1.650",
+    "cameraZ": "-3.649",
+    "drawCalls": "54",
+    "triangles": "181306"
+  },
+  "errors": []
+}

@@ -16,7 +16,7 @@ const RECORD_FLOWS = [
   { id: 'war-room-task', realm: 'War Room Task', erp: 'Task detail', source: 'components/realm/WarRoom.jsx', signals: ['onOpenTask', 'Mở Task ERP'], target: '/tasks?focus=:id' },
   { id: 'war-room-project', realm: 'Campaign', erp: 'Project detail', source: 'components/realm/RealmOffice.jsx', signals: ["realmRecordHref('project', selectedCampaign?.id)"], target: '/projects/:id' },
   { id: 'embassy-lead', realm: 'Embassy opportunity', erp: 'Lead detail', source: 'components/realm/RoyalEmbassy.jsx', signals: ['onOpenLead', 'Mở Lead ERP'], target: '/leads?focus=:id' },
-  { id: 'lead-focus', realm: 'Realm deep-link', erp: 'Lead modal', source: 'app/(app)/leads/page.jsx', signals: ["get('focus')", "setModal({ mode: 'edit', row: lead })"], target: 'Lead FormModal' },
+  { id: 'lead-focus', realm: 'Realm deep-link', erp: 'Lead modal', source: 'app/(app)/leads/page.jsx', signals: ["get('focus')", "openLead(focusId, 'edit', controller.signal)", '/api/data/leads?id=${encodeURIComponent(id)}', 'setModal({ mode, row: body[0] })'], target: 'Lead FormModal' },
   { id: 'embassy-client', realm: 'Embassy alliance', erp: 'Client detail', source: 'components/realm/RoyalEmbassy.jsx', signals: ['onOpenClient', 'Mở Client ERP'], target: '/clients/:id' },
   { id: 'global-search', realm: 'Shared ERP and Realm search', erp: 'Exact record', source: 'lib/global-search-contract.js', signals: ["realmRecordHref('lead'", "realmRecordHref('task'", "realmRecordHref('project'", "realmRecordHref('staff'"], target: 'record-aware routes' },
 ];

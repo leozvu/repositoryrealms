@@ -258,6 +258,15 @@ test('realm protocol only accepts the current typed envelope', () => {
   assert.equal(isRealmMessage(createEnvelope('emote', 'player-1', { emoteId: 'wave' })), true);
 });
 
+test('authenticated colleagues with the same name retain distinct avatars, while duplicate sessions collapse', () => {
+  const people = mergeRealmPresencePeople({ selfProfile: { userId: 'self', name: 'Mai Anh' }, remotePlayers: [
+    { id: 'old-tab', userId: 'colleague', name: 'Mai Anh', seenAt: 10 },
+    { id: 'new-tab', userId: 'colleague', name: 'Mai Anh', seenAt: 20 },
+    { id: 'self-tab', userId: 'self', name: 'Mai Anh', seenAt: 30 },
+  ] });
+  assert.deepEqual(people.map(person => person.id), ['new-tab']);
+});
+
 test('realm social payloads use allowlisted emotes and bounded text', () => {
   assert.equal(REALM_EMOTES.length, 4);
   assert.equal(realmEmote(' WAVE ')?.mark, 'HI');

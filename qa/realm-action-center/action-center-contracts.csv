@@ -9,7 +9,7 @@ lead-followup-scope,server,lib/realm-action-admin.js,"canWrite('activities', use
 atomic-create-audit,server,lib/realm-action-admin.js,tx.taskComment.create | tx.activity.create | createAuditData | tx.realmActionReceipt.create,,verified
 safe-action-response,api,app/api/realm-demo/actions/route.js,action: result.action | source: 'erp' | result.event ||,,verified
 cross-surface-event,server,lib/realm-change-feed.js,"activities: ['embassy'] | taskcomments: ['operations', 'campaigns']",,verified
-erp-notification,server,lib/events.js,resource === 'taskcomments' | bình luận việc | await notify(task.assigneeId | resource === 'activities' | lên lịch follow-up,,verified
+erp-notification,server,lib/events.js,"resource === 'taskcomments' | bình luận việc | await sendNotification(task.assigneeId | resource === 'activities' | lên lịch follow-up | const sendNotification = (ids, text, route) => notify(ids, text, route, ctx.db ? { db } : {})",,verified
 war-room-permission,server,lib/realm-war-room-admin.js,"canWrite('taskcomments', user) | canComment: commentWriteAllowed",,verified
 embassy-permission,server,lib/realm-embassy-admin.js,"canWrite('activities', user) | canFollowUp: followupWriteAllowed",,verified
 action-composer,client,components/realm/RealmCreateActionDialog.jsx,War Council note | Diplomatic follow-up | Idempotency-Key | Gửi War Council note | Lập Diplomatic follow-up | RepositoryRealms,,verified

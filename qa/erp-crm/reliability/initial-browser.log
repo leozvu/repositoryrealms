@@ -1,0 +1,87 @@
+
+Running 14 tests using 1 worker
+
+(node:14000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x   1 [desktop-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command (5.7s)
+(node:30228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  2 [desktop-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:31:1 › My Work distinguishes unavailable approval and task data from a zero workload (566ms)
+  ok  3 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:4:1 › changing session identity clears the previous user rows before the new request completes (405ms)
+  ok  4 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:20:1 › changing filters and disabling a resource cannot expose old rows (391ms)
+  ok  5 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:32:1 › read failure exposes retry and recovers without an empty-success state (420ms)
+  ok  6 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:43:1 › actual Lead handler keeps failed form contents and closes only on confirmed write (551ms)
+  ok  7 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:63:1 › dirty form stays open when discard is declined; fields lock during submission (577ms)
+(node:12356) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x   8 [mobile-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command (5.7s)
+(node:3092) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  9 [mobile-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:31:1 › My Work distinguishes unavailable approval and task data from a zero workload (533ms)
+  ok 10 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:4:1 › changing session identity clears the previous user rows before the new request completes (386ms)
+  ok 11 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:20:1 › changing filters and disabling a resource cannot expose old rows (399ms)
+  ok 12 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:32:1 › read failure exposes retry and recovers without an empty-success state (400ms)
+  ok 13 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:43:1 › actual Lead handler keeps failed form contents and closes only on confirmed write (572ms)
+  ok 14 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:63:1 › dirty form stays open when discard is declined; fields lock during submission (573ms)
+
+
+  1) [desktop-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command 
+
+    Error: expect(locator).toBeDisabled() failed
+
+    Locator: getByRole('button', { name: 'Bắt đầu', exact: true }).last()
+    Expected: disabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeDisabled" with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Bắt đầu', exact: true }).last()
+
+        at C:\Users\Asus\OneDrive\Tài liệu\Fak that shit\CRMegoric-Realm-3D\tests\e2e\erp-my-work-ui.spec.mjs:73:14
+        at async C:\Users\Asus\OneDrive\Tài liệu\Fak that shit\CRMegoric-Realm-3D\node_modules\playwright\lib\worker\workerProcessEntry.js:1662:9
+        at async C:\Users\Asus\OneDrive\Tài liệu\Fak that shit\CRMegoric-Realm-3D\node_modules\playwright\lib\worker\workerProcessEntry.js:1154:11
+        at async C:\Users\Asus\OneDrive\Tài liệu\Fak that shit\CRMegoric-Realm-3D\node_modules\playwright\lib\worker\workerProcessEntry.js:1660:7
+
+    Error Context: test-results\erp-components\erp-my-work-ui-My-Work-ser-9cb29-thout-replaying-the-command-desktop-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\erp-components\erp-my-work-ui-My-Work-ser-9cb29-thout-replaying-the-command-desktop-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\erp-components\erp-my-work-ui-My-Work-ser-9cb29-thout-replaying-the-command-desktop-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command 
+
+    Error: expect(locator).toBeDisabled() failed
+
+    Locator: getByRole('button', { name: 'Bắt đầu', exact: true }).last()
+    Expected: disabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeDisabled" with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Bắt đầu', exact: true }).last()
+
+        at C:\Users\Asus\OneDrive\Tài liệu\Fak that shit\CRMegoric-Realm-3D\tests\e2e\erp-my-work-ui.spec.mjs:73:14
+        at async C:\Users\Asus\OneDrive\Tài liệu\Fak that shit\CRMegoric-Realm-3D\node_modules\playwright\lib\worker\workerProcessEntry.js:1662:9
+        at async C:\Users\Asus\OneDrive\Tài liệu\Fak that shit\CRMegoric-Realm-3D\node_modules\playwright\lib\worker\workerProcessEntry.js:1154:11
+        at async C:\Users\Asus\OneDrive\Tài liệu\Fak that shit\CRMegoric-Realm-3D\node_modules\playwright\lib\worker\workerProcessEntry.js:1660:7
+
+    Error Context: test-results\erp-components\erp-my-work-ui-My-Work-ser-9cb29-thout-replaying-the-command-mobile-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\erp-components\erp-my-work-ui-My-Work-ser-9cb29-thout-replaying-the-command-mobile-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\erp-components\erp-my-work-ui-My-Work-ser-9cb29-thout-replaying-the-command-mobile-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command 
+    [mobile-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command 
+  12 passed (34.0s)

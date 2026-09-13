@@ -1,7 +1,8 @@
 'use client';
 // UI kit dùng chung: icon, toast, modal, form động, hook dữ liệu — port từ v1
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
+import { SessionContext } from 'next-auth/react';
 import {
   ArrowRight, ArrowsClockwise, Article, Bank, Bell, Briefcase, Buildings,
   Cake, CalendarBlank, CaretDown, CaretRight, CaretUp, ChartBar, ChartLineUp,
@@ -17,6 +18,7 @@ import {
 } from '@phosphor-icons/react';
 import { BADGE } from '@/lib/format';
 import { ROLE_LABEL } from '@/lib/perm';
+import { createResourceClient } from '@/lib/resource-client';
 
 /* ---------- v3.6: tên chức danh tùy biến theo công ty (Settings.roleLabels) ---------- */
 export const RoleLabelsCtx = createContext(null);
@@ -278,9 +280,16 @@ export function ConfirmDialog({ msg, onYes, onClose, yesLabel = 'Xóa', modalCla
 /* ---------- Form động (port fieldHTML/formModal từ v1) ---------- */
 export function FormModal({ title, fields, data = {}, onSave, onClose, large, extraFooter }) {
   const formRef = useRef(null);
+  const fieldPrefix = useId();
+  const dirtyRef = useRef(false);
   const submittingRef = useRef(false);
   const [submitting, setSubmitting] = useState(false);
   const toast = useToast();
+  useEffect(() => {
+    const warn = event => { if (dirtyRef.current) { event.preventDefault(); event.returnValue = ''; } };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, []);
   // v3.20: onSave có thể async và trả về false để GIỮ modal mở (validate thất bại).
   // Trước đây luôn onClose() sau onSave → validate lỗi vẫn đóng modal, người dùng thấy toast
   // lỗi nhưng mất hết dữ liệu vừa nhập. Ảnh hưởng mọi FormModal toàn app.
@@ -299,7 +308,7 @@ export function FormModal({ title, fields, data = {}, onSave, onClose, large, ex
     setSubmitting(true);
     try {
       const res = await onSave(out);
-      if (res !== false && res !== null) onClose();
+      if (res !== false && res !== null) { dirtyRef.current = false; onClose(); }
     } catch {
       toast?.('Không thể lưu dữ liệu. Vui lòng thử lại.', 'error');
     } finally {
@@ -307,7 +316,11 @@ export function FormModal({ title, fields, data = {}, onSave, onClose, large, ex
       setSubmitting(false);
     }
   };
-  const close = () => { if (!submittingRef.current) onClose(); };
+  const close = () => {
+    if (submittingRef.current) return;
+    if (dirtyRef.current && !window.confirm('Bạn có thay đổi chưa lưu. Bỏ các thay đổi này và đóng?')) return;
+    dirtyRef.current = false; onClose();
+  };
   return (
     <Modal title={title} onClose={close} large={large}
       footer={<>
@@ -317,25 +330,25 @@ export function FormModal({ title, fields, data = {}, onSave, onClose, large, ex
           {submitting ? 'Đang lưu…' : 'Lưu'}
         </button>
       </>}>
-      <form ref={formRef} className="form-grid" aria-busy={submitting || undefined} onSubmit={e => { e.preventDefault(); submit(); }}>
+      <form ref={formRef} className="form-grid" aria-busy={submitting || undefined} onChange={() => { dirtyRef.current = true; }} onSubmit={e => { e.preventDefault(); submit(); }}>
         {fields.map(f => {
           const v = data[f.key] ?? f.default ?? '';
           return (
             <div key={f.key} className={`field ${f.full ? 'full' : ''}`}>
-              <label>{f.label}{f.required && <span className="req"> *</span>}</label>
+              <label htmlFor={`${fieldPrefix}-${f.key}`}>{f.label}{f.required && <span className="req"> *</span>}</label>
               {f.type === 'select' ? (
-                <select name={f.key} defaultValue={v} required={f.required}>
+                <select id={`${fieldPrefix}-${f.key}`} name={f.key} defaultValue={v} required={f.required} disabled={submitting}>
                   {f.options.map(o => <option key={String(o.value)} value={o.value}>{o.label}</option>)}
                 </select>
               ) : f.type === 'multiselect' ? (
-                <select name={f.key} multiple size={Math.min(5, Math.max(3, f.options.length))}
+                <select id={`${fieldPrefix}-${f.key}`} name={f.key} disabled={submitting} multiple size={Math.min(5, Math.max(3, f.options.length))}
                   defaultValue={Array.isArray(v) ? v : []}>
                   {f.options.map(o => <option key={String(o.value)} value={o.value}>{o.label}</option>)}
                 </select>
               ) : f.type === 'textarea' ? (
-                <textarea name={f.key} defaultValue={v} />
+                <textarea id={`${fieldPrefix}-${f.key}`} name={f.key} defaultValue={v} disabled={submitting} />
               ) : (
-                <input name={f.key} type={f.type || 'text'} defaultValue={v} required={f.required}
+                <input id={`${fieldPrefix}-${f.key}`} name={f.key} type={f.type || 'text'} defaultValue={v} required={f.required} disabled={submitting}
                   placeholder={f.placeholder || ''} {...(f.type === 'number' ? { min: 0, step: 'any' } : {})} />
               )}
               {f.hint && <div className="hint">{f.hint}</div>}
@@ -368,68 +381,51 @@ function useAnyLoading() {
 // Chỉ các cột có trong danh sách trắng FILTERABLE (lib/registry) mới có tác dụng.
 // options.enabled=false giữ nguyên thứ tự hook nhưng không phát request cho phân hệ đang tắt.
 export function useResource(name, filter, options = {}) {
+  const session = useContext(SessionContext);
   const enabled = options.enabled !== false;
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [mutating, setMutating] = useState(false);
-  const mutationRef = useRef(null);
-  const [forbidden, setForbidden] = useState(false);
+  const clientRef = useRef(null);
   const toast = useToast();
-  // Chuỗi hóa filter để useCallback không chạy lại mỗi lần render (object literal luôn khác nhau)
+  const toastRef = useRef(toast); toastRef.current = toast;
   const qs = filter
-    ? new URLSearchParams(Object.entries(filter).filter(([, v]) => v !== undefined && v !== null && v !== '')).toString()
+    ? new URLSearchParams(Object.entries(filter).filter(([, v]) => v !== undefined && v !== null && v !== '').sort(([a], [b]) => a.localeCompare(b))).toString()
     : '';
-  const refresh = useCallback(async () => {
-    if (!enabled) {
-      setRows([]);
-      setLoading(false);
-      setForbidden(false);
-      return;
-    }
-    setLoading(true);
-    bumpInflight(1); // v3.14: báo cho EmptyState biết đang tải
-    try {
-      const res = await fetch(`/api/data/${name}${qs ? '?' + qs : ''}`);
-      if (res.status === 403) { setForbidden(true); return; }
-      if (res.ok) setRows(await res.json());
-    } finally {
-      setLoading(false);
-      bumpInflight(-1); // luôn trừ lại kể cả khi lỗi, nếu không skeleton treo vĩnh viễn
-    }
-  }, [enabled, name, qs]);
-  useEffect(() => { refresh(); }, [refresh]);
-
-  const call = async (method, url, body) => {
-    if (!enabled) return null;
-    if (mutationRef.current) return mutationRef.current;
-    const request = (async () => {
-      setMutating(true);
-      try {
-        const res = await fetch(url, {
-          method, headers: { 'Content-Type': 'application/json' },
-          body: body ? JSON.stringify(body) : undefined,
-        });
-        const json = await res.json().catch(() => ({}));
-        if (!res.ok) { toast(json.error || 'Có lỗi xảy ra', 'error'); return null; }
-        await refresh();
-        return json;
-      } catch {
-        toast('Không thể kết nối máy chủ. Vui lòng thử lại.', 'error');
-        return null;
-      } finally {
-        mutationRef.current = null;
-        setMutating(false);
-      }
-    })();
-    mutationRef.current = request;
-    return request;
-  };
+  const url = options.readUrl || `/api/data/${name}${qs ? '?' + qs : ''}`;
+  const scopeKey = JSON.stringify([enabled, options.scopeKey ?? '', session?.status, session?.data?.user]);
+  const key = JSON.stringify([url, scopeKey]);
+  const initial = { rows: [], metadata: null, loading: enabled, mutating: false, forbidden: false, error: '', updatedAt: null };
+  const [snapshot, setSnapshot] = useState(() => ({ key, ...initial }));
+  useEffect(() => {
+    setSnapshot({ key, ...initial });
+    if (!enabled) return undefined;
+    const client = createResourceClient({ url, decodeRead: options.decodeRead, onInflight: bumpInflight,
+      onMessage: message => toastRef.current?.(message, 'error'),
+      onState: patch => setSnapshot(previous => previous.key === key ? { ...previous, ...patch } : previous),
+    });
+    clientRef.current = { key, client };
+    void client.refresh();
+    return () => { client.dispose(); if (clientRef.current?.client === client) clientRef.current = null; };
+  }, [key]);
+  const refresh = useCallback(() => clientRef.current?.key === key ? clientRef.current.client.refresh() : Promise.resolve(null), [key]);
+  const call = (method, target, body) => clientRef.current?.key === key
+    ? clientRef.current.client.call(method, target, body) : Promise.resolve(null);
+  // Never expose the previous filter/resource's rows, even in the render before cleanup.
+  const state = snapshot.key === key ? snapshot : initial;
   return {
-    rows, loading, mutating, forbidden, refresh,
+    ...state, scopeKey, refresh,
     create: data => call('POST', `/api/data/${name}`, data),
     update: (id, data) => call('PUT', `/api/data/${name}/${id}`, data),
     remove: id => call('DELETE', `/api/data/${name}/${id}`),
   };
+}
+
+export function ResourceError({ error, onRetry, loading = false }) {
+  if (!error) return null;
+  return <div className="resource-error" role="alert">
+    <span>{error}</span>
+    <button type="button" className="btn btn-outline btn-sm" onClick={onRetry} disabled={loading}>
+      {loading ? 'Đang tải…' : 'Thử tải lại'}
+    </button>
+  </div>;
 }
 
 /* ---------- v3.4: Xuất CSV (BOM UTF-8 để Excel đọc tiếng Việt) ---------- */

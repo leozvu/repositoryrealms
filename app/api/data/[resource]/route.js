@@ -1,46 +1,33 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
-import { RESOURCES, canRead, canWrite, filterableOf } from '@/lib/registry';
+import { RESOURCES, canRead, canWrite } from '@/lib/registry';
+import { CollectionQueryError, readCollection, collectionHeaders } from '@/lib/collection-query';
 import { isFreelancer } from '@/lib/perm';
 import { interceptWrite } from '@/lib/approvals';
-import { emitEvent } from '@/lib/events';
+import { commitRecordMutation } from '@/lib/record-mutation';
 import { resourceEnabled } from '@/lib/module-guard';
 
-async function audit(user, action, entity, refId, detail) {
-  await prisma.auditLog.create({
-    data: { userId: user.id, userName: user.name, action, entity, refId: refId || null, detail: detail || null },
-  });
-}
 
 export async function GET(req, { params }) {
+  params = await params;
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canRead(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
-  // v3.13: lọc phía server theo danh sách trắng — VD /api/data/timelogs?taskId=abc.
-  // Trước đây mọi lời gọi đều kéo NGUYÊN bảng về trình duyệt rồi lọc bằng JS: mở một
-  // công việc là tải lại toàn bộ TimeLog/TaskComment/TaskEvent của cả công ty.
-  // Bộ lọc CHỒNG LÊN scope() (AND), không thay thế — lọc thêm không bao giờ nới quyền.
-  const sp = new URL(req.url).searchParams;
-  const extra = {};
-  for (const f of filterableOf(params.resource)) {
-    const v = sp.get(f);
-    if (v === null || v === '') continue;
-    extra[f] = v === '__null__' ? null : v; // __null__ để lọc "chưa gắn" (VD giờ chưa xuất hóa đơn)
+  try {
+    const { rows, page } = await readCollection(prisma, { resource: params.resource, cfg, user, params: new URL(req.url).searchParams });
+    return NextResponse.json(rows, { headers: collectionHeaders(page) });
+  } catch (error) {
+    if (!(error instanceof CollectionQueryError)) throw error;
+    return NextResponse.json({ error: error.message, code: error.code }, { status: error.status, headers: collectionHeaders() });
   }
-  const scoped = cfg.scope ? await cfg.scope(user, prisma) : {};
-  const where = Object.keys(extra).length ? { AND: [scoped, extra] } : scoped;
-
-  const take = Math.min(+sp.get('limit') || 0, 2000) || undefined;
-  let rows = await prisma[cfg.model].findMany({ where, orderBy: cfg.orderBy, take });
-  if (cfg.sanitize) rows = rows.map(r => cfg.sanitize(r, user));
-  return NextResponse.json(rows);
 }
 
 export async function POST(req, { params }) {
+  params = await params;
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (isFreelancer(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
@@ -56,16 +43,12 @@ export async function POST(req, { params }) {
     if (err) return NextResponse.json({ error: err }, { status: 400 });
   }
   try {
-    const icp = await interceptWrite(params.resource, null, data, user);
-    if (icp?.block) return NextResponse.json({ _blocked: true, _notice: icp.block });
-    if (icp?.data) data = icp.data;
-    const row = await prisma[cfg.model].create({ data });
-    await audit(user, 'create', params.resource, row.id, row.name || row.title || row.code || null);
-    await emitEvent(params.resource, 'create', row, null, user); // v3.3 + Realm change feed
-    const notice = icp?.after ? await icp.after(row) : null;
+    const result = await commitRecordMutation(prisma, { resource: params.resource, event: 'create', cfg, data, user, interceptWrite });
+    if (result.blocked) return NextResponse.json({ _blocked: true, _notice: result.notice });
+    const { row, notice } = result;
     const out = cfg.sanitize ? cfg.sanitize(row, user) : row;
     return NextResponse.json(notice ? { ...out, _notice: notice } : out);
   } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 400 });
+    return NextResponse.json({ error: e.message, ...(e.code ? { code: e.code } : {}) }, { status: e.status || 400 });
   }
 }

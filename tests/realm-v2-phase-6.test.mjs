@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
+import { realmV2AreaDecision } from '../lib/realm-v2-navigation.js';
 
 const read = (file) => fs.readFileSync(path.resolve(file), 'utf8');
 
@@ -9,8 +10,14 @@ test('Phase 6 exposes World Map and CEO Terminal as Director-only product compos
   const route = read('app/realm-v2/[[...area]]/page.jsx');
   assert.match(route, /'world-map', 'ceo-terminal'/);
   assert.match(route, /CanonicalRealmExecutiveScreen/);
-  assert.match(route, /isDirector\(user\)/);
-  assert.match(route, /redirect\('\/dashboard'\)/);
+  assert.match(route, /realmV2AreaDecision\(user, slug, modules\)/);
+  assert.match(route, /if \(!access.allowed\) return/);
+  for (const slug of ['world-map', 'ceo-terminal']) {
+    assert.equal(realmV2AreaDecision({ id: 'director', roles: ['DIRECTOR'] }, slug).allowed, true);
+    for (const role of ['STAFF', 'PM', 'LEAD', 'AM', 'ACCOUNTANT', 'HR']) {
+      assert.equal(realmV2AreaDecision({ id: 'viewer', roles: [role] }, slug).allowed, false);
+    }
+  }
 });
 
 test('World Map composes canonical federation, dashboard and command sources with independent degradation', () => {

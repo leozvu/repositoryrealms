@@ -1,0 +1,125 @@
+{
+  "buildId": "585c-bVPJ9w1auuscamXU",
+  "recordedAt": "2026-09-13T01:12:27.1366619Z",
+  "url": "http://127.0.0.1:3410/realm-demo?world=3d",
+  "unit": {
+    "passed": 44,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "passed": 8,
+    "failed": 0,
+    "workers": 1,
+    "scope": "4 selected scenarios across desktop Chromium and Pixel 5 emulation; all eight stations on desktop, two on mobile"
+  },
+  "aaaGate": "Not passed; G1 In progress",
+  "files": [
+    {
+      "path": "browser.log",
+      "bytes": 1671,
+      "sha256": "3db99689b7ce206da01e85fe27140292934b3dfa343ff9d1c7d54eefc2b0f360"
+    },
+    {
+      "path": "build.log",
+      "bytes": 22426,
+      "sha256": "a3846e73a63961961e758d1bdedaa9d24d0fd65eefccfd3563dc786787e33326"
+    },
+    {
+      "path": "desktop-medieval-bay-first.png",
+      "bytes": 479555,
+      "sha256": "4dd8685b4350714efdb1c6de98a11cdc12bd108c09d24c0acb6eaf5cba7a18e1"
+    },
+    {
+      "path": "desktop-medieval-bay-follow.png",
+      "bytes": 705757,
+      "sha256": "406636ba32aa6ed730059e7d38feab098a829c7bcc71030cac58b4566c147223"
+    },
+    {
+      "path": "desktop-medieval-bay-high.png",
+      "bytes": 763722,
+      "sha256": "36362dbcaaa49af8656e72aac74eaa832c505bb9baad2f321a07cc3efc63e02a"
+    },
+    {
+      "path": "desktop-medieval-observation.json",
+      "bytes": 591,
+      "sha256": "ce1bc591ee480fb35a80e4d472a76dc73d8c82f5e44b20f14fb5d4b13e575f02"
+    },
+    {
+      "path": "mobile-medieval-bay-first.png",
+      "bytes": 156741,
+      "sha256": "66c6176ce5daccbf27150834b14df7ed038a62136da5dabdd0fd742557c8dddb"
+    },
+    {
+      "path": "mobile-medieval-bay-follow.png",
+      "bytes": 238531,
+      "sha256": "9371535820207f11ffc1c0b00c251450baaa146dbffc023590de72f3774e53d3"
+    },
+    {
+      "path": "mobile-medieval-bay-high.png",
+      "bytes": 279302,
+      "sha256": "88d32a7329985e4e91e0aaa873d7cbe039f8ca5d19c7b34ca78b1ce8456188ba"
+    },
+    {
+      "path": "mobile-medieval-observation.json",
+      "bytes": 589,
+      "sha256": "99958f25288ee0dcfe3f31a91f31e4210d2fac92e78d127f17faa2ee418034de"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 4484,
+      "sha256": "8c487e99453000c3391b6c4115f1afb1b65a3cdb575f51fdbd4cb85fe3a76120"
+    },
+    {
+      "path": "unit.log",
+      "bytes": 10888,
+      "sha256": "8ec1bd82eb714c78db561e6d484920f11696b1b54ec6f87ec439d40f0a21ec40"
+    }
+  ],
+  "sources": [
+    {
+      "path": "lib/realm-office-camera.js",
+      "sha256": "32d0f89d428540f458baf4e4092c973702bfa4bd928f06a4ef046d5370afef8c"
+    },
+    {
+      "path": "lib/realm-office-3d.js",
+      "sha256": "8fdc3690c5cd6ebf9efb0b52c001c70f73f68e374a09c8d36b618b1e801beef8"
+    },
+    {
+      "path": "components/realm/three/officeRuntime.js",
+      "sha256": "b40515f8ec778ce9143cdbbdc69fe90dd8a96cb7d3882af632fa6a6838c5cc6f"
+    },
+    {
+      "path": "components/realm/three/officeQuality.js",
+      "sha256": "13b223e6a00d1e8352667b53d597b4418832d9beab8e53dca70a166bee5f64c1"
+    },
+    {
+      "path": "components/realm/three/guildhallScene.js",
+      "sha256": "e5fb72f366a810ff70b2fb38d4511a7b7f1c64516d8be321a6bb5e1bde87e8f7"
+    },
+    {
+      "path": "components/realm/three/medievalWorkBay.js",
+      "sha256": "d246e981073b3c90bab32465433f583c29e81b37b5bf05a3713de0e19a8d2b00"
+    },
+    {
+      "path": "components/realm/RealmWorld3D.jsx",
+      "sha256": "79914ec0d5802524a58a31fee00f50b1766480f864ae6fd9e504f63354a26138"
+    },
+    {
+      "path": "components/realm/realm-world-3d.module.css",
+      "sha256": "00fbb4908aab42c55aeb04980c14ca12efc755b5ae3b9e179604f4f959365544"
+    },
+    {
+      "path": "tests/realm-office-camera.test.mjs",
+      "sha256": "5dbd1c6559a815a03f1b48b9053bce2b0bcaf5dbc6044e0945ad6d0cbb141b6a"
+    },
+    {
+      "path": "tests/realm-office-quality.test.mjs",
+      "sha256": "6debb2e31c21d7a44d1922fd416073c9f3e51f13e16adfb123989df093cf7330"
+    },
+    {
+      "path": "tests/e2e/realm-office-3d.spec.mjs",
+      "sha256": "c71ba631cbc7fadb5b84d6712cc7d1f8a5e5e1ef6df892f1bbbad3db8f5bac38"
+    }
+  ]
+}

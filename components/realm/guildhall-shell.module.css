@@ -19,6 +19,13 @@
 }
 
 .shell *, .shell *::before, .shell *::after { box-sizing: border-box; }
+/* The light 3D tier also avoids full-frame grain blending and backdrop passes. */
+.shell:has([data-quality=balanced])::after { display: none; }
+.shell:has([data-quality=balanced]) .commandBar,
+.shell:has([data-quality=balanced]) .actionDock,
+.shell:has([data-quality=balanced]) .surfaceBackdrop,
+.shell:has([data-quality=balanced]) .voiceTrayHeader,
+.shell:has([data-quality=balanced]) .voiceTray > section { backdrop-filter: none; }
 .shell button, .shell a, .shell select { font: inherit; }
 .shell button:focus-visible, .shell a:focus-visible, .shell select:focus-visible {
   outline: 2px solid #f0cf7c;
@@ -343,6 +350,7 @@
 }
 
 .worldViewport:has([data-realm-world-version='3']) .worldTitle { display: none; }
+.worldViewport:has([data-realm-world-version='3d']) .worldTitle { display: none; }
 
 .worldTitle span { display: block; margin-bottom: 3px; color: #cfb069; font-size: .5rem; font-weight: 740; letter-spacing: .11em; text-transform: uppercase; }
 .worldTitle h1 { margin: 0; color: #f4eee1; font-family: "Cabinet Grotesk", var(--font-display), serif; font-size: clamp(1.05rem, 2vw, 1.35rem); font-weight: 640; letter-spacing: -.025em; line-height: 1; }

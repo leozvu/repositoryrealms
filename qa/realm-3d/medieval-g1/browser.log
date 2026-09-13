@@ -1,0 +1,13 @@
+
+Running 4 tests using 1 worker
+
+(node:33136) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [desktop-chromium] › tests\e2e\realm-office-3d.spec.mjs:22:1 › 3D office has functional first-person and overview cameras without layout overflow (34.7s)
+  ok 2 [desktop-chromium] › tests\e2e\realm-office-3d.spec.mjs:39:1 › medieval work bay opens the real archive and preserves camera controls on return (58.9s)
+(node:28204) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 3 [mobile-chromium] › tests\e2e\realm-office-3d.spec.mjs:22:1 › 3D office has functional first-person and overview cameras without layout overflow (18.5s)
+  ok 4 [mobile-chromium] › tests\e2e\realm-office-3d.spec.mjs:39:1 › medieval work bay opens the real archive and preserves camera controls on return (47.4s)
+
+  4 passed (2.9m)

@@ -1,0 +1,73 @@
+{
+  "buildId": "Ulg4NzwQ6tSysXQj7rycN",
+  "capturedAt": "2026-09-13T00:50:58.822578Z",
+  "scope": "Targeted archive/camera QA, not AAA benchmark",
+  "browserTests": {
+    "passed": 4,
+    "failed": 0
+  },
+  "unitTests": {
+    "passed": 39,
+    "failed": 0
+  },
+  "files": [
+    {
+      "path": "desktop-medieval-bay-first.png",
+      "bytes": 564547,
+      "sha256": "11e0e00bd621d5fc79dd6c5589367fbfd167161584c0b6d482586d383bd3164c"
+    },
+    {
+      "path": "desktop-medieval-bay-follow.png",
+      "bytes": 720540,
+      "sha256": "c81746beb6ef487fc71ba51c9f472bbeb4c80d6d72f9718dd4bc5dda9f08a28a"
+    },
+    {
+      "path": "desktop-medieval-bay-high.png",
+      "bytes": 811734,
+      "sha256": "d45918f63ffb7e047268de9ca49421773be8a3358914cbd8994eeb823290cb6f"
+    },
+    {
+      "path": "desktop-medieval-observation.json",
+      "bytes": 476,
+      "sha256": "783ca4f0365dca0a9a0fae97772c3c32bdb2abfd1a5f61ec13201ebf73d9deea"
+    },
+    {
+      "path": "mobile-medieval-bay-first.png",
+      "bytes": 196366,
+      "sha256": "db21c78f0fbde57d354a7593756d3045c182a9c59835f54b7801daa230f1825a"
+    },
+    {
+      "path": "mobile-medieval-bay-follow.png",
+      "bytes": 253315,
+      "sha256": "008724e36bb16ecb95e2abc476418f8a148d791badd1c89d8a154fb14d39ebb6"
+    },
+    {
+      "path": "mobile-medieval-bay-high.png",
+      "bytes": 296811,
+      "sha256": "7974c641d5aa3cc1c0d48ed31b30c8f9eb3c011fb412024b8b31af59028a5002"
+    },
+    {
+      "path": "mobile-medieval-observation.json",
+      "bytes": 474,
+      "sha256": "ff7446dcb46d44c450bf9e4b7ef85a0e0d9ed1b7ffb4c3789720531c40772394"
+    }
+  ],
+  "sourceHashes": [
+    {
+      "path": "components/realm/three/medievalWorkBay.js",
+      "sha256": "13ba64f29719beb4e8c722a82009e94236a9711df881ce1769a051a39adcc40c"
+    },
+    {
+      "path": "components/realm/three/guildhallScene.js",
+      "sha256": "9f9dacf783a7af8fe24297bd196e9ebd4e6d4d1f0f0422d4987824c5981ccdd4"
+    },
+    {
+      "path": "tests/realm-office-scene.test.mjs",
+      "sha256": "bd560c98138da6cf47f5fc479477257d9876c08468d50378c98b618900e63075"
+    },
+    {
+      "path": "tests/e2e/realm-office-3d.spec.mjs",
+      "sha256": "2d9d6a204d7d3ff774c47ad0a9cc8e0876a5657a88d8f9906c0b60eb1ba4ce5e"
+    }
+  ]
+}

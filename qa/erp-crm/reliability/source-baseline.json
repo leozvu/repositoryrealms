@@ -1,0 +1,88 @@
+{
+  "scope": "Static source inventory; not a live workflow baseline",
+  "recordedAt": "2026-09-13T01:33:55.887Z",
+  "summary": {
+    "uiRoutes": 81,
+    "apiRoutes": 148,
+    "interactiveElements": 1368,
+    "sourceFilesWithInteractions": 123,
+    "routesInPrimaryNavigation": 67,
+    "routesWithResourceCandidates": 44,
+    "byKind": {
+      "action": 767,
+      "form-control": 390,
+      "form-submit": 21,
+      "navigation": 190
+    },
+    "uxRiskCandidates": {
+      "clickable_non_semantic": 87,
+      "control_binding_unverified": 333,
+      "keyboard_path_unverified": 87,
+      "possible_noop_button": 5,
+      "unlabelled_button_candidate": 78
+    },
+    "topInteractiveSources": [
+      {
+        "source": "components/realm/RealmOffice.jsx",
+        "count": 73
+      },
+      {
+        "source": "app/(app)/settings/page.jsx",
+        "count": 38
+      },
+      {
+        "source": "app/(app)/tasks/page.jsx",
+        "count": 38
+      },
+      {
+        "source": "components/realm-v2/CanonicalRealmGovernanceScreens.jsx",
+        "count": 38
+      },
+      {
+        "source": "components/realm-v2/CanonicalRealmCommunicationScreens.jsx",
+        "count": 33
+      },
+      {
+        "source": "app/(app)/ceo-commands/page.jsx",
+        "count": 30
+      },
+      {
+        "source": "components/realm-v2/CanonicalRealmExperienceScreens.jsx",
+        "count": 30
+      },
+      {
+        "source": "app/(app)/teamwork/page.jsx",
+        "count": 28
+      },
+      {
+        "source": "components/Shell.jsx",
+        "count": 26
+      },
+      {
+        "source": "components/realm-v2/CanonicalRealmPeopleRecognitionScreens.jsx",
+        "count": 25
+      },
+      {
+        "source": "app/(app)/automation/page.jsx",
+        "count": 22
+      },
+      {
+        "source": "app/(app)/freelancers/page.jsx",
+        "count": 22
+      },
+      {
+        "source": "components/realm-v2/CanonicalRealmScreens.jsx",
+        "count": 22
+      },
+      {
+        "source": "app/(app)/templates/page.jsx",
+        "count": 21
+      },
+      {
+        "source": "components/realm-v2/CanonicalRealmOperationsScreens.jsx",
+        "count": 21
+      }
+    ]
+  },
+  "parseErrors": []
+}
