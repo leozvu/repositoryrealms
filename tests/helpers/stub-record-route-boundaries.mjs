@@ -31,7 +31,7 @@ export const prisma = new Proxy({}, {
       catch (error) { state.records = records; state.calls = calls; throw error; }
     };
     return {
-      async findUnique({ where }) { return structuredClone(Object.values(state.records[model] || {}).find(row => Object.entries(where).every(([key, value]) => row[key] === value)) || null); },
+      async findUnique({ where }) { return structuredClone(Object.values(state.records[model] || {}).find(row => Object.entries(where.occurrenceId_deliveryKey || where).every(([key, value]) => row[key] === value)) || null); },
       async findFirst() { return model === 'approval' ? state.pendingApproval : null; },
       async create({ data }) {
         if (state.failModel === model) throw new Error('Injected persistence failure');
@@ -48,6 +48,17 @@ export const prisma = new Proxy({}, {
         const existing = Object.values(state.records[model] || {}).find(row => Object.entries(fields).every(([key, value]) => row[key] === value));
         if (existing) return prisma[model].update({ where: { id: existing.id }, data: update });
         return prisma[model].create({ data: create });
+      },
+      async createMany({ data, skipDuplicates }) {
+        if (state.failModel === model) throw new Error('Injected persistence failure');
+        let count = 0;
+        for (const entry of data) {
+          const duplicate = Object.values(state.records[model] || {}).some(row => row.id === entry.id || (model === 'eventOutbox' && row.occurrenceId === entry.occurrenceId && row.deliveryKey === entry.deliveryKey));
+          if (duplicate && skipDuplicates) continue;
+          if (duplicate) throw Object.assign(new Error('unique violation'), { code: 'P2002' });
+          await prisma[model].create({ data: entry }); count++;
+        }
+        return { count };
       },
       async update({ where, data }) {
         const row = state.records[model][where.id];

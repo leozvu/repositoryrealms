@@ -51,14 +51,55 @@ test('PostgreSQL outbox atomicity, concurrent leases, recovery and HTTP uncertai
 
     await t.test('same occurrence concurrent enqueue creates one job; payload mismatch aborts its transaction', async () => {
       const input = event('duplicate');
-      const created = await Promise.all([enqueueEvent(prisma, input, { now: at }), enqueueEvent(prisma, input, { now: at })]);
-      assert.equal(created[0].id, created[1].id);
+      const created = await Promise.all(Array.from({ length: 8 }, () => enqueueEvent(prisma, input, { now: at })));
+      assert.equal(new Set(created.map(row => row.id)).size, 1);
       assert.equal(await prisma.eventOutbox.count({ where: { occurrenceId: input.occurrenceId } }), 1);
       await assert.rejects(prisma.$transaction(async tx => {
         await tx.auditLog.create({ data: audit('conflict') });
         await enqueueEvent(tx, { ...input, row: { id: 'different' } }, { now: at });
       }), { code: 'OUTBOX_OCCURRENCE_CONFLICT' });
       assert.equal(await prisma.auditLog.count({ where: { userId: prefix } }), 0);
+    });
+
+    await t.test('concurrent ReadCommitted transactions deduplicate and conflicting payload rolls back only its business effects', async () => {
+      for (const differentPayload of [false, true]) {
+        const suffix = differentPayload ? 'tx-conflict' : 'tx-duplicate';
+        const input = event(suffix);
+        let arrived = 0;
+        let release;
+        const barrier = new Promise(resolve => { release = resolve; });
+        const results = await Promise.allSettled([0, 1].map(index => prisma.$transaction(async tx => {
+          const taskId = `${prefix}-${suffix}-${index}`;
+          await tx.task.create({ data: { id: taskId, title: 'Concurrent outbox fixture' } });
+          await tx.auditLog.create({ data: audit(`${suffix}-${index}`) });
+          if (++arrived === 2) release();
+          await barrier;
+          return enqueueEvent(tx, { ...input, row: { id: differentPayload ? taskId : `${prefix}-same` } }, { now: at });
+        }, { isolationLevel: 'ReadCommitted', timeout: 15_000 })));
+        const successful = results.filter(result => result.status === 'fulfilled');
+        const failed = results.filter(result => result.status === 'rejected');
+        assert.equal(successful.length, differentPayload ? 1 : 2);
+        assert.equal(failed.length, differentPayload ? 1 : 0);
+        if (differentPayload) assert.equal(failed[0].reason.code, 'OUTBOX_OCCURRENCE_CONFLICT');
+        else assert.equal(successful[0].value.id, successful[1].value.id);
+        assert.equal(await prisma.eventOutbox.count({ where: { occurrenceId: input.occurrenceId } }), 1);
+        assert.equal(await prisma.task.count({ where: { id: { startsWith: `${prefix}-${suffix}-` } } }), successful.length);
+        assert.equal(await prisma.auditLog.count({ where: { refId: { startsWith: `${prefix}-${suffix}-` } } }), successful.length);
+        const stored = await prisma.eventOutbox.findUnique({ where: { id: successful[0].value.id } });
+        if (differentPayload) assert.ok(await prisma.task.findUnique({ where: { id: readOutboxPayload(stored).row.id } }));
+      }
+    });
+
+    await t.test('concurrent duplicate delivery enqueue preserves processing and delivered state', async () => {
+      const input = event('preserve-delivery');
+      const { id } = await enqueueEvent(prisma, input, { now: at });
+      for (const status of ['processing', 'delivered']) {
+        await prisma.eventOutbox.update({ where: { id }, data: { status, attempts: 3, leaseToken: 'current-worker', leaseUntil: new Date(+at + 60_000), completedAt: at } });
+        const before = await prisma.eventOutbox.findUnique({ where: { id } });
+        const copies = await Promise.all(Array.from({ length: 4 }, () => enqueueEvent(prisma, input, { now: new Date(+at + 120_000) })));
+        assert.ok(copies.every(row => row.id === id));
+        assert.deepEqual(await prisma.eventOutbox.findUnique({ where: { id } }), before);
+      }
     });
 
     await t.test('concurrent claims select one owner, expired lease is reclaimed and stale worker is fenced', async () => {

@@ -3,6 +3,7 @@ function matches(row, where = {}) {
   return Object.entries(where).every(([key, value]) => {
     if (key === 'OR') return value.some(part => matches(row, part));
     if (key === 'AND') return value.every(part => matches(row, part));
+    if (key === 'occurrenceId_deliveryKey') return matches(row, value);
     const actual = row[key];
     if (value && typeof value === 'object' && !(value instanceof Date)) {
       return Object.entries(value).every(([op, expected]) => ({
@@ -27,7 +28,17 @@ export function createOutboxMemoryDB(seed = {}) {
     };
     db[name] = {
       async create(args) { fail(name, 'create', args); return create(args); },
-      async createMany(args) { fail(name, 'createMany', args); args.data.forEach(data => create({ data })); return { count: args.data.length }; },
+      async createMany(args) {
+        fail(name, 'createMany', args);
+        let count = 0;
+        for (const data of args.data) {
+          const duplicate = state[name].some(row => row.id === data.id || (name === 'eventOutbox' && row.occurrenceId === data.occurrenceId && row.deliveryKey === data.deliveryKey));
+          if (duplicate && args.skipDuplicates) continue;
+          if (duplicate) throw Object.assign(new Error('unique violation'), { code: 'P2002' });
+          create({ data }); count++;
+        }
+        return { count };
+      },
       async upsert(args) {
         fail(name, 'upsert', args);
         const key = args.where.occurrenceId_deliveryKey;

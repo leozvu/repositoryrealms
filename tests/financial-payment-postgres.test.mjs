@@ -184,7 +184,7 @@ test('PostgreSQL payment concurrency, durable replay, currency and rollback', { 
       const brokenOutbox = {
         $transaction: (work, options) => db.$transaction(tx => work(new Proxy(tx, {
           get(target, property) {
-            if (property === 'eventOutbox') return { upsert: async () => { throw new Error('injected outbox failure'); } };
+            if (property === 'eventOutbox') return { createMany: async () => { throw new Error('injected outbox failure'); } };
             return target[property];
           },
         })), options),

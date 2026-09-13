@@ -13,7 +13,7 @@ const clock = () => new Date(at);
 
 test('business mutation + audit + enqueue roll back together on enqueue failure', async () => {
   const db = createOutboxMemoryDB();
-  db.fail = (model, method) => model === 'eventOutbox' && method === 'upsert';
+  db.fail = (model, method) => model === 'eventOutbox' && method === 'createMany';
   await assert.rejects(db.$transaction(async tx => {
     await tx.task.create({ data: { id: 'task-1' } });
     await tx.auditLog.create({ data: { action: 'create' } });
@@ -31,6 +31,36 @@ test('occurrence deduplication preserves job and rejects payload drift without c
   await assert.rejects(enqueueEvent(db, event({ row: { id: 'task-1', title: 'Changed' } })), { code: 'OUTBOX_OCCURRENCE_CONFLICT' });
   await enqueueEvent(db, event({ occurrenceId: 'occurrence-2' }), { now: at });
   assert.equal(db.rows('eventOutbox').length, 2);
+});
+
+test('duplicate enqueue never changes the payload, timestamps, lease or completed delivery state', async () => {
+  for (const status of ['processing', 'delivered']) {
+    const db = createOutboxMemoryDB();
+    const first = await enqueueEvent(db, event(), { now: at });
+    await db.eventOutbox.updateMany({ where: { id: first.id }, data: {
+      status, attempts: 3, leaseToken: 'current-worker', leaseUntil: new Date(+at + 60_000), completedAt: at,
+    } });
+    const before = db.rows('eventOutbox');
+    assert.deepEqual(await enqueueEvent(db, event(), { now: new Date(+at + 120_000) }), first);
+    assert.deepEqual(db.rows('eventOutbox'), before);
+  }
+});
+
+test('missing deduplicated row fails closed and isolation conflicts propagate without in-transaction retries', async () => {
+  const db = createOutboxMemoryDB();
+  db.eventOutbox.findUnique = async () => null;
+  await assert.rejects(db.$transaction(async tx => {
+    await tx.task.create({ data: { id: 'rolled-back' } });
+    await enqueueEvent(tx, event(), { now: at });
+  }), { code: 'OUTBOX_ENQUEUE_MISSING' });
+  assert.equal(db.rows('task').length, 0);
+  assert.equal(db.rows('eventOutbox').length, 0);
+
+  let attempts = 0;
+  const conflict = Object.assign(new Error('serialization conflict'), { code: 'P2034' });
+  db.eventOutbox.createMany = async () => { attempts++; throw conflict; };
+  await assert.rejects(enqueueEvent(db, event()), error => error === conflict);
+  assert.equal(attempts, 1);
 });
 
 test('durable snapshots strip known credential fields including nested previous records', async () => {

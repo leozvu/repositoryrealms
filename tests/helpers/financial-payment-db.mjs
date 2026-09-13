@@ -4,19 +4,22 @@ export function createPaymentDb(records = {}, hooks = {}) {
   let state = { invoice: [], vendorBill: [], approval: [], transaction: [], financialPaymentReceipt: [], auditLog: [], eventOutbox: [], setting: [], ...structuredClone(records) };
   let revision = 0;
   const stats = { conflicts: 0, transactions: 0, casMisses: 0 };
-  const matches = (row, where) => Object.entries(where).every(([key, value]) => row[key] === value);
+  const matches = (row, where) => Object.entries(where).every(([key, value]) => key === 'occurrenceId_deliveryKey' ? matches(row, value) : row[key] === value);
   function model(db, name, dirty) {
     return {
       async findUnique({ where }) { return structuredClone(db[name].find(row => matches(row, where)) || null); },
       async findFirst({ where }) { return structuredClone(db[name].find(row => matches(row, where)) || null); },
-      async upsert({ where, create }) {
+      async createMany({ data, skipDuplicates }) {
         if (hooks.outboxFailureOnce && name === 'eventOutbox') { hooks.outboxFailureOnce = false; throw new Error('outbox storage failure'); }
-        const existing = db[name].find(row => matches(row, where.occurrenceId_deliveryKey || where));
-        if (existing) return structuredClone(existing);
-        const row = { id: `${name}-${db[name].length + 1}`, ...structuredClone(create) };
-        db[name].push(row);
-        dirty.value = true;
-        return structuredClone(row);
+        let count = 0;
+        for (const entry of data) {
+          const duplicate = db[name].some(row => row.id === entry.id || (name === 'eventOutbox' && row.occurrenceId === entry.occurrenceId && row.deliveryKey === entry.deliveryKey));
+          if (duplicate && skipDuplicates) continue;
+          if (duplicate) throw Object.assign(new Error('unique violation'), { code: 'P2002' });
+          db[name].push(structuredClone(entry)); count++;
+        }
+        if (count) dirty.value = true;
+        return { count };
       },
       async updateMany({ where, data }) {
         if (hooks.casMissOnce && ['invoice', 'vendorBill'].includes(name)) { hooks.casMissOnce = false; stats.casMisses += 1; return { count: 0 }; }

@@ -3,7 +3,7 @@ export function createLeadConversionDb(leads = [], hooks = {}) {
   let state = { lead: structuredClone(leads), client: [], auditLog: [], eventOutbox: [] };
   let revision = 0;
   const stats = { conflicts: 0, transactions: 0, casMisses: 0 };
-  const matches = (row, where) => Object.entries(where).every(([key, value]) => value === undefined || row[key] === value);
+  const matches = (row, where) => Object.entries(where).every(([key, value]) => key === 'occurrenceId_deliveryKey' ? matches(row, value) : value === undefined || row[key] === value);
   const db = {
     async $transaction(callback, options) {
       if (options?.isolationLevel !== 'Serializable') throw new Error('Conversion requires Serializable');
@@ -19,11 +19,17 @@ export function createLeadConversionDb(leads = [], hooks = {}) {
           const row = { id: `${name}-${snapshot[name].length + 1}`, ...structuredClone(data) };
           snapshot[name].push(row); dirty = true; return structuredClone(row);
         },
-        async upsert({ where, create }) {
+        async createMany({ data, skipDuplicates }) {
           if (hooks.outboxFailureOnce) { hooks.outboxFailureOnce = false; throw new Error('outbox storage failed'); }
-          const existing = snapshot[name].find(row => matches(row, where.occurrenceId_deliveryKey));
-          if (existing) return structuredClone(existing);
-          snapshot[name].push(structuredClone(create)); dirty = true; return structuredClone(create);
+          let count = 0;
+          for (const entry of data) {
+            const duplicate = snapshot[name].some(row => row.id === entry.id || (name === 'eventOutbox' && row.occurrenceId === entry.occurrenceId && row.deliveryKey === entry.deliveryKey));
+            if (duplicate && skipDuplicates) continue;
+            if (duplicate) throw Object.assign(new Error('unique violation'), { code: 'P2002' });
+            snapshot[name].push(structuredClone(entry)); count++;
+          }
+          dirty ||= count > 0;
+          return { count };
         },
         async updateMany({ where, data }) {
           if (hooks.casMissOnce) { hooks.casMissOnce = false; stats.casMisses++; return { count: 0 }; }

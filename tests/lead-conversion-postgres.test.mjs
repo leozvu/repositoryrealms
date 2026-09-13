@@ -35,7 +35,7 @@ function brokenOutbox(db) {
   return { $transaction: (work, options) => db.$transaction(tx => work(new Proxy(tx, {
     get(target, key) {
       if (key !== 'eventOutbox') return target[key];
-      return { upsert: async () => { throw new Error('injected outbox failure after client/link/audit'); } };
+      return { createMany: async () => { throw new Error('injected outbox failure after client/link/audit'); } };
     },
   })), options) };
 }
