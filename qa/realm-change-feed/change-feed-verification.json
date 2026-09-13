@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "summary": {
-    "contracts": 10,
-    "verifiedContracts": 10,
+    "contracts": 12,
+    "verifiedContracts": 12,
     "scenarios": 6,
     "verifiedScenarios": 6
   },
@@ -46,7 +46,30 @@
       "layer": "api",
       "source": "app/api/data/[resource]/route.js",
       "signals": [
-        "await emitEvent(params.resource, 'create'"
+        "await commitRecordMutation(prisma, { resource: params.resource, event: 'create'"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "atomic-resource-event-intent",
+      "layer": "server",
+      "source": "lib/record-mutation.js",
+      "signals": [
+        "return db.$transaction(async tx =>",
+        "await tx.auditLog.create",
+        "await enqueueEvent(tx, { resource, event, row: changed"
+      ],
+      "missingSignals": [],
+      "status": "verified"
+    },
+    {
+      "id": "durable-event-publisher",
+      "layer": "server",
+      "source": "lib/events.js",
+      "signals": [
+        "export async function processDurableEvent(tx, payload, job)",
+        "await publishRealmChange(tx, { resource, action: event, entityId: row?.id, actorId: user?.id })"
       ],
       "missingSignals": [],
       "status": "verified"

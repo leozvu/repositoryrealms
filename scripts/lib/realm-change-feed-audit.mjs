@@ -10,7 +10,9 @@ const CONTRACTS = [
   { id: 'append-only-model', layer: 'database', source: 'prisma/schema.prisma', signals: ['model RealmChangeEvent', 'domains        String', '@@index([createdAt, id])'] },
   { id: 'additive-migration', layer: 'database', source: 'prisma/migrations/20260718170000_add_realm_change_feed/migration.sql', signals: ['CREATE TABLE "RealmChangeEvent"', 'CREATE INDEX "RealmChangeEvent_createdAt_id_idx"'] },
   { id: 'erp-event-publisher', layer: 'server', source: 'lib/events.js', signals: ["await step('Realm change feed'", 'publishRealmChange(prisma'] },
-  { id: 'awaited-resource-events', layer: 'api', source: 'app/api/data/[resource]/route.js', signals: ["await emitEvent(params.resource, 'create'"] },
+  { id: 'awaited-resource-events', layer: 'api', source: 'app/api/data/[resource]/route.js', signals: ["await commitRecordMutation(prisma, { resource: params.resource, event: 'create'"] },
+  { id: 'atomic-resource-event-intent', layer: 'server', source: 'lib/record-mutation.js', signals: ['return db.$transaction(async tx =>', 'await tx.auditLog.create', 'await enqueueEvent(tx, { resource, event, row: changed'] },
+  { id: 'durable-event-publisher', layer: 'server', source: 'lib/events.js', signals: ['export async function processDurableEvent(tx, payload, job)', 'await publishRealmChange(tx, { resource, action: event, entityId: row?.id, actorId: user?.id })'] },
   { id: 'authenticated-cursor-api', layer: 'api', source: 'app/api/realm-demo/changes/route.js', signals: ['const user = await currentUser()', 'loadRealmChangeFeed(prisma, user, { cursor })', 'realmJsonResponse(trace, feed'] },
   { id: 'payload-free-response', layer: 'server', source: 'lib/realm-change-feed.js', signals: ['select: { id: true, createdAt: true, domains: true }', 'domains: [...domainSet].sort()', 'eventCount: rows.length'] },
   { id: 'fail-soft-publisher', layer: 'server', source: 'lib/realm-change-feed.js', signals: ['safelyPublishRealmChange', 'return null'] },
@@ -82,7 +84,7 @@ function report(result) {
     `- Additive database migration: **1**\n\n` +
     `## Contract matrix\n\n${markdownTable(result.contracts, [['Contract', 'id'], ['Layer', 'layer'], ['Evidence', 'source'], ['Status', 'status']])}\n\n` +
     `## Cơ chế đã khóa\n\n` +
-    `- Mutation ERP phát metadata append-only; lỗi feed không làm hỏng thao tác nghiệp vụ chính.\n` +
+    `- CRUD ERP ghi record + audit + outbox trong cùng transaction; worker phát metadata append-only và thử lại khi lỗi feed.\n` +
     `- Cursor có thứ tự theo thời gian và ID, giữ được backlog qua nhiều instance serverless.\n` +
     `- Response chỉ trả domain tổng hợp và số event, không trả entity ID, actor ID hay nội dung nghiệp vụ.\n` +
     `- Client dừng polling khi tab ẩn, tự nối lại khi focus/online và chỉ refresh panel liên quan.\n` +

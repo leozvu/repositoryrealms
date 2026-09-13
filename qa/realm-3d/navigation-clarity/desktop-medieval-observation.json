@@ -1,0 +1,26 @@
+{
+  "project": "desktop-chromium",
+  "scope": "Functional/visual observation; not an AAA performance benchmark",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "world": {
+    "realmWorldVersion": "3d",
+    "ready": "true",
+    "camera": "first",
+    "quality": "high",
+    "materials": "ready",
+    "renderScale": "0.75",
+    "resolutionPreference": "clarity",
+    "playerX": "-10.20",
+    "playerZ": "-3.75",
+    "frameP95": "683",
+    "cameraX": "-10.200",
+    "cameraY": "1.650",
+    "cameraZ": "-3.750",
+    "drawCalls": "55",
+    "triangles": "181498"
+  },
+  "errors": []
+}

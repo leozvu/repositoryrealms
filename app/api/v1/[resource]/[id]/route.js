@@ -2,68 +2,68 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { apiUser } from '@/lib/apiauth';
-import { RESOURCES, canRead, canWrite, canDelete } from '@/lib/registry';
+import { RESOURCES, canRead, canWrite, canDelete, canDeleteRecord } from '@/lib/registry';
 import { interceptWrite } from '@/lib/approvals';
-import { emitEvent } from '@/lib/events';
+import { commitRecordMutation } from '@/lib/record-mutation';
+import { resourceEnabled } from '@/lib/module-guard';
 
-async function audit(user, action, entity, refId, detail) {
-  await prisma.auditLog.create({
-    data: { userId: user.id, userName: user.name, action, entity, refId: refId || null, detail: detail || null },
-  });
-}
 
 export async function GET(req, { params }) {
+  params = await params;
   const user = await apiUser(req);
   if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canRead(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
+  if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
+  const scope = cfg.scope ? await cfg.scope(user, prisma) : null;
+  const row = scope
+    ? await prisma[cfg.model].findFirst({ where: { AND: [{ id: params.id }, scope] } })
+    : await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
   return NextResponse.json(cfg.sanitize ? cfg.sanitize(row, user) : row);
 }
 
 export async function PUT(req, { params }) {
+  params = await params;
   const user = await apiUser(req);
   if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canWrite(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
-  if (cfg.canWriteRow && !cfg.canWriteRow(row, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (cfg.canWriteRow && !(await cfg.canWriteRow(row, user, prisma))) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   let data = await req.json();
   delete data.id;
-  if (cfg.filterUpdate) data = cfg.filterUpdate(data, user);
+  if (cfg.filterUpdate) data = cfg.filterUpdate(data, user, row);
   if (cfg.validate) {
     const err = await cfg.validate(row, data, prisma);
     if (err) return NextResponse.json({ error: err }, { status: 400 });
   }
   try {
-    const icp = await interceptWrite(params.resource, row, data, user);
-    if (icp?.block) return NextResponse.json({ _blocked: true, _notice: icp.block });
-    if (icp?.data) data = icp.data;
-    const updated = await prisma[cfg.model].update({ where: { id: params.id }, data });
-    await audit(user, 'update', params.resource, params.id, updated.name || updated.title || updated.code || null);
-    if (icp?.after) await icp.after(updated);
-    await emitEvent(params.resource, 'update', updated, row, user);
+    const result = await commitRecordMutation(prisma, { resource: params.resource, event: 'update', cfg, row, data, user, interceptWrite });
+    if (result.blocked) return NextResponse.json({ _blocked: true, _notice: result.notice });
+    const updated = result.row;
     return NextResponse.json(cfg.sanitize ? cfg.sanitize(updated, user) : updated);
   } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 400 });
+    return NextResponse.json({ error: e.message, ...(e.code ? { code: e.code } : {}) }, { status: e.status || 400 });
   }
 }
 
 export async function DELETE(req, { params }) {
+  params = await params;
   const user = await apiUser(req);
   if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   const cfg = RESOURCES[params.resource];
   if (!cfg || !canDelete(params.resource, user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (!(await resourceEnabled(params.resource))) return NextResponse.json({ error: 'Phân hệ này đang tắt cho công ty' }, { status: 403 });
   const row = await prisma[cfg.model].findUnique({ where: { id: params.id } });
   if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
+  if (!(await canDeleteRecord(params.resource, row, user, prisma))) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   try {
-    await prisma[cfg.model].delete({ where: { id: params.id } });
-    await audit(user, 'delete', params.resource, params.id, row.name || row.title || row.code || null);
-    await emitEvent(params.resource, 'delete', row, null, user);
+    await commitRecordMutation(prisma, { resource: params.resource, event: 'delete', cfg, row, user });
     return NextResponse.json({ ok: true });
   } catch (e) {
-    return NextResponse.json({ error: 'Không xóa được — còn dữ liệu liên quan' }, { status: 400 });
+    return NextResponse.json({ error: e.status === 409 ? e.message : 'Không xóa được — còn dữ liệu liên quan', ...(e.status === 409 ? { code: e.code } : {}) }, { status: e.status || 400 });
   }
 }

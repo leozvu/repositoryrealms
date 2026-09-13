@@ -1,9 +1,12 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useResource, Icon, FormModal, ConfirmDialog, Forbidden, ExportCsv, AsyncButton, useToast } from '@/components/ui';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useResource, Icon, FormModal, ConfirmDialog, Forbidden, AsyncButton, useToast, ResourceError } from '@/components/ui';
+import LeadExport from '@/components/crm/LeadExport';
+import { decodeLeadBoard } from '@/lib/lead-board-client';
 import { ActivitiesModal } from '@/components/Activities';
 import { BarChart } from '@/components/charts';
-import { money, moneyShort, initials, todayISO, localISO, LEAD_STAGES } from '@/lib/format';
+import { money, moneyShort, initials, todayISO, LEAD_STAGES } from '@/lib/format';
 import { LEAD_SOURCES } from '@/lib/lead-intake';
 import styles from './crm-workload.module.css';
 
@@ -19,10 +22,25 @@ const ACTION_LABEL = {
 };
 
 export default function LeadsPage() {
-  const { rows, loading, forbidden, create, update, remove } = useResource('leads');
+  const [cursors, setCursors] = useState({});
+  const [pageHistory, setPageHistory] = useState({});
+  const boardQuery = new URLSearchParams(Object.entries(cursors).sort(([a], [b]) => a.localeCompare(b))).toString();
+  const resource = useResource('leads', null, { readUrl: `/api/leads/board${boardQuery ? '?' + boardQuery : ''}`, decodeRead: decodeLeadBoard });
+  const { rows, metadata: board, loading, forbidden, error, mutating: resourceMutating } = resource;
+  const [converting, setConverting] = useState(false);
+  const conversionController = useRef(null);
+  const mutating = resourceMutating || converting;
+  const resetPages = () => { setCursors({}); setPageHistory({}); };
+  const refresh = () => { if (boardQuery) resetPages(); else resource.refresh(); };
+  const save = async (method, ...args) => { if (conversionController.current) return null; const result = await resource[method](...args); if (result) resetPages(); return result; };
+  const create = data => save('create', data), update = (id, data) => save('update', id, data), remove = id => save('remove', id);
+  const summary = board?.summary;
   const users = useResource('users');
-  const clients = useResource('clients');
-  const [modal, setModal] = useState(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const focusId = searchParams.get('focus');
+  const [modalState, setModalState] = useState(null);
+  const modal = modalState?.scopeKey === resource.scopeKey ? modalState : null;
   const [dragId, setDragId] = useState(null);
   const [overCol, setOverCol] = useState(null);
   const [settings, setSettings] = useState(null);
@@ -30,48 +48,74 @@ export default function LeadsPage() {
   const [workloadLoading, setWorkloadLoading] = useState(true);
   const [workloadError, setWorkloadError] = useState('');
   const toast = useToast();
-  const focusedRecordRef = useRef(null);
-  useEffect(() => { fetch('/api/settings').then(r => r.ok ? r.json() : null).then(setSettings).catch(() => {}); }, []);
+  const recordController = useRef(null);
+  const scopeRef = useRef(resource.scopeKey); scopeRef.current = resource.scopeKey;
+  const modalIntent = useRef(0);
+  const setModal = useCallback(next => {
+    recordController.current?.abort(); modalIntent.current++;
+    setModalState(next ? { ...next, scopeKey: scopeRef.current } : null);
+  }, []);
+  const workloadController = useRef(null);
+  useEffect(() => {
+    setModal(null); resetPages(); setConverting(false);
+    return () => { recordController.current?.abort(); conversionController.current?.abort(); conversionController.current = null; };
+  }, [resource.scopeKey, setModal]);
+  useEffect(() => {
+    const controller = new AbortController(); setSettings(null);
+    fetch('/api/settings', { signal: controller.signal, cache: 'no-store' }).then(r => r.ok ? r.json() : null)
+      .then(value => { if (!controller.signal.aborted) setSettings(value); }).catch(() => {});
+    return () => controller.abort();
+  }, [resource.scopeKey]);
   const loadWorkload = useCallback(async () => {
+    workloadController.current?.abort();
+    const controller = new AbortController(); workloadController.current = controller;
     setWorkloadLoading(true);
     setWorkloadError('');
+    setWorkloadPayload(null);
     try {
-      const response = await fetch('/api/leads/workload', { cache: 'no-store' });
+      const response = await fetch('/api/leads/workload', { cache: 'no-store', signal: controller.signal });
       const body = await response.json();
+      if (controller.signal.aborted) return;
       if (!response.ok) throw new Error(body?.error || 'Không thể tải CRM Workload Intelligence.');
-      setWorkloadPayload(body);
+      setWorkloadPayload({ ...body, scopeKey: resource.scopeKey });
     } catch (error) {
-      setWorkloadError(error.message || 'Không thể tải CRM Workload Intelligence.');
+      if (!controller.signal.aborted) setWorkloadError(error.message || 'Không thể tải CRM Workload Intelligence.');
     } finally {
-      setWorkloadLoading(false);
+      if (!controller.signal.aborted) setWorkloadLoading(false);
     }
-  }, []);
-  useEffect(() => { loadWorkload(); }, [loadWorkload, rows.length]);
+  }, [resource.scopeKey]);
+  useEffect(() => { loadWorkload(); return () => workloadController.current?.abort(); }, [loadWorkload]);
+  const openLead = useCallback(async (id, mode = 'edit', signal) => {
+    recordController.current?.abort();
+    const controller = new AbortController(), startedScope = scopeRef.current;
+    recordController.current = controller;
+    const abort = () => controller.abort();
+    signal?.addEventListener('abort', abort, { once: true });
+    try {
+      const response = await fetch(`/api/data/leads?id=${encodeURIComponent(id)}`, { cache: 'no-store', signal: controller.signal });
+      const body = await response.json();
+      if (controller.signal.aborted || scopeRef.current !== startedScope) return;
+      if (!response.ok || !Array.isArray(body)) throw new Error(body?.error || 'Không thể mở Lead.');
+      if (!body[0]) throw new Error('Không tìm thấy Lead hoặc bạn không còn quyền xem bản ghi này.');
+      setModal({ mode, row: body[0] });
+    } catch (error) { if (!controller.signal.aborted && scopeRef.current === startedScope) toast(error.message, 'error'); }
+    finally { signal?.removeEventListener('abort', abort); }
+  }, [toast, setModal]);
   useEffect(() => {
-    if (loading || typeof window === 'undefined') return;
-    const focusId = new URLSearchParams(window.location.search).get('focus');
-    if (!focusId || focusedRecordRef.current === focusId) return;
-    focusedRecordRef.current = focusId;
-    const lead = rows.find((row) => row.id === focusId);
-    if (!lead) {
-      toast('Không tìm thấy Lead hoặc bạn không còn quyền xem bản ghi này.', 'error');
-      return;
-    }
-    setModal({ mode: 'edit', row: lead });
-  }, [loading, rows, toast]);
-  if (forbidden) return <Forbidden />;
+    if (!focusId) return;
+    const controller = new AbortController();
+    openLead(focusId, 'edit', controller.signal);
+    return () => controller.abort();
+  }, [resource.scopeKey, focusId, openLead]);
 
   /* ---------- v3.4: forecast doanh thu weighted theo xác suất giai đoạn ---------- */
-  const PROB = { new: settings?.probNew ?? 10, contacted: settings?.probContacted ?? 20, proposal: settings?.probProposal ?? 40, negotiation: settings?.probNegotiation ?? 60 };
-  const mk = off => { const d = new Date(); d.setMonth(d.getMonth() + off); return localISO(d).slice(0, 7); };
-  const fcMonths = [mk(0), mk(1), mk(2)];
-  const openAll = rows.filter(l => !['won', 'lost'].includes(l.stage));
-  const noDate = openAll.filter(l => !l.expectedClose);
-  const fcValues = fcMonths.map(k => Math.round(openAll
-    .filter(l => l.expectedClose && l.expectedClose.slice(0, 7) === k)
-    .reduce((s, l) => s + (l.value || 0) * (PROB[l.stage] || 0) / 100, 0)));
-  const target = settings?.monthlyTarget || 0;
+  const PROB = summary?.probability || {};
+  const fcMonths = summary?.months || [];
+  const fcValues = summary?.forecast || [];
+  const target = summary?.target || 0;
 
+  const keepCurrentOption = (options, value, fallbackLabel = value) => value && !options.some(option => option.value === value)
+    ? [{ value, label: fallbackLabel }, ...options] : options;
   const FIELDS = [
     { key: 'name', label: 'Người liên hệ', required: true },
     { key: 'company', label: 'Công ty' },
@@ -79,70 +123,69 @@ export default function LeadsPage() {
     { key: 'phone', label: 'Điện thoại' },
     // v3.42: cùng danh sách nguồn với cổng nhận lead tự động, để lead nhập tay và lead
     // chảy về từ Facebook/TikTok gộp báo cáo được với nhau
-    { key: 'source', label: 'Nguồn', type: 'select', options: LEAD_SOURCES.map(s => ({ value: s, label: s })) },
+    { key: 'source', label: 'Nguồn', type: 'select', options: keepCurrentOption(LEAD_SOURCES.map(s => ({ value: s, label: s })), modal?.row?.source) },
     { key: 'campaign', label: 'Chiến dịch (VD 4_MKT_Landing_ThaoVietAn)' },
-    { key: 'region', label: 'Khu vực', type: 'select', options: [{ value: '', label: '—' }, ...(settings?.leadRegions || []).map(r => ({ value: r, label: r }))] },
-    { key: 'serviceLine', label: 'Mảng dịch vụ quan tâm', type: 'select', options: [{ value: '', label: '—' }, ...(settings?.serviceLines || []).map(x => ({ value: x, label: x }))] },
+    { key: 'region', label: 'Khu vực', type: 'select', options: keepCurrentOption([{ value: '', label: '—' }, ...(settings?.leadRegions || []).map(r => ({ value: r, label: r }))], modal?.row?.region) },
+    { key: 'serviceLine', label: 'Mảng dịch vụ quan tâm', type: 'select', options: keepCurrentOption([{ value: '', label: '—' }, ...(settings?.serviceLines || []).map(x => ({ value: x, label: x }))], modal?.row?.serviceLine) },
     { key: 'value', label: 'Giá trị dự kiến (đ)', type: 'number' },
     { key: 'stage', label: 'Giai đoạn', type: 'select', options: LEAD_STAGES.map(s => ({ value: s.key, label: s.label })) },
     { key: 'expectedClose', label: 'Ngày dự kiến chốt (cho dự báo)', type: 'date' },
-    { key: 'ownerId', label: 'Người phụ trách', type: 'select', options: users.rows.filter(u => u.status === 'active').map(u => ({ value: u.id, label: u.name })) },
+    { key: 'ownerId', label: 'Người phụ trách', type: 'select', options: keepCurrentOption([{ value: '', label: 'Chưa phân công' }, ...users.rows.filter(u => u.status === 'active').map(u => ({ value: u.id, label: u.name }))], modal?.row?.ownerId, 'Giữ người phụ trách hiện tại') },
     { key: 'note', label: 'Ghi chú', type: 'textarea', full: true },
   ];
-  const userName = id => users.rows.find(u => u.id === id)?.name || '—';
-  const open = rows.filter(l => !['won', 'lost'].includes(l.stage));
-  const workload = workloadPayload?.workloadIntelligence;
+  const userName = id => users.rows.find(u => u.id === id)?.name || id || '—';
+  const workload = workloadPayload?.scopeKey === resource.scopeKey ? workloadPayload.workloadIntelligence : null;
   const workloadByLead = useMemo(() => new Map((workload?.leads || []).map((lead) => [lead.id, lead])), [workload]);
 
-  // v3.42: hiệu quả theo chiến dịch — trả lời "tiền quảng cáo đổ vào đâu thì ra khách thật".
+  // Giá trị deal thắng vẫn là ước tính trên Lead, không phải tiền đã thu.
   // Chỉ dựng khi có ít nhất một lead gắn nhãn chiến dịch, để công ty chưa dùng không bị rác màn hình.
-  const campaigns = useMemo(() => {
-    const map = new Map();
-    rows.forEach(l => {
-      const key = l.campaign || '(không gắn chiến dịch)';
-      const c = map.get(key) || { key, total: 0, won: 0, wonValue: 0, openValue: 0, source: l.source || '' };
-      c.total += 1;
-      if (l.stage === 'won') { c.won += 1; c.wonValue += l.value || 0; }
-      else if (l.stage !== 'lost') c.openValue += l.value || 0;
-      map.set(key, c);
-    });
-    return [...map.values()].sort((a, b) => b.wonValue - a.wonValue || b.total - a.total).slice(0, 10);
-  }, [rows]);
-  const hasCampaigns = rows.some(l => l.campaign);
+  const campaigns = summary?.campaigns || [];
+  const hasCampaigns = summary?.hasCampaigns;
 
   const drop = async stage => {
     setOverCol(null);
     const lead = rows.find(l => l.id === dragId);
     if (!lead || lead.stage === stage) return;
-    await update(lead.id, { stage });
+    const result = await update(lead.id, { stage });
+    if (!result) return;
     await loadWorkload();
     if (stage === 'won') toast(`Chúc mừng! Deal "${lead.company || lead.name}" đã thắng`);
   };
 
   const convertToClient = async lead => {
-    const res = await clients.create({
-      name: lead.company || lead.name, contact: lead.name, email: lead.email, phone: lead.phone,
-      note: 'Chuyển từ pipeline (' + (lead.source || '') + ')', createdAt: todayISO(),
-    });
-    if (!res) return false;
-    toast('Đã tạo khách hàng mới từ deal thắng');
-    setModal(null); return true;
+    if (conversionController.current || resourceMutating) return false;
+    const controller = new AbortController(), startedScope = resource.scopeKey, startedIntent = modalIntent.current;
+    conversionController.current = controller; setConverting(true);
+    const current = () => !controller.signal.aborted && scopeRef.current === startedScope && modalIntent.current === startedIntent;
+    try {
+      const response = await fetch(`/api/leads/${encodeURIComponent(lead.id)}/convert`, { method: 'POST', signal: controller.signal });
+      const result = await response.json();
+      if (!current()) return false;
+      if (!response.ok || !result.clientId) throw new Error(result.error || 'Không thể chuyển Lead thành khách hàng.');
+      toast(result.replayed ? 'Mở khách hàng đã liên kết với Lead' : 'Đã tạo khách hàng và lưu nguồn Lead');
+      setModal(null);
+      router.push(`/clients/${encodeURIComponent(result.clientId)}`);
+      return true;
+    } catch (error) {
+      if (current()) toast(error.message || 'Chưa xác minh được chuyển Lead. Hãy kiểm tra khách hàng đã liên kết.', 'error');
+      return false;
+    } finally {
+      if (conversionController.current === controller) { conversionController.current = null; setConverting(false); }
+    }
   };
 
+  if (forbidden) return <Forbidden />;
+  if (error && !modal) return <ResourceError error={error} onRetry={refresh} loading={loading} />;
   return (
     <>
+      <ResourceError error={error} onRetry={refresh} loading={loading} />
       <div className="toolbar">
         <span style={{ fontSize: '.85rem', color: 'var(--muted)' }}>
-          Pipeline mở: <b style={{ color: 'var(--fg)' }}>{money(open.reduce((s, l) => s + l.value, 0))}</b> · {open.length} cơ hội
+          Pipeline mở: <b style={{ color: 'var(--fg)' }}>{summary ? money(summary.openValue) : '—'}</b> · {summary?.openCount ?? '—'} cơ hội
         </span>
         <div className="spacer"></div>
-        <ExportCsv rows={rows} name="pipeline" cols={[
-          { label: 'Deal', value: l => l.company || l.name }, { key: 'name', label: 'Người liên hệ' },
-          { key: 'stage', label: 'Giai đoạn' }, { key: 'value', label: 'Giá trị' }, { key: 'source', label: 'Nguồn' },
-          { key: 'campaign', label: 'Chiến dịch' }, { key: 'region', label: 'Khu vực' }, { key: 'serviceLine', label: 'Mảng dịch vụ' },
-          { key: 'expectedClose', label: 'Dự kiến chốt' }, { label: 'Phụ trách', value: l => userName(l.ownerId) },
-        ]} />
-        <button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm khách tiềm năng</span></button>
+        <LeadExport scopeKey={resource.scopeKey} disabled={loading || !summary?.total} userName={userName} />
+        <button className="btn btn-primary" disabled={mutating} onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} /><span>Thêm khách tiềm năng</span></button>
       </div>
 
       {hasCampaigns && (
@@ -150,7 +193,7 @@ export default function LeadsPage() {
           <div className="card-head"><span className="card-title">Hiệu quả theo chiến dịch</span></div>
           <div className="card-body" style={{ overflowX: 'auto' }}>
             <table className="table">
-              <thead><tr><th>Chiến dịch</th><th style={{ textAlign: 'right' }}>Lead</th><th style={{ textAlign: 'right' }}>Chốt</th><th style={{ textAlign: 'right' }}>Tỷ lệ chốt</th><th style={{ textAlign: 'right' }}>Doanh thu đã chốt</th><th style={{ textAlign: 'right' }}>Đang mở</th></tr></thead>
+              <thead><tr><th>Chiến dịch</th><th style={{ textAlign: 'right' }}>Lead</th><th style={{ textAlign: 'right' }}>Chốt</th><th style={{ textAlign: 'right' }}>Tỷ lệ chốt</th><th style={{ textAlign: 'right' }}>Giá trị deal thắng</th><th style={{ textAlign: 'right' }}>Đang mở</th></tr></thead>
               <tbody>
                 {campaigns.map(c => (
                   <tr key={c.key}>
@@ -164,6 +207,7 @@ export default function LeadsPage() {
                 ))}
               </tbody>
             </table>
+            <p style={{ fontSize: '.78rem', color: 'var(--muted)' }}>Giá trị dự kiến của các Lead đã chốt thắng. Khoản thu thực tế được ghi nhận tại Tài chính.</p>
           </div>
         </div>
       )}
@@ -180,9 +224,10 @@ export default function LeadsPage() {
 
         <div className={styles.live} aria-live="polite">
           {workloadLoading ? 'Đang tổng hợp Lead, Activity và owner WIP…'
-            : workloadError || `Snapshot ${new Date(workloadPayload.generatedAt).toLocaleString('vi-VN')} · ${workload?.ruleVersion}`}
+            : workloadError || (workload ? `Snapshot ${new Date(workloadPayload.generatedAt).toLocaleString('vi-VN')} · ${workload.ruleVersion}` : 'Đang tải…')}
         </div>
         {workloadError && <div className={styles.error} role="alert"><span>{workloadError}</span><button type="button" onClick={loadWorkload}>Thử lại</button></div>}
+        {workload && (workloadPayload.limits?.leadSnapshotTruncated || workloadPayload.limits?.activitySnapshotTruncated) && <p role="status">Workload dùng tối đa 2.000 Lead và 20.000 activity gần nhất; đây là phân tích một phần. Tổng pipeline và forecast bên dưới vẫn dùng toàn bộ Lead trong quyền xem.</p>}
 
         {workload && <>
           <div className={styles.metrics} aria-label="CRM workload summary">
@@ -197,15 +242,15 @@ export default function LeadsPage() {
               <header><div><p>Manager Queue</p><h2 id="crm-manager-queue">Việc cần quyết định</h2></div><span>Advisory only</span></header>
               <div className={styles.queueList}>
                 {workload.managerQueue.map((item) => {
-                  const lead = item.kind === 'lead_review' ? rows.find((row) => row.id === item.entityId) : null;
+                  const lead = item.kind === 'lead_review' ? item.entityId : null;
                   return <article key={item.id} className={styles.queueItem} data-level={item.level}>
                     <div className={styles.queueMain}><span>{item.kind === 'owner_capacity' ? 'Owner capacity' : item.lifecycle?.label || 'Lead review'}</span>
                       <strong>{item.title}</strong><small>{item.ownerName} · nguồn: {item.source}</small></div>
                     <div className={styles.queueReason}><strong>{item.signals[0]?.label}</strong><span>{item.signals[0]?.explanation}</span></div>
                     <div className={styles.queueActions}>
                       <span>{ACTION_LABEL[item.recommendedAction] || item.recommendedAction}</span>
-                      {lead && <button type="button" onClick={() => setModal({ mode: 'edit', row: lead })}>Review Lead</button>}
-                      {lead && <button type="button" className={styles.secondaryAction} onClick={() => setModal({ mode: 'acts', row: lead })}>Nhật ký / follow-up</button>}
+                      {lead && <AsyncButton disabled={mutating} onClick={() => openLead(lead)}>Review Lead</AsyncButton>}
+                      {lead && <AsyncButton disabled={mutating} className={styles.secondaryAction} onClick={() => openLead(lead, 'acts')}>Nhật ký / follow-up</AsyncButton>}
                     </div>
                   </article>;
                 })}
@@ -235,7 +280,7 @@ export default function LeadsPage() {
       </section>
 
       <details className={styles.pipelineDrilldown}>
-        <summary><span>Pipeline &amp; forecast drill-down</span><strong>{open.length} cơ hội đang mở · {moneyShort(open.reduce((sum, lead) => sum + lead.value, 0))}</strong><small>Mở để thao tác forecast và Kanban CRM gốc.</small></summary>
+        <summary><span>Pipeline &amp; forecast drill-down</span><strong>{summary?.openCount ?? '—'} cơ hội đang mở · {summary ? moneyShort(summary.openValue) : '—'}</strong><small>Tổng và dự báo tính trên toàn bộ Lead trong quyền xem; mỗi cột tải 25 thẻ.</small></summary>
         <div className={styles.pipelineBody}>
 
       {/* v3.4: dự báo doanh thu chốt 3 tháng (weighted theo xác suất giai đoạn) */}
@@ -248,10 +293,10 @@ export default function LeadsPage() {
         <div className="card-body" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'center' }}>
           <BarChart labels={fcMonths.map(k => 'T' + +k.slice(5))} series={[{ name: 'Dự báo chốt', color: '#7C3AED', values: fcValues }]} height={170} />
           <div style={{ fontSize: '.83rem', display: 'grid', gap: 8 }}>
-            <div><b style={{ fontSize: '1.25rem', color: 'var(--primary)' }}>{moneyShort(fcValues[0])}</b> dự báo tháng này
+            <div><b style={{ fontSize: '1.25rem', color: 'var(--primary)' }}>{summary ? moneyShort(fcValues[0]) : '—'}</b> dự báo tháng này
               {target > 0 && <span style={{ color: fcValues[0] >= target ? 'var(--accent)' : 'var(--muted)' }}> · {Math.round(fcValues[0] / target * 100)}% mục tiêu {moneyShort(target)}</span>}</div>
-            {noDate.length > 0 && <div className={styles.forecastWarning}><Icon name="alert" size={15} />{noDate.length} deal chưa đặt ngày dự kiến chốt — chưa tính vào dự báo</div>}
-            <div style={{ color: 'var(--muted)' }}>Deal thắng thực tế sẽ thay dự báo bằng doanh thu thật.</div>
+            {summary?.noDateCount > 0 && <div className={styles.forecastWarning}><Icon name="alert" size={15} />{summary.noDateCount} deal chưa đặt ngày dự kiến chốt — chưa tính vào dự báo</div>}
+            <div style={{ color: 'var(--muted)' }}>Giá trị Lead là ước tính. Khoản thu thực tế được ghi nhận tại Tài chính.</div>
           </div>
         </div>
       </div>
@@ -264,12 +309,12 @@ export default function LeadsPage() {
               onDragOver={e => { e.preventDefault(); setOverCol(st.key); }}
               onDragLeave={() => setOverCol(null)}
               onDrop={() => drop(st.key)}>
-              <div className="kan-head"><span className="dot" style={{ background: st.color }}></span>{st.label}<span className="count">{items.length}</span></div>
+              <div className="kan-head"><span className="dot" style={{ background: st.color }}></span>{st.label}<span className="count">{summary?.stages[st.key]?.count ?? '—'}</span></div>
               {items.map(l => {
                 const leadWorkload = workloadByLead.get(l.id);
                 const lifecycleTone = LIFECYCLE_TONE[leadWorkload?.lifecycle?.band] || 'decided';
                 return (
-                <button type="button" key={l.id} className={`kan-card ${styles.leadCardButton}`} draggable
+                <button type="button" key={l.id} className={`kan-card ${styles.leadCardButton}`} draggable={!mutating} disabled={mutating}
                   onDragStart={() => setDragId(l.id)}
                   onClick={() => setModal({ mode: 'edit', row: l })}
                   aria-label={`Mở Lead ${l.company || l.name}, ${leadWorkload?.lifecycle?.label || st.label}`}>
@@ -285,6 +330,18 @@ export default function LeadsPage() {
                   {leadWorkload && <span className={styles.leadEvidence}>{leadWorkload.lastTouch.date ? `Last recorded touch ${leadWorkload.lastTouch.date}` : 'Chưa có evidence ngày'} · confidence {leadWorkload.confidence.band}</span>}
                 </button>
               );})}
+              <nav aria-label={`Phân trang ${st.label}`} style={{ display: 'flex', gap: 8, alignItems: 'center', padding: 8 }}>
+                <button className="btn btn-outline btn-sm" disabled={loading || mutating || !pageHistory[st.key]?.length} onClick={() => {
+                  const history = pageHistory[st.key] || [], previous = history.at(-1);
+                  setPageHistory(value => ({ ...value, [st.key]: history.slice(0, -1) }));
+                  setCursors(value => { const next = { ...value }; if (previous) next[`${st.key}Cursor`] = previous; else delete next[`${st.key}Cursor`]; return next; });
+                }}>Trước</button>
+                <span style={{ fontSize: '.75rem' }}>Trang {(pageHistory[st.key]?.length || 0) + 1}</span>
+                <button className="btn btn-outline btn-sm" disabled={loading || mutating || !board?.columns[st.key]?.page.hasMore} onClick={() => {
+                  setPageHistory(value => ({ ...value, [st.key]: [...(value[st.key] || []), cursors[`${st.key}Cursor`] || null] }));
+                  setCursors(value => ({ ...value, [`${st.key}Cursor`]: board.columns[st.key].page.nextCursor }));
+                }}>Tiếp</button>
+              </nav>
             </div>
           );
         })}
@@ -294,18 +351,18 @@ export default function LeadsPage() {
       </details>
 
       {modal?.mode === 'add' && <FormModal title="Thêm khách tiềm năng" fields={FIELDS} data={{ stage: 'new', source: 'Facebook' }}
-        onClose={() => setModal(null)} onSave={async d => { await create({ ...d, createdAt: todayISO() }); toast('Đã thêm'); await loadWorkload(); }} />}
-      {modal?.mode === 'edit' && <FormModal title="Chi tiết khách tiềm năng" fields={FIELDS} data={modal.row}
-        onClose={() => setModal(null)} onSave={async d => { await update(modal.row.id, d); toast('Đã cập nhật'); await loadWorkload(); }}
+        onClose={() => setModal(null)} onSave={async d => { const result = await create({ ...d, createdAt: todayISO() }); if (!result) return false; toast('Đã thêm'); await loadWorkload(); return result; }} />}
+      {modal?.mode === 'edit' && <FormModal key={modal.row.id} title="Chi tiết khách tiềm năng" fields={FIELDS} data={modal.row}
+        onClose={() => setModal(null)} onSave={async d => { const result = await update(modal.row.id, d); if (!result) return false; toast('Đã cập nhật'); await loadWorkload(); return result; }}
         extraFooter={<>
           <button className="btn btn-ghost" style={{ marginRight: 'auto', color: 'var(--danger)' }}
-            onClick={() => setModal({ mode: 'del', row: modal.row })}><Icon name="trash" size={16} /> Xóa</button>
-          <button className="btn btn-outline" onClick={() => setModal({ mode: 'acts', row: modal.row })}><Icon name="clock" size={16} /> Nhật ký &amp; hẹn</button>
-          {modal.row.stage === 'won' && <AsyncButton className="btn btn-outline" pendingLabel="Đang chuyển…" onClick={() => convertToClient(modal.row)}>Chuyển thành khách hàng</AsyncButton>}
+            disabled={mutating} onClick={() => setModal({ mode: 'del', row: modal.row })}><Icon name="trash" size={16} /> Xóa</button>
+          <button className="btn btn-outline" disabled={mutating} onClick={() => setModal({ mode: 'acts', row: modal.row })}><Icon name="clock" size={16} /> Nhật ký &amp; hẹn</button>
+          {(modal.row.clientId || modal.row.stage === 'won') && <AsyncButton disabled={mutating} className="btn btn-outline" pendingLabel="Đang mở khách hàng…" onClick={() => convertToClient(modal.row)}>{modal.row.clientId ? 'Mở khách hàng đã liên kết' : 'Chuyển thành khách hàng'}</AsyncButton>}
         </>} />}
       {modal?.mode === 'acts' && <ActivitiesModal refType="lead" refId={modal.row.id} name={modal.row.company || modal.row.name} onClose={() => { setModal(null); loadWorkload(); }} />}
       {modal?.mode === 'del' && <ConfirmDialog msg={`Xóa khách tiềm năng "${modal.row.company || modal.row.name}"?`}
-        onClose={() => setModal(null)} onYes={async () => { await remove(modal.row.id); toast('Đã xóa'); await loadWorkload(); }} />}
+        onClose={() => setModal(null)} onYes={async () => { const result = await remove(modal.row.id); if (!result) return false; toast('Đã xóa'); await loadWorkload(); return result; }} />}
     </>
   );
 }

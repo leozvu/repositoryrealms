@@ -1039,7 +1039,9 @@
       "source": "app/(app)/leads/page.jsx",
       "signals": [
         "get('focus')",
-        "setModal({ mode: 'edit', row: lead })"
+        "openLead(focusId, 'edit', controller.signal)",
+        "/api/data/leads?id=${encodeURIComponent(id)}",
+        "setModal({ mode, row: body[0] })"
       ],
       "target": "Lead FormModal",
       "missingSignals": [],

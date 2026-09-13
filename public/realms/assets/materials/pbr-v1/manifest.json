@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "imported": "2026-09-09",
+  "license": "https://polyhaven.com/license",
+  "apiCredit": "Powered by Poly Haven",
+  "runtime": "Local files only; no runtime API or remote CDN dependency",
+  "assets": [
+    {
+      "file": "oak_veneer_03-color.jpg",
+      "asset": "oak_veneer_03",
+      "channel": "color",
+      "bytes": 577314,
+      "sha256": "5107c0400b3ceb551b2d9d3200460efc0509b543dca04be891a49869795d6ed7",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_03/oak_veneer_03_diff_1k.jpg",
+      "page": "https://polyhaven.com/a/oak_veneer_03",
+      "authors": {
+        "Jenelle van Heerden": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "oak_veneer_03-normal.jpg",
+      "asset": "oak_veneer_03",
+      "channel": "normal",
+      "bytes": 278961,
+      "sha256": "f933166a6a3d3dff1dc671b4b93a3a19598c798b621f65bfe5d9bb37ab437ee4",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_03/oak_veneer_03_nor_gl_1k.jpg",
+      "page": "https://polyhaven.com/a/oak_veneer_03",
+      "authors": {
+        "Jenelle van Heerden": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "oak_veneer_03-roughness.jpg",
+      "asset": "oak_veneer_03",
+      "channel": "roughness",
+      "bytes": 789620,
+      "sha256": "a681ab188a9066528dce5003dd5ddd00070f762101719aefa2172ee7f8a124d0",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_03/oak_veneer_03_rough_1k.jpg",
+      "page": "https://polyhaven.com/a/oak_veneer_03",
+      "authors": {
+        "Jenelle van Heerden": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sandstone_blocks_05-color.jpg",
+      "asset": "sandstone_blocks_05",
+      "channel": "color",
+      "bytes": 635678,
+      "sha256": "d17c322d9e793ab9fc198948a34f2632595560471ff8714f2b0e052bc75c9ee3",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sandstone_blocks_05/sandstone_blocks_05_diff_1k.jpg",
+      "page": "https://polyhaven.com/a/sandstone_blocks_05",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sandstone_blocks_05-normal.jpg",
+      "asset": "sandstone_blocks_05",
+      "channel": "normal",
+      "bytes": 1224895,
+      "sha256": "ab42361855310d8de9b11470c6b21e512c9926decd5548dc9e9d72bd6cc06f3e",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sandstone_blocks_05/sandstone_blocks_05_nor_gl_1k.jpg",
+      "page": "https://polyhaven.com/a/sandstone_blocks_05",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "sandstone_blocks_05-roughness.jpg",
+      "asset": "sandstone_blocks_05",
+      "channel": "roughness",
+      "bytes": 210439,
+      "sha256": "4f4d27fc3186e18db5423ddbd41902cd5c5bd5642d4cdea89610c1b5d1f9821d",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/sandstone_blocks_05/sandstone_blocks_05_rough_1k.jpg",
+      "page": "https://polyhaven.com/a/sandstone_blocks_05",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "grey_plaster_03-color.jpg",
+      "asset": "grey_plaster_03",
+      "channel": "color",
+      "bytes": 486612,
+      "sha256": "b0952ccabee3f68a1962684a8bc2fe64101b92e569cfd13cf1d8c11b65f395d9",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/grey_plaster_03/grey_plaster_03_diff_1k.jpg",
+      "page": "https://polyhaven.com/a/grey_plaster_03",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "grey_plaster_03-normal.jpg",
+      "asset": "grey_plaster_03",
+      "channel": "normal",
+      "bytes": 467515,
+      "sha256": "801b002ad7a8872cc998080f9a0345b68e49708c09570050e09e1e0fb3af161d",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/grey_plaster_03/grey_plaster_03_nor_gl_1k.jpg",
+      "page": "https://polyhaven.com/a/grey_plaster_03",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "grey_plaster_03-roughness.jpg",
+      "asset": "grey_plaster_03",
+      "channel": "roughness",
+      "bytes": 424960,
+      "sha256": "6d51b445ed36d27887db7d0c5db23d6ef6aa3c1f49e7c65878ee80c66353c2ee",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/grey_plaster_03/grey_plaster_03_rough_1k.jpg",
+      "page": "https://polyhaven.com/a/grey_plaster_03",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "fabric_pattern_07-normal.jpg",
+      "asset": "fabric_pattern_07",
+      "channel": "normal",
+      "bytes": 828071,
+      "sha256": "f6955bbdead9f023f2357f6f8808ed49627d10882cd2a3cb6b5a5ace155abc45",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fabric_pattern_07/fabric_pattern_07_nor_gl_1k.jpg",
+      "page": "https://polyhaven.com/a/fabric_pattern_07",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "license": "CC0-1.0"
+    },
+    {
+      "file": "fabric_pattern_07-roughness.jpg",
+      "asset": "fabric_pattern_07",
+      "channel": "roughness",
+      "bytes": 488744,
+      "sha256": "3d90ac40b5c32a15649cc8525b7eeed133ea46b63a0e3eae5e34911d5c967e3a",
+      "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fabric_pattern_07/fabric_pattern_07_rough_1k.jpg",
+      "page": "https://polyhaven.com/a/fabric_pattern_07",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "license": "CC0-1.0"
+    }
+  ]
+}

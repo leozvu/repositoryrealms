@@ -8,7 +8,8 @@ import { ToastProvider } from '@/components/ui';
 import { LanguageSwitch } from '@/components/LanguageProvider';
 import CollaborationBridge, { WorkspaceSurfaceSwitch } from '@/components/collaboration/CollaborationBridge';
 import { GlobalSearch, NotificationsModal } from '@/components/Shell';
-import { areaBySlug, mobileDestinations, REALM_V2_AREAS } from '@/lib/realm-v2-contracts';
+import { areaBySlug, mobileDestinations } from '@/lib/realm-v2-contracts';
+import { visibleRealmV2Areas } from '@/lib/realm-v2-navigation';
 import Icon from './Icon';
 import styles from './realm-v2.module.css';
 
@@ -111,14 +112,15 @@ const PRIMARY_NAVIGATION = [
   ['Hội đồng', ['action-center', 'ceo-terminal']],
 ];
 
-function groups() {
+function groups(visibleAreas) {
+  const visibleSlugs = new Set(visibleAreas.map((area) => area.slug));
   return PRIMARY_NAVIGATION.map(([label, slugs]) => [
     label,
-    slugs.map((itemSlug) => areaBySlug(itemSlug)).filter(Boolean),
-  ]);
+    slugs.filter((itemSlug) => visibleSlugs.has(itemSlug)).map((itemSlug) => areaBySlug(itemSlug)),
+  ]).filter(([, areas]) => areas.length);
 }
 
-function ProductShell({ user, company, slug, pilot, children }) {
+function ProductShell({ user, company, slug, pilot, modules = null, children }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -128,7 +130,9 @@ function ProductShell({ user, company, slug, pilot, children }) {
   const [unread, setUnread] = useState(0);
   const [realmIdentity, setRealmIdentity] = useState(null);
   const headingRef = useRef(null);
-  const navigationGroups = useMemo(groups, []);
+  const visibleAreas = useMemo(() => visibleRealmV2Areas(user, modules), [user, modules]);
+  const navigationGroups = useMemo(() => groups(visibleAreas), [visibleAreas]);
+  const mobileAreas = useMemo(() => mobileDestinations().filter((area) => visibleAreas.some((visible) => visible.slug === area.slug)), [visibleAreas]);
   const page = PAGE_COPY[slug] || {
     eyebrow: areaBySlug(slug).group,
     title: areaBySlug(slug).labelVi,
@@ -263,7 +267,7 @@ function ProductShell({ user, company, slug, pilot, children }) {
         </main>
 
         <nav className={styles.mobileNav} aria-label="Điều hướng chính trên di động">
-          {mobileDestinations().map((item) => (
+          {mobileAreas.map((item) => (
             <Link className={styles.mobileNavItem} data-active={slug === item.slug || undefined} aria-current={slug === item.slug ? 'page' : undefined} href={`/realm-v2/${item.slug}`} key={item.slug}>
               <Icon name={item.icon} size={19}/><span>{{ home: 'Trang chủ', 'my-work': 'Việc tôi', 'action-center': 'Hành động', inbox: 'Hộp thư', mobile: 'Xem thêm' }[item.slug]}</span>
             </Link>
@@ -277,7 +281,7 @@ function ProductShell({ user, company, slug, pilot, children }) {
             <header className={styles.drawerHeader}><strong>Tất cả điểm đến</strong><span className={styles.drawerHeaderActions}><LanguageSwitch compact/><button type="button" className={styles.iconButton} onClick={() => setDrawerOpen(false)} aria-label="Đóng"><Icon name="close"/></button></span></header>
             <nav className={`${styles.drawerBody} ${styles.list}`}>
               <Link href="/realm" className={`${styles.listItem} ${styles.drawerRealmEntry}`} onClick={() => setDrawerOpen(false)}><span className={styles.listIcon}><Icon name="map"/></span><span className={styles.listCopy}><strong>Bước vào thế giới Realm</strong><span>Nhân vật, hiện diện và voice theo khoảng cách</span></span><Icon name="chevron" size={14}/></Link>
-              {REALM_V2_AREAS.map((item) => <Link href={`/realm-v2/${item.slug}`} key={item.slug} className={styles.listItem} onClick={() => setDrawerOpen(false)}><span className={styles.listIcon}><Icon name={item.icon}/></span><span className={styles.listCopy}><strong>{item.labelVi}</strong><span>{item.group}</span></span><Icon name="chevron" size={14}/></Link>)}
+              {visibleAreas.map((item) => <Link href={`/realm-v2/${item.slug}`} key={item.slug} className={styles.listItem} onClick={() => setDrawerOpen(false)}><span className={styles.listIcon}><Icon name={item.icon}/></span><span className={styles.listCopy}><strong>{item.labelVi}</strong><span>{item.group}</span></span><Icon name="chevron" size={14}/></Link>)}
               <button type="button" className={styles.listItem} onClick={() => signOut({ callbackUrl: '/login' })} style={{ width: '100%', borderInline: 0, background: 'transparent', color: 'inherit', textAlign: 'left' }}><span className={styles.listIcon}><Icon name="lock"/></span><span className={styles.listCopy}><strong>Đăng xuất</strong><span>Kết thúc phiên hiện tại</span></span></button>
             </nav>
           </section>
@@ -285,7 +289,7 @@ function ProductShell({ user, company, slug, pilot, children }) {
       )}
       {searchOpen && (
         <GlobalSearch
-          commands={REALM_V2_AREAS.map((item) => ({ label: item.labelVi, href: `/realm-v2/${item.slug}`, icon: item.icon, group: item.group }))}
+          commands={visibleAreas.map((item) => ({ label: item.labelVi, href: `/realm-v2/${item.slug}`, icon: item.icon, group: item.group }))}
           onClose={() => setSearchOpen(false)}
         />
       )}

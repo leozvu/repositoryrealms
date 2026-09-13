@@ -1,37 +1,37 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth';
-import { hasAny, isDirector } from '@/lib/perm';
-import { payVendorBill, createApproval, getSettings } from '@/lib/approvals';
+import { hasAny } from '@/lib/perm';
+import { notify, usersWithRole } from '@/lib/events';
+import { notificationRecordRoute } from '@/lib/notification-inbox';
+import { requestVendorPayment, financialPaymentResponse } from '@/lib/financial-payment-command';
 
-// Thanh toán hóa đơn NCC.
-// Dưới ngưỡng (hoặc người trả là Kế toán/GĐ đủ quyền) → trả ngay + ghi sổ.
-// Từ ngưỡng trở lên → đi qua chuỗi duyệt Kế toán (→ Giám đốc nếu rất lớn).
 export async function POST(req, { params }) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'unauthorized', code: 'unauthorized' }, { status: 401 });
   if (!hasAny(user, ['ACCOUNTANT', 'PM'])) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
-  const { date } = await req.json();
-  const bill = await prisma.vendorBill.findUnique({ where: { id: params.id }, include: { vendor: true } });
-  if (!bill) return NextResponse.json({ error: 'not found' }, { status: 404 });
-  if (bill.status === 'paid') return NextResponse.json({ error: 'Hóa đơn này đã thanh toán rồi' }, { status: 400 });
-
-  const s = await getSettings();
-  const needApproval = bill.amount >= s.approveExpenseOver && !isDirector(user);
-  if (needApproval) {
-    const dup = await prisma.approval.findFirst({ where: { type: 'vendorbill', refId: bill.id, status: 'pending' } });
-    if (dup) return NextResponse.json({ _blocked: true, _notice: 'Hóa đơn này đang chờ duyệt thanh toán' });
-    const steps = [{ role: 'ACCOUNTANT', label: 'Kế toán' }];
-    if (bill.amount >= s.approveExpenseDirectorOver) steps.push({ role: 'DIRECTOR', label: 'Giám đốc' });
-    const { autoApproved } = await createApproval({
-      type: 'vendorbill', refId: bill.id,
-      title: `Duyệt trả ${bill.vendor.name} — ${bill.code} (${bill.amount.toLocaleString('vi-VN')}đ)`,
-      amount: bill.amount, payload: { date }, steps, user,
+  try {
+    const { date } = await req.json();
+    const result = await requestVendorPayment(prisma, user, {
+      recordId: params.id, date, idempotencyKey: req.headers.get('idempotency-key'),
     });
-    return NextResponse.json(autoApproved
-      ? { ok: true, _notice: 'Đã tự duyệt (bạn giữ vai trò duyệt) và thanh toán, ghi vào sổ quỹ' }
-      : { _blocked: true, _notice: 'Đã tạo yêu cầu phê duyệt thanh toán — xử lý trong mục Phê duyệt' });
+    if (result.pending) {
+      if (!result.replayed) {
+        try {
+          const step = JSON.parse(result.approval.steps).find(item => item.status === 'pending');
+          const targets = step.userId ? [step.userId] : (await usersWithRole(step.role)).map(person => person.id);
+          await notify(targets.filter(id => id !== user.id), 'Chờ bạn duyệt: ' + result.approval.title, notificationRecordRoute('approvals', result.approval.id));
+        } catch { /* A committed approval remains recoverable in the approval inbox. */ }
+      }
+      return NextResponse.json({ _blocked: true, approvalId: result.approval.id, _notice: 'Hóa đơn đang chờ phê duyệt thanh toán.' });
+    }
+    return NextResponse.json({
+      ...result.payment.record,
+      _payment: { ...result.payment.receipt, replayed: result.payment.replayed },
+      _notice: result.payment.replayed ? 'Thanh toán đã được xác nhận trong sổ quỹ.' : 'Đã thanh toán và ghi khoản chi vào sổ quỹ.',
+    });
+  } catch (error) {
+    const response = financialPaymentResponse(error);
+    return NextResponse.json(response.body, { status: response.status });
   }
-  const updated = await payVendorBill(bill.id, date, user);
-  return NextResponse.json({ ...updated, _notice: 'Đã thanh toán và ghi khoản chi vào sổ quỹ' });
 }

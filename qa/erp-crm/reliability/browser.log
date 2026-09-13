@@ -1,0 +1,23 @@
+
+Running 14 tests using 1 worker
+
+(node:31244) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [desktop-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command (643ms)
+  ok  2 [desktop-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:31:1 › My Work distinguishes unavailable approval and task data from a zero workload (392ms)
+  ok  3 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:4:1 › changing session identity clears the previous user rows before the new request completes (407ms)
+  ok  4 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:20:1 › changing filters and disabling a resource cannot expose old rows (373ms)
+  ok  5 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:32:1 › read failure exposes retry and recovers without an empty-success state (379ms)
+  ok  6 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:43:1 › actual Lead handler keeps failed form contents and closes only on confirmed write (2.4s)
+  ok  7 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:63:1 › dirty form stays open when discard is declined; fields lock during submission (571ms)
+(node:33800) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  8 [mobile-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command (622ms)
+  ok  9 [mobile-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:31:1 › My Work distinguishes unavailable approval and task data from a zero workload (397ms)
+  ok 10 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:4:1 › changing session identity clears the previous user rows before the new request completes (389ms)
+  ok 11 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:20:1 › changing filters and disabling a resource cannot expose old rows (375ms)
+  ok 12 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:32:1 › read failure exposes retry and recovers without an empty-success state (399ms)
+  ok 13 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:43:1 › actual Lead handler keeps failed form contents and closes only on confirmed write (2.9s)
+  ok 14 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:63:1 › dirty form stays open when discard is declined; fields lock during submission (586ms)
+
+  14 passed (30.1s)

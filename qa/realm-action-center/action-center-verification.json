@@ -133,9 +133,10 @@
       "signals": [
         "resource === 'taskcomments'",
         "bình luận việc",
-        "await notify(task.assigneeId",
+        "await sendNotification(task.assigneeId",
         "resource === 'activities'",
-        "lên lịch follow-up"
+        "lên lịch follow-up",
+        "const sendNotification = (ids, text, route) => notify(ids, text, route, ctx.db ? { db } : {})"
       ],
       "missingSignals": [],
       "status": "verified"

@@ -21,7 +21,7 @@ import { NOTIFICATION_SYNC_EVENT } from '@/lib/notification-inbox';
 import RealmFeedbackLauncher from './realm/RealmFeedbackLauncher';
 import RealmPilotOnboarding from './realm/RealmPilotOnboarding';
 import { LanguageSwitch, useLanguage } from './LanguageProvider';
-import { GLOBAL_SEARCH_GROUPS, searchGroupRows } from '@/lib/global-search-contract';
+import { GLOBAL_SEARCH_GROUPS } from '@/lib/global-search-contract';
 
 const NAV = ERP_NAV;
 
@@ -50,7 +50,7 @@ function useDebouncedValue(value, delay = 180) {
 
 export function GlobalSearch({ onClose, commands = [] }) {
   const [query, setQuery] = useState('');
-  const [data, setData] = useState({});
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
@@ -60,7 +60,7 @@ export function GlobalSearch({ onClose, commands = [] }) {
   useEffect(() => {
     const needle = debouncedQuery.trim();
     if (needle.length < 2) {
-      setData({});
+      setData(null);
       setLoading(false);
       setError('');
       return undefined;
@@ -68,15 +68,15 @@ export function GlobalSearch({ onClose, commands = [] }) {
     const controller = new AbortController();
     setLoading(true);
     setError('');
-    Promise.all(GLOBAL_SEARCH_GROUPS.map(async (group) => {
-      const response = await fetch(`/api/data/${group.res}`, { signal: controller.signal });
-      if (!response.ok) return [group.res, []];
-      const rows = await response.json();
-      return [group.res, Array.isArray(rows) ? rows : []];
-    }))
-      .then((pairs) => setData(Object.fromEntries(pairs)))
+    setData(null);
+    fetch(`/api/search?${new URLSearchParams({ q: needle, limit: '5' })}`, { signal: controller.signal, cache: 'no-store' })
+      .then(async response => {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Không thể tải kết quả.');
+        if (!controller.signal.aborted) setData({ query: needle, groups: result.groups });
+      })
       .catch((searchError) => {
-        if (searchError.name !== 'AbortError') setError('Không thể tải kết quả. Hãy thử lại.');
+        if (!controller.signal.aborted && searchError.name !== 'AbortError') setError(searchError.message || 'Không thể tải kết quả. Hãy thử lại.');
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
@@ -89,8 +89,8 @@ export function GlobalSearch({ onClose, commands = [] }) {
     const destinations = commands
       .filter((command) => !needle || command.label.toLowerCase().includes(needle))
       .slice(0, needle ? 5 : 7);
-    const records = needle.length < 2 ? [] : GLOBAL_SEARCH_GROUPS
-      .map((group) => ({ ...group, items: searchGroupRows(group, data[group.res], needle, 5) }))
+    const records = needle.length < 2 || data?.query !== query.trim() ? [] : GLOBAL_SEARCH_GROUPS
+      .map((group) => { const result = data.groups.find(item => item.resource === group.res); return { ...group, items: result?.items || [], hasMore: result?.hasMore || false }; })
       .filter((group) => group.items.length);
     return { destinations, records };
   }, [commands, data, query]);
@@ -133,6 +133,7 @@ export function GlobalSearch({ onClose, commands = [] }) {
           autoFocus
           aria-label="Tìm bản ghi hoặc chức năng"
           placeholder="Tìm khách hàng, dự án, hóa đơn hoặc chức năng"
+          maxLength={100}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={onKeyDown}
@@ -172,7 +173,7 @@ export function GlobalSearch({ onClose, commands = [] }) {
         {error && <div className="command-state command-state-error"><Icon name="warning" />{error}</div>}
         {!loading && !error && resultGroups.records.map((group) => (
           <section className="command-group" key={group.res}>
-            <h3>{group.label}</h3>
+            <h3>{group.label}{group.hasMore ? ' · 5 kết quả đầu' : ''}</h3>
             {group.items.map((row) => {
               const index = cursor++;
               return (
@@ -192,9 +193,10 @@ export function GlobalSearch({ onClose, commands = [] }) {
                 </button>
               );
             })}
+            {group.hasMore && <p className="command-hint">Còn kết quả khác. Thêm từ khóa để thu hẹp tìm kiếm.</p>}
           </section>
         ))}
-        {!loading && !error && query.trim().length >= 2 && !resultGroups.records.length && (
+        {!loading && !error && data?.query === query.trim() && query.trim().length >= 2 && !resultGroups.records.length && (
           <div className="command-state"><Icon name="search" />Không có bản ghi phù hợp với “{query.trim()}”.</div>
         )}
         {query.trim().length < 2 && (

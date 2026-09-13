@@ -1,0 +1,266 @@
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 965ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+   ▲ Next.js 15.5.21
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 2.0min
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/91) ...
+   Generating static pages (22/91) 
+   Generating static pages (45/91) 
+   Generating static pages (68/91) 
+ ✓ Generating static pages (91/91)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                        Size  First Load JS
+┌ ○ /                                                             167 B         107 kB
+├ ○ /_not-found                                                    1 kB         104 kB
+├ ƒ /analytics                                                  4.39 kB         183 kB
+├ ƒ /api/apikeys                                                  479 B         104 kB
+├ ƒ /api/approvals                                                479 B         104 kB
+├ ƒ /api/approvals/[id]/decide                                    479 B         104 kB
+├ ƒ /api/attendance/punch                                         479 B         104 kB
+├ ƒ /api/audit                                                    479 B         104 kB
+├ ƒ /api/auth/[...nextauth]                                       479 B         104 kB
+├ ƒ /api/avatar                                                   479 B         104 kB
+├ ƒ /api/avatar/[id]                                              479 B         104 kB
+├ ƒ /api/ceo/v1/backup-export                                     479 B         104 kB
+├ ƒ /api/ceo/v1/capabilities                                      479 B         104 kB
+├ ƒ /api/ceo/v1/command-gateway                                   479 B         104 kB
+├ ƒ /api/ceo/v1/command-gateway/[id]/reconcile                    479 B         104 kB
+├ ƒ /api/ceo/v1/commands                                          479 B         104 kB
+├ ƒ /api/ceo/v1/commands/receipts                                 479 B         104 kB
+├ ƒ /api/ceo/v1/credential-rotation                               479 B         104 kB
+├ ƒ /api/ceo/v1/dashboard                                         479 B         104 kB
+├ ƒ /api/ceo/v1/dashboard/cron                                    479 B         104 kB
+├ ƒ /api/ceo/v1/dashboard/refresh                                 479 B         104 kB
+├ ƒ /api/ceo/v1/decision-queue                                    479 B         104 kB
+├ ƒ /api/ceo/v1/decisions                                         479 B         104 kB
+├ ƒ /api/ceo/v1/directory                                         479 B         104 kB
+├ ƒ /api/ceo/v1/directory/profile                                 479 B         104 kB
+├ ƒ /api/ceo/v1/federation/policy                                 479 B         104 kB
+├ ƒ /api/ceo/v1/federation/presence                               479 B         104 kB
+├ ƒ /api/ceo/v1/federation/world                                  479 B         104 kB
+├ ƒ /api/ceo/v1/health                                            479 B         104 kB
+├ ƒ /api/ceo/v1/identity/recover                                  479 B         104 kB
+├ ƒ /api/ceo/v1/identity/recovery                                 479 B         104 kB
+├ ƒ /api/ceo/v1/identity/session                                  479 B         104 kB
+├ ƒ /api/ceo/v1/identity/session/step-up                          479 B         104 kB
+├ ƒ /api/ceo/v1/identity/sessions/[id]/revoke                     479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/conversations                           479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/conversations/[id]                      479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/conversations/[id]/messages             479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/conversations/[id]/refresh              479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/deliver                                 479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/directory                               479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/export                                  479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/feed                                    479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/messages/[id]/reconcile                 479 B         104 kB
+├ ƒ /api/ceo/v1/messaging/receipts                                479 B         104 kB
+├ ƒ /api/ceo/v1/registry                                          479 B         104 kB
+├ ƒ /api/ceo/v1/registry/[id]                                     479 B         104 kB
+├ ƒ /api/ceo/v1/registry/[id]/rotate                              479 B         104 kB
+├ ƒ /api/ceo/v1/registry/[id]/service-credential                  479 B         104 kB
+├ ƒ /api/ceo/v1/rollout                                           479 B         104 kB
+├ ƒ /api/ceo/v1/rollout/[entityId]/transition                     479 B         104 kB
+├ ƒ /api/ceo/v1/rollout/evidence                                  479 B         104 kB
+├ ƒ /api/ceo/v1/schema-reconcile                                  479 B         104 kB
+├ ƒ /api/ceo/v1/security/control-plane                            479 B         104 kB
+├ ƒ /api/ceo/v1/security/rehearsal                                479 B         104 kB
+├ ƒ /api/ceo/v1/security/service-credential                       479 B         104 kB
+├ ƒ /api/ceo/v1/snapshot                                          479 B         104 kB
+├ ƒ /api/ceo/v1/sso/authorize                                     479 B         104 kB
+├ ƒ /api/ceo/v1/sso/callback                                      479 B         104 kB
+├ ƒ /api/ceo/v1/sso/exchange                                      479 B         104 kB
+├ ƒ /api/ceo/v1/staff/links                                       479 B         104 kB
+├ ƒ /api/ceo/v1/staff/message                                     479 B         104 kB
+├ ƒ /api/ceo/v1/staff/sso                                         479 B         104 kB
+├ ƒ /api/chat                                                     479 B         104 kB
+├ ƒ /api/chat/[id]                                                479 B         104 kB
+├ ƒ /api/collaboration/contact                                    479 B         104 kB
+├ ƒ /api/collaboration/presence                                   479 B         104 kB
+├ ƒ /api/copilot                                                  479 B         104 kB
+├ ƒ /api/data/[resource]                                          479 B         104 kB
+├ ƒ /api/data/[resource]/[id]                                     479 B         104 kB
+├ ƒ /api/docs                                                     479 B         104 kB
+├ ƒ /api/docs/[id]                                                479 B         104 kB
+├ ƒ /api/email/send                                               479 B         104 kB
+├ ƒ /api/errorlog                                                 479 B         104 kB
+├ ƒ /api/execution/actions                                        479 B         104 kB
+├ ƒ /api/execution/my-work                                        479 B         104 kB
+├ ƒ /api/execution/team-work                                      479 B         104 kB
+├ ƒ /api/finance/intelligence                                     479 B         104 kB
+├ ƒ /api/freelancer/home                                          479 B         104 kB
+├ ƒ /api/freelancer/task/[id]                                     479 B         104 kB
+├ ƒ /api/freelancer/timelog                                       479 B         104 kB
+├ ƒ /api/hr/evidence-intelligence                                 479 B         104 kB
+├ ƒ /api/ics                                                      479 B         104 kB
+├ ƒ /api/ics/[token]                                              479 B         104 kB
+├ ƒ /api/import                                                   479 B         104 kB
+├ ƒ /api/import/bulk                                              479 B         104 kB
+├ ƒ /api/insights                                                 479 B         104 kB
+├ ƒ /api/integrations/leozops/v1/action-proposals                 479 B         104 kB
+├ ƒ /api/integrations/leozops/v1/commands/create-task             479 B         104 kB
+├ ƒ /api/integrations/leozops/v1/commands/create-task/receipts    479 B         104 kB
+├ ƒ /api/integrations/leozops/v1/lead-brief                       479 B         104 kB
+├ ƒ /api/integrations/leozops/v1/lead-snapshot                    479 B         104 kB
+├ ƒ /api/invoices/[id]/pay                                        479 B         104 kB
+├ ƒ /api/invoices/from-hours                                      479 B         104 kB
+├ ƒ /api/lead-intake                                              479 B         104 kB
+├ ƒ /api/leads/[id]/convert                                       479 B         104 kB
+├ ƒ /api/leads/board                                              479 B         104 kB
+├ ƒ /api/leads/workload                                           479 B         104 kB
+├ ƒ /api/leozops/action-proposals                                 479 B         104 kB
+├ ƒ /api/leozops/action-proposals/[id]/review                     479 B         104 kB
+├ ƒ /api/leozops/command-intents                                  479 B         104 kB
+├ ƒ /api/leozops/command-intents/[id]/confirm                     479 B         104 kB
+├ ƒ /api/leozops/jobs/run                                         479 B         104 kB
+├ ƒ /api/leozops/runtime                                          479 B         104 kB
+├ ƒ /api/livesessions/[id]/reconcile                              479 B         104 kB
+├ ƒ /api/livesessions/[id]/settle                                 479 B         104 kB
+├ ƒ /api/notifications                                            479 B         104 kB
+├ ƒ /api/payouts/[id]/pay                                         479 B         104 kB
+├ ƒ /api/payroll                                                  479 B         104 kB
+├ ƒ /api/payroll/[id]/finalize                                    479 B         104 kB
+├ ƒ /api/projects/[id]/execution-health                           479 B         104 kB
+├ ƒ /api/projects/apply-template                                  479 B         104 kB
+├ ƒ /api/projects/stats                                           479 B         104 kB
+├ ƒ /api/push/subscribe                                           479 B         104 kB
+├ ƒ /api/quotes/[id]/convert                                      479 B         104 kB
+├ ƒ /api/realm-demo/actions                                       479 B         104 kB
+├ ƒ /api/realm-demo/changes                                       479 B         104 kB
+├ ƒ /api/realm-demo/chronicle                                     479 B         104 kB
+├ ƒ /api/realm-demo/command-center                                479 B         104 kB
+├ ƒ /api/realm-demo/economy                                       479 B         104 kB
+├ ƒ /api/realm-demo/embassy                                       479 B         104 kB
+├ ƒ /api/realm-demo/experience                                    479 B         104 kB
+├ ƒ /api/realm-demo/feedback                                      479 B         104 kB
+├ ƒ /api/realm-demo/guild                                         479 B         104 kB
+├ ƒ /api/realm-demo/health                                        479 B         104 kB
+├ ƒ /api/realm-demo/launch                                        479 B         104 kB
+├ ƒ /api/realm-demo/launch/approvals                              479 B         104 kB
+├ ƒ /api/realm-demo/operations                                    479 B         104 kB
+├ ƒ /api/realm-demo/pilot                                         479 B         104 kB
+├ ƒ /api/realm-demo/pilot/operations                              479 B         104 kB
+├ ƒ /api/realm-demo/pilot/rehearsal                               479 B         104 kB
+├ ƒ /api/realm-demo/readiness                                     479 B         104 kB
+├ ƒ /api/realm-demo/release-candidate                             479 B         104 kB
+├ ƒ /api/realm-demo/rewards                                       479 B         104 kB
+├ ƒ /api/realm-demo/session                                       479 B         104 kB
+├ ƒ /api/realm-demo/token                                         479 B         104 kB
+├ ƒ /api/realm-demo/treasury                                      479 B         104 kB
+├ ƒ /api/realm-demo/war-room                                      479 B         104 kB
+├ ƒ /api/realm-v2/profile-recognition                             479 B         104 kB
+├ ƒ /api/recurring/generate                                       479 B         104 kB
+├ ƒ /api/search                                                   479 B         104 kB
+├ ƒ /api/settings                                                 479 B         104 kB
+├ ƒ /api/shipments/[id]/pay                                       479 B         104 kB
+├ ƒ /api/staff-message/deliver                                    479 B         104 kB
+├ ƒ /api/staff-sso/callback                                       479 B         104 kB
+├ ƒ /api/staff-sso/start                                          479 B         104 kB
+├ ƒ /api/stocklots/[id]/issue                                     479 B         104 kB
+├ ƒ /api/users                                                    479 B         104 kB
+├ ƒ /api/users/2fa                                                479 B         104 kB
+├ ƒ /api/v1/[resource]                                            479 B         104 kB
+├ ƒ /api/v1/[resource]/[id]                                       479 B         104 kB
+├ ƒ /api/v1/summary                                               479 B         104 kB
+├ ƒ /api/vendorbills/[id]/pay                                     479 B         104 kB
+├ ƒ /approvals                                                  8.35 kB         187 kB
+├ ƒ /assets                                                     2.14 kB         181 kB
+├ ƒ /attendance                                                 3.87 kB         183 kB
+├ ƒ /audit                                                      1.56 kB         180 kB
+├ ƒ /automation                                                 3.35 kB         182 kB
+├ ƒ /calendar                                                   2.96 kB         182 kB
+├ ƒ /ceo-briefing                                               6.84 kB         289 kB
+├ ƒ /ceo-commands                                               6.79 kB         289 kB
+├ ƒ /ceo-decisions                                              3.03 kB         285 kB
+├ ƒ /ceo-inbox                                                  5.34 kB         287 kB
+├ ƒ /ceo-navigator                                              7.62 kB         290 kB
+├ ƒ /ceo-overview                                               12.5 kB         294 kB
+├ ƒ /ceo-registry                                               7.37 kB         286 kB
+├ ƒ /ceo-rollout                                                5.71 kB         284 kB
+├ ƒ /ceo-security                                               5.31 kB         284 kB
+├ ƒ /ceo-workforce                                              6.04 kB         288 kB
+├ ƒ /ceo-world                                                  4.07 kB         286 kB
+├ ƒ /clients                                                    2.94 kB         185 kB
+├ ƒ /clients/[id]                                               4.38 kB         186 kB
+├ ƒ /commissions                                                2.52 kB         181 kB
+├ ƒ /contracts                                                  3.72 kB         182 kB
+├ ƒ /copilot                                                    2.29 kB         181 kB
+├ ƒ /dashboard                                                   6.5 kB         288 kB
+├ ƒ /docs                                                       2.07 kB         181 kB
+├ ƒ /finance                                                    9.26 kB         222 kB
+├ ƒ /financials                                                 4.76 kB         183 kB
+├ ƒ /finplan                                                    5.37 kB         184 kB
+├ ƒ /freelancer                                                 2.79 kB         181 kB
+├ ƒ /freelancers                                                4.24 kB         183 kB
+├ ƒ /fxreval                                                    2.38 kB         181 kB
+├ ƒ /gantt                                                      3.38 kB         182 kB
+├ ƒ /growing                                                    3.69 kB         182 kB
+├ ƒ /guide                                                      7.73 kB         186 kB
+├ ƒ /import                                                      5.6 kB         184 kB
+├ ƒ /install                                                    3.46 kB         182 kB
+├ ƒ /inventory                                                  4.98 kB         184 kB
+├ ƒ /invoices                                                   6.57 kB         189 kB
+├ ƒ /invoices/[id]                                              1.12 kB         184 kB
+├ ƒ /leads                                                      10.9 kB         190 kB
+├ ƒ /live                                                       4.43 kB         183 kB
+├ ○ /login                                                      2.58 kB         215 kB
+├ ○ /manifest.webmanifest                                         479 B         104 kB
+├ ƒ /markets                                                    2.79 kB         181 kB
+├ ƒ /messages                                                   3.77 kB         182 kB
+├ ƒ /myday                                                      7.78 kB         190 kB
+├ ƒ /okr                                                        2.26 kB         181 kB
+├ ƒ /payroll                                                    4.51 kB         183 kB
+├ ƒ /portfolio                                                   3.1 kB         185 kB
+├ ƒ /projects                                                    4.6 kB         187 kB
+├ ƒ /projects/[id]                                              6.53 kB         189 kB
+├ ƒ /quotes                                                     5.37 kB         219 kB
+├ ƒ /quotes/[id]                                                1.15 kB         184 kB
+├ ƒ /realm                                                        167 B         567 kB
+├ ƒ /realm-demo                                                   168 B         567 kB
+├ ƒ /realm-v2/[[...area]]                                         276 B         403 kB
+├ ƒ /realm-v2/design-system                                     11.9 kB         206 kB
+├ ƒ /realm-v2/phase-1-qa                                        2.86 kB         346 kB
+├ ƒ /realm-v2/phase-2-qa                                          215 B         351 kB
+├ ƒ /realm-v2/phase-3-qa                                        2.01 kB         348 kB
+├ ƒ /realm-v2/phase-4-qa                                        2.01 kB         349 kB
+├ ƒ /realm-v2/phase-5-qa                                        2.01 kB         348 kB
+├ ƒ /realm-v2/phase-6-qa                                          212 B         346 kB
+├ ƒ /realm-v2/phase-7-qa                                          211 B         345 kB
+├ ƒ /realm-v2/phase-8-qa                                          211 B         346 kB
+├ ƒ /recruitment                                                2.45 kB         181 kB
+├ ƒ /reports                                                    6.36 kB         185 kB
+├ ƒ /resources                                                  3.16 kB         182 kB
+├ ƒ /reviews                                                    3.27 kB         189 kB
+├ ƒ /services                                                   2.01 kB         181 kB
+├ ƒ /settings                                                   33.6 kB         316 kB
+├ ƒ /shipments                                                  6.35 kB         185 kB
+├ ƒ /staff                                                      4.45 kB         187 kB
+├ ƒ /staff/[id]                                                 2.97 kB         185 kB
+├ ƒ /tasks                                                      6.54 kB         185 kB
+├ ƒ /teamwork                                                   7.21 kB         186 kB
+├ ƒ /templates                                                  2.61 kB         181 kB
+├ ƒ /tickets                                                     4.1 kB         183 kB
+├ ƒ /timesheet                                                  2.21 kB         181 kB
+├ ƒ /vendors                                                    4.64 kB         183 kB
+└ ƒ /violations                                                 2.71 kB         181 kB
++ First Load JS shared by all                                    103 kB
+  ├ chunks/1255-f5767ca0d1da046a.js                               46 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js                         54.2 kB
+  └ other shared chunks (total)                                 2.86 kB
+
+
+ƒ Middleware                                                    35.2 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

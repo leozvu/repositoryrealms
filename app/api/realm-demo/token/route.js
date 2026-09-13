@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 const safeText = (value, maxLength) => typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
 
 function allowedMap(requestedMap) {
-  const maps = (process.env.REALM_MAP_IDS || 'castle').split(',').map((item) => item.trim()).filter(Boolean);
+  const maps = (process.env.REALM_MAP_IDS || 'castle,guildhall-3d').split(',').map((item) => item.trim()).filter(Boolean);
   return maps.includes(requestedMap) ? requestedMap : maps[0];
 }
 

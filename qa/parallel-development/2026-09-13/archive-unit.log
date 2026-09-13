@@ -1,0 +1,24 @@
+✔ archive cabinetry stays on the floor and within the existing navigation/camera envelope (194.1288ms)
+✔ bound volumes have inset paper, closed curved spines and supported upright or stacked poses (144.6678ms)
+✔ archive detail stays in two book material batches with a bounded triangle increase (456.3972ms)
+✔ camera boom stops before a thin wall and does not block a clear overhead view (1.0553ms)
+✔ parallel, diagonal and zero-length camera paths are bounded and finite (0.2784ms)
+✔ the real archive shelves obstruct the follow camera and all work destinations can be reached closely (379.9839ms)
+✔ overview ray reaches the project workstation through the lifted ceiling after camera mode changes (389.756ms)
+✔ bundled material files match their source manifest and decode as finite 1K maps (35.2419ms)
+✔ UV mapping keeps a physical texture scale after world transforms and batching (0.5914ms)
+✔ full and half planks retain physical grain density, tint, bounds and a shared draw call (1.1774ms)
+✔ textures finish loading into the same objects after switching to light graphics, and failures retain a fallback (2.8141ms)
+✔ late texture callbacks cannot revive resources after leaving the 3D office (0.5352ms)
+✔ the constructed hall keeps all work areas mutually reachable around actual furniture (385.7187ms)
+✔ all eight workspace objects have raycast targets without visible proxy surfaces (332.5025ms)
+✔ the new desk keeps metric height through batching and window rays reach outside through masonry (347.433ms)
+✔ authored furniture has correct dimensions, a usable knee space and owned finite geometry (14.2101ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2877.1688

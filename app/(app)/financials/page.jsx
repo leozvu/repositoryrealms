@@ -6,6 +6,9 @@ import { useState } from 'react';
 import { useResource, Icon, Forbidden } from '@/components/ui';
 import { money, todayISO, remainOf } from '@/lib/format';
 import { periodMatch, incomeStatement, cashFlow, cashBalanceAsOf } from '@/lib/financials';
+import { amountInVnd } from '@/lib/money';
+import { financialConversionIssues } from '@/lib/financial-reporting';
+import StatePanel from '@/components/system/StatePanel';
 import { lotRemaining, lotValue } from '@/lib/inventory';
 
 export default function FinancialsPage() {
@@ -18,6 +21,8 @@ export default function FinancialsPage() {
   const year = +todayISO().slice(0, 4);
   const [q, setQ] = useState(0); // 0 = cả năm, 1-4 = quý
   if (txs.forbidden) return <Forbidden />;
+  const conversionIssues = financialConversionIssues({ transactions: txs.rows, invoices: invoices.rows, shipments: ships.rows });
+  if (conversionIssues.length) return <StatePanel state="error" title="Chưa thể tổng hợp báo cáo VND" description={`${conversionIssues.length} bản ghi có số tiền hoặc tỷ giá không hợp lệ. Cập nhật bản ghi gốc để lập báo cáo.`} action={<a className="btn btn-outline" href="/finance">Mở sổ giao dịch</a>} />;
 
   const period = q ? { year, quarter: q } : { year };
   const match = periodMatch(period);
@@ -27,9 +32,8 @@ export default function FinancialsPage() {
   // Tình hình tài chính HIỆN TẠI (ảnh chụp).
   const today = todayISO();
   const cash = cashBalanceAsOf(txs.rows, today);
-  const toVnd = (a, cur, fx) => (cur && cur !== 'VND') ? Math.round(a * (fx || 1)) : a;
-  const arInv = invoices.rows.filter(v => !['paid', 'draft'].includes(v.status) && remainOf(v) > 0).reduce((s, v) => s + toVnd(remainOf(v), v.currency, v.fxRate), 0);
-  const arShip = ships.rows.filter(s => !['paid', 'draft'].includes(s.status) && s.amount > 0).reduce((s, x) => s + toVnd(x.amount, x.currency, x.fxRate), 0);
+  const arInv = invoices.rows.filter(v => !['paid', 'draft', 'void'].includes(v.status) && remainOf(v) > 0).reduce((s, v) => s + amountInVnd(remainOf(v), v.currency, v.fxRate), 0);
+  const arShip = ships.rows.filter(s => !['paid', 'draft', 'void'].includes(s.status) && s.amount > 0).reduce((s, x) => s + amountInVnd(x.amount, x.currency, x.fxRate), 0);
   const ar = arInv + arShip;
   const inventory = lots.rows.reduce((s, l) => s + lotValue(l), 0);
   const ap = bills.rows.filter(b => b.status !== 'paid').reduce((s, b) => s + b.amount, 0)

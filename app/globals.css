@@ -1178,3 +1178,6 @@ kbd{padding:3px 5px;border:1px solid var(--border);border-radius:4px;background:
 .document-editor-body .items-table input{min-width:80px}
 .document-editor-body .totals{width:min(430px,100%);margin-left:auto;border-top:1px solid var(--border)}
 @media(max-width:720px){.document-workspace-header{grid-template-columns:1fr auto}.document-workspace-header>button:first-child{grid-column:1/-1;justify-self:start}.document-editor-body{padding:12px;overflow:hidden}.document-editor-body .items-table{display:block;overflow-x:auto;min-width:0}.document-editor-body .items-table table{min-width:720px}}
+
+/* Recoverable resource failures share one compact, keyboard-accessible action. */
+.resource-error{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;margin-bottom:16px;border:1px solid var(--danger);border-radius:8px;background:var(--surface);color:var(--text);font-size:.875rem;line-height:1.5}.resource-error>span{flex:1;min-width:180px}.resource-error .btn{flex-shrink:0}

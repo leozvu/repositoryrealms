@@ -1,0 +1,35 @@
+
+Running 26 tests using 1 worker
+
+(node:8320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [desktop-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:19:1 › column paging retains full-scope totals and export requests the full collection only on demand (2.6s)
+  ok  2 [desktop-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:46:1 › focus links load a scoped Lead outside visible pages (874ms)
+  ok  3 [desktop-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:56:1 › expired cursor offers a first-page recovery and session changes clear totals and cards (1.2s)
+  ok  4 [desktop-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:75:1 › changing focus loads the new record; unresolved lookups preserve current form values (1.0s)
+  ok  5 [desktop-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:96:1 › late focus lookup cannot replace an add form the user has started (922ms)
+  ok  6 [desktop-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:110:1 › conversion response after a session change cannot redirect or show a previous account result (862ms)
+  ok  7 [desktop-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command (864ms)
+  ok  8 [desktop-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:31:1 › My Work distinguishes unavailable approval and task data from a zero workload (683ms)
+  ok  9 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:4:1 › changing session identity clears the previous user rows before the new request completes (803ms)
+  ok 10 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:20:1 › changing filters and disabling a resource cannot expose old rows (636ms)
+  ok 11 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:32:1 › read failure exposes retry and recovers without an empty-success state (534ms)
+  ok 12 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:43:1 › actual Lead handler keeps failed form contents and closes only on confirmed write (733ms)
+  ok 13 [desktop-chromium] › tests\e2e\erp-resource-ui.spec.mjs:63:1 › dirty form stays open when discard is declined; fields lock during submission (967ms)
+(node:25400) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 14 [mobile-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:19:1 › column paging retains full-scope totals and export requests the full collection only on demand (1.5s)
+  ok 15 [mobile-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:46:1 › focus links load a scoped Lead outside visible pages (621ms)
+  ok 16 [mobile-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:56:1 › expired cursor offers a first-page recovery and session changes clear totals and cards (970ms)
+  ok 17 [mobile-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:75:1 › changing focus loads the new record; unresolved lookups preserve current form values (976ms)
+  ok 18 [mobile-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:96:1 › late focus lookup cannot replace an add form the user has started (811ms)
+  ok 19 [mobile-chromium] › tests\e2e\erp-lead-board-ui.spec.mjs:110:1 › conversion response after a session change cannot redirect or show a previous account result (906ms)
+  ok 20 [mobile-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:10:1 › My Work serializes actions and reloads a stale task without replaying the command (781ms)
+  ok 21 [mobile-chromium] › tests\e2e\erp-my-work-ui.spec.mjs:31:1 › My Work distinguishes unavailable approval and task data from a zero workload (615ms)
+  ok 22 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:4:1 › changing session identity clears the previous user rows before the new request completes (619ms)
+  ok 23 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:20:1 › changing filters and disabling a resource cannot expose old rows (663ms)
+  ok 24 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:32:1 › read failure exposes retry and recovers without an empty-success state (749ms)
+  ok 25 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:43:1 › actual Lead handler keeps failed form contents and closes only on confirmed write (878ms)
+  ok 26 [mobile-chromium] › tests\e2e\erp-resource-ui.spec.mjs:63:1 › dirty form stays open when discard is declined; fields lock during submission (1.0s)
+
+  26 passed (60.0s)

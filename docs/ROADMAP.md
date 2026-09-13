@@ -1,10 +1,16 @@
 # Roadmap — RepositoryRealms ERP/CRM
 
+## Ưu tiên hiện tại — ba phần phát triển song song
+
+Quyết định mới nhất của người dùng (13/09/2026 UTC): phát triển song song ERP/CRM, Realm 3D theo mục tiêu AAA và **LeozOps chính là Jarvis**. Quyết định này thay yêu cầu tạm dừng Realm trước đó. [Kế hoạch tích hợp](PARALLEL-PRODUCT-DEVELOPMENT.md) điều phối ba phần; kế hoạch chi tiết và bằng chứng cũ được giữ lại.
+
+Các mục có ngày/thành tích phía dưới là lịch sử; không tự coi chúng là trạng thái nghiệm thu hiện tại.
+
 Cập nhật 2026-07-24 · Chốt bởi founder (Vũ Lương Sơn) · Nhánh làm việc `fix/crm-erp`
 
 ## Realm flagship spatial rebuild
 
-Kế hoạch đang hoạt động cho việc đập và xây lại `/realm-demo` theo chuẩn spatial coworking medieval-fantasy, với game feel và quality gate benchmark AAA: [`docs/realms/REALM-AAA-SPATIAL-REBUILD-PLAN.md`](realms/REALM-AAA-SPATIAL-REBUILD-PLAN.md).
+Kế hoạch đã tiếp tục cho việc xây lại `/realm-demo` theo chuẩn spatial coworking medieval-fantasy, với game feel và quality gate benchmark AAA: [`docs/realms/REALM-AAA-SPATIAL-REBUILD-PLAN.md`](realms/REALM-AAA-SPATIAL-REBUILD-PLAN.md).
 
 Kế hoạch này là nguồn sự thật cho world runtime mới. Nó bảo toàn business capability, RepositoryRealms authorization, receipt, audit và ERP fallback; đồng thời thay thế kiến trúc single-image, DOM hotspot, static character và panel-first interaction hiện tại.
 

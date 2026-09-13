@@ -209,6 +209,9 @@ model Client {
   invoices  Invoice[]
   quotes    Quote[]
   contacts  Contact[]
+  originSource String? // Snapshot nguồn lead tại thời điểm chuyển đổi
+  originCampaign String? // Snapshot chiến dịch; không phải doanh thu đã thu
+  convertedFromLead Lead? @relation("LeadConversion")
 }
 
 // ===== v3.4: một khách nhiều người liên hệ =====
@@ -243,6 +246,10 @@ model Lead {
   serviceLine String? // mảng dịch vụ khách quan tâm — chia sale theo chuyên môn
   intakeKey   String? @unique // khóa chống trùng: liên hệ + chiến dịch
   intakeAt    DateTime? // thời điểm hệ thống nhận, tách khỏi createdAt (chuỗi) cũ
+  clientId    String? @unique
+  client      Client? @relation("LeadConversion", fields: [clientId], references: [id], onDelete: Restrict)
+  convertedAt DateTime?
+  convertedById String?
 
   @@index([campaign])
   @@index([ownerId, stage])
@@ -780,9 +787,33 @@ model Transaction {
   desc        String?
   projectId   String?
   createdById String?
+  paymentReceipt FinancialPaymentReceipt?
 
   @@index([date])
   @@index([projectId])
+}
+
+// Atomic receipt of an invoice/vendor cash command. The linked ledger entry
+// cannot be removed while the receipt remains; retry returns the saved result.
+model FinancialPaymentReceipt {
+  id             String      @id @default(cuid())
+  idempotencyKey String      @unique
+  requestHash    String
+  resource       String
+  recordId       String
+  userId         String
+  approvalId     String?
+  transactionId  String      @unique
+  transaction    Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict)
+  amount         Int
+  currency       String
+  fxRate         Float
+  date           String
+  resultJson     String
+  createdAt      DateTime    @default(now())
+
+  @@index([resource, recordId, createdAt])
+  @@index([approvalId])
 }
 
 // v3.32: Chi phí định kỳ — mẫu để sinh nhanh phiếu chi hằng tháng (thuê VP, internet, subscription…).
@@ -899,6 +930,7 @@ model Approval {
   status        String    @default("pending") // pending | approved | rejected
   createdAt     DateTime  @default(now())
   decidedAt     DateTime?
+  requestKey    String?   @unique // nullable for existing and non-payment approvals
 }
 
 // ===== v2.2 HRM =====
@@ -1937,4 +1969,32 @@ model Violation {
   createdAt      DateTime @default(now())
 
   @@index([occurredAt])
+}
+
+// Durable local event and per-destination HTTP delivery. Acknowledgement of local
+// effects is committed in the same transaction; HTTP receivers must deduplicate.
+model EventOutbox {
+  id             String   @id
+  occurrenceId   String
+  deliveryKey    String
+  kind           String // event | webhook
+  resource       String
+  event          String
+  payloadVersion Int      @default(1)
+  payload        String
+  requestHash    String
+  status         String   @default("pending") // pending | processing | delivered | dead
+  attempts       Int      @default(0)
+  maxAttempts    Int      @default(8)
+  availableAt    DateTime @default(now())
+  leaseToken     String?
+  leaseUntil     DateTime?
+  lastErrorCode  String?
+  completedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([occurrenceId, deliveryKey])
+  @@index([status, availableAt])
+  @@index([status, leaseUntil])
 }

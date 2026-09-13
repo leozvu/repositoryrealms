@@ -3,13 +3,20 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useResource, Icon, FormModal, ConfirmDialog, Badge, Forbidden, useToast } from '@/components/ui';
-import { money, fmtDate, todayISO, monthKey, remainOf } from '@/lib/format';
+import { money, moneyC, CURRENCIES, fmtDate, todayISO, monthKey } from '@/lib/format';
+import { transactionAmountVnd } from '@/lib/money';
+import { financialConversionIssues, invoiceReceivableVnd, transactionTotalsVnd } from '@/lib/financial-reporting';
 import FinancialIntelligencePanel from '@/components/finance/FinancialIntelligencePanel';
 import PageHeader from '@/components/system/PageHeader';
 import DataTable from '@/components/system/DataTable';
 import StatePanel from '@/components/system/StatePanel';
 
 const CATEGORIES = ['Doanh thu dịch vụ', 'Doanh thu khác', 'Lương nhân sự', 'Ngân sách quảng cáo', 'Văn phòng', 'Công cụ / phần mềm', 'Marketing nội bộ', 'Thuế / phí', 'Khác'];
+const ledgerAmountVnd = transaction => {
+  try { return transactionAmountVnd(transaction); }
+  catch (error) { if (error instanceof RangeError) return null; throw error; }
+};
+const displayVnd = value => value === null ? 'Chưa thể quy đổi' : money(value);
 
 export default function FinancePage() {
   const { rows, forbidden, create, update, remove } = useResource('transactions');
@@ -58,17 +65,20 @@ export default function FinancePage() {
     .filter((transaction) => (typeFilter === 'all' || transaction.type === typeFilter)
       && (monthFilter === 'all' || monthKey(transaction.date) === monthFilter))
     .sort((a, b) => b.date.localeCompare(a.date));
-  const income = visible.filter((transaction) => transaction.type === 'income').reduce((sum, transaction) => sum + transaction.amount, 0);
-  const expense = visible.filter((transaction) => transaction.type === 'expense').reduce((sum, transaction) => sum + transaction.amount, 0);
+  const conversionIssues = financialConversionIssues({ transactions: visible, invoices: invoices.rows });
+  const ledgerValid = !conversionIssues.some(issue => issue.resource === 'transactions');
+  const { income, expense, balance } = ledgerValid ? transactionTotalsVnd(visible) : { income: null, expense: null, balance: null };
   const overdueInvoices = invoices.rows.filter((invoice) => !['paid', 'draft', 'void'].includes(invoice.status)
     && invoice.dueDate && invoice.dueDate < todayISO());
   const payable = bills.rows.filter((bill) => bill.status !== 'paid').reduce((sum, bill) => sum + (bill.amount || 0), 0);
-  const receivable = invoices.rows.filter((invoice) => !['paid', 'draft', 'void'].includes(invoice.status))
-    .reduce((sum, invoice) => sum + remainOf(invoice), 0);
+  const receivable = conversionIssues.some(issue => issue.resource === 'invoices') ? null : invoices.rows.filter((invoice) => !['paid', 'draft', 'void'].includes(invoice.status))
+    .reduce((sum, invoice) => sum + invoiceReceivableVnd(invoice), 0);
 
   const fields = [
     { key: 'type', label: 'Loại', type: 'select', options: [{ value: 'income', label: 'Khoản thu' }, { value: 'expense', label: 'Khoản chi' }], required: true },
-    { key: 'amount', label: 'Số tiền (đ)', type: 'number', required: true },
+    { key: 'amount', label: 'Số tiền nguyên tệ', type: 'number', required: true },
+    { key: 'currency', label: 'Đồng tiền', type: 'select', required: true, options: Object.keys(CURRENCIES).map(value => ({ value, label: value })) },
+    { key: 'fxRate', label: 'Tỷ giá ghi sổ (VND / 1 đơn vị tiền)', type: 'number', required: true, hint: 'Giao dịch VND luôn được tính theo tỷ giá 1.' },
     { key: 'category', label: 'Danh mục', type: 'select', options: CATEGORIES.map((category) => ({ value: category, label: category })) },
     { key: 'date', label: 'Ngày', type: 'date', required: true },
     { key: 'projectId', label: 'Thuộc dự án', type: 'select', options: [{ value: '', label: 'Không thuộc dự án' }, ...projects.rows.map((project) => ({ value: project.id, label: project.name }))] },
@@ -82,9 +92,9 @@ export default function FinancePage() {
     { accessorKey: 'desc', header: 'Diễn giải', size: 280, cell: ({ row }) => row.original.desc || 'Chưa có diễn giải' },
     { id: 'project', header: 'Dự án', size: 180, cell: ({ row }) => projectName(row.original.projectId), meta: { exportValue: (row) => projectName(row.projectId) } },
     {
-      accessorKey: 'amount', header: 'Số tiền', size: 150,
-      cell: ({ row }) => <strong className={row.original.type === 'income' ? 'amount-income' : 'amount-expense'}>{row.original.type === 'income' ? '+' : '−'}{money(row.original.amount)}</strong>,
-      meta: { exportValue: (row) => row.type === 'income' ? row.amount : -row.amount },
+      id: 'amount', accessorFn: ledgerAmountVnd, header: 'Số tiền (VND)', size: 180,
+      cell: ({ row }) => <div><strong className={row.original.type === 'income' ? 'amount-income' : 'amount-expense'}>{row.original.type === 'income' ? '+' : '−'}{displayVnd(ledgerAmountVnd(row.original))}</strong>{row.original.currency && row.original.currency !== 'VND' && <div className="cell-sub">{moneyC(row.original.amount, row.original.currency)} · tỷ giá {row.original.fxRate ?? 'chưa có'}</div>}</div>,
+      meta: { exportValue: (row) => ledgerAmountVnd(row) === null ? '' : (row.type === 'income' ? 1 : -1) * ledgerAmountVnd(row) },
     },
     {
       id: 'actions', header: '', size: 80, enableSorting: false, enableHiding: false, meta: { export: false },
@@ -109,20 +119,22 @@ export default function FinancePage() {
         actions={<button className="btn btn-primary" onClick={() => setModal({ mode: 'add' })}><Icon name="plus" size={16} />Ghi thu hoặc chi</button>}
       />
 
+      {conversionIssues.length > 0 && <StatePanel compact state="error" title="Chưa thể tổng hợp tiền VND" description={`${conversionIssues.length} bản ghi có số tiền hoặc tỷ giá không hợp lệ. Sửa bản ghi gốc để cập nhật tổng; không thay tỷ giá thiếu bằng 1.`} />}
+
       {overdueInvoices.length > 0 && (
         <StatePanel
           compact
           state="error"
           title={`${overdueInvoices.length} hóa đơn đã quá hạn`}
-          description={`Tổng phải thu hiện tại ${money(receivable)}. Mở danh sách để xử lý thu tiền.`}
+          description={`Tổng phải thu hiện tại: ${displayVnd(receivable)}. Mở danh sách để xử lý thu tiền.`}
           action={<Link className="btn btn-outline btn-sm" href="/invoices">Mở phải thu</Link>}
         />
       )}
 
       <section className="finance-pulse" aria-label="Tóm tắt tài chính theo bộ lọc">
-        <div><span>Thu theo bộ lọc</span><strong className="amount-income">{money(income)}</strong></div>
-        <div><span>Chi theo bộ lọc</span><strong className="amount-expense">{money(expense)}</strong></div>
-        <div><span>Chênh lệch</span><strong>{money(income - expense)}</strong></div>
+        <div><span>Thu theo bộ lọc (VND)</span><strong className="amount-income">{displayVnd(income)}</strong></div>
+        <div><span>Chi theo bộ lọc (VND)</span><strong className="amount-expense">{displayVnd(expense)}</strong></div>
+        <div><span>Chênh lệch</span><strong>{displayVnd(balance)}</strong></div>
         <div><span>Phải trả nhà cung cấp</span><strong>{money(payable)}</strong></div>
       </section>
 
@@ -159,7 +171,8 @@ export default function FinancePage() {
             <article className="mobile-record" key={transaction.id}>
               <div><Badge map="tx" k={transaction.type} /><time>{fmtDate(transaction.date)}</time></div>
               <strong>{transaction.desc || transaction.category}</strong>
-              <span className={transaction.type === 'income' ? 'amount-income' : 'amount-expense'}>{transaction.type === 'income' ? '+' : '−'}{money(transaction.amount)}</span>
+              <span className={transaction.type === 'income' ? 'amount-income' : 'amount-expense'}>{transaction.type === 'income' ? '+' : '−'}{displayVnd(ledgerAmountVnd(transaction))}</span>
+              {transaction.currency && transaction.currency !== 'VND' && <span>{moneyC(transaction.amount, transaction.currency)} · tỷ giá {transaction.fxRate ?? 'chưa có'}</span>}
               <button className="btn btn-outline btn-sm" onClick={() => setModal({ mode: 'edit', row: transaction })}>Mở</button>
             </article>
           )}
@@ -170,9 +183,11 @@ export default function FinancePage() {
         <FormModal
           title="Ghi thu hoặc chi"
           fields={fields}
-          data={{ type: 'expense', date: todayISO(), category: 'Khác' }}
+          data={{ type: 'expense', date: todayISO(), category: 'Khác', currency: 'VND', fxRate: 1 }}
           onClose={() => setModal(null)}
           onSave={async (data) => {
+            if (ledgerAmountVnd(data) === null) { toast('Số tiền hoặc tỷ giá không hợp lệ.', 'error'); return false; }
+            if (data.currency === 'VND') data.fxRate = 1;
             const result = await create({ ...data, projectId: data.projectId || null });
             if (result) toast(result._notice || 'Đã ghi sổ', result._blocked ? 'error' : 'success');
           }}
@@ -182,9 +197,11 @@ export default function FinancePage() {
         <FormModal
           title="Sửa giao dịch"
           fields={fields}
-          data={{ ...modal.row, projectId: modal.row.projectId || '' }}
+          data={{ ...modal.row, currency: modal.row.currency || 'VND', fxRate: modal.row.fxRate ?? (!modal.row.currency || modal.row.currency === 'VND' ? 1 : ''), projectId: modal.row.projectId || '' }}
           onClose={() => setModal(null)}
           onSave={async (data) => {
+            if (ledgerAmountVnd(data) === null) { toast('Số tiền hoặc tỷ giá không hợp lệ.', 'error'); return false; }
+            if (data.currency === 'VND') data.fxRate = 1;
             await update(modal.row.id, { ...data, projectId: data.projectId || null });
             toast('Đã cập nhật giao dịch');
           }}

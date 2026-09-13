@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Icon, ConfirmDialog, EmptyState, AsyncButton, useToast } from '@/components/ui';
 import { money, thisMonth, parseItems } from '@/lib/format';
+import { getPayrollTaxRules, payrollNeedsTaxRecalculation } from '@/lib/payroll';
 
 /* ---------- Phiếu lương cá nhân (nhân viên) ---------- */
 function Payslips({ payslips }) {
@@ -23,6 +24,11 @@ function Payslips({ payslips }) {
           <div className="detail-stat"><b style={{ color: 'var(--danger)' }}>−{money(p.line.tax)}</b><span>Thuế TNCN</span></div>
           <div className="detail-stat"><b style={{ color: 'var(--accent)', fontSize: '1.15rem' }}>{money(p.line.net)}</b><span>THỰC NHẬN</span></div>
         </div>
+        <p className="cell-sub" style={{ marginTop: 12 }}>
+          {p.line.calculationVersion
+            ? `Kỳ thuế ${p.line.taxPeriod} · ${p.line.taxBracketCount} bậc · giảm trừ bản thân ${money(p.line.personalDeduction)} · ${p.line.dependents || 0} người phụ thuộc: ${money(p.line.dependentDeduction || 0)}`
+            : 'Phiếu lương lưu từ phiên bản trước; các số tiền đã lưu được giữ nguyên.'}
+        </p>
       </div>
     </div>
   ));
@@ -44,6 +50,11 @@ export default function PayrollPage() {
 
   const cur = data.payrolls.find(p => p.id === sel);
   const lines = cur ? parseItems(cur.lines) : [];
+  let taxRules = null, needsTaxRecalculation = false;
+  if (cur) {
+    try { taxRules = getPayrollTaxRules(cur.month); needsTaxRecalculation = payrollNeedsTaxRecalculation(lines, cur.month); }
+    catch { needsTaxRecalculation = true; }
+  }
   const total = k => lines.reduce((s, l) => s + (l[k] || 0), 0);
 
   const generate = async () => {
@@ -52,7 +63,7 @@ export default function PayrollPage() {
     const res = await fetch('/api/payroll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ month }) });
     const json = await res.json();
     if (!res.ok) return toast(json.error, 'error');
-    toast('Đã tạo bảng lương nháp — chỉnh phụ cấp/thưởng rồi chốt');
+    toast('Đã tạo bảng lương nháp — kiểm tra phụ cấp, thưởng và người phụ thuộc rồi chốt');
     setSel(json.id); load();
   };
   const updateLine = async (userId, k, v) => {
@@ -85,12 +96,15 @@ export default function PayrollPage() {
         <div className="spacer"></div>
         {cur && cur.status === 'draft' && <AsyncButton className="btn btn-outline" pendingLabel="Đang tính…" onClick={regenerate}
           title="Nạp lại giờ OT / đi muộn từ Chấm công — dùng khi bảng lương tạo từ giữa tháng"><Icon name="repeat" size={16} /><span>Tính lại từ chấm công</span></AsyncButton>}
-        {cur && cur.status === 'draft' && <button className="btn btn-outline" onClick={() => setConfirm(true)}><Icon name="check" size={16} /><span>Chốt & ghi sổ quỹ</span></button>}
+        {cur && cur.status === 'draft' && <button className="btn btn-outline" disabled={needsTaxRecalculation} title={needsTaxRecalculation ? 'Tính lại theo kỳ thuế trước khi chốt' : undefined} onClick={() => setConfirm(true)}><Icon name="check" size={16} /><span>Chốt & ghi sổ quỹ</span></button>}
         <AsyncButton className="btn btn-primary" pendingLabel="Đang tạo…" onClick={generate}><Icon name="plus" size={16} /><span>Tạo bảng lương tháng</span></AsyncButton>
       </div>
 
       {cur ? (
         <>
+          {cur.status === 'draft' && needsTaxRecalculation && <p role="status" style={{ color: 'var(--warn, #D97706)', marginBottom: 16 }}>
+            Bản nháp này chưa có kết quả tính theo đúng kỳ thuế. Chọn “Tính lại từ chấm công”, kiểm tra người phụ thuộc và các khoản thu nhập trước khi chốt. Số tiền đã lưu chưa được tự thay đổi.
+          </p>}
           <div className="grid kpi-grid" style={{ marginBottom: 16 }}>
             <div className="card kpi"><span className="kpi-label">Tổng thực nhận</span><div className="kpi-value" style={{ color: 'var(--accent)' }}>{money(total('net'))}</div></div>
             {/* v3.13: tiền làm thêm — trước đây HR phải tự tính ngoài hệ thống rồi nhét vào ô thưởng */}
@@ -103,7 +117,7 @@ export default function PayrollPage() {
           </div>
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Nhân sự</th><th className="num">Lương cơ bản</th><th className="num">Giờ OT</th><th className="num">Tiền OT</th><th className="num">Phụ cấp</th><th className="num">Thưởng</th><th className="num">BHXH (10.5%)</th><th className="num">Thuế TNCN</th><th className="num">Thực nhận</th><th className="num">Chi phí Cty</th></tr></thead>
+              <thead><tr><th>Nhân sự</th><th className="num">Lương cơ bản</th><th className="num">Giờ OT</th><th className="num">Tiền OT</th><th className="num">Phụ cấp</th><th className="num">Thưởng</th><th className="num">Người phụ thuộc</th><th className="num">BHXH (10.5%)</th><th className="num">Thuế TNCN</th><th className="num">Thực nhận</th><th className="num">Chi phí Cty</th></tr></thead>
               <tbody>
                 {lines.map(l => (
                   <tr key={l.userId}>
@@ -132,6 +146,14 @@ export default function PayrollPage() {
                         ? <input type="number" min="0" defaultValue={l.bonus} onBlur={e => +e.target.value !== l.bonus && updateLine(l.userId, 'bonus', e.target.value)}
                             style={{ width: 110, padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 7, textAlign: 'right', background: 'var(--card)', color: 'var(--fg)' }} />
                         : money(l.bonus)}</td>
+                    <td className="num" style={{ width: 110 }}>
+                      {cur.status === 'draft'
+                        ? <input type="number" min="0" step="1" defaultValue={l.dependents || 0}
+                            aria-label={`Người phụ thuộc của ${l.name}`}
+                            title="Số người phụ thuộc đã xác nhận đủ điều kiện giảm trừ trong kỳ"
+                            onBlur={e => +e.target.value !== (l.dependents || 0) && updateLine(l.userId, 'dependents', e.target.value)}
+                            style={{ width: 70, padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 7, textAlign: 'right', background: 'var(--card)', color: 'var(--fg)' }} />
+                        : (l.dependents || 0)}</td>
                     <td className="num" style={{ color: 'var(--danger)' }}>−{money(l.insurance)}</td>
                     <td className="num" style={{ color: 'var(--danger)' }}>−{money(l.tax)}</td>
                     <td className="num" style={{ fontWeight: 800, color: 'var(--accent)' }}>{money(l.net)}</td>
@@ -142,8 +164,12 @@ export default function PayrollPage() {
             </table>
           </div>
           <p style={{ fontSize: '.75rem', color: 'var(--muted)', marginTop: 10 }}>
-            Công thức: BHXH/YT/TN người lao động 10.5% lương cơ bản · giảm trừ bản thân 11 triệu · thuế TNCN lũy tiến 7 bậc ·
-            chi phí công ty = tổng thu nhập + 21.5% BH công ty đóng. Mỗi nhân viên chỉ xem được phiếu lương của chính mình.
+            {taxRules ? <>Quy tắc TNCN cá nhân cư trú cho kỳ {cur.month}: giảm trừ bản thân {money(taxRules.personalDeduction)} · mỗi người phụ thuộc {money(taxRules.dependentDeductionPerPerson)} · biểu thuế {taxRules.brackets.length} bậc. </> : 'Kỳ tính thuế chưa hợp lệ. '}
+            {cur.status === 'final' && needsTaxRecalculation && 'Bảng đã chốt thuộc phiên bản trước; số liệu lịch sử được giữ nguyên. '}
+            Năm tính thuế đang lấy từ tháng bảng lương; đối chiếu thời điểm trả thu nhập trước khi chốt.
+            <br />
+            Mô hình hiện tại: BH người lao động 10.5% và BH công ty 21.5% lương cơ bản, chưa áp dụng trần đóng; phụ cấp được coi là miễn thuế, chưa phân loại phần OT miễn thuế.
+            Chi phí công ty = tổng thu nhập + BH công ty đóng. Mỗi nhân viên chỉ xem được phiếu lương của chính mình.
             <br />
             <b>Làm thêm (v3.13)</b>: giờ OT lấy thẳng từ Chấm công tháng đó · tiền OT = giờ OT × (lương cơ bản ÷ 176) × hệ số
             (đổi hệ số trong Cài đặt) · bảo hiểm không tính trên OT. Số lần đi muộn / ngày nghỉ chỉ hiển thị để tham khảo,

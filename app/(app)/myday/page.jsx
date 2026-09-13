@@ -9,10 +9,11 @@
 // task.reprioritize (hàng đợi của chính mình) nên có receipt + audit như mọi thao tác khác.
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Icon, useToast } from '@/components/ui';
 import { compareWorkItems } from '@/lib/execution-engine';
+import { nextTaskAction } from '@/lib/task-presentation';
 import PageHeader from '@/components/system/PageHeader';
 import StatePanel from '@/components/system/StatePanel';
 import styles from './my-work.module.css';
@@ -52,14 +53,6 @@ function dueTone(task, today) {
   return `due${left}`; // due1 | due2 | due3
 }
 
-function nextTransition(task) {
-  if (task.status === 'todo') return { nextState: 'doing', label: 'Bắt đầu' };
-  if (['doing', 'in_progress'].includes(task.status)) return { nextState: 'review', label: 'Gửi review' };
-  if (task.status === 'review') return { nextState: 'done', label: 'Hoàn tất' };
-  if (task.status === 'waiting') return { nextState: 'doing', label: 'Tiếp tục' };
-  return null;
-}
-
 function dueLabel(dueDate, today) {
   if (!dueDate) return 'Không có hạn';
   const left = daysLeft(dueDate, today);
@@ -70,8 +63,8 @@ function dueLabel(dueDate, today) {
   return `Hạn ${date}`;
 }
 
-function TaskBlock({ task, index, today, busy, dragState, onDragStart, onDragOver, onDrop, onDragEnd, onTransition, onEstimate, onNudge, count }) {
-  const transition = nextTransition(task);
+function TaskBlock({ task, index, today, busy, pending, dragState, onDragStart, onDragOver, onDrop, onDragEnd, onTransition, onEstimate, onNudge, count }) {
+  const transition = nextTaskAction(task);
   const tone = dueTone(task, today);
   const draggable = !busy;
   const isDragging = dragState.dragId === task.id;
@@ -108,7 +101,7 @@ function TaskBlock({ task, index, today, busy, dragState, onDragStart, onDragOve
         <button className="icon-btn" disabled={busy} onClick={() => onEstimate(task)} title="Cập nhật estimate" aria-label="Cập nhật estimate"><Icon name="clock" size={14} /></button>
         {transition && (
           <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => onTransition(task, transition.nextState)}>
-            <Icon name={transition.nextState === 'done' ? 'check' : 'tasks'} size={14} />{busy ? '…' : transition.label}
+            <Icon name={transition.nextState === 'done' ? 'check' : 'tasks'} size={14} />{pending ? 'Đang cập nhật…' : transition.label}
           </button>
         )}
       </div>
@@ -150,6 +143,11 @@ export default function MyDayPage() {
   const [approvals, setApprovals] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [conflict, setConflict] = useState('');
+  const [approvalsError, setApprovalsError] = useState('');
+  const [updatedAt, setUpdatedAt] = useState(null);
+  const loadRef = useRef(null);
+  const actionLock = useRef(false);
   const [busyId, setBusyId] = useState('');
   const [estimateTask, setEstimateTask] = useState(null);
   const [sortingByDeadline, setSortingByDeadline] = useState(false); // hành động "Xếp theo deadline"
@@ -158,24 +156,36 @@ export default function MyDayPage() {
   const today = todayISO();
 
   const load = useCallback(async () => {
+    loadRef.current?.abort();
+    const controller = new AbortController(); loadRef.current = controller;
     setLoading(true);
     setError('');
     try {
-      const response = await fetch('/api/execution/my-work', { cache: 'no-store' });
+      const response = await fetch('/api/execution/my-work', { cache: 'no-store', signal: controller.signal });
       const body = await response.json();
+      if (controller.signal.aborted) return null;
       if (!response.ok) throw new Error(body.error || 'Không thể tải công việc.');
       setModel(body);
+      setUpdatedAt(new Date());
       setLocalOrder(null);
+      return body;
     } catch (requestError) {
-      setError(requestError.message || 'Không thể tải công việc.');
+      if (!controller.signal.aborted) { setModel(null); setError(requestError.message || 'Không thể tải công việc.'); }
+      return null;
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     load();
-    fetch('/api/approvals', { cache: 'no-store' }).then((response) => response.ok ? response.json() : null).then(setApprovals).catch(() => {});
+    const controller = new AbortController();
+    fetch('/api/approvals', { cache: 'no-store', signal: controller.signal }).then(async response => {
+      if (!response.ok) throw new Error('Không thể tải việc chờ duyệt.');
+      const body = await response.json();
+      if (!controller.signal.aborted) { setApprovals(body); setApprovalsError(''); }
+    }).catch(() => { if (!controller.signal.aborted) { setApprovals(null); setApprovalsError('Chưa tải được việc chờ duyệt. Mở trang Phê duyệt để kiểm tra.'); } });
+    return () => { controller.abort(); loadRef.current?.abort(); };
   }, [load]);
 
   // Gộp mọi hàng đợi mở thành MỘT lưới "cục việc" — thứ tự = queuePosition tự sắp.
@@ -213,6 +223,9 @@ export default function MyDayPage() {
   const ownerId = model?.queue?.ownerId;
 
   const act = async (command, okMessage) => {
+    if (actionLock.current) return false;
+    actionLock.current = true;
+    setConflict('');
     setBusyId(command.entityId);
     try {
       // key chỉ được chứa [a-zA-Z0-9:_-] — dấu chấm trong tên action từng làm server trả 400
@@ -224,7 +237,13 @@ export default function MyDayPage() {
         body: JSON.stringify(command),
       });
       const body = await response.json();
-      if (!response.ok) throw new Error(body.error || 'Không thể cập nhật Task.');
+      if (!response.ok) {
+        if (response.status === 409) {
+          setConflict('Công việc đã thay đổi ở nơi khác. Đã yêu cầu tải bản mới; kiểm tra lại trước khi thao tác.');
+          await load();
+        }
+        throw new Error(body.error || 'Không thể cập nhật Task.');
+      }
       if (okMessage) toast(okMessage);
       await load();
       return true;
@@ -233,6 +252,7 @@ export default function MyDayPage() {
       setLocalOrder(null);
       return false;
     } finally {
+      actionLock.current = false;
       setBusyId('');
     }
   };
@@ -271,7 +291,9 @@ export default function MyDayPage() {
   // "Xếp theo deadline" giờ là HÀNH ĐỘNG một phát (không phải chế độ xem): xếp cả bảng
   // theo hạn rồi LƯU thành thứ tự tay — sau đó kéo thả chỉnh tiếp tùy ý.
   const sortByDeadline = async () => {
-    if (!ownerId || sortingByDeadline || openTasks.length < 2) return;
+    if (!ownerId || actionLock.current || sortingByDeadline || openTasks.length < 2) return;
+    actionLock.current = true;
+    setConflict('');
     setSortingByDeadline(true);
     try {
       const desired = [...openTasks].sort((a, b) =>
@@ -296,6 +318,7 @@ export default function MyDayPage() {
       setLocalOrder(null);
       await load();
     } finally {
+      actionLock.current = false;
       setSortingByDeadline(false);
     }
   };
@@ -312,7 +335,7 @@ export default function MyDayPage() {
         title={session?.user?.name ? `Việc của ${session.user.name.split(/\s+/).slice(-1)[0]}` : 'Việc của tôi'}
         description="Làm ngay, tiếp theo, bị chặn và để sau. Thứ tự trong mỗi nhóm vẫn được ghi vào Task ERP."
         actions={<div className={styles.heroActions}>
-          <button className="btn btn-outline" onClick={load} disabled={loading}><Icon name="repeat" size={16} /> Làm mới</button>
+          <button className="btn btn-outline" onClick={load} disabled={loading || Boolean(busyId) || sortingByDeadline}><Icon name="repeat" size={16} /> Làm mới</button>
           <Link className="btn btn-primary" href="/tasks"><Icon name="tasks" size={16} /> Bảng công việc</Link>
         </div>}
       />
@@ -323,18 +346,20 @@ export default function MyDayPage() {
           ['Đang làm', metrics.doing],
           ['Bị chặn', metrics.blocked],
           ['Quá hạn', metrics.overdue],
-          ['Chờ tôi duyệt', toApprove.length],
-        ].map(([label, value]) => <div key={label} className={styles.metric}><span>{label}</span><strong>{value}</strong></div>)}
+          ['Chờ tôi duyệt', approvals ? toApprove.length : '—'],
+        ].map(([label, value]) => <div key={label} className={styles.metric}><span>{label}</span><strong>{label !== 'Chờ tôi duyệt' && (!model || loading) ? '—' : value}</strong></div>)}
       </section>
 
       <div className={styles.viewBar}>
-        <button className="btn btn-outline" disabled={sortingByDeadline || displayed.length < 2} onClick={sortByDeadline}>
+        <button className="btn btn-outline" disabled={loading || Boolean(busyId) || sortingByDeadline || displayed.length < 2} onClick={sortByDeadline}>
           <Icon name="clock" size={14} /> {sortingByDeadline ? 'Đang xếp…' : 'Xếp cả bảng theo deadline'}
         </button>
         <span className={styles.viewHint}>Thứ tự là của bạn. Kéo thả hoặc dùng nút lên xuống để điều chỉnh.</span>
       </div>
 
-      <div className={styles.live} aria-live="polite">{loading ? 'Đang đồng bộ từ ERP…' : error || `Đã đồng bộ ${metrics.open} việc đang mở.`}</div>
+      <div className={styles.live} aria-live="polite">{loading ? 'Đang tải công việc…' : error || `Cập nhật ${updatedAt?.toLocaleTimeString('vi-VN') || ''} · ${metrics.open} việc đang mở.`}</div>
+      {conflict && <StatePanel compact state="error" title={conflict} />}
+      {approvalsError && <StatePanel compact state="error" title={approvalsError} action={<Link className="btn btn-outline" href="/approvals">Mở Phê duyệt</Link>} />}
       {error && <StatePanel compact state="error" title={error} action={<button className="btn btn-outline" onClick={load}>Thử lại</button>} />}
 
       {estimateTask && <EstimatePanel key={`${estimateTask.id}:${estimateTask.workVersion}`} task={estimateTask} busy={busyId === estimateTask.id} onClose={() => setEstimateTask(null)} onSave={saveEstimate} />}
@@ -348,7 +373,7 @@ export default function MyDayPage() {
                 {section.tasks.map((task) => {
                   const index = displayed.findIndex((item) => item.id === task.id);
                   return <TaskBlock key={task.id} task={task} index={index} count={displayed.length} today={today}
-                    busy={busyId === task.id || sortingByDeadline} dragState={dragState}
+                    busy={loading || Boolean(busyId) || sortingByDeadline} pending={busyId === task.id} dragState={dragState}
                     onDragStart={(currentTask, currentIndex) => setDragState({ dragId: currentTask.id, dragIndex: currentIndex, overId: null })}
                     onDragOver={(currentTask) => setDragState((state) => state.overId === currentTask.id ? state : { ...state, overId: currentTask.id })}
                     onDrop={onDrop}
@@ -372,7 +397,7 @@ export default function MyDayPage() {
         </section>
       )}
 
-      <section className={styles.intelligenceSummary} aria-labelledby="resource-intelligence-summary">
+      {!error && model && <section className={styles.intelligenceSummary} aria-labelledby="resource-intelligence-summary">
         <div>
           <p className={styles.eyebrow}>Nguồn lực có bằng chứng</p>
           <h2 id="resource-intelligence-summary">Ước lượng, thời gian khai báo và dữ liệu lịch sử</h2>
@@ -384,11 +409,11 @@ export default function MyDayPage() {
           <div><dt>Baseline đủ mẫu</dt><dd>{intelligence.baselineReady}</dd></div>
           <div><dt>TimeLog tự khai báo</dt><dd>{hours(intelligence.declaredLoggedHours)}</dd></div>
         </dl>
-      </section>
+      </section>}
 
       <section className={styles.approvals} aria-labelledby="my-approvals-title">
         <div><h2 id="my-approvals-title">Phê duyệt cần xử lý</h2><p>Luồng phê duyệt vẫn dùng nguyên module ERP hiện có.</p></div>
-        <strong>{toApprove.length}</strong>
+        <strong>{approvals ? toApprove.length : '—'}</strong>
         <Link className="btn btn-outline" href="/approvals">Mở phê duyệt</Link>
       </section>
     </div>

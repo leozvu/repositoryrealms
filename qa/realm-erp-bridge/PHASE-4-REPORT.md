@@ -30,7 +30,7 @@ Phase 4 giữ ERP/CRM làm nguồn sự thật duy nhất và biến lớp medie
 | war-room-task | War Room Task | Task detail | /tasks?focus=:id | verified | onOpenTask + Mở Task ERP |
 | war-room-project | Campaign | Project detail | /projects/:id | verified | realmRecordHref('project', selectedCampaign?.id) |
 | embassy-lead | Embassy opportunity | Lead detail | /leads?focus=:id | verified | onOpenLead + Mở Lead ERP |
-| lead-focus | Realm deep-link | Lead modal | Lead FormModal | verified | get('focus') + setModal({ mode: 'edit', row: lead }) |
+| lead-focus | Realm deep-link | Lead modal | Lead FormModal | verified | get('focus') + openLead(focusId, 'edit', controller.signal) + /api/data/leads?id=${encodeURIComponent(id)} + setModal({ mode, row: body[0] }) |
 | embassy-client | Embassy alliance | Client detail | /clients/:id | verified | onOpenClient + Mở Client ERP |
 | global-search | Shared ERP and Realm search | Exact record | record-aware routes | verified | realmRecordHref('lead' + realmRecordHref('task' + realmRecordHref('project' + realmRecordHref('staff' |
 

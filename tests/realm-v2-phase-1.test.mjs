@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
+import { mobileDestinations } from '../lib/realm-v2-contracts.js';
+import { visibleRealmV2Areas } from '../lib/realm-v2-navigation.js';
 
 const read = (file) => fs.readFileSync(path.resolve(file), 'utf8');
 
@@ -24,7 +26,7 @@ test('Phase 1 does not import preview fixtures into product shell or screens', (
   assert.doesNotMatch(product, /Non-canonical/);
 });
 
-test('Phase 1 preserves ERP routes, the immersive Realm entrance and five-item mobile navigation', () => {
+test('Phase 1 preserves ERP routes, the immersive Realm entrance and permission-aware mobile navigation', () => {
   const appLayout = read('app/(app)/layout.jsx');
   const switcher = read('components/collaboration/CollaborationBridge.jsx');
   const shell = read('components/realm-v2/RealmV2ApplicationShell.jsx');
@@ -33,7 +35,10 @@ test('Phase 1 preserves ERP routes, the immersive Realm entrance and five-item m
   assert.match(appLayout, /realmV2Available=\{!ceoPortal && realmV2PreviewEnabled\(\)\}/);
   assert.match(switcher, /const href = realm \? '\/dashboard' : '\/realm'/);
   assert.doesNotMatch(switcher, /realmV2Available \? '\/realm-v2\/home' : '\/realm'/);
-  assert.match(shell, /mobileDestinations\(\)\.map/);
+  assert.match(shell, /mobileDestinations\(\)\.filter/);
+  assert.match(shell, /mobileAreas\.map/);
+  const visible = visibleRealmV2Areas({ id: 'staff', roles: ['STAFF'] }, ['tasks']);
+  assert.equal(mobileDestinations().filter((area) => visible.some((item) => item.slug === area.slug)).length, 5);
   for (const label of ['Trang chủ', 'Việc tôi', 'Hành động', 'Hộp thư', 'Xem thêm']) assert.ok(shell.includes(label));
   assert.match(shell, /href="\/realm-v2\/home"/);
 });

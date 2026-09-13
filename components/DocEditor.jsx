@@ -2,7 +2,7 @@
 // Trình soạn báo giá / hóa đơn dùng chung: items động, VAT, chọn nhanh từ bảng giá
 import { useState } from 'react';
 import { Modal, Icon, AsyncButton, useToast } from './ui';
-import { money, moneyC, todayISO, daysFromNow, parseItems, nextCode } from '@/lib/format';
+import { money, moneyC, todayISO, daysFromNow, parseItems, paidOf, nextCode } from '@/lib/format';
 
 // v3.13: nextCode dọn về lib/format để server (API xuất hóa đơn từ giờ công) dùng chung
 // một logic. Re-export để các trang đang import từ DocEditor không phải sửa.
@@ -15,7 +15,7 @@ import { money, moneyC, todayISO, daysFromNow, parseItems, nextCode } from '@/li
 export { nextCode };
 
 const STATUS = {
-  invoice: [['draft', 'Nháp'], ['sent', 'Đã gửi'], ['overdue', 'Quá hạn'], ['paid', 'Đã thu']],
+  invoice: [['draft', 'Nháp'], ['sent', 'Đã gửi'], ['overdue', 'Quá hạn']],
   quote: [['draft', 'Nháp'], ['sent', 'Đã gửi'], ['accepted', 'Chấp nhận'], ['rejected', 'Từ chối']],
 };
 
@@ -86,8 +86,10 @@ export default function DocEditor({ kind, doc, clients, projects = [], services 
           <input type="number" value={d.fxRate || ''} onChange={e => setD({ ...d, fxRate: e.target.value })} placeholder="VD: 25400" /></div>}
         {isInv && <div className="field"><label>Hạn thanh toán</label><input type="date" value={d.dueDate || ''} onChange={e => setD({ ...d, dueDate: e.target.value })} /></div>}
         <div className="field"><label>Trạng thái</label>
-          <select value={d.status} onChange={e => setD({ ...d, status: e.target.value })}>
-            {STATUS[kind].map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></div>
+          <select value={d.status} disabled={isInv && doc?.status === 'paid'} onChange={e => setD({ ...d, status: e.target.value })}>
+            {isInv && doc?.status === 'paid' && <option value="paid">Đã thu</option>}
+            {STATUS[kind].filter(([v]) => !(isInv && paidOf(doc || {}) > 0 && v === 'draft')).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+          {isInv && <div className="hint">Trạng thái đã thu được cập nhật qua thao tác ghi nhận thanh toán.</div>}</div>
         <div className="field"><label>VAT (%)</label><input type="number" min="0" max="100" value={d.vat} onChange={e => setD({ ...d, vat: e.target.value })} /></div>
         {isInv && <div className="field full"><label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <input type="checkbox" style={{ width: 'auto' }} checked={!!d.recurring} onChange={e => setD({ ...d, recurring: e.target.checked })} />

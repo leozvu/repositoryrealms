@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "next dev -p 3300",
+    "dev:workspace": "node scripts/dev-workspace.mjs",
+    "realm:preview": "node scripts/realm-preview.mjs",
+    "realm:preview:status": "node scripts/realm-preview.mjs --status",
+    "events:worker": "node scripts/event-outbox-worker.mjs",
     "build": "prisma generate && next build",
     "start": "next start -p 3300",
     "db:push": "prisma db push",
@@ -14,6 +18,7 @@
     "test:leozops": "node --test --test-concurrency=1 \"tests/leozops-*.test.mjs\"",
     "test:coverage": "node --test --test-concurrency=1 --experimental-test-coverage --test-coverage-lines=90 --test-coverage-functions=85 --test-coverage-branches=75 \"tests/**/*.test.mjs\"",
     "test:e2e": "playwright test",
+    "audit:images:check": "node scripts/audit-image-integrity.mjs --check",
     "realm:v2:baseline:capture": "node scripts/capture-realm-v2-visual-baseline.mjs",
     "audit:realm:v2:baseline": "node scripts/audit-realm-v2-visual-baseline.mjs",
     "audit:realm:v2:baseline:check": "node scripts/audit-realm-v2-visual-baseline.mjs --check",
@@ -158,12 +163,13 @@
     "gsap": "^3.15.0",
     "livekit-client": "^2.20.1",
     "livekit-server-sdk": "^2.17.0",
-    "next": "15.5.21",
+    "next": "15.5.25",
     "next-auth": "^4.24.7",
-    "nodemailer": "9.0.3",
+    "nodemailer": "10.0.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "remotion": "^4.0.508",
+    "three": "0.186.0",
     "ws": "8.21.0"
   },
   "devDependencies": {
@@ -172,12 +178,12 @@
     "prisma": "^5.17.0"
   },
   "overrides": {
-    "sharp": "0.35.3",
+    "sharp": "0.35.4",
     "next": {
       "postcss": "8.5.26"
     },
     "next-auth": {
-      "nodemailer": "9.0.3",
+      "nodemailer": "10.0.9",
       "uuid": "11.1.1"
     },
     "postcss": "8.5.26",

@@ -16,13 +16,13 @@ function createSessionId() {
   return `realm-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-export function useRealmPresence({ positionRef, profile, status, onChat, onEmote }) {
+export function useRealmPresence({ positionRef, profile, status, onChat, onEmote, mapId = 'castle' }) {
   const [sessionId] = useState(createSessionId);
   const [remotePlayers, setRemotePlayers] = useState([]);
   const [transportState, setTransportState] = useState('connecting');
   const [networkInfo, setNetworkInfo] = useState({
     realmId: 'crmegoric-demo',
-    mapId: 'castle',
+    mapId,
     authMode: 'local',
     partyAuthority: false,
     maxPartySize: 2,
@@ -151,7 +151,7 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
     const startLocalTransport = async () => {
       if (cancelled || fallbackStarted) return;
       fallbackStarted = true;
-      const local = createBroadcastTransport({ onMessage: handleMessage });
+      const local = createBroadcastTransport({ onMessage: handleMessage, mapId });
       try {
         await local.connect();
       } catch (error) {
@@ -164,7 +164,7 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
       setTransportState('local-ready');
       setNetworkInfo({
         realmId: 'crmegoric-demo',
-        mapId: 'castle',
+        mapId,
         authMode: 'local-fallback',
         partyAuthority: false,
         maxPartySize: 2,
@@ -180,6 +180,7 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
       if (gatewayUrl) {
         const gateway = createGatewayTransport({
           gatewayUrl,
+          mapId,
           sessionId,
           profile: profileRef.current,
           onMessage: handleMessage,
@@ -241,7 +242,7 @@ export function useRealmPresence({ positionRef, profile, status, onChat, onEmote
       transportRef.current = null;
       remotesRef.current.clear();
     };
-  }, [publish, publishPresence, sessionId]);
+  }, [publish, publishPresence, sessionId, mapId]);
 
   useEffect(() => { publishPresence(); }, [profile, publishPresence, status]);
 

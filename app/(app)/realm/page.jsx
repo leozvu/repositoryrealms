@@ -36,7 +36,7 @@ export default async function RealmPage({ searchParams }) {
       initialBridge={initialBridge}
       pilotFeatures={pilot.config.features}
       initialMode={initialMode}
-      worldVersion={query?.world === 'v2' ? 'v2' : 'v3'}
+      worldVersion={query?.world === 'v2' ? 'v2' : query?.world === 'v3' ? 'v3' : '3d'}
     />
   );
 }

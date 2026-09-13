@@ -156,7 +156,7 @@ export default function DataTable({
               </tbody>
             </table>
           </div>
-          {renderMobile && <div className="data-table-mobile">{mobileRows.map((row) => renderMobile(row))}</div>}
+          {renderMobile && <div className="data-table-mobile">{table.getRowModel().rows.map((row) => renderMobile(row.original))}</div>}
           <div className="data-table-pagination">
             <span>Trang {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}</span>
             <button className="btn btn-outline btn-sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>Trước</button>

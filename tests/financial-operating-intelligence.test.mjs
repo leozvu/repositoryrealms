@@ -86,3 +86,40 @@ test('project economics sắp theo tên, không tạo employee ranking hay indiv
   assert.equal(result.policy.automaticPayment, false);
   assert.equal(JSON.stringify(result).includes('salary'), false);
 });
+
+test('mixed-currency intelligence matches the ledger, uses receipt snapshots and keeps unpaid invoice book value', () => {
+  const result = fixture({
+    projects: [], timeLogs: [], usersById: {}, vendorBills: [], recurringExpenses: [],
+    invoices: [
+      { id: 'eur', status: 'sent', currency: 'EUR', fxRate: 30_000, items: '[{"qty":1,"price":100}]', vat: 10, payments: '[{"amount":20,"currency":"EUR","fxRate":31000}]', dueDate: '2026-07-30' },
+      { id: 'usd', status: 'sent', currency: 'USD', fxRate: 25_000, items: '[{"qty":1,"price":200}]', payments: '[{"amount":50}]', dueDate: '2026-07-30' },
+      { id: 'vnd', status: 'sent', currency: 'VND', fxRate: 99, items: '[{"qty":1,"price":1000000}]', payments: '[{"amount":100000,"fxRate":99}]', dueDate: '2026-07-30' },
+      { id: 'draft', status: 'draft', currency: 'USD', items: '[{"qty":1,"price":99999}]', payments: '[]' },
+      { id: 'void', status: 'void', currency: 'USD', items: '[{"qty":1,"price":99999}]', payments: '[]' },
+    ],
+    transactions: [
+      { type: 'income', amount: 100, currency: 'USD', fxRate: 25_000, date: '2026-07-01' },
+      { type: 'income', amount: 50, currency: 'EUR', fxRate: 30_000, date: '2026-07-01' },
+      { type: 'income', amount: 200_000, currency: 'VND', fxRate: 99, date: '2026-07-01' },
+      { type: 'expense', category: 'Tools', amount: 20, currency: 'USD', fxRate: 25_000, date: '2026-07-01' },
+      { type: 'expense', category: 'Tools', amount: 10, currency: 'EUR', fxRate: 30_000, date: '2026-07-01' },
+      { type: 'expense', category: 'Tools', amount: 100_000, fxRate: 99, date: '2026-07-01' },
+    ],
+    budgets: [{ month: '2026-07', category: 'Tools', amount: 1_000_000 }],
+  });
+  assert.equal(result.summary.ledgerIncome, 4_200_000);
+  assert.equal(result.summary.ledgerExpense, 900_000);
+  assert.equal(result.summary.cashBalance, 3_300_000);
+  assert.equal(result.summary.invoiced, 9_300_000);
+  assert.equal(result.summary.collected, 1_970_000);
+  assert.equal(result.summary.receivable, 7_350_000, 'receivable is not reduced by a receipt FX gain');
+  assert.equal(result.currentMonthBudget.rows[0].actual, 900_000);
+  assert.equal(result.currentMonthBudget.rows[0].usagePercent, 90);
+  assert.equal(result.cashForecast[0].scheduledReceipts, 7_350_000);
+  assert.equal(result.cashForecast[0].closingBalance, 10_650_000);
+});
+
+test('invalid FX prevents intelligence from publishing invented parity or partial cash totals', () => {
+  assert.throws(() => fixture({ transactions: [{ type: 'income', amount: 100, currency: 'USD', fxRate: 0 }] }), RangeError);
+  assert.throws(() => fixture({ invoices: [{ id: 'fx', status: 'sent', currency: 'EUR', items: '[{"qty":1,"price":100}]', payments: '[]' }] }), RangeError);
+});

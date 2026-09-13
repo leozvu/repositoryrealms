@@ -1,0 +1,103 @@
+{
+  "recordedAt": "2026-09-13T02:13:16.068Z",
+  "buildId": "yyey-xTXFRNmrxTgh6bcx",
+  "scope": "Current uncommitted source fingerprint; not branch HEAD or an AAA release",
+  "sources": [
+    {
+      "path": "app/(app)/leads/page.jsx",
+      "sha256": "676ce2d60fe0a54ead736c4d2f761b270e92079c4e191a30bc97e769d21ef3f1"
+    },
+    {
+      "path": "app/(app)/quotes/page.jsx",
+      "sha256": "142c52e4f88f078cd7d4849496db63254231b14101cc42292af2db1b63708120"
+    },
+    {
+      "path": "app/(app)/invoices/page.jsx",
+      "sha256": "315a99574272bec255ef9e9f1e08eef07e8d807355762bbc22ac3e2909a198eb"
+    },
+    {
+      "path": "app/(app)/tickets/page.jsx",
+      "sha256": "ec1553d57b640b9352ae8446f3178823ca5f36a0436454efbb18e542f6378375"
+    },
+    {
+      "path": "app/api/leads/board/route.js",
+      "sha256": "110d397f5b94c9b69dfbcf0420d289b1c5435003f1bbff0e92e5d32fb07a6580"
+    },
+    {
+      "path": "components/crm/LeadExport.jsx",
+      "sha256": "7e9413de23ee942d90c647c6029c5aac084dece28acef46e614e2440b16e68a6"
+    },
+    {
+      "path": "components/ui.jsx",
+      "sha256": "1c960dcf785c8f0f55b19958e021ec6dd4c7ab1cc43cf0c440aa025463906d1c"
+    },
+    {
+      "path": "lib/lead-board.js",
+      "sha256": "3c4cdb2ac5423be1cb89483e220420de1f5c2e547b45fe4aff1d4b4836441292"
+    },
+    {
+      "path": "lib/lead-board-client.js",
+      "sha256": "99e3899d0db7e7acaa96927e59667e8dbb7e36187c58034f28b545cfce7714c3"
+    },
+    {
+      "path": "lib/collection-query.js",
+      "sha256": "4cb11266a2f013de680008702c4289b768a552f2645c78a5d8cf9f0810942401"
+    },
+    {
+      "path": "lib/resource-client.js",
+      "sha256": "b06f21de7dac71313e51fd54a1d7a9b7b918f05a573d578993e0acee5b8a05ef"
+    },
+    {
+      "path": "lib/registry.js",
+      "sha256": "7af3e584fc233785d3c919dcf723dbac73a098fd3dc31874e71bbdb4a640c8e8"
+    },
+    {
+      "path": "components/realm/three/medievalArchive.js",
+      "sha256": "f11b2487f031f1fa7290913e8d75b3e4ff68c7a4dbacb0ddb4a5665d31295146"
+    },
+    {
+      "path": "components/realm/three/guildhallScene.js",
+      "sha256": "fd61bc8acdc471b6afee952ed6b9398733cd7a17e8b7cf7b8f313daf86aa7479"
+    },
+    {
+      "path": "scripts/lib/realm-erp-bridge-audit.mjs",
+      "sha256": "ef385e7ab158723c4aae583d148d2a8b2a1d4c80f8ea2ebc64730ad21857a8eb"
+    },
+    {
+      "path": "playwright.erp-components.config.mjs",
+      "sha256": "97589d40a04ea9d32780c826acab438ab3b9314047ffdf43e77f1a96bc069602"
+    },
+    {
+      "path": "tests/lead-board.test.mjs",
+      "sha256": "af826db438673d2d8539547c16fe370003b0d9805990cf39c84b27c8fab905c6"
+    },
+    {
+      "path": "tests/lead-board-postgres.test.mjs",
+      "sha256": "bdfd0361e88af7d25b45f2bfec9665a07751623a7a6add7d85ed1101b2ae536a"
+    },
+    {
+      "path": "tests/erp-commercial-reliability.test.mjs",
+      "sha256": "b69be9a871538bd4e9a141900b22093640720f2278750122f3ebf6683c8f3cd7"
+    },
+    {
+      "path": "tests/realm-office-archive.test.mjs",
+      "sha256": "8a3a379c5aeef849456019e76bf759ef0a408830b27ada1f752e525d51c60b6b"
+    },
+    {
+      "path": "tests/e2e/erp-lead-board-ui.spec.mjs",
+      "sha256": "339cc360706d0829f761f33dc69f75cd91f3d5d62dac644402b18c529fd2fb06"
+    },
+    {
+      "path": "tests/helpers/lead-board-browser.mjs",
+      "sha256": "56c10802ce51ea345ef83f8c6e77feabf49764e500430210bda56d0a70d211da"
+    },
+    {
+      "path": "playwright.realm-diagnostic.config.mjs",
+      "sha256": "af351bcbd45fd45912b12337a80d1931a93a47a7a5b78f850146f455bb742e9a"
+    },
+    {
+      "path": "qa/realm-3d/diagnostics/realm-office-diagnostic.spec.mjs",
+      "sha256": "58fad41ec0fc99416ee8390c62d99afdb4585db22a468a6067a230b1facb2bad"
+    }
+  ]
+}
